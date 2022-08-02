@@ -16,6 +16,7 @@ ERR_RUNTIME_ERROR   1       发生错误
   输出的错误信息包括文件名、代码位置以及函数名称
 
 .. code-block:: c
+    :caption: source code
 
     #define ERR_LOG(_fmt, ...)                     \
         fprintf(stderr,                            \
@@ -34,6 +35,7 @@ ERR_RUNTIME_ERROR   1       发生错误
 * 宏函数 ``try_goto`` 必须搭配 C 语言的标签 ``error`` 使用，例如
 
 .. code-block:: c
+    :caption: example
 
     #include <gmlib/bint.h>
     #include <gmlib/err.h>
