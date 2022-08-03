@@ -8,5 +8,9 @@ GMLIB 密码库
    utils
    err
    bint
+   math
+   sm2
+   sm3
+   sm4
 
 

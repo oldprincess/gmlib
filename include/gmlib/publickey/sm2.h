@@ -24,12 +24,8 @@ typedef struct SM2_SIGN_CTX {
 } SM2_SIGN_CTX;
 
 /// @brief SM2 签名初始化
-int sm2_sign_init(uint8_t* ENTL,
-                  uint8_t* ID,
-                  EC_CTX* ec_ctx,
-                  BINT* da,
-                  ECPoint* P,
-                  SM2_SIGN_CTX* sm2_sign_ctx);
+int sm2_sign_init(uint8_t* ENTL, uint8_t* ID, EC_CTX* ec_ctx, BINT* da,
+                  ECPoint* P, SM2_SIGN_CTX* sm2_sign_ctx);
 
 /// @brief SM2 签名重置
 void sm2_sign_reset(SM2_SIGN_CTX* sm2_sign_ctx);
@@ -53,10 +49,7 @@ typedef struct SM2_VERIFY_CTX {
 } SM2_VERIFY_CTX;
 
 /// @brief SM2 验签初始化
-int sm2_verify_init(uint8_t* ENTL,
-                    uint8_t* ID,
-                    EC_CTX* ec_ctx,
-                    ECPoint* P,
+int sm2_verify_init(uint8_t* ENTL, uint8_t* ID, EC_CTX* ec_ctx, ECPoint* P,
                     SM2_VERIFY_CTX* sm2_verify_ctx);
 
 /// @brief SM2 验签重置
@@ -66,12 +59,11 @@ void sm2_verify_reset(SM2_VERIFY_CTX* sm2_verify_ctx);
 void sm2_verify_update(uint8_t* in, int inl, SM2_VERIFY_CTX* sm2_verify_ctx);
 
 /// @brief SM2 验签Final
-int sm2_verify_final(int* status,
-                     uint8_t* signature,
+int sm2_verify_final(int* status, uint8_t* signature,
                      SM2_VERIFY_CTX* sm2_verify_ctx);
 
 #ifdef __cplusplus
 }
 #endif  // __cplusplus
 
-#endif // SM2_H
+#endif  // SM2_H
