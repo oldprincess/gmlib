@@ -11,6 +11,7 @@ void test_sm2();
 void test_ec();
 
 int main() {
+    srand((unsigned)time(NULL));  // 设置随机数种子
     test_bint();
     test_sm4();
     test_math();
