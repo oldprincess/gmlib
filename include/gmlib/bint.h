@@ -180,27 +180,27 @@ int bint_cmp(BINT* n1, BINT* n2);
 /// @brief 是否为零
 /// @param[in] n
 /// @return 1(yes), 0(no)
-inline int bint_is_zero(BINT* n) {
+static inline int bint_is_zero(BINT* n) {
     return n->dsize == 0;
 }
 
 /// @brief 是否为负
 /// @param[in] n
 /// @return 1(yes), 0(no)
-inline int bint_is_neg(BINT* n) {
+static inline int bint_is_neg(BINT* n) {
     return n->sign == -1;
 }
 
 /// @brief 是否为正
 /// @param[in] n
 /// @return 1(yes), 0(no)
-inline int bint_is_pos(BINT* n) {
+static inline int bint_is_pos(BINT* n) {
     return n->sign == 1;
 }
 
 /// @brief 设置大整数为零
 /// @param[inout] n
-inline void bint_set_zero(BINT* n) {
+static inline void bint_set_zero(BINT* n) {
     n->dsize = 0;
     n->sign = 0;
 }
@@ -208,7 +208,7 @@ inline void bint_set_zero(BINT* n) {
 /// @brief 是否是奇数
 /// @param[in]  n
 /// @return 1(奇数), 0(偶数)
-inline int bint_is_odd(BINT* n) {
+static inline int bint_is_odd(BINT* n) {
     return (n->d[0] & 1) == 1 && n->dsize != 0;
 }
 
