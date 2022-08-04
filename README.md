@@ -59,10 +59,10 @@ cmake --build .
 
 若编译成功，则应该在`build/output`目录下生成结果文件，在其下的`exe`和`lib`目录为生成的测试文件与lib文件
 
-* 在控制台中输入下述命令，执行编译出的测试文件 `gmlib-test.exe`
+* 在控制台中输入下述命令，执行编译出的测试文件 `gmlib-test`
 
 ```bash
-./output/exe/DEBUG/gmlib-test.exe
+./output/exe/DEBUG/gmlib-test
 ```
 
 应当可在控制台中看到输出 `test finish!`，说明测试结果正确
@@ -72,6 +72,8 @@ cmake --build .
 ```bash
 cmake .. -DCMAKE_BUILD_TYPE="Release"
 ```
+
+**注**：在 linux 系统中编译流程同上
 
 ### 1.3 通过VS编译
 
