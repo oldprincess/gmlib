@@ -2,4 +2,4 @@ build*/
 gmlib-doc/
 .vscode/
 CMakeLists.txt.user
-main.c
+
