@@ -23,7 +23,7 @@ extern "C" {
     fprintf(stderr,                            \
             "[Error] "_fmt                     \
             ". File `%s`, line %d, in `%s`\n", \
-            __VA_ARGS__, __FILE__, __LINE__, __FUNCTION__)
+            ##__VA_ARGS__, __FILE__, __LINE__, __FUNCTION__)
 
 #else
 
