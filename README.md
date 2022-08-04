@@ -1,6 +1,6 @@
 ﻿# GMLib
 
-支持国密 SM4-ECB/CBC/CTR，SM3，SM2签名/加密 的密码库
+支持国密 SM4-ECB/CBC/CTR，SM3，SM2签名/加密 的密码库，文档页面 https://oldprincess.github.io/gmlib/
 
 ## 一、快速开始
 
@@ -101,7 +101,7 @@ int main() {
 
 该错误提示是由 `GMLIB_DEBUG` 宏控制，若想在 RELEASE 模式中也输出错误 log，可修改 CMakeLists.txt 文件，将 `# set(CMAKE_C_FLAGS_RELEASE -DGMLIB_DEBUG)` 该注释消去再重新编译工程
 
-更多使用样例请参考doc文档
+更多使用样例请参考docs文档和demo目录
 
 ## 三、其它
 
