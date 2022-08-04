@@ -9,6 +9,7 @@ GMLIB 密码库
    err
    bint
    math
+   ec
    sm2
    sm3
    sm4

@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>SM3 算法 &#8212; gmlib  文档</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/translations.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="SM4 算法" href="sm4.html" />
+    <link rel="prev" title="SM2 算法" href="sm2.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="总索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="sm4.html" title="SM4 算法"
+             accesskey="N">下一页</a> |</li>
+        <li class="right" >
+          <a href="sm2.html" title="SM2 算法"
+             accesskey="P">上一页</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">gmlib  文档</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">SM3 算法</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="sm3">
+<h1>SM3 算法<a class="headerlink" href="#sm3" title="此标题的永久链接">¶</a></h1>
+<p>SM3 官方文档参考 <a class="reference external" href="http://www.gmbz.org.cn/main/viewfile/20180108023812835219.html">http://www.gmbz.org.cn/main/viewfile/20180108023812835219.html</a></p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 10%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>宏定义</p></th>
+<th class="head"><p>值</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>SM3_DIGEST_SIZE</p></td>
+<td><p>16</p></td>
+<td><p>SM3 摘要字节数</p></td>
+</tr>
+<tr class="row-odd"><td><p>SM3_BLOCK_SIZE</p></td>
+<td><p>16</p></td>
+<td><p>SM3 压缩函数分组数</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.SM3_CTX">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SM3_CTX</span></span></span><a class="headerlink" href="#c.SM3_CTX" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM3 算法 Context</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm3_init">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm3_init</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.SM3_CTX" title="SM3_CTX"><span class="n"><span class="pre">SM3_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm3_init" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM3 初始化</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm3_update">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm3_update</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">in</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">inl</span></span>, <a class="reference internal" href="#c.SM3_CTX" title="SM3_CTX"><span class="n"><span class="pre">SM3_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm3_update" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM3 更新消息</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p><code class="docutils literal notranslate"><span class="pre">update</span></code> 函数可让待哈希的消息分段多次输入，能在对大文件/数据进行 Hash 时提供便利</p>
+</div>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id1" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// Z = X || Y</span>
+<span class="n">sm3_update</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span><span class="w"> </span><span class="n">Z</span><span class="p">.</span><span class="n">len</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="c1">// 等价于</span>
+<span class="n">sm3_update</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="w"> </span><span class="n">X</span><span class="p">.</span><span class="n">len</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="n">sm3_update</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span><span class="w"> </span><span class="n">Y</span><span class="p">.</span><span class="n">len</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm3_final">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm3_final</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <a class="reference internal" href="#c.SM3_CTX" title="SM3_CTX"><span class="n"><span class="pre">SM3_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm3_final" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM3 Final 并输出摘要</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id2" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/hash/sm3.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/utils.h&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">SM3_CTX</span><span class="w"> </span><span class="n">sm3_ctx</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">msg</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="sc">&#39;a&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;b&#39;</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;c&#39;</span><span class="p">};</span><span class="w">  </span><span class="c1">// 原始消息</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">digest</span><span class="p">[</span><span class="n">SM3_DIGEST_SIZE</span><span class="p">];</span><span class="w">  </span><span class="c1">// 消息摘要</span>
+
+<span class="w">    </span><span class="c1">// 初始化 SM3</span>
+<span class="w">    </span><span class="n">sm3_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">sm3_ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 输入消息</span>
+<span class="w">    </span><span class="n">sm3_update</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sm3_ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 结束 SM3 并输出摘要 digest</span>
+<span class="w">    </span><span class="n">sm3_final</span><span class="p">(</span><span class="n">digest</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sm3_ctx</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">dump_data</span><span class="p">(</span><span class="n">digest</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">digest</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/*  SM3 摘要结果</span>
+<span class="cm">        66 c7 f0 f4 62 ee ed d9 d1 f2 d4 6b dc 10 e4 e2</span>
+<span class="cm">        41 67 c4 87 5c f2 f7 a2 29 7d a0 2b 8f 4b a8 e0</span>
+<span class="cm">    */</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>上一主题</h4>
+    <p class="topless"><a href="sm2.html"
+                          title="上一章">SM2 算法</a></p>
+  </div>
+  <div>
+    <h4>下一主题</h4>
+    <p class="topless"><a href="sm4.html"
+                          title="下一章">SM4 算法</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>本页</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/sm3.rst.txt"
+            rel="nofollow">显示源代码</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="总索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="sm4.html" title="SM4 算法"
+             >下一页</a> |</li>
+        <li class="right" >
+          <a href="sm2.html" title="SM2 算法"
+             >上一页</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">gmlib  文档</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">SM3 算法</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; 版权所有 2022, oldprincess.
+      由 <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1创建。
+    </div>
+  </body>
+</html>

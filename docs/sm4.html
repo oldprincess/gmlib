@@ -1,0 +1,504 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>SM4 算法 &#8212; gmlib  文档</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/translations.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="prev" title="SM3 算法" href="sm3.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="总索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="sm3.html" title="SM3 算法"
+             accesskey="P">上一页</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">gmlib  文档</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">SM4 算法</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="sm4">
+<h1>SM4 算法<a class="headerlink" href="#sm4" title="此标题的永久链接">¶</a></h1>
+<p>SM4 官方文档参考 <a class="reference external" href="http://www.gmbz.org.cn/main/viewfile/20180108015408199368.html">http://www.gmbz.org.cn/main/viewfile/20180108015408199368.html</a></p>
+<hr class="docutils" />
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 46%" />
+<col style="width: 9%" />
+<col style="width: 46%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>宏定义</p></th>
+<th class="head"><p>值</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>SM4_BLOCK_SIZE</p></td>
+<td><p>16</p></td>
+<td><p>分组字节数</p></td>
+</tr>
+<tr class="row-odd"><td><p>SM4_FAST_BLOCK_SIZE</p></td>
+<td><p>16</p></td>
+<td><p>最快加解密分组字节数</p></td>
+</tr>
+<tr class="row-even"><td><p>SM4_KEYLEN</p></td>
+<td><p>16</p></td>
+<td><p>密钥字节数</p></td>
+</tr>
+</tbody>
+</table>
+<p>分组密码常用的优化策略为利用 <code class="docutils literal notranslate"><span class="pre">SIMD</span></code> 指令集并行加解密多个分组，以提升效率。
+<code class="docutils literal notranslate"><span class="pre">SM4_FAST_BLOCK_SIZE</span></code> 与这一并行优化方式有关，主要用于工作模式之中。</p>
+<section id="id1">
+<h2>一、SM4 加解密<a class="headerlink" href="#id1" title="此标题的永久链接">¶</a></h2>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.SM4_Key">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SM4_Key</span></span></span><a class="headerlink" href="#c.SM4_Key" title="永久链接至目标">¶</a><br /></dt>
+<dd><dl class="c var">
+<dt class="sig sig-object c" id="c.SM4_Key.rk">
+<span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rk</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">32</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#c.SM4_Key.rk" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 32 轮轮密钥</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_keyinit">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_keyinit</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">key</span></span>, <a class="reference internal" href="#c.SM4_Key" title="SM4_Key"><span class="n"><span class="pre">SM4_Key</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">sm4key</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_keyinit" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 轮密钥生成</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_encrypt">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_encrypt</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">in</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">block_num</span></span>, <a class="reference internal" href="#c.SM4_Key" title="SM4_Key"><span class="n"><span class="pre">SM4_Key</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">sm4key</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_encrypt" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 ECB模式加密</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_decrypt">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_decrypt</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">in</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">block_num</span></span>, <a class="reference internal" href="#c.SM4_Key" title="SM4_Key"><span class="n"><span class="pre">SM4_Key</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">sm4key</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_decrypt" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 ECB模式解密</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>SM4 加解密函数 <code class="docutils literal notranslate"><span class="pre">sm4_encrypt</span></code> 和 <code class="docutils literal notranslate"><span class="pre">sm4_decrypt</span></code> 均以分组数作为输入，
+例如若需要加密长度为 <code class="docutils literal notranslate"><span class="pre">L</span></code> 字节的数据，则参数 <code class="docutils literal notranslate"><span class="pre">block_num</span></code> 应为 <code class="docutils literal notranslate"><span class="pre">L</span> <span class="pre">/</span> <span class="pre">SM4_BLOCK_SIZE</span></code></p>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id2" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// 128比特密钥</span>
+<span class="kt">uint8_t</span><span class="w"> </span><span class="n">key</span><span class="p">[</span><span class="n">SM4_KEYLEN</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0x01</span><span class="p">,</span><span class="w"> </span><span class="mh">0x23</span><span class="p">,</span><span class="w"> </span><span class="mh">0x45</span><span class="p">,</span><span class="w"> </span><span class="mh">0x67</span><span class="p">,</span><span class="w"> </span><span class="mh">0x89</span><span class="p">,</span><span class="w"> </span><span class="mh">0xab</span><span class="p">,</span><span class="w"> </span><span class="mh">0xcd</span><span class="p">,</span><span class="w"> </span><span class="mh">0xef</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0xfe</span><span class="p">,</span><span class="w"> </span><span class="mh">0xdc</span><span class="p">,</span><span class="w"> </span><span class="mh">0xba</span><span class="p">,</span><span class="w"> </span><span class="mh">0x98</span><span class="p">,</span><span class="w"> </span><span class="mh">0x76</span><span class="p">,</span><span class="w"> </span><span class="mh">0x54</span><span class="p">,</span><span class="w"> </span><span class="mh">0x32</span><span class="p">,</span><span class="w"> </span><span class="mh">0x10</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="c1">// 128比特明文</span>
+<span class="kt">uint8_t</span><span class="w"> </span><span class="n">plaintext</span><span class="p">[</span><span class="n">SM4_BLOCK_SIZE</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0x00</span><span class="p">,</span><span class="w"> </span><span class="mh">0x11</span><span class="p">,</span><span class="w"> </span><span class="mh">0x22</span><span class="p">,</span><span class="w"> </span><span class="mh">0x33</span><span class="p">,</span><span class="w"> </span><span class="mh">0x44</span><span class="p">,</span><span class="w"> </span><span class="mh">0x55</span><span class="p">,</span><span class="w"> </span><span class="mh">0x66</span><span class="p">,</span><span class="w"> </span><span class="mh">0x77</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0x88</span><span class="p">,</span><span class="w"> </span><span class="mh">0x99</span><span class="p">,</span><span class="w"> </span><span class="mh">0xaa</span><span class="p">,</span><span class="w"> </span><span class="mh">0xbb</span><span class="p">,</span><span class="w"> </span><span class="mh">0xcc</span><span class="p">,</span><span class="w"> </span><span class="mh">0xdd</span><span class="p">,</span><span class="w"> </span><span class="mh">0xee</span><span class="p">,</span><span class="w"> </span><span class="mh">0xff</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="c1">// 128比特密文输出</span>
+<span class="kt">uint8_t</span><span class="w"> </span><span class="n">out</span><span class="p">[</span><span class="n">SM4_BLOCK_SIZE</span><span class="p">];</span><span class="w"></span>
+
+<span class="n">SM4_Key</span><span class="w"> </span><span class="n">sm4key</span><span class="p">;</span><span class="w"></span>
+<span class="c1">// SM4 轮密钥初始化</span>
+<span class="n">sm4_keyinit</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sm4key</span><span class="p">);</span><span class="w"></span>
+<span class="c1">// SM4 加密</span>
+<span class="n">sm4_encrypt</span><span class="p">(</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">plaintext</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">plaintext</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">SM4_BLOCK_SIZE</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sm4key</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="sm4-ecb">
+<h2>二、SM4 ECB 模式<a class="headerlink" href="#sm4-ecb" title="此标题的永久链接">¶</a></h2>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.SM4_ECB_CTX">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SM4_ECB_CTX</span></span></span><a class="headerlink" href="#c.SM4_ECB_CTX" title="永久链接至目标">¶</a><br /></dt>
+<dd><dl class="c var">
+<dt class="sig sig-object c" id="c.SM4_ECB_CTX.sm4key">
+<a class="reference internal" href="#c.SM4_Key" title="SM4_Key"><span class="n"><span class="pre">SM4_Key</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4key</span></span></span><a class="headerlink" href="#c.SM4_ECB_CTX.sm4key" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 轮密钥</p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.SM4_ECB_CTX.buffer">
+<span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">buffer</span></span></span><span class="p"><span class="pre">[</span></span><span class="n"><span class="pre">SM4_FAST_BLOCK_SIZE</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#c.SM4_ECB_CTX.buffer" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>缓冲区</p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.SM4_ECB_CTX.bsize">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bsize</span></span></span><a class="headerlink" href="#c.SM4_ECB_CTX.bsize" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>buffer 长度</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>SM4 ECB 模式默认采用 pkcs7 填充，若不想使用填充可调用低层的 <code class="docutils literal notranslate"><span class="pre">sm4_encrypt</span></code> 函数</p>
+</div>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_ecb_init">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_ecb_init</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">key</span></span>, <a class="reference internal" href="#c.SM4_ECB_CTX" title="SM4_ECB_CTX"><span class="n"><span class="pre">SM4_ECB_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ecb_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_ecb_init" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 ECB模式初始化</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_ecb_reset">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_ecb_reset</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.SM4_ECB_CTX" title="SM4_ECB_CTX"><span class="n"><span class="pre">SM4_ECB_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ecb_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_ecb_reset" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 ECB模式Context重置</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_ecb_encrypt_update">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_ecb_encrypt_update</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">outl</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">in</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">inl</span></span>, <a class="reference internal" href="#c.SM4_ECB_CTX" title="SM4_ECB_CTX"><span class="n"><span class="pre">SM4_ECB_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ecb_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_ecb_encrypt_update" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 ECB加密模式Update数据</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_ecb_decrypt_update">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_ecb_decrypt_update</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">outl</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">in</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">inl</span></span>, <a class="reference internal" href="#c.SM4_ECB_CTX" title="SM4_ECB_CTX"><span class="n"><span class="pre">SM4_ECB_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ecb_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_ecb_decrypt_update" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 ECB解密模式Update数据</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_ecb_encrypt_final">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_ecb_encrypt_final</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">outl</span></span>, <a class="reference internal" href="#c.SM4_ECB_CTX" title="SM4_ECB_CTX"><span class="n"><span class="pre">SM4_ECB_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ecb_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_ecb_encrypt_final" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 ECB加密模式Final</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_ecb_decrypt_final">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_ecb_decrypt_final</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">outl</span></span>, <a class="reference internal" href="#c.SM4_ECB_CTX" title="SM4_ECB_CTX"><span class="n"><span class="pre">SM4_ECB_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ecb_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_ecb_decrypt_final" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 ECB解密模式Final</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id3" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/bint.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/cipher/sm4.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/utils.h&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">key</span><span class="p">[</span><span class="n">SM4_KEYLEN</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">};</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">plaintext</span><span class="p">[</span><span class="n">SM4_BLOCK_SIZE</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">};</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">ciphertext</span><span class="p">[</span><span class="n">SM4_BLOCK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">SM4_ECB_CTX</span><span class="w"> </span><span class="n">sm4_ecb_ctx</span><span class="p">;</span><span class="w">       </span><span class="c1">// ECB Context</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">outptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ciphertext</span><span class="p">;</span><span class="w">  </span><span class="c1">// 输出指针</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">outl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">                  </span><span class="c1">// 输出长度</span>
+
+<span class="w">    </span><span class="n">sm4_ecb_init</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sm4_ecb_ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">sm4_ecb_encrypt_update</span><span class="p">(</span><span class="n">outptr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">outl</span><span class="p">,</span><span class="w">               </span><span class="c1">// output</span>
+<span class="w">                        </span><span class="n">plaintext</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">plaintext</span><span class="p">),</span><span class="w">   </span><span class="c1">// input</span>
+<span class="w">                        </span><span class="o">&amp;</span><span class="n">sm4_ecb_ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">sm4_ecb_encrypt_final</span><span class="p">(</span><span class="n">outptr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sm4_ecb_ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">//  9f 1f 7b ff 6f 55 11 38 4d 94 30 53 1e 53 8f d3</span>
+<span class="w">    </span><span class="c1">//  a8 3f 90 cc 9f 35 ca c4 da f6 6b fa 07 1c 41 82</span>
+<span class="w">    </span><span class="n">dump_data</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">outptr</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ciphertext</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">csize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">outptr</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ciphertext</span><span class="p">);</span><span class="w">  </span><span class="c1">// 密文长度</span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plaintext</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">sm4_ecb_reset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">sm4_ecb_ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">sm4_ecb_decrypt_update</span><span class="p">(</span><span class="n">outptr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="n">ciphertext</span><span class="p">,</span><span class="w"> </span><span class="n">csize</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sm4_ecb_ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">sm4_ecb_decrypt_final</span><span class="p">(</span><span class="n">outptr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sm4_ecb_ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">//  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</span>
+<span class="w">    </span><span class="n">dump_data</span><span class="p">(</span><span class="n">plaintext</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">outptr</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">plaintext</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="sm4-cbc">
+<h2>二、SM4 CBC 模式<a class="headerlink" href="#sm4-cbc" title="此标题的永久链接">¶</a></h2>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.SM4_CBC_CTX">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SM4_CBC_CTX</span></span></span><a class="headerlink" href="#c.SM4_CBC_CTX" title="永久链接至目标">¶</a><br /></dt>
+<dd><dl class="c var">
+<dt class="sig sig-object c" id="c.SM4_CBC_CTX.sm4key">
+<a class="reference internal" href="#c.SM4_Key" title="SM4_Key"><span class="n"><span class="pre">SM4_Key</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4key</span></span></span><a class="headerlink" href="#c.SM4_CBC_CTX.sm4key" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 轮密钥</p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.SM4_CBC_CTX.iv">
+<span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iv</span></span></span><span class="p"><span class="pre">[</span></span><span class="n"><span class="pre">SM4_BLOCK_SIZE</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#c.SM4_CBC_CTX.iv" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>CBC 模式初始向量 iv</p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.SM4_CBC_CTX.buffer">
+<span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">buffer</span></span></span><span class="p"><span class="pre">[</span></span><span class="n"><span class="pre">SM4_FAST_BLOCK_SIZE</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#c.SM4_CBC_CTX.buffer" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>缓冲区</p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.SM4_CBC_CTX.bsize">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bsize</span></span></span><a class="headerlink" href="#c.SM4_CBC_CTX.bsize" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>buffer 长度</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>SM4 CBC 模式默认采用 pkcs7 填充，因为填充的原因，密文长度将会比明文长度长</p>
+</div>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_cbc_init">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_cbc_init</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">key</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">iv</span></span>, <a class="reference internal" href="#c.SM4_CBC_CTX" title="SM4_CBC_CTX"><span class="n"><span class="pre">SM4_CBC_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">cbc_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_cbc_init" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 CBC模式初始化</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_cbc_reset">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_cbc_reset</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">iv</span></span>, <a class="reference internal" href="#c.SM4_CBC_CTX" title="SM4_CBC_CTX"><span class="n"><span class="pre">SM4_CBC_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">cbc_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_cbc_reset" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 CBC模式Context重置</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_cbc_encrypt_update">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_cbc_encrypt_update</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">outl</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">in</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">inl</span></span>, <a class="reference internal" href="#c.SM4_CBC_CTX" title="SM4_CBC_CTX"><span class="n"><span class="pre">SM4_CBC_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">cbc_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_cbc_encrypt_update" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 CBC加密模式Update数据</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_cbc_decrypt_update">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_cbc_decrypt_update</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">outl</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">in</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">inl</span></span>, <a class="reference internal" href="#c.SM4_CBC_CTX" title="SM4_CBC_CTX"><span class="n"><span class="pre">SM4_CBC_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">cbc_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_cbc_decrypt_update" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 CBC解密模式Update数据</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_cbc_encrypt_final">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_cbc_encrypt_final</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">outl</span></span>, <a class="reference internal" href="#c.SM4_CBC_CTX" title="SM4_CBC_CTX"><span class="n"><span class="pre">SM4_CBC_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">cbc_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_cbc_encrypt_final" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 CBC加密模式Final</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_cbc_decrypt_final">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_cbc_decrypt_final</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">outl</span></span>, <a class="reference internal" href="#c.SM4_CBC_CTX" title="SM4_CBC_CTX"><span class="n"><span class="pre">SM4_CBC_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">cbc_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_cbc_decrypt_final" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 CBC解密模式Final</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id4" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/cipher/sm4.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/utils.h&gt;</span><span class="cp"></span>
+
+<span class="c1">// 128比特密钥</span>
+<span class="kt">uint8_t</span><span class="w"> </span><span class="n">key</span><span class="p">[</span><span class="n">SM4_KEYLEN</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0x01</span><span class="p">,</span><span class="w"> </span><span class="mh">0x23</span><span class="p">,</span><span class="w"> </span><span class="mh">0x45</span><span class="p">,</span><span class="w"> </span><span class="mh">0x67</span><span class="p">,</span><span class="w"> </span><span class="mh">0x89</span><span class="p">,</span><span class="w"> </span><span class="mh">0xab</span><span class="p">,</span><span class="w"> </span><span class="mh">0xcd</span><span class="p">,</span><span class="w"> </span><span class="mh">0xef</span><span class="p">,</span><span class="w">  </span><span class="c1">//</span>
+<span class="w">    </span><span class="mh">0xfe</span><span class="p">,</span><span class="w"> </span><span class="mh">0xdc</span><span class="p">,</span><span class="w"> </span><span class="mh">0xba</span><span class="p">,</span><span class="w"> </span><span class="mh">0x98</span><span class="p">,</span><span class="w"> </span><span class="mh">0x76</span><span class="p">,</span><span class="w"> </span><span class="mh">0x54</span><span class="p">,</span><span class="w"> </span><span class="mh">0x32</span><span class="p">,</span><span class="w"> </span><span class="mh">0x10</span><span class="p">,</span><span class="w">  </span><span class="c1">//</span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="c1">// 128比特初始向量</span>
+<span class="kt">uint8_t</span><span class="w"> </span><span class="n">iv</span><span class="p">[</span><span class="n">SM4_KEYLEN</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0x01</span><span class="p">,</span><span class="w"> </span><span class="mh">0x23</span><span class="p">,</span><span class="w"> </span><span class="mh">0x45</span><span class="p">,</span><span class="w"> </span><span class="mh">0x67</span><span class="p">,</span><span class="w"> </span><span class="mh">0x89</span><span class="p">,</span><span class="w"> </span><span class="mh">0xAB</span><span class="p">,</span><span class="w"> </span><span class="mh">0xCD</span><span class="p">,</span><span class="w"> </span><span class="mh">0xEF</span><span class="p">,</span><span class="w">  </span><span class="c1">//</span>
+<span class="w">    </span><span class="mh">0xFE</span><span class="p">,</span><span class="w"> </span><span class="mh">0xDC</span><span class="p">,</span><span class="w"> </span><span class="mh">0xBA</span><span class="p">,</span><span class="w"> </span><span class="mh">0x98</span><span class="p">,</span><span class="w"> </span><span class="mh">0x76</span><span class="p">,</span><span class="w"> </span><span class="mh">0x54</span><span class="p">,</span><span class="w"> </span><span class="mh">0x32</span><span class="p">,</span><span class="w"> </span><span class="mh">0x10</span><span class="p">,</span><span class="w">  </span><span class="c1">//</span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="c1">// 128比特明文</span>
+<span class="kt">uint8_t</span><span class="w"> </span><span class="n">plaintext</span><span class="p">[</span><span class="n">SM4_BLOCK_SIZE</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0x00</span><span class="p">,</span><span class="w"> </span><span class="mh">0x11</span><span class="p">,</span><span class="w"> </span><span class="mh">0x22</span><span class="p">,</span><span class="w"> </span><span class="mh">0x33</span><span class="p">,</span><span class="w"> </span><span class="mh">0x44</span><span class="p">,</span><span class="w"> </span><span class="mh">0x55</span><span class="p">,</span><span class="w"> </span><span class="mh">0x66</span><span class="p">,</span><span class="w"> </span><span class="mh">0x77</span><span class="p">,</span><span class="w">  </span><span class="c1">//</span>
+<span class="w">    </span><span class="mh">0x88</span><span class="p">,</span><span class="w"> </span><span class="mh">0x99</span><span class="p">,</span><span class="w"> </span><span class="mh">0xaa</span><span class="p">,</span><span class="w"> </span><span class="mh">0xbb</span><span class="p">,</span><span class="w"> </span><span class="mh">0xcc</span><span class="p">,</span><span class="w"> </span><span class="mh">0xdd</span><span class="p">,</span><span class="w"> </span><span class="mh">0xee</span><span class="p">,</span><span class="w"> </span><span class="mh">0xff</span><span class="p">,</span><span class="w">  </span><span class="c1">//</span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="c1">// 128比特密文输出</span>
+<span class="kt">uint8_t</span><span class="w"> </span><span class="n">out</span><span class="p">[</span><span class="n">SM4_BLOCK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">];</span><span class="w"></span>
+<span class="kt">int</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">SM4_CBC_CTX</span><span class="w"> </span><span class="n">sm4_cbc_ctx</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">outptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">outl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// SM4 CBC初始化</span>
+<span class="w">    </span><span class="n">sm4_cbc_init</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">iv</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sm4_cbc_ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// SM4 CBC Update 消息</span>
+<span class="w">    </span><span class="n">sm4_cbc_encrypt_update</span><span class="p">(</span><span class="n">outptr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="n">plaintext</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">plaintext</span><span class="p">),</span><span class="w"></span>
+<span class="w">                        </span><span class="o">&amp;</span><span class="n">sm4_cbc_ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w">  </span><span class="c1">// 更新out指针</span>
+<span class="w">    </span><span class="c1">// SM4 CBC Final</span>
+<span class="w">    </span><span class="n">sm4_cbc_encrypt_final</span><span class="p">(</span><span class="n">outptr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sm4_cbc_ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w">  </span><span class="c1">// 更新out指针</span>
+
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ciphertext_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">outptr</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">out</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">dump_data</span><span class="p">(</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ciphertext_size</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="c1">//  5d 1f ee 63 f5 eb 8b b5 03 58 0a b8 23 92 5d 55</span>
+<span class="w">    </span><span class="c1">//  d1 b0 fc eb 63 b8 b2 4f 3f f5 d9 3a 33 ea d1 70</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="sm4-ctr">
+<h2>三、SM4 CTR 模式<a class="headerlink" href="#sm4-ctr" title="此标题的永久链接">¶</a></h2>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.SM4_CTR_CTX">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SM4_CTR_CTX</span></span></span><a class="headerlink" href="#c.SM4_CTR_CTX" title="永久链接至目标">¶</a><br /></dt>
+<dd><dl class="c var">
+<dt class="sig sig-object c" id="c.SM4_CTR_CTX.sm4key">
+<a class="reference internal" href="#c.SM4_Key" title="SM4_Key"><span class="n"><span class="pre">SM4_Key</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4key</span></span></span><a class="headerlink" href="#c.SM4_CTR_CTX.sm4key" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 轮密钥</p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.SM4_CTR_CTX.iv">
+<span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iv</span></span></span><span class="p"><span class="pre">[</span></span><span class="n"><span class="pre">SM4_BLOCK_SIZE</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#c.SM4_CTR_CTX.iv" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>CTR 模式初始向量 iv</p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.SM4_CTR_CTX.buffer">
+<span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">buffer</span></span></span><span class="p"><span class="pre">[</span></span><span class="n"><span class="pre">SM4_FAST_BLOCK_SIZE</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#c.SM4_CTR_CTX.buffer" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>缓冲区</p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.SM4_CTR_CTX.bsize">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bsize</span></span></span><a class="headerlink" href="#c.SM4_CTR_CTX.bsize" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>buffer 长度</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>SM4 CTR 模式默认不采用填充，输出的密文结果将于明文长度一致，即使明文长度不是 <code class="docutils literal notranslate"><span class="pre">BLOCK_SIZE</span></code> 整数倍</p>
+</div>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_ctr_init">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_ctr_init</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">key</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">iv</span></span>, <a class="reference internal" href="#c.SM4_CTR_CTX" title="SM4_CTR_CTX"><span class="n"><span class="pre">SM4_CTR_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ctr_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_ctr_init" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 CTR模式初始化</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_ctr_reset">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_ctr_reset</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">iv</span></span>, <a class="reference internal" href="#c.SM4_CTR_CTX" title="SM4_CTR_CTX"><span class="n"><span class="pre">SM4_CTR_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ctr_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_ctr_reset" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 CTR模式Context重置</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_ctr_encrypt_update">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_ctr_encrypt_update</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">outl</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">in</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">inl</span></span>, <a class="reference internal" href="#c.SM4_CTR_CTX" title="SM4_CTR_CTX"><span class="n"><span class="pre">SM4_CTR_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ctr_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_ctr_encrypt_update" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 CTR加密模式Update数据</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_ctr_decrypt_update">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_ctr_decrypt_update</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">outl</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">in</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">inl</span></span>, <a class="reference internal" href="#c.SM4_CTR_CTX" title="SM4_CTR_CTX"><span class="n"><span class="pre">SM4_CTR_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ctr_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_ctr_decrypt_update" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 CTR解密模式Update数据</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_ctr_encrypt_final">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_ctr_encrypt_final</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">outl</span></span>, <a class="reference internal" href="#c.SM4_CTR_CTX" title="SM4_CTR_CTX"><span class="n"><span class="pre">SM4_CTR_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ctr_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_ctr_encrypt_final" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 CTR加密模式Final</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.sm4_ctr_decrypt_final">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sm4_ctr_decrypt_final</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">outl</span></span>, <a class="reference internal" href="#c.SM4_CTR_CTX" title="SM4_CTR_CTX"><span class="n"><span class="pre">SM4_CTR_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">ctr_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.sm4_ctr_decrypt_final" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>SM4 CTR解密模式Final</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">目录</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">SM4 算法</a><ul>
+<li><a class="reference internal" href="#id1">一、SM4 加解密</a></li>
+<li><a class="reference internal" href="#sm4-ecb">二、SM4 ECB 模式</a></li>
+<li><a class="reference internal" href="#sm4-cbc">二、SM4 CBC 模式</a></li>
+<li><a class="reference internal" href="#sm4-ctr">三、SM4 CTR 模式</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>上一主题</h4>
+    <p class="topless"><a href="sm3.html"
+                          title="上一章">SM3 算法</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>本页</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/sm4.rst.txt"
+            rel="nofollow">显示源代码</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="总索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="sm3.html" title="SM3 算法"
+             >上一页</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">gmlib  文档</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">SM4 算法</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; 版权所有 2022, oldprincess.
+      由 <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1创建。
+    </div>
+  </body>
+</html>

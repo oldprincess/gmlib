@@ -48,19 +48,4 @@
 
 .. note:: 
     
-    在调用 ``rand_mem`` 函数前应该设置一个随机数种子 ``srand`` 
-
-.. code-block:: c
-    :caption: example
-
-    srand((unsigned)time(NULL));  // 设置随机数种子
-    rand_mem(b, sizeof(b));       // 随机内存
-
-.. code-block:: c
-    :caption: source code
-
-    void rand_mem(uint8_t* mem, int size) {
-        for (int i = 0; i < size; i++) {
-            mem[i] = rand() % 256;
-        }
-    }
+    在调用 ``rand_mem`` 调用了 ``stdlib.h`` 中的 ``rand`` 函数 

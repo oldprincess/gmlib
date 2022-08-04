@@ -59,8 +59,74 @@ void sm2_verify_reset(SM2_VERIFY_CTX* sm2_verify_ctx);
 void sm2_verify_update(uint8_t* in, int inl, SM2_VERIFY_CTX* sm2_verify_ctx);
 
 /// @brief SM2 验签Final
-int sm2_verify_final(int* status, uint8_t* signature,
+int sm2_verify_final(int* status,
+                     uint8_t* signature,
                      SM2_VERIFY_CTX* sm2_verify_ctx);
+
+// ========================================
+// =========== SM2 加密 ===================
+// ========================================
+
+#define SM2_CRYPT_C3_SIZE SM3_DIGEST_SIZE
+
+typedef struct SM2_KDF_CTX {
+    uint32_t ct;
+    SM3_CTX sm3_ctx;
+} SM2_KDF_CTX;
+
+typedef struct SM2_Crypt_CTX {
+    SM3_CTX sm3_ctx;  // SM3
+    // KDF
+    struct {
+        uint8_t key_stream[SM3_DIGEST_SIZE];  // 密钥流缓冲区
+        int kpos;                             // 密钥流指针
+        SM2_KDF_CTX ctx;
+    } kdf;
+    // 存放中间数据 (x2, y2) 的内存区
+    struct {
+        uint8_t y[GMLIB_BINT_BITS / 8];  // y2
+        int bsize;
+    } dot2;  // (x2, y2)
+} SM2_Crypt_CTX;
+
+/// @brief SM2 加密初始化(输出C1)
+int sm2_encrypt_init(uint8_t* C1,
+                     int* outl,
+                     int PC,
+                     EC_CTX* ec_ctx,
+                     ECPoint* P,
+                     SM2_Crypt_CTX* sm2_crypt_ctx);
+
+/// @brief SM2 加密Update(输出C2)
+void sm2_encrypt_update(uint8_t* out,
+                        int* outl,
+                        uint8_t* in,
+                        int inl,
+                        SM2_Crypt_CTX* sm2_crypt_ctx);
+
+/// @brief SM2 加密Final(输出C3)
+void sm2_encrypt_final(uint8_t* C3, SM2_Crypt_CTX* sm2_crypt_ctx);
+
+// ========================================
+// =========== SM2 解密 ===================
+// ========================================
+
+/// @brief SM2 解密初始化
+int sm2_decrypt_init(uint8_t* C1,
+                     int* read_size,
+                     EC_CTX* ec_ctx,
+                     BINT* da,
+                     SM2_Crypt_CTX* sm2_crypt_ctx);
+
+/// @brief SM2 解密Update(输出msg)
+void sm2_decrypt_update(uint8_t* out,
+                        int* outl,
+                        uint8_t* in,
+                        int inl,
+                        SM2_Crypt_CTX* sm2_crypt_ctx);
+
+/// @brief SM2 解密Final
+int sm2_decrypt_final(uint8_t* C3, SM2_Crypt_CTX* sm2_crypt_ctx);
 
 #ifdef __cplusplus
 }

@@ -63,7 +63,14 @@ void memxor(uint8_t* dst, uint8_t* a, uint8_t* b, int size) {
     }
 }
 
+#include <time.h>
 void rand_mem(uint8_t* mem, int size) {
+    static int init = 0;
+    if (init == 0) {
+        // 初始化随机数
+        srand((unsigned)time(NULL));
+        init = 1;
+    }
     for (int i = 0; i < size; i++) {
         mem[i] = rand() % 256;
     }

@@ -23,13 +23,21 @@ extern EC_CTX EC_Fp192_CTX;
 extern EC_CTX EC_Fp256_CTX;
 
 // ====================================
-// ======== 椭圆曲线点 CTX ============
+// ======== 椭圆曲线 CTX ==============
 // ====================================
 
 /// @brief EC Context 拷贝
+/// @param[out] r   结果输出
+/// @param[in]  ctx
 void ec_ctx_copy(EC_CTX* r, EC_CTX* ctx);
 
 /// @brief EC Context 构造
+/// @param[out] r   EC Context 输出
+/// @param[in]  a   曲线参数 a
+/// @param[in]  b   曲线参数 b
+/// @param[in]  p   素域 p
+/// @param[in]  G   曲线生成元 G
+/// @param[in]  n   生成元G的阶
 void ec_ctx_construct(EC_CTX* r,
                       BINT* a,
                       BINT* b,
@@ -47,6 +55,8 @@ void ec_ctx_construct(EC_CTX* r,
 /// @param[in]  y   y坐标
 void ec_construct(ECPoint* r, BINT* x, BINT* y);
 
+#define EC_PC_NO_ZIP 0x04
+
 /// @brief 椭圆曲线点转字节串
 /// @param[in]  n       点(仿射坐标)
 /// @param[in]  PC      转换方式(04:未压缩)
@@ -61,7 +71,7 @@ int ec_to_bytes(ECPoint* n, int PC, uint8_t* b, int* bsize, EC_CTX* ec_ctx);
 /// @param[in]  b       字节串
 /// @param[in]  ec_ctx  椭圆曲线参数
 /// @return 错误码（0表示无错误）
-int ec_from_bytes(ECPoint* n, uint8_t* b, EC_CTX* ec_ctx);
+int ec_from_bytes(ECPoint* n, uint8_t* b, int* read_size, EC_CTX* ec_ctx);
 
 // ====================================
 // ======== 椭圆曲线点算数 =============

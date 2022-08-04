@@ -1,0 +1,303 @@
+﻿SM2 算法
+====================
+
+SM2 官方文档可从 http://www.gmbz.org.cn/main/bzlb.html 处查询
+
+.. c:var:: extern EC_CTX SM2_Fp256_CTX;
+
+    SM2 标准文档中给定的 Fp256 椭圆曲线(256bit有限域)
+
+.. note::
+
+    ``GMLib`` 的 SM2 选择采用 ``SM3`` 作为辅助的哈希函数
+
+####################
+一、SM2 签名验签
+####################
+
+.. note:: 
+
+    SM2 签名的大小与所使用的椭圆曲线中的素域有关，例如使用 256bit 有限域时，
+    签名大小为 512bit(512/8字节)
+
+====================
+1.1 SM2 签名
+====================
+
+.. c:struct:: SM2_SIGN_CTX
+
+    SM2 签名 Context
+
+.. c:function:: int sm2_sign_init(uint8_t* ENTL, uint8_t* ID, EC_CTX* ec_ctx, \
+                                  BINT* da, ECPoint* P, SM2_SIGN_CTX* sm2_sign_ctx);
+    
+    :param ENTL:    ID 的比特长度，共 2 字节
+    :param ID:      签名者可辩别标识
+    :param ec_ctx:  椭圆曲线
+    :param da:      签名者私钥
+    :param P:       签名者公钥
+    :param sm2_sign_ctx:    SM2 签名 Context
+                        
+    SM2 签名初始化
+
+.. c:function:: void sm2_sign_reset(SM2_SIGN_CTX* sm2_sign_ctx);
+
+    SM2 签名重置
+
+.. note::
+
+    利用 ``sm2_sign_reset`` 可实现一个签名者对多条消息签名，避免频繁地初始化
+
+.. code-block:: c
+    :caption: example
+
+    SM2_SIGN_CTX sm2_sign_ctx;
+    sm2_sign_init(..., &sm2_sign_ctx);
+    // 对消息1签名 ...
+    sm2_sign_update(msg1, ...);
+    sm2_sign_final(...)
+    // 对消息2签名
+    sm2_sign_reset(&sm2_sign_ctx);
+    sm2_sign_update(msg2, ...);
+    sm2_sign_final(...)
+
+.. c:function:: void sm2_sign_update(uint8_t* in, int inl, SM2_SIGN_CTX* sm2_sign_ctx);
+
+    SM2 签名 Update
+
+.. c:function:: int sm2_sign_final(uint8_t* out, int* outl, SM2_SIGN_CTX* sm2_sign_ctx);
+
+    SM2 签名 Final
+
+====================
+1.2 SM2 验签
+====================
+
+.. c:struct:: SM2_VERIFY_CTX
+
+    SM2 验签 Context
+
+.. c:function:: int sm2_verify_init(uint8_t* ENTL, uint8_t* ID, EC_CTX* ec_ctx, ECPoint* P, \
+                                    SM2_VERIFY_CTX* sm2_verify_ctx);
+                        
+    SM2 验签初始化
+
+.. c:function:: void sm2_verify_reset(SM2_VERIFY_CTX* sm2_verify_ctx);
+
+    SM2 验签重置
+
+.. c:function:: void sm2_verify_update(uint8_t* in, int inl, SM2_VERIFY_CTX* sm2_verify_ctx);
+
+    SM2 验签 Update
+
+.. c:function:: int sm2_verify_final(int* status, uint8_t* signature, SM2_VERIFY_CTX* sm2_verify_ctx);
+
+    SM2 验签 Final
+
+.. code-block:: c
+    :caption: example
+
+    #include <gmlib/publickey/sm2.h>
+    #include <stdio.h>
+
+    static uint8_t ID_A[] = {
+        0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,  //
+        0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,  //
+    };
+
+    static uint8_t ENTL_A[] = {0x00, 0x80};
+
+    // 签名方私钥
+    static char* da_hex =
+        "3945208F_7B2144B1_3F36E38A_C6D39F95_88939369_2860B51A_42FB81EF_4DF7C5B8";
+
+    // 待签名消息
+    static uint8_t msg[] = {
+        'm', 'e', 's', 's', 'a', 'g', 'e', ' ', 'd', 'i', 'g', 'e', 's', 't',
+    };
+
+    // signature=(r,s)
+    static uint8_t signature[2 * (GMLIB_BINT_BITS / 8)];
+    static int outl;
+
+    int main() {
+        BINT da;    // 私钥
+        ECPoint P;  // 公钥
+
+        // 载入私钥
+        bint_from_str(&da, da_hex, 16);
+        // 计算公钥 P = [da]G
+        ec_mul(&P, &da, &SM2_Fp256_CTX.G, &SM2_Fp256_CTX);
+
+        // sm2 签名
+        SM2_SIGN_CTX sm2_sign_ctx;
+        sm2_sign_init(ENTL_A, ID_A, &SM2_Fp256_CTX, &da, &P, &sm2_sign_ctx);
+        sm2_sign_update(msg, sizeof(msg), &sm2_sign_ctx);
+        sm2_sign_final(signature, &outl, &sm2_sign_ctx);
+
+        // sm2 验签
+        SM2_VERIFY_CTX sm2_verify_ctx;
+        int status = 0;  // 签名正确性
+        sm2_verify_init(ENTL_A, ID_A, &SM2_Fp256_CTX, &P, &sm2_verify_ctx);
+        sm2_verify_update(msg, sizeof(msg), &sm2_verify_ctx);
+        sm2_verify_final(&status, signature, &sm2_verify_ctx);
+        if (status != 1) {
+            puts("check fail!");
+            return -1;
+        }
+        puts("check ok!");
+        return 0;
+    }
+
+####################
+二、SM2 加解密
+####################
+
+.. note:: 
+
+    SM2 的密文为三元组 ``C1 || C3 || C2`` 
+
+===================  ================   =========
+宏定义                值                 含义
+===================  ================   ========= 
+SM2_CRYPT_C3_SIZE    SM3_DIGEST_SIZE     C3长度
+===================  ================   =========
+
+.. c:struct:: SM2_Crypt_CTX
+
+    SM2 加解密 Context
+
+====================
+2.1 SM2 加密
+====================
+
+.. c:function:: int sm2_encrypt_init(uint8_t* C1, int* outl, int PC, \
+                                     EC_CTX* ec_ctx, ECPoint* P, \
+                                     SM2_Crypt_CTX* sm2_crypt_ctx);
+    
+    SM2 加密初始化(输出C1)
+
+.. c:function:: void sm2_encrypt_update(uint8_t* out, int* outl, uint8_t* in, int inl, \
+                                        SM2_Crypt_CTX* sm2_crypt_ctx);
+                                    
+    SM2 加密Update(输出C2)
+
+.. note::
+
+    SM2 加解密的 ``update`` 函数可以使明密文分多次输入，这在加密大文件时很有效
+
+.. code-block:: c
+    :caption: example
+
+    msg = msg1 || msg2 // msg 是 msg1 和 msg2 的拼接
+    sm2_encrypt_update(C2ptr, &outl, msg, sizeof(msg), &crypt_ctx);
+    C2ptr += outl;
+    // 等价于
+    sm2_encrypt_update(C2ptr, &outl, msg1, sizeof(msg1), &crypt_ctx);
+    C2ptr += outl;
+    sm2_encrypt_update(C2ptr, &outl, msg2, sizeof(msg2), &crypt_ctx);
+    C2ptr += outl;
+    
+
+.. c:function:: void sm2_encrypt_final(uint8_t* C3, SM2_Crypt_CTX* sm2_crypt_ctx);
+
+    SM2 加密Final(输出C3)
+
+
+====================
+2.2 SM2 解密
+====================
+
+.. c:function:: int sm2_decrypt_init(uint8_t* C1, int* read_size, \
+                                     EC_CTX* ec_ctx, BINT* da, \
+                                     SM2_Crypt_CTX* sm2_crypt_ctx);
+    
+    解密初始化(输出C1)
+
+.. note::
+
+    SM2 解密初始化中的参数 ``read_size`` 标明了 ``C1`` 的大小，
+    由于在加密时选取不同的 ``PC`` 参数使得点 ``C1`` 在内存中的表示方式不同，
+    对应的长度也不同。解密方通过 ``read_size`` 的结果移动密文指针，
+    确定 ``C3`` 和 ``C2`` 的位置
+
+.. code-block:: c
+    :caption: example
+
+    sm2_decrypt_init(ciphertext, &outl, &SM2_Fp256_CTX, &da, &ctx);
+    C1 = ciphertext;                             // 确定C1的位置
+    C3 = ciphertext + outl;                      // 确定C3的位置
+    C2 = ciphertext + outl + SM2_CRYPT_C3_SIZE;  // 确定C2的位置
+
+.. c:function:: void sm2_decrypt_update(uint8_t* out, int* outl, uint8_t* in, int inl, \
+                                        SM2_Crypt_CTX* sm2_crypt_ctx);
+                                    
+    SM2 解密Update(输出msg)
+
+.. c:function:: int sm2_decrypt_final(uint8_t* C3, SM2_Crypt_CTX* sm2_crypt_ctx);
+
+    SM2 解密Final
+
+.. code-block:: c
+    :caption: example
+
+    #include <gmlib/publickey/sm2.h>
+    #include <gmlib/utils.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+
+    static char* da_hex =
+        "3945208F_7B2144B1_3F36E38A_C6D39F95_88939369_2860B51A_42FB81EF_4DF7C5B8";
+
+    // "encryption standard"
+    static uint8_t msg[] = {'e', 'n', 'c', 'r', 'y', 'p', 't', 'i', 'o', 'n',
+                            ' ', 's', 't', 'a', 'n', 'd', 'a', 'r', 'd'};
+
+    static uint8_t ciphertext[2048];
+    static uint8_t out[2048];
+    static int PC = EC_PC_NO_ZIP;
+    static uint8_t *C1, *C2, *C3;  // (C1,C3,C2)分量指针
+
+    static BINT da;    // 私钥
+    static ECPoint P;  // 公钥
+
+    void test_sm2_crypt() {}
+
+    int main() {
+        // 初始化双方数据
+        bint_from_str(&da, da_hex, 16);  // load da
+        // P = [da]G
+        ec_mul(&P, &da, &SM2_Fp256_CTX.G, &SM2_Fp256_CTX);
+
+        puts("msg:");
+        dump_data(msg, sizeof(msg));
+
+        int outl, csize, c2size;
+        SM2_Crypt_CTX crypt_ctx;
+        // 加密
+        sm2_encrypt_init(ciphertext, &outl, PC, &SM2_Fp256_CTX, &P, &crypt_ctx);
+        C1 = ciphertext;                             // 确定C1的位置
+        C3 = ciphertext + outl;                      // 确定C3的位置
+        C2 = ciphertext + outl + SM2_CRYPT_C3_SIZE;  // 确定C2的位置
+
+        sm2_encrypt_update(C2, &c2size, msg, sizeof(msg), &crypt_ctx);
+        sm2_encrypt_final(C3, &crypt_ctx);
+        csize = (int)(C2 - C1) + c2size;
+
+        puts("ciphertext");
+        dump_data(ciphertext, csize);
+
+        // 解密
+        sm2_decrypt_init(ciphertext, &outl, &SM2_Fp256_CTX, &da, &crypt_ctx);
+        C1 = ciphertext;                             // 确定C1的位置
+        C3 = ciphertext + outl;                      // 确定C3的位置
+        C2 = ciphertext + outl + SM2_CRYPT_C3_SIZE;  // 确定C2的位置
+        c2size = csize - (int)(C2 - C1);
+        sm2_decrypt_update(out, &outl, C2, c2size, &crypt_ctx);
+        sm2_decrypt_final(C3, &crypt_ctx);
+
+        puts("msg:");
+        dump_data(out, outl);
+
+        return 0;
+    }

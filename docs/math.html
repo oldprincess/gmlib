@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>大整数数学运算函数 &#8212; gmlib  文档</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/translations.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="椭圆曲线 EC" href="ec.html" />
+    <link rel="prev" title="大整数运算 BINT 模块" href="bint.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="总索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="ec.html" title="椭圆曲线 EC"
+             accesskey="N">下一页</a> |</li>
+        <li class="right" >
+          <a href="bint.html" title="大整数运算 BINT 模块"
+             accesskey="P">上一页</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">gmlib  文档</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">大整数数学运算函数</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="id1">
+<h1>大整数数学运算函数<a class="headerlink" href="#id1" title="此标题的永久链接">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>为了简便，示例代码中并未进行错误处理，
+实际情况下应当检查函数返回值，防止发生异常</p>
+</div>
+<section id="id2">
+<h2>一、一般函数<a class="headerlink" href="#id2" title="此标题的永久链接">¶</a></h2>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_rand_bits">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_rand_bits</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">bits</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_rand_bits" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>随机生成bits比特大整数</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_rand_range">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_rand_range</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">left</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">right</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_rand_range" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>随机生成[left, right)范围大整数</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_prime_bits">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_prime_bits</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">bits</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_prime_bits" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>随机生成bits比特大素数</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_is_prime">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_is_prime</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">status</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_is_prime" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>素数判断(无视符号位)</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id3" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BINT</span><span class="w"> </span><span class="n">p</span><span class="p">;</span><span class="w"></span>
+<span class="kt">int</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="n">bint_prime_bits</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="mi">256</span><span class="p">);</span><span class="w">    </span><span class="c1">// 256 比特素数</span>
+<span class="n">bint_is_prime</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">status</span><span class="p">);</span><span class="w">  </span><span class="c1">// 素性检测</span>
+<span class="c1">// is prime</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">puts</span><span class="p">(</span><span class="s">&quot;is prime&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">puts</span><span class="p">(</span><span class="s">&quot;not prime&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_gcd">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_gcd</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">gcd</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n1</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n2</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_gcd" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>最大公约数</p>
+</dd></dl>
+
+</section>
+<section id="fp">
+<h2>二、有限域 Fp 运算<a class="headerlink" href="#fp" title="此标题的永久链接">¶</a></h2>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.fp_add">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fp_add</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n1</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n2</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.fp_add" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>有限域加法</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.fp_sub">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fp_sub</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n1</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n2</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.fp_sub" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>有限域减法</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.fp_mul">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fp_mul</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n1</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n2</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.fp_mul" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>有限域乘法</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.fp_mul_u32">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fp_mul_u32</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n1</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">n2</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.fp_mul_u32" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>有限域乘法</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.fp_sqr">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fp_sqr</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.fp_sqr" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>有限域二次幂</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.fp_pow">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fp_pow</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">e</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.fp_pow" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>有限域求幂</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.fp_inverse">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fp_inverse</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.fp_inverse" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>有限域求逆</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.fp_neg">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fp_neg</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <a class="reference internal" href="bint.html#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">p</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.fp_neg" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>有限域取负</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>有限域算法要求输入的 <code class="docutils literal notranslate"><span class="pre">p</span></code> 为正素数，会保证输出的值为非负数</p>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">目录</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">大整数数学运算函数</a><ul>
+<li><a class="reference internal" href="#id2">一、一般函数</a></li>
+<li><a class="reference internal" href="#fp">二、有限域 Fp 运算</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>上一主题</h4>
+    <p class="topless"><a href="bint.html"
+                          title="上一章">大整数运算 BINT 模块</a></p>
+  </div>
+  <div>
+    <h4>下一主题</h4>
+    <p class="topless"><a href="ec.html"
+                          title="下一章">椭圆曲线 EC</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>本页</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/math.rst.txt"
+            rel="nofollow">显示源代码</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="总索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="ec.html" title="椭圆曲线 EC"
+             >下一页</a> |</li>
+        <li class="right" >
+          <a href="bint.html" title="大整数运算 BINT 模块"
+             >上一页</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">gmlib  文档</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">大整数数学运算函数</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; 版权所有 2022, oldprincess.
+      由 <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1创建。
+    </div>
+  </body>
+</html>

@@ -33,7 +33,7 @@ error:
 }
 
 /// @brief 字节串转椭圆曲线点
-int ec_from_bytes(ECPoint* n, uint8_t* b, EC_CTX* ec_ctx) {
+int ec_from_bytes(ECPoint* n, uint8_t* b, int* read_size, EC_CTX* ec_ctx) {
     int size = bint_bytes_len(&ec_ctx->p);
     int PC = b[0];
     if (PC == 4) {
@@ -41,6 +41,7 @@ int ec_from_bytes(ECPoint* n, uint8_t* b, EC_CTX* ec_ctx) {
         try_goto(bint_from_bytes(&n->x, x_mem, size, BINT_BIG_ENDIAN));
         try_goto(bint_from_bytes(&n->y, y_mem, size, BINT_BIG_ENDIAN));
         n->infinity = 0;
+        *read_size = 2 * size + 1;
     } else {
         ERR_LOG("Unsupported ECPoint conversion type");
         goto error;

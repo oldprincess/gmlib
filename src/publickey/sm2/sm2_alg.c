@@ -1,6 +1,7 @@
 #include "sm2_alg.h"
 #include <gmlib/err.h>
 #include <gmlib/hash/sm3.h>
+#include <gmlib/utils.h>
 
 /// @brief 计算 Z = SM3(ENTL || ID || a || b || G.x || G.y || P.x || P.y)
 int sm2_calculate_z(uint8_t* out,
@@ -37,4 +38,22 @@ int sm2_calculate_z(uint8_t* out,
     return ERR_NOERROR;
 error:
     return ERR_RUNTIME_ERROR;
+}
+
+void sm2_kdf_init(SM2_KDF_CTX* kdf_ctx) {
+    kdf_ctx->ct = 1;
+    sm3_init(&kdf_ctx->sm3_ctx);
+}
+void sm2_kdf_init_update(uint8_t* in, int inl, SM2_KDF_CTX* kdf_ctx) {
+    sm3_update(in, inl, &kdf_ctx->sm3_ctx);
+}
+
+void sm2_kdf_next(uint8_t* out, SM2_KDF_CTX* kdf_ctx) {
+    uint8_t b[4];
+    storeu32_be(b, kdf_ctx->ct);
+    kdf_ctx->ct++;  // ct++
+
+    SM3_CTX tmp_ctx = kdf_ctx->sm3_ctx;  // 拷贝SM3
+    sm3_update(b, 4, &tmp_ctx);          // H(Z||ct)
+    sm3_final(out, &tmp_ctx);
 }

@@ -1,0 +1,669 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>大整数运算 BINT 模块 &#8212; gmlib  文档</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/translations.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="大整数数学运算函数" href="math.html" />
+    <link rel="prev" title="错误处理" href="err.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="总索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="math.html" title="大整数数学运算函数"
+             accesskey="N">下一页</a> |</li>
+        <li class="right" >
+          <a href="err.html" title="错误处理"
+             accesskey="P">上一页</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">gmlib  文档</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">大整数运算 BINT 模块</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="bint">
+<h1>大整数运算 BINT 模块<a class="headerlink" href="#bint" title="此标题的永久链接">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>为了简便，示例代码中并未进行错误处理，
+实际情况下应当检查函数返回值，防止发生异常</p>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 65%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>宏定义</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GMLIB_BINT_BITS</p></td>
+<td><p>大整数BINT最大比特数</p></td>
+</tr>
+<tr class="row-odd"><td><p>GMLIB_BINT_SIZE</p></td>
+<td><p>大整数BINT最大字数(32bit为一个字)</p></td>
+</tr>
+</tbody>
+</table>
+<p>大整数 <code class="docutils literal notranslate"><span class="pre">BINT</span></code> 将使用栈空间，默认是 GMLIB_BINT_BITS = 512 比特长度</p>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.BINT">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BINT</span></span></span><a class="headerlink" href="#c.BINT" title="永久链接至目标">¶</a><br /></dt>
+<dd><dl class="c var">
+<dt class="sig sig-object c" id="c.BINT.d">
+<span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">d</span></span></span><span class="p"><span class="pre">[</span></span><span class="n"><span class="pre">GMLIB_BINT_SIZE</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#c.BINT.d" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>GMLIB_BINT_BITS 大小内存空间，单位为32比特字，长度为 GMLIB_BINT_SIZE</p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.BINT.sign">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sign</span></span></span><a class="headerlink" href="#c.BINT.sign" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>BINT 符号位</p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.BINT.dsize">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dsize</span></span></span><a class="headerlink" href="#c.BINT.dsize" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>BINT 占用32比特字的内存长度</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>不要自行改动 <cite>BINT</cite> 结构体的成员数据，除非你确定知道这么做的后果。</p>
+</div>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.BINT_ONE">
+<a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BINT_ONE</span></span></span><a class="headerlink" href="#c.BINT_ONE" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数常量1</p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.BINT_TWO">
+<a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BINT_TWO</span></span></span><a class="headerlink" href="#c.BINT_TWO" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数常量2</p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.BINT_THREE">
+<a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BINT_THREE</span></span></span><a class="headerlink" href="#c.BINT_THREE" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数常量3</p>
+</dd></dl>
+
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>不要改变 <code class="docutils literal notranslate"><span class="pre">BINT_ONE</span></code>， <code class="docutils literal notranslate"><span class="pre">BINT_TWO</span></code> 和 <code class="docutils literal notranslate"><span class="pre">BINT_THREE</span></code> 这三个常量的值，否则会发生错误。</p>
+</div>
+<section id="id1">
+<h2>一、大整数读入与输出<a class="headerlink" href="#id1" title="此标题的永久链接">¶</a></h2>
+<section id="id2">
+<h3>1.1 字符串转化<a class="headerlink" href="#id2" title="此标题的永久链接">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 20%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>相关宏定义</p></th>
+<th class="head"><p>值</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>BINT_HEX</p></td>
+<td><p>16</p></td>
+<td><p>16进制</p></td>
+</tr>
+<tr class="row-odd"><td><p>BINT_DEC</p></td>
+<td><p>10</p></td>
+<td><p>10进制</p></td>
+</tr>
+<tr class="row-even"><td><p>BINT_BIN</p></td>
+<td><p>2</p></td>
+<td><p>2进制</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_from_str">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_from_str</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">str</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">radix</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_from_str" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>从字符串中加载大整数</p>
+</dd></dl>
+
+<p>字符串忽略大小写，且可以使用 <code class="docutils literal notranslate"><span class="pre">_</span></code> 作为分隔符以便阅读</p>
+<div class="literal-block-wrapper docutils container" id="id15">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id15" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BINT</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;123456&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">         </span><span class="c1">// x = 123456</span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;-123456&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">        </span><span class="c1">// x = -123456</span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ABCDEF&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span><span class="w">         </span><span class="c1">// x = 0xABCDEF</span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abcd_EFGH&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span><span class="w">      </span><span class="c1">// x = 0xABCDEFGH</span>
+</pre></div>
+</div>
+</div>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_to_str">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_to_str</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">str</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">radix</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_to_str" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数转字符串</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id16">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id16" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BINT</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="kt">char</span><span class="w"> </span><span class="n">s</span><span class="p">[</span><span class="n">GMLIB_BINT_BITS</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">];</span><span class="w"></span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;123456&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">  </span><span class="c1">// x = 123456</span>
+<span class="n">bint_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">           </span><span class="c1">// s = &quot;123456&quot;</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;x=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">);</span><span class="w">              </span><span class="c1">// x = 123456</span>
+<span class="n">bint_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span><span class="w">           </span><span class="c1">// s = &quot;1E240&quot;</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;x=0x%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">);</span><span class="w">            </span><span class="c1">// x = 0x1E240</span>
+</pre></div>
+</div>
+</div>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_fast_to_str">
+<span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">bint_fast_to_str</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">radix</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_fast_to_str" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数转字符串（非线程安全，用于打印输出）</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id17">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id17" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BINT</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;123456&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">             </span><span class="c1">// x=123456</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;x=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span><span class="w">  </span><span class="c1">// x=123456</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>函数 <code class="docutils literal notranslate"><span class="pre">bint_fast_to_str</span></code> 应当只用于输出数据，且一个 <code class="docutils literal notranslate"><span class="pre">printf</span></code> 中仅能调用一次该函数，
+像如下的代码将会产生错误的输出结果</p>
+</div>
+<div class="literal-block-wrapper docutils container" id="id18">
+<div class="code-block-caption"><span class="caption-text">error code</span><a class="headerlink" href="#id18" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// error output</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;x=%s, y=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">),</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="id3">
+<h3>1.2 整数转化<a class="headerlink" href="#id3" title="此标题的永久链接">¶</a></h3>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_from_u32">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_from_u32</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">u</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_from_u32" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>从整数中读入大整数</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_to_u32">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_to_u32</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">u</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_to_u32" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数转32位整数</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id19">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id19" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BINT</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="kt">uint32_t</span><span class="w"> </span><span class="n">u1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">123456</span><span class="p">,</span><span class="w"> </span><span class="n">u2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="n">bint_from_u32</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">u1</span><span class="p">);</span><span class="w">  </span><span class="c1">// x=123456</span>
+<span class="n">bint_to_u32</span><span class="p">(</span><span class="o">&amp;</span><span class="n">u2</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">);</span><span class="w">   </span><span class="c1">// u2=123456</span>
+<span class="c1">// u1=123456, u2=123456, x=123456</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;u1=%d, u2=%d, x=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">u1</span><span class="p">,</span><span class="w"> </span><span class="n">u2</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h3>1.3 字节串转化<a class="headerlink" href="#id4" title="此标题的永久链接">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 57%" />
+<col style="width: 17%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>相关宏定义</p></th>
+<th class="head"><p>值</p></th>
+<th class="head"><p>含义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>BINT_BIG_ENDIAN</p></td>
+<td><p>1</p></td>
+<td><p>大端模式</p></td>
+</tr>
+<tr class="row-odd"><td><p>BINT_LITTLE_ENDIAN</p></td>
+<td><p>0</p></td>
+<td><p>小端模式</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_from_bytes">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_from_bytes</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">b</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">bsize</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">endian</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_from_bytes" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>从字节串中读取大整数</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id20">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id20" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BINT</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="kt">uint8_t</span><span class="w"> </span><span class="n">b</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mh">0x12</span><span class="p">,</span><span class="w"> </span><span class="mh">0x34</span><span class="p">,</span><span class="w"> </span><span class="mh">0x56</span><span class="p">,</span><span class="w"> </span><span class="mh">0x78</span><span class="p">};</span><span class="w"></span>
+<span class="c1">// x=0x12345678</span>
+<span class="n">bint_from_bytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">b</span><span class="p">),</span><span class="w"> </span><span class="n">BINT_BIG_ENDIAN</span><span class="p">);</span><span class="w"></span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;x=0x%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">));</span><span class="w"></span>
+<span class="c1">// x=0x78563412</span>
+<span class="n">bint_from_bytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">b</span><span class="p">),</span><span class="w"> </span><span class="n">BINT_LITTLE_ENDIAN</span><span class="p">);</span><span class="w"></span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;x=0x%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">));</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_to_bytes">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_to_bytes</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">b</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">bsize</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">endian</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_to_bytes" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数转字节串</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id21">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id21" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BINT</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="kt">uint8_t</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span><span class="w"></span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;01_23_45_67&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span><span class="w">  </span><span class="c1">// x=0x01234567</span>
+<span class="n">bint_to_bytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">BINT_BIG_ENDIAN</span><span class="p">);</span><span class="w"></span>
+<span class="n">dump_data</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span><span class="w">  </span><span class="c1">// 01 23 45 67</span>
+<span class="n">bint_to_bytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="n">BINT_BIG_ENDIAN</span><span class="p">);</span><span class="w"></span>
+<span class="n">dump_data</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">);</span><span class="w">  </span><span class="c1">// 00 00 01 23 45 67</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<div class="line-block">
+<div class="line">像上面的代码那样，当字节串长度超过表示大整数 <code class="docutils literal notranslate"><span class="pre">BINT</span></code> 所需要的大小时，会默认补0</div>
+<div class="line">建议采用 <code class="docutils literal notranslate"><span class="pre">bint_bytes_len</span></code> 函数获取大整数所需要的字节大小，如下所示</div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id22">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id22" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">bsize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bint_bytes_len</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">);</span><span class="w">  </span><span class="c1">// 4</span>
+<span class="n">bint_to_bytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">bsize</span><span class="p">,</span><span class="w"> </span><span class="n">BINT_BIG_ENDIAN</span><span class="p">);</span><span class="w"></span>
+<span class="n">dump_data</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">bsize</span><span class="p">);</span><span class="w">  </span><span class="c1">// 01 23 45 67</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="id5">
+<h2>二、大整数运算<a class="headerlink" href="#id5" title="此标题的永久链接">¶</a></h2>
+<section id="id6">
+<h3>2.1 加减法<a class="headerlink" href="#id6" title="此标题的永久链接">¶</a></h3>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_add">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_add</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n1</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n2</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_add" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数加法</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_sub">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_sub</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n1</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n2</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_sub" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数减法</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id23">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id23" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BINT</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="n">z2</span><span class="p">;</span><span class="w"></span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1000&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">  </span><span class="c1">// x=1000</span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;2000&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">  </span><span class="c1">// y=2000</span>
+<span class="n">bint_add</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">y</span><span class="p">);</span><span class="w">          </span><span class="c1">// z1=x+y</span>
+<span class="n">bint_sub</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z2</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">y</span><span class="p">);</span><span class="w">          </span><span class="c1">// z2=x-y</span>
+<span class="c1">// x+y=3000</span>
+<span class="c1">// x-y=-1000</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;x+y=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span><span class="w"></span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;x-y=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z2</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="id7">
+<h3>2.2 乘法<a class="headerlink" href="#id7" title="此标题的永久链接">¶</a></h3>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_mul">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_mul</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n1</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n2</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_mul" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数乘法</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_sqr">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_sqr</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_sqr" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数二次幂</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_mul_u32">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_mul_u32</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n1</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">n2</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_mul_u32" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数乘法</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id24">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id24" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BINT</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="n">z2</span><span class="p">,</span><span class="w"> </span><span class="n">z3</span><span class="p">;</span><span class="w"></span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1000&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">  </span><span class="c1">// x=1000</span>
+<span class="n">bint_mul</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">);</span><span class="w">          </span><span class="c1">// z1=x*x</span>
+<span class="n">bint_sqr</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z2</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">);</span><span class="w">              </span><span class="c1">// z2=x^2</span>
+<span class="n">bint_mul_u32</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z3</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">);</span><span class="w">    </span><span class="c1">// z3=x*1000</span>
+<span class="c1">// x*x   =  1000000</span>
+<span class="c1">// x^2   =  1000000</span>
+<span class="c1">// x*1000=  1000000</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;x*x=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span><span class="w"></span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;x^2=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z2</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span><span class="w"></span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;x*1000=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z3</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="id8">
+<h3>2.3 除法<a class="headerlink" href="#id8" title="此标题的永久链接">¶</a></h3>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_divmod">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_divmod</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">q</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n1</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n2</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_divmod" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数除法</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_divmod_u32">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_divmod_u32</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">q</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n1</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">n2</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_divmod_u32" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数除法</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id25">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id25" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BINT</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="n">z2</span><span class="p">;</span><span class="w"></span>
+<span class="kt">uint32_t</span><span class="w"> </span><span class="n">rem</span><span class="p">;</span><span class="w"></span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1001&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">  </span><span class="c1">// x=1001</span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;50&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">    </span><span class="c1">// y=50</span>
+
+<span class="n">bint_divmod</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">z2</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">y</span><span class="p">);</span><span class="w"></span>
+<span class="c1">// x div y = 20, x mod y = 1</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;x div y=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span><span class="w"></span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;x mod y=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z2</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span><span class="w"></span>
+<span class="c1">// same</span>
+<span class="n">bint_divmod</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">y</span><span class="p">);</span><span class="w">  </span><span class="c1">// 丢弃余数</span>
+<span class="n">bint_divmod</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">z2</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">y</span><span class="p">);</span><span class="w">  </span><span class="c1">// 丢弃商</span>
+<span class="c1">// also like</span>
+<span class="n">bint_divmod_u32</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">rem</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="id9">
+<h3>2.4 幂<a class="headerlink" href="#id9" title="此标题的永久链接">¶</a></h3>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_pow">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_pow</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">e</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">mod</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_pow" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数求幂</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_pow_u32">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_pow_u32</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">e</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">mod</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_pow_u32" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数求幂</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id26">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id26" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BINT</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">mod</span><span class="p">,</span><span class="w"> </span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="n">z2</span><span class="p">;</span><span class="w"></span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1001&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">  </span><span class="c1">// x=1001</span>
+<span class="c1">// x^3</span>
+<span class="n">bint_pow</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">BINT_THREE</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span><span class="w"></span>
+<span class="n">bint_pow_u32</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z2</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span><span class="w"></span>
+<span class="c1">// z1=1003003001, z2=1003003001</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;z1=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span><span class="w"></span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;z2=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z2</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span><span class="w"></span>
+
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mod</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1000&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span><span class="w">  </span><span class="c1">// mod=1000</span>
+<span class="n">bint_pow_u32</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">mod</span><span class="p">);</span><span class="w">   </span><span class="c1">// x^3 mod 1000</span>
+<span class="c1">// z1=1</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;z1=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="id10">
+<h3>2.5 算数移位<a class="headerlink" href="#id10" title="此标题的永久链接">¶</a></h3>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_sll">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_sll</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">bits</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_sll" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数逻辑（算数）左移</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_sra">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_sra</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">bits</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_sra" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数算数右移</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id27">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id27" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BINT</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">;</span><span class="w"></span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1110&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w">  </span><span class="c1">// x=0b1110</span>
+
+<span class="n">bint_sll</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w">  </span><span class="c1">// z=0b1110000</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;z=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">));</span><span class="w"></span>
+<span class="n">bint_sra</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w">  </span><span class="c1">// z=11</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;z=%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_fast_to_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">));</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="id11">
+<h2>三、功能函数<a class="headerlink" href="#id11" title="此标题的永久链接">¶</a></h2>
+<section id="id12">
+<h3>3.1 比较函数<a class="headerlink" href="#id12" title="此标题的永久链接">¶</a></h3>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_cmp">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_cmp</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n1</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n2</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_cmp" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数比较</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_is_zero">
+<span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_is_zero</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_is_zero" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>是否为零</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_is_neg">
+<span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_is_neg</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_is_neg" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>是否为负</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_is_pos">
+<span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_is_pos</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_is_pos" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>是否为正</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_is_odd">
+<span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_is_odd</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_is_odd" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>是否是奇数</p>
+</dd></dl>
+
+</section>
+<section id="id13">
+<h3>3.2 设置/拷贝函数<a class="headerlink" href="#id13" title="此标题的永久链接">¶</a></h3>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_set_zero">
+<span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_set_zero</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_set_zero" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>设置大整数为零</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_copy">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_copy</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_copy" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数拷贝</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_neg">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_neg</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_neg" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数取负</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_abs">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_abs</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">r</span></span>, <a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_abs" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数取绝对值</p>
+</dd></dl>
+
+</section>
+<section id="id14">
+<h3>3.3 杂项/辅助函数<a class="headerlink" href="#id14" title="此标题的永久链接">¶</a></h3>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_bytes_len">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_bytes_len</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_bytes_len" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数的字节数</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_bits_len">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_bits_len</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_bits_len" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数的比特数</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.bint_bits_at">
+<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bint_bits_at</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.BINT" title="BINT"><span class="n"><span class="pre">BINT</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">index</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.bint_bits_at" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>大整数某一比特位数值</p>
+</dd></dl>
+
+<div class="literal-block-wrapper docutils container" id="id28">
+<div class="code-block-caption"><span class="caption-text">example</span><a class="headerlink" href="#id28" title="此代码块的永久链接">¶</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">BINT</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"></span>
+<span class="n">bint_from_str</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;11100&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w">  </span><span class="c1">// x=0b11100</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">bits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bint_bits_len</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">);</span><span class="w">   </span><span class="c1">// bits=5</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bits</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">--</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 1 1 1 0 0</span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">bint_bits_at</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+<span class="n">puts</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">目录</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">大整数运算 BINT 模块</a><ul>
+<li><a class="reference internal" href="#id1">一、大整数读入与输出</a><ul>
+<li><a class="reference internal" href="#id2">1.1 字符串转化</a></li>
+<li><a class="reference internal" href="#id3">1.2 整数转化</a></li>
+<li><a class="reference internal" href="#id4">1.3 字节串转化</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id5">二、大整数运算</a><ul>
+<li><a class="reference internal" href="#id6">2.1 加减法</a></li>
+<li><a class="reference internal" href="#id7">2.2 乘法</a></li>
+<li><a class="reference internal" href="#id8">2.3 除法</a></li>
+<li><a class="reference internal" href="#id9">2.4 幂</a></li>
+<li><a class="reference internal" href="#id10">2.5 算数移位</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id11">三、功能函数</a><ul>
+<li><a class="reference internal" href="#id12">3.1 比较函数</a></li>
+<li><a class="reference internal" href="#id13">3.2 设置/拷贝函数</a></li>
+<li><a class="reference internal" href="#id14">3.3 杂项/辅助函数</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>上一主题</h4>
+    <p class="topless"><a href="err.html"
+                          title="上一章">错误处理</a></p>
+  </div>
+  <div>
+    <h4>下一主题</h4>
+    <p class="topless"><a href="math.html"
+                          title="下一章">大整数数学运算函数</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>本页</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/bint.rst.txt"
+            rel="nofollow">显示源代码</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="总索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="math.html" title="大整数数学运算函数"
+             >下一页</a> |</li>
+        <li class="right" >
+          <a href="err.html" title="错误处理"
+             >上一页</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">gmlib  文档</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">大整数运算 BINT 模块</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; 版权所有 2022, oldprincess.
+      由 <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1创建。
+    </div>
+  </body>
+</html>
