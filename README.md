@@ -43,6 +43,7 @@
 ### 1.2 通过CMake编译（推荐）
 
 测试环境1：`Windows 10` 系统，`VS` 版本2019，`CMake` 版本3.15
+
 测试环境2：`Ubuntu 18.04.6 LTS` 系统，`gcc` 版本7.5.0，`CMake` 版本3.10.2
 
 若 `Windows` 电脑中没有配置 `CMake` 环境，则可从 https://cmake.org/download/ 处下载安装配置
