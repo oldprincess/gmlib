@@ -42,10 +42,18 @@
 
 ### 1.2 通过CMake编译（推荐）
 
-本机环境 `VS` 版本为2019，`CMake` 版本为3.15（仅供参考）
-若没有 `CMake` 环境，则可从 https://cmake.org/download/ 处下载安装
+测试环境1：`Windows 10` 系统，`VS` 版本2019，`CMake` 版本3.15
+测试环境2：`Ubuntu 18.04.6 LTS` 系统，`gcc` 版本7.5.0，`CMake` 版本3.10.2
 
-* 拷贝 gmlib 项目至本机，执行下述命令
+若 `Windows` 电脑中没有配置 `CMake` 环境，则可从 https://cmake.org/download/ 处下载安装配置
+
+* 拷贝 gmlib 项目至本机(也可以通过下载zip包的方式拷贝)
+
+```bash
+git clone https://github.com/oldprincess/gmlib.git
+```
+
+执行下述命令
 
 ```bash
 # 进入 gmlib 目录
