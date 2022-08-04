@@ -61,6 +61,7 @@ git clone https://github.com/oldprincess/gmlib.git
 cd gmlib
 # 创建 build 目录，避免污染源代码
 mkdir build
+cd build
 # 执行cmake 以 Debug 模式编译
 cmake .. -DCMAKE_BUILD_TYPE="Debug"
 cmake --build .
