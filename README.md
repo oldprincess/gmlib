@@ -86,6 +86,8 @@ cmake .. -DCMAKE_BUILD_TYPE="Release"
 
 ### 1.3 通过VS编译
 
+**注**：该方式并未测试
+
 若不想下载 `CMake`，则可使用 VS 创建工程，并在工程中添加 `src` 和 `test` 中的源文件，并添加外部 include_path 为 `gmlib/include` 目录。
 
 为了测试程序能正常运行，需要在编译时添加 `GMLIB_TEST` 宏，使算法中与随机数生成相关的代码生成固定的随机数，否则测试程序将不通过。若无需测试，仅需要使用库中的代码，`test` 目录中的源文件可排除在项目之外，且无需添加 `GMLIB_TEST` 宏。
@@ -114,7 +116,13 @@ int main() {
 
 而若使用 RELEASE 模式编译的库，则不会有上述提示
 
-该错误提示是由 `GMLIB_DEBUG` 宏控制，若想在 RELEASE 模式中也输出错误 log，可修改 CMakeLists.txt 文件，将 `# set(CMAKE_C_FLAGS_RELEASE -DGMLIB_DEBUG)` 该注释消去再重新编译工程
+该错误提示是由 `GMLIB_DEBUG` 宏控制，若想在 RELEASE 模式中也输出错误 log，可修改 CMakeLists.txt 文件，将下述注释
+
+```bash
+# set(CMAKE_C_FLAGS_RELEASE -DGMLIB_DEBUG)
+```
+
+消去再重新编译工程
 
 更多使用样例请参考docs文档和demo目录
 
