@@ -1,12 +1,12 @@
 ﻿# GMLib
 
-支持国密 SM4-ECB/CBC/CTR，SM3，SM2签名/验签 的密码库
+支持国密 SM4-ECB/CBC/CTR，SM3，SM2签名/加密 的密码库
 
 ## 一、快速开始
 
 ### 1.1 文件目录
 
-整个项目主要分为3部分，`include` 目录为 `gmlib` 库向外暴露的接口， `src` 目录为实现的源代码，`test` 目录为测试函数
+整个项目主要分为4部分，`include` 目录为 `gmlib` 库向外暴露的接口， `src` 目录为实现的源代码，`test` 目录为测试函数，`demo` 目录为一些调用样例
 
 ```tree
 ├─include               # include 文件
@@ -27,16 +27,17 @@
 │  └─publickey              # 公钥密码
 │      └─sm2                    # SM2 算法
 |
-└─test                  # 测试文件
-    ├─bint
-    ├─cipher
-    │  └─sm4
-    ├─ec
-    ├─hash
-    │  └─sm3
-    ├─math
-    └─publickey
-        └─sm2
+├─test                  # 测试文件
+|   ├─bint
+|   ├─cipher
+|   │  └─sm4
+|   ├─ec
+|   ├─hash
+|   │  └─sm3
+|   ├─math
+|   └─publickey
+|       └─sm2
+├─demo                  # 样例
 ```
 
 ### 1.2 通过CMake编译（推荐）
