@@ -20,6 +20,7 @@ int sm2_decrypt_init(uint8_t* C1,
     try_goto(ec_mul(&dot, da, &dot, ec_ctx));
     uint8_t x2[GMLIB_BINT_BITS / 8];
     uint8_t* y2 = sm2_crypt_ctx->dot2.y;
+    sm2_crypt_ctx->dot2.bsize = size;
     try_goto(bint_to_bytes(&dot.x, x2, size, BINT_BIG_ENDIAN));
     try_goto(bint_to_bytes(&dot.y, y2, size, BINT_BIG_ENDIAN));
 

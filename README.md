@@ -52,8 +52,8 @@
 cd gmlib
 # 创建 build 目录，避免污染源代码
 mkdir build
-# 执行cmake
-cmake ..
+# 执行cmake 以 Debug 模式编译
+cmake .. -DCMAKE_BUILD_TYPE="Debug"
 cmake --build .
 ```
 
@@ -67,7 +67,11 @@ cmake --build .
 
 应当可在控制台中看到输出 `test finish!`，说明测试结果正确
 
-上述编译流程默认编译 DEBUG 项目，以 DEBUG 模式编译将开启 `GMLib` 库的错误 log 功能。若需要关闭该功能，或是想使用 RELEASE 版本，则应当以 RELEASE 模式编译。在 Windows 平台下则将上述 `cmake --build .` 命令改为 `cmake --build . --config Release` 即可。
+上述编译流程默认编译 DEBUG 项目，以 DEBUG 模式编译将开启 `GMLib` 库的错误 log 功能。若需要关闭该功能，或是想使用 RELEASE 版本，则应当以 RELEASE 模式编译。将 cmake 命令改为
+
+```bash
+cmake .. -DCMAKE_BUILD_TYPE="Release"
+```
 
 ### 1.3 通过VS编译
 
