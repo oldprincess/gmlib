@@ -13,7 +13,8 @@
 │  └─gmlib              # gmlib 库头文件
 │      ├─cipher             # 分组密码
 │      ├─hash               # 哈希函数
-│      └─publickey          # 公钥密码
+│      ├─publickey          # 公钥密码
+|      └─stream             # 流密码
 |
 ├─src                   # gmlib 源代码
 │  ├─bint                   # 大整数运算
