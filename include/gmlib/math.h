@@ -1,3 +1,15 @@
+/**
+ * @file math.h
+ * @brief 大整数数学运算
+ *
+ * 参考资料：<br>
+ * [1]. openssl 3.0 大整数 bn 模块 <br>
+ * [2]. 密码学实验教程. 郭华、刘建伟、李大伟 <br>
+ *
+ * 素性检测参考 openssl bn_prime 模块；
+ * Miller-Rabin 测试、求逆、计算 gcd 等数学算法参考《密码学实验教程》；
+ */
+
 #ifndef MATH_H
 #define MATH_H
 

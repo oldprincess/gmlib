@@ -60,7 +60,7 @@ error:
 
 static void test_encrypt() {
     int outl;
-    SM2_Crypt_CTX crypt_ctx;
+    SM2_CRYPT_CTX crypt_ctx;
     // 加密
     try_goto(sm2_encrypt_init(out, &outl, PC, &SM2_Fp256_CTX, &P, &crypt_ctx));
     C1 = out;                             // 确定C1的位置
@@ -90,7 +90,7 @@ error:
 
 static void test_decrypt() {
     int outl;
-    SM2_Crypt_CTX ctx;
+    SM2_CRYPT_CTX ctx;
     // 加密
     try_goto(sm2_decrypt_init(ciphertext, &outl, &SM2_Fp256_CTX, &da, &ctx));
     C1 = ciphertext;                             // 确定C1的位置

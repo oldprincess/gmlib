@@ -1,3 +1,15 @@
+/**
+ * @file ec.h
+ * @brief 椭圆曲线运算
+ *
+ * 参考资料：<br>
+ * [1]. GM/T 0003.1-2012 SM2 椭圆曲线公钥密码算法第1部分：总则 <br>
+ *
+ * 椭圆曲线点与字节串转化、点加/数乘运算、jacobian坐标系表示等均可在
+ * SM2 国标文档中查看学习
+ * http://www.gmbz.org.cn/main/viewfile/20180108015515787986.html
+ */
+
 #ifndef EC_H
 #define EC_H
 

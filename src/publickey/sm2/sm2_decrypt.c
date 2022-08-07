@@ -9,7 +9,7 @@ int sm2_decrypt_init(uint8_t* C1,
                      int* read_size,
                      EC_CTX* ec_ctx,
                      BINT* da,
-                     SM2_Crypt_CTX* sm2_crypt_ctx) {
+                     SM2_CRYPT_CTX* sm2_crypt_ctx) {
     ECPoint dot;
     int size = bint_bytes_len(&ec_ctx->p);
     // 加载C1并校验是否在曲线上
@@ -44,8 +44,8 @@ void sm2_decrypt_update(uint8_t* out,
                         int* outl,
                         uint8_t* in,
                         int inl,
-                        SM2_Crypt_CTX* sm2_crypt_ctx) {
-    SM2_Crypt_CTX* ctx = sm2_crypt_ctx;
+                        SM2_CRYPT_CTX* sm2_crypt_ctx) {
+    SM2_CRYPT_CTX* ctx = sm2_crypt_ctx;
     *outl = 0;
     uint8_t* optr = out;  // 保存outptr原始位置
     // 加密
@@ -74,7 +74,7 @@ void sm2_decrypt_update(uint8_t* out,
 }
 
 /// @brief SM2 解密Final
-int sm2_decrypt_final(uint8_t* C3, SM2_Crypt_CTX* sm2_crypt_ctx) {
+int sm2_decrypt_final(uint8_t* C3, SM2_CRYPT_CTX* sm2_crypt_ctx) {
     uint8_t digest[SM3_DIGEST_SIZE];
     SM3_CTX* sm3_ctx = &sm2_crypt_ctx->sm3_ctx;
 

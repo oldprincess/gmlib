@@ -1,3 +1,8 @@
+/**
+ * @file err.h
+ * @brief 错误处理
+ */
+
 #ifndef ERR_H
 #define ERR_H
 

@@ -1,3 +1,12 @@
+/**
+ * @file mode.h
+ * @brief 分组密码工作模式
+ *
+ * 参考资料：<br>
+ * [1]. SP 800-38A
+ * specifies five confidentiality modes of operation for block ciphers <br>
+ */
+
 #ifndef MODE_H
 #define MODE_H
 
@@ -262,4 +271,4 @@ void ctr_final(uint8_t* out,           // output buffer
 }
 #endif  // __cplusplus
 
-#endif // MODE_H
+#endif  // MODE_H

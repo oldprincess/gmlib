@@ -5,7 +5,7 @@
 
 /// @brief 计算 Z = SM3(ENTL || ID || a || b || G.x || G.y || P.x || P.y)
 int sm2_calculate_z(uint8_t* out,
-                    uint8_t* ENTL,
+                    uint8_t ENTL[2],
                     uint8_t* ID,
                     ECPoint* P,
                     EC_CTX* ec_ctx) {

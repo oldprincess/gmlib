@@ -15,7 +15,7 @@ void ecb_encrypt_update(uint8_t* out,           // output buffer
                         int* ecb_bsize,         // ecb buffer size
                         int ecb_mbsize          // ecb max bsize
 ) {
-    *outl = 0;        // 初始化 outl
+    *outl = 0;  // 初始化 outl
     while (inl > 0) {
         // 拷贝缓冲区数据
         int size = ecb_mbsize - *ecb_bsize;
@@ -30,7 +30,7 @@ void ecb_encrypt_update(uint8_t* out,           // output buffer
         if (*ecb_bsize == ecb_mbsize) {
             // 缓冲区填满，加密
             encrypt(out, ecb_buffer, ecb_mbsize / block_size, cipher_key);
-            *ecb_bsize = 0;    // 清空缓冲区
+            *ecb_bsize = 0;       // 清空缓冲区
             *outl += ecb_mbsize;  //更新output len
             out += ecb_mbsize;    // 更新 output ptr
         }
@@ -49,13 +49,13 @@ void ecb_decrypt_update(uint8_t* out,           // output buffer
                         int* ecb_bsize,         // ecb buffer size
                         int ecb_mbsize          // ecb max bsize
 ) {
-    *outl = 0;        // 初始化 outl
+    *outl = 0;  // 初始化 outl
     while (inl > 0) {
         // 缓冲区是否已满
         if (*ecb_bsize == ecb_mbsize) {
             // 缓冲区填满，解密
             decrypt(out, ecb_buffer, ecb_mbsize / block_size, cipher_key);
-            *ecb_bsize = 0;    // 清空缓冲区
+            *ecb_bsize = 0;       // 清空缓冲区
             *outl += ecb_mbsize;  // 更新 output len
             out += ecb_mbsize;    // 更新 output ptr
         }

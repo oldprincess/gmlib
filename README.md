@@ -1,6 +1,6 @@
 ﻿# GMLib
 
-支持国密 SM4-ECB/CBC/CTR，SM3，SM2签名/加密 的密码库，文档页面 https://oldprincess.github.io/gmlib/
+支持国密 SM4-ECB/CBC/CTR，SM3，SM2签名/加密，ZUC算法 的密码库，文档页面 https://oldprincess.github.io/gmlib/
 
 ## 一、快速开始
 
@@ -24,9 +24,10 @@
 │  ├─hash                   # 哈希算法
 │  │  └─sm3                     # SM3 算法
 │  ├─math                   # 数学函数
-│  └─publickey              # 公钥密码
-│      └─sm2                    # SM2 算法
-|
+│  ├─publickey              # 公钥密码
+│  │   └─sm2                    # SM2 算法
+|  └─stream                 # 流密码
+|      └─zuc                    # ZUC 算法
 ├─test                  # 测试文件
 |   ├─bint
 |   ├─cipher
@@ -35,9 +36,13 @@
 |   ├─hash
 |   │  └─sm3
 |   ├─math
-|   └─publickey
-|       └─sm2
-├─demo                  # 样例
+|   ├─publickey
+|   │   └─sm2
+|   └─stream
+|       └─zuc
+|
+└─demo                  # 样例
+
 ```
 
 ### 1.2 通过CMake编译（推荐）

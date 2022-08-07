@@ -1,3 +1,16 @@
+/**
+ * @file bint.h
+ * @brief 大整数运算
+ *
+ * 参考资料：<br>
+ * [1]. The Art of Computer Programming (TAOCP), Donald Knuth <br>
+ * [2]. JDK 大整数运算 MutableBigInteger.java、BigInteger.java <br>
+ * [3]. openssl 3.0 大整数 bn 模块 <br>
+ *
+ * 大整数 struct 结构参考 openssl；
+ * 大整数各种运算 TAOCP 中的算法为基础，代码实现参考 JAVA JDK；
+ */
+
 #ifndef BINT_H
 #define BINT_H
 
@@ -16,6 +29,7 @@ extern "C" {
 #define BINT_HEX 16
 #define BINT_DEC 10
 #define BINT_BIN 2
+
 #define BINT_BIG_ENDIAN 1
 #define BINT_LITTLE_ENDIAN 0
 
@@ -26,11 +40,9 @@ typedef struct BINT {
     int dsize;                    // 数据长度
 } BINT;
 
-extern BINT BINT_ONE;
-
-extern BINT BINT_TWO;
-
-extern BINT BINT_THREE;
+extern BINT BINT_ONE;    // 大整数1
+extern BINT BINT_TWO;    // 大整数2
+extern BINT BINT_THREE;  // 大整数3
 
 // =======================================
 // ============ 类型转换 ==================

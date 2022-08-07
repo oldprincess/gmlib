@@ -10,7 +10,7 @@ int sm2_encrypt_init(uint8_t* C1,
                      int PC,
                      EC_CTX* ec_ctx,
                      ECPoint* P,
-                     SM2_Crypt_CTX* sm2_crypt_ctx) {
+                     SM2_CRYPT_CTX* sm2_crypt_ctx) {
     ECPoint dot;
     BINT k;
     int size = bint_bytes_len(&ec_ctx->p);
@@ -58,8 +58,8 @@ void sm2_encrypt_update(uint8_t* out,
                         int* outl,
                         uint8_t* in,
                         int inl,
-                        SM2_Crypt_CTX* sm2_crypt_ctx) {
-    SM2_Crypt_CTX* ctx = sm2_crypt_ctx;
+                        SM2_CRYPT_CTX* sm2_crypt_ctx) {
+    SM2_CRYPT_CTX* ctx = sm2_crypt_ctx;
     *outl = 0;
     // 更新 SM3 = H(x2||msg
     sm3_update(in, inl, &ctx->sm3_ctx);
@@ -87,7 +87,7 @@ void sm2_encrypt_update(uint8_t* out,
 }
 
 /// @brief SM2 加密Final(输出C3)
-void sm2_encrypt_final(uint8_t* C3, SM2_Crypt_CTX* sm2_crypt_ctx) {
+void sm2_encrypt_final(uint8_t* C3, SM2_CRYPT_CTX* sm2_crypt_ctx) {
     SM3_CTX* sm3_ctx = &sm2_crypt_ctx->sm3_ctx;
 
     int size = sm2_crypt_ctx->dot2.bsize;

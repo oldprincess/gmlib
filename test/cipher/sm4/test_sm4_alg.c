@@ -19,7 +19,7 @@ void test_sm4_alg() {
     };
     static uint8_t buffer[SM4_BLOCK_SIZE] = {0};
 
-    SM4_Key sm4key;
+    SM4_KEY sm4key;
     int block_num = sizeof(plaintext) / SM4_BLOCK_SIZE;
     sm4_keyinit(key, &sm4key);
     sm4_encrypt(buffer, plaintext, block_num, &sm4key);

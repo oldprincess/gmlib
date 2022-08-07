@@ -49,7 +49,7 @@ static uint32_t CK[32] = {
 #define rotl(n, s) ((n) << (s) | (n) >> (32 - (s)))
 
 /// @brief SM4 轮密钥生成
-void sm4_common_keyinit(uint8_t* key, SM4_Key* sm4key) {
+void sm4_common_keyinit(uint8_t* key, SM4_KEY* sm4key) {
     uint32_t k[4];
     uint32_t tmp, tmp1;
     // load key as big endian
@@ -76,7 +76,7 @@ void sm4_common_keyinit(uint8_t* key, SM4_Key* sm4key) {
     }
 }
 
-static int sm4_do(uint8_t* out, uint8_t* in, SM4_Key* sm4key, int enc) {
+static int sm4_do(uint8_t* out, uint8_t* in, SM4_KEY* sm4key, int enc) {
     uint32_t x[4];
     uint32_t tmp, tmp1;
     // load input as big endian
@@ -113,11 +113,11 @@ static int sm4_do(uint8_t* out, uint8_t* in, SM4_Key* sm4key, int enc) {
 }
 
 /// @brief SM4 加密
-void sm4_common_encrypt(uint8_t* out, uint8_t* in, SM4_Key* sm4key) {
+void sm4_common_encrypt(uint8_t* out, uint8_t* in, SM4_KEY* sm4key) {
     sm4_do(out, in, sm4key, 1);
 }
 
 /// @brief SM4 解密
-void sm4_common_decrypt(uint8_t* out, uint8_t* in, SM4_Key* sm4key) {
+void sm4_common_decrypt(uint8_t* out, uint8_t* in, SM4_KEY* sm4key) {
     sm4_do(out, in, sm4key, 0);
 }

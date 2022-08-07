@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>ZUC 算法 &#8212; gmlib  文档</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/translations.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="SM2 算法" href="sm2.html" />
+    <link rel="prev" title="椭圆曲线 EC" href="ec.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="总索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="sm2.html" title="SM2 算法"
+             accesskey="N">下一页</a> |</li>
+        <li class="right" >
+          <a href="ec.html" title="椭圆曲线 EC"
+             accesskey="P">上一页</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">gmlib  文档</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ZUC 算法</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="zuc">
+<h1>ZUC 算法<a class="headerlink" href="#zuc" title="此标题的永久链接">¶</a></h1>
+<p>ZUC 官方文档可从 <a class="reference external" href="http://www.gmbz.org.cn/main/bzlb.html">http://www.gmbz.org.cn/main/bzlb.html</a> 处查询</p>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.ZUC_CTX">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ZUC_CTX</span></span></span><a class="headerlink" href="#c.ZUC_CTX" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>ZUC 祖冲之算法</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.zuc_init">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">zuc_init</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">key</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">iv</span></span>, <a class="reference internal" href="#c.ZUC_CTX" title="ZUC_CTX"><span class="n"><span class="pre">ZUC_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">zuc_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.zuc_init" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>祖冲之算法ZUC初始化</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.zuc_next">
+<span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">zuc_next</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.ZUC_CTX" title="ZUC_CTX"><span class="n"><span class="pre">ZUC_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">zuc_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.zuc_next" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>祖冲之算法产生一节拍32比特密钥</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.zuc_put_next">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">zuc_put_next</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <a class="reference internal" href="#c.ZUC_CTX" title="ZUC_CTX"><span class="n"><span class="pre">ZUC_CTX</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">zuc_ctx</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.zuc_put_next" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>祖冲之算法产生一节拍32比特密钥</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.zuc_confidentiality_crypt">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">zuc_confidentiality_crypt</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">in</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">inbits</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">COUNT</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n"><span class="pre">BEARER</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n"><span class="pre">DIRECTION</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">CK</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.zuc_confidentiality_crypt" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>祖冲之算法机密性算法(加/解密)</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.zuc_integrity_mac">
+<span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">zuc_integrity_mac</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">out</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">in</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">inbits</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">COUNT</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n"><span class="pre">BEARER</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n"><span class="pre">DIRECTION</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">IK</span></span><span class="sig-paren">)</span><span class="p"><span class="pre">;</span></span><a class="headerlink" href="#c.zuc_integrity_mac" title="永久链接至目标">¶</a><br /></dt>
+<dd><p>祖冲之算法完整性算法(MAC)</p>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>上一主题</h4>
+    <p class="topless"><a href="ec.html"
+                          title="上一章">椭圆曲线 EC</a></p>
+  </div>
+  <div>
+    <h4>下一主题</h4>
+    <p class="topless"><a href="sm2.html"
+                          title="下一章">SM2 算法</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>本页</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/zuc.rst.txt"
+            rel="nofollow">显示源代码</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="总索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="sm2.html" title="SM2 算法"
+             >下一页</a> |</li>
+        <li class="right" >
+          <a href="ec.html" title="椭圆曲线 EC"
+             >上一页</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">gmlib  文档</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ZUC 算法</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; 版权所有 2022, oldprincess.
+      由 <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1创建。
+    </div>
+  </body>
+</html>

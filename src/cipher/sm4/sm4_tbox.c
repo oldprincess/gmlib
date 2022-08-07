@@ -183,7 +183,7 @@ static uint32_t Table3[256] = {
     0xD45F5F8B, 0xC82F2FE7, 0x39E4E4DD, 0x49212168,
 };
 
-static void sm4_do(uint8_t* out, uint8_t* in, SM4_Key* sm4key, uint8_t enc) {
+static void sm4_do(uint8_t* out, uint8_t* in, SM4_KEY* sm4key, uint8_t enc) {
     uint32_t x[4];
     uint32_t tmp, tmp1;
     // load input as big endian
@@ -216,9 +216,9 @@ static void sm4_do(uint8_t* out, uint8_t* in, SM4_Key* sm4key, uint8_t enc) {
     storeu32_be(out + 12, x[0]);
 }
 
-void sm4_tbox_encrypt(uint8_t* out, uint8_t* in, SM4_Key* sm4key) {
+void sm4_tbox_encrypt(uint8_t* out, uint8_t* in, SM4_KEY* sm4key) {
     sm4_do(out, in, sm4key, 1);
 }
-void sm4_tbox_decrypt(uint8_t* out, uint8_t* in, SM4_Key* sm4key) {
+void sm4_tbox_decrypt(uint8_t* out, uint8_t* in, SM4_KEY* sm4key) {
     sm4_do(out, in, sm4key, 0);
 }
