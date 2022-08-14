@@ -1,0 +1,86 @@
+#include <gmlib/cipher/mode.h>
+#include <gmlib/cipher/sm4.h>
+#include <gmlib/err.h>
+#include <memory.h>
+#include <stdlib.h>
+
+static uint8_t key[SM4_KEYLEN] = {
+    0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,  //
+    0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10,  //
+};
+
+// 测试点1
+
+static uint8_t pt1[] = {
+    0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,  //
+    0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10,  //
+    0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,  //
+    0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10,  //
+};
+
+static uint8_t ct1[] = {
+    0x68, 0x1E, 0xDF, 0x34, 0xD2, 0x06, 0x96, 0x5E,  //
+    0x86, 0xB3, 0xE9, 0x4F, 0x53, 0x6E, 0x42, 0x46,  //
+    0x68, 0x1E, 0xDF, 0x34, 0xD2, 0x06, 0x96, 0x5E,  //
+    0x86, 0xB3, 0xE9, 0x4F, 0x53, 0x6E, 0x42, 0x46,  //
+    0x00, 0x2A, 0x8A, 0x4E, 0xFA, 0x86, 0x3C, 0xCA,  //
+    0xD0, 0x24, 0xAC, 0x03, 0x00, 0xBB, 0x40, 0xD2,  //
+};
+
+// 测试点2
+
+static uint8_t pt2[SM4_BLOCK_SIZE - 2] = {
+    0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,  //
+    0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54,              //
+};
+
+static uint8_t ct2[SM4_BLOCK_SIZE] = {
+    0x74, 0xD9, 0x3B, 0xED, 0x35, 0xB5, 0x42, 0xBB,  //
+    0x77, 0xD0, 0x21, 0x82, 0xB1, 0x86, 0x51, 0x25,  //
+};
+
+static uint8_t out[SM4_BLOCK_SIZE * 4];
+static int outl;
+
+void test_mode_ecb() {
+    SM4_CTX sm4_ctx;
+    ECB_CTX ctx;
+    uint8_t* outptr;
+    // 测试点1
+    ecb_init(key, &SM4Info, &sm4_ctx, &ctx);
+    outptr = out;
+    ecb_encrypt_update(outptr, &outl, pt1, sizeof(pt1), &ctx);
+    outptr += outl;
+    ecb_encrypt_final(outptr, &outl, &ctx);
+    outptr += outl;
+    if (memcmp(out, ct1, sizeof(ct1)) != 0 || outptr - out != sizeof(ct1)) {
+        ERR_LOG("Err in ecb mode");
+        goto error;
+    }
+    // 测试点2
+    ecb_init(key, &SM4Info, &sm4_ctx, &ctx);
+    outptr = out;
+    ecb_encrypt_update(outptr, &outl, pt2, sizeof(pt2), &ctx);
+    outptr += outl;
+    ecb_encrypt_final(outptr, &outl, &ctx);
+    outptr += outl;
+    if (memcmp(out, ct2, sizeof(ct2)) != 0 || outptr - out != sizeof(ct2)) {
+        ERR_LOG("Err in ecb mode");
+        goto error;
+    }
+    // 测试解密
+    ecb_init(key, &SM4Info, &sm4_ctx, &ctx);
+    outptr = out;
+    ecb_decrypt_update(outptr, &outl, ct2, sizeof(ct2), &ctx);
+    outptr += outl;
+    try_goto(ecb_decrypt_final(outptr, &outl, &ctx));
+    outptr += outl;
+    if (memcmp(out, pt2, sizeof(pt2)) != 0 || outptr - out != sizeof(pt2)) {
+        ERR_LOG("Err in ecb mode");
+        goto error;
+    }
+
+    return;
+error:
+    exit(-1);
+}

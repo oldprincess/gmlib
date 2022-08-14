@@ -2,6 +2,8 @@
 
 支持国密 SM4-ECB/CBC/GCM，SM3，SM2签名/加密，ZUC算法 的密码库，文档页面 https://oldprincess.github.io/gmlib/
 
+开发这个库的时候参考了很多密码库，例如 `crypto++`，`openssl`，`gmssl`，`oryx-embedded` 以及 `JAVA JDK`，所以很多地方都能看到这些库的影子
+
 ## 一、快速开始
 
 ### 1.1 文件目录
