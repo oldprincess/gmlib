@@ -11,6 +11,10 @@ uint32_t loadu32_be(uint8_t* data) {
     return n;
 }
 
+uint64_t loadu64_be(uint8_t* data) {
+    return ((uint64_t)loadu32_be(data) << 32) | loadu32_be(data + 4);
+}
+
 void storeu32_be(uint8_t* dst, uint32_t n) {
     dst[3] = n & 0xFF;
     dst[2] = (n >> 8) & 0xFF;

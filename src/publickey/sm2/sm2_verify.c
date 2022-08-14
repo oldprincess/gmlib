@@ -10,8 +10,8 @@ int sm2_verify_init(uint8_t* ENTL,
                     ECPoint* P,
                     SM2_VERIFY_CTX* sm2_verify_ctx) {
     // 拷贝参数
-    ec_ctx_copy(&sm2_verify_ctx->ec_ctx, ec_ctx);
-    ec_copy(&sm2_verify_ctx->P, P);
+    sm2_verify_ctx->ec_ctx = ec_ctx;
+    sm2_verify_ctx->P = P;
 
     // 计算标识符Z
     try_goto(sm2_calculate_z(sm2_verify_ctx->Z, ENTL, ID, P, ec_ctx));
@@ -41,7 +41,7 @@ int sm2_verify_final(int* status,
                      uint8_t* signature,
                      SM2_VERIFY_CTX* sm2_verify_ctx) {
     BINT r, s, e, t, R;
-    EC_CTX* ec_ctx = &sm2_verify_ctx->ec_ctx;
+    EC_CTX* ec_ctx = sm2_verify_ctx->ec_ctx;
     ECPoint d1, d2;
 
     // load (r,s)
@@ -68,7 +68,7 @@ int sm2_verify_final(int* status,
 
     // (x1,y1) = [s]G+[t]P
     try_goto(ec_mul(&d1, &s, &ec_ctx->G, ec_ctx));
-    try_goto(ec_mul(&d2, &t, &sm2_verify_ctx->P, ec_ctx));
+    try_goto(ec_mul(&d2, &t, sm2_verify_ctx->P, ec_ctx));
     try_goto(ec_add(&d1, &d1, &d2, ec_ctx));
 
     // R = (e+x1) % n

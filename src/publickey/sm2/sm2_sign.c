@@ -10,21 +10,22 @@ int sm2_sign_init(uint8_t* ENTL,
                   BINT* da,
                   ECPoint* P,
                   SM2_SIGN_CTX* sm2_sign_ctx) {
+    SM2_SIGN_CTX* ctx = sm2_sign_ctx;
     // 拷贝参数
-    ec_ctx_copy(&sm2_sign_ctx->ec_ctx, ec_ctx);
-    bint_copy(&sm2_sign_ctx->da, da);
+    ctx->ec_ctx = ec_ctx;
+    ctx->da = da;
 
     // 预计算数据 (da+1)^-1
     BINT da_plus_1;
     try_goto(bint_add(&da_plus_1, da, &BINT_ONE));
-    try_goto(fp_inverse(&sm2_sign_ctx->da_plus_1_iv, &da_plus_1, &ec_ctx->n));
+    try_goto(fp_inverse(&ctx->da_plus_1_iv, &da_plus_1, &ec_ctx->n));
 
     // 计算标识符Z
-    try_goto(sm2_calculate_z(sm2_sign_ctx->Z, ENTL, ID, P, ec_ctx));
+    try_goto(sm2_calculate_z(ctx->Z, ENTL, ID, P, ec_ctx));
 
     // 初始化 H(Z || ...)
-    sm3_init(&sm2_sign_ctx->sm3_ctx);
-    sm3_update(sm2_sign_ctx->Z, SM3_DIGEST_SIZE, &sm2_sign_ctx->sm3_ctx);
+    sm3_init(&ctx->sm3_ctx);
+    sm3_update(ctx->Z, SM3_DIGEST_SIZE, &ctx->sm3_ctx);
 
     return ERR_NOERROR;
 error:
@@ -47,8 +48,9 @@ int sm2_sign_final(uint8_t* out, int* outl, SM2_SIGN_CTX* sm2_sign_ctx) {
     uint8_t digest[SM3_DIGEST_SIZE];
     BINT e, k, r, t;
     ECPoint point;
-    EC_CTX* ec_ctx = &sm2_sign_ctx->ec_ctx;
-    BINT *da = &sm2_sign_ctx->da, *da_plus_1_iv = &sm2_sign_ctx->da_plus_1_iv;
+    EC_CTX* ec_ctx = sm2_sign_ctx->ec_ctx;
+    BINT* da = sm2_sign_ctx->da;
+    BINT* da_plus_1_iv = &sm2_sign_ctx->da_plus_1_iv;
     // e = H(Z || msg)
     sm3_final(digest, &sm2_sign_ctx->sm3_ctx);
     try_goto(bint_from_bytes(&e, digest, SM3_DIGEST_SIZE, BINT_BIG_ENDIAN));

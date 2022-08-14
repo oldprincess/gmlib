@@ -30,9 +30,9 @@ include_directories(include)
 file(GLOB ALL_SOURCE
     "src/*.c"
     "src/bint/*.c"
-    "src/cipher/cipher_mode/*.c"
-    "src/cipher/cipher_mode/gcm/*.c"
-    "src/cipher/sm4/*.c"
+    "src/cipher/mode/*.c"
+    "src/cipher/mode/gcm/*.c"
+    "src/cipher/*.c"
     "src/ec/*.c"
     "src/hash/sm3/*.c"
     "src/math/*.c"
@@ -43,7 +43,7 @@ file(GLOB ALL_SOURCE
 # 测试文件列表
 file(GLOB ALL_TEST_SOURCE
     "test/bint/*.c"
-    "test/cipher/sm4/*.c"
+    "test/cipher/*.c"
     "test/ec/*.c"
     "test/hash/sm3/*.c"
     "test/math/*.c"
@@ -55,9 +55,10 @@ file(GLOB ALL_TEST_SOURCE
 file(GLOB LOCAL_INCLUDE
     "src/*.h"
     "src/bint/*.h"
-    "src/cipher/cipher_mode/*.h"
-    "src/cipher/cipher_mode/gcm/*.h"
+    "src/cipher/mode/*.h"
+    "src/cipher/mode/gcm/*.h"
     "src/cipher/sm4/*.h"
+    "src/cipher/aes/*.h"
     "src/ec/*.h"
     "src/hash/sm3/*.h"
     "src/math/*.h"

@@ -1,12 +1,3 @@
-/**
- * @file mode.h
- * @brief 分组密码工作模式
- *
- * 参考资料：<br>
- * [1]. SP 800-38A
- * specifies five confidentiality modes of operation for block ciphers <br>
- */
-
 #ifndef MODE_H
 #define MODE_H
 
@@ -14,261 +5,159 @@
 extern "C" {
 #endif  // __cplusplus
 
-#include <stdint.h>
+#include <gmlib/cipher/types.h>
 
-// =========================================
-// ============= Cipher Info ===============
-// =========================================
+#define BLOCK_SIZE 16
 
-//  Cipher Encrypt Function-Type
-/// @brief 以ECB模式加密数据
-/// @param[out] out         输出
-/// @param[in]  in          输入
-/// @param[in]  block_num   输入BLOCK数
-/// @param[in]  cipher_key  算法轮密钥
-typedef void (*CipherEncrypt)(uint8_t* out,     // output buffer
-                              uint8_t* in,      // input buffer
-                              int block_num,    // block number
-                              void* cipher_key  // cipher key
-);
+// ==========================================
+// ============== ECB MODE ==================
+// ==========================================
 
-//  Cipher Decrypt Function-Type
-/// @brief 以ECB模式解密数据
-/// @param[out] out         输出
-/// @param[in]  in          输入
-/// @param[in]  block_num   输入BLOCK数
-/// @param[in]  cipher_key  算法轮密钥
-typedef void (*CipherDecrypt)(uint8_t* out,     // output buffer
-                              uint8_t* in,      // input buffer
-                              int block_num,    // block number
-                              void* cipher_key  // cipher key
-);
+typedef struct ECB_CTX {
+    uint8_t buffer[BLOCK_SIZE];
+    int bsize;
+    const CipherInfo* cipher;
+    void* cctx;
+} ECB_CTX;
 
-// =========================================
-// ============= ECB Mode ==================
-// =========================================
+/// @brief ECB 模式初始化
+void ecb_init(uint8_t* key,              ///< [in]    用户密钥
+              const CipherInfo* cipher,  ///< [in]    算法
+              void* cctx,                ///< [inout] 算法上下文
+              ECB_CTX* mctx);
 
-/// @brief ECB模式加密update
-/// @param[out]     out         输出
-/// @param[out]     outl        输出长度
-/// @param[in]      in          输入
-/// @param[in]      inl         输入长度
-/// @param[in]      encrypt     加密函数
-/// @param[in]      cipher_key  算法密钥
-/// @param[in]      block_size  算法block大小
-/// @param[inout]   ecb_buffer  ECB缓冲区
-/// @param[inout]   ecb_bsize   ECB缓冲区长度
-/// @param[in]      ecb_mbsize  ECB缓冲区上限
-void ecb_encrypt_update(uint8_t* out,           // output buffer
-                        int* outl,              // output len
-                        uint8_t* in,            // input buffer
-                        int inl,                // input len
-                        CipherEncrypt encrypt,  // encrypt func
-                        void* cipher_key,       // cipher key
-                        int block_size,         // cipher block size
-                        uint8_t* ecb_buffer,    // ecb buffer
-                        int* ecb_bsize,         // ecb buffer size
-                        int ecb_mbsize          // ecb max bsize
-);
+/// @brief ECB 加密
+void ecb_encrypt_update(uint8_t* out,  ///< [out] 输出
+                        int* outl,     ///< [out] 输出长度
+                        uint8_t* in,   ///< [in]  输入
+                        int inl,       ///< [in]  输入长度
+                        ECB_CTX* mctx);
 
-/// @brief ECB模式解密update
-/// @param[out]     out         输出
-/// @param[out]     outl        输出长度
-/// @param[in]      in          输入
-/// @param[in]      inl         输入长度
-/// @param[in]      decrypt     解密函数
-/// @param[in]      cipher_key  算法密钥
-/// @param[in]      block_size  算法block大小
-/// @param[inout]   ecb_buffer  ECB缓冲区
-/// @param[inout]   ecb_bsize   ECB缓冲区长度
-/// @param[in]      ecb_mbsize  ECB缓冲区上限
-void ecb_decrypt_update(uint8_t* out,           // output buffer
-                        int* outl,              // output len
-                        uint8_t* in,            // input buffer
-                        int inl,                // input len
-                        CipherDecrypt decrypt,  // decrypt func
-                        void* cipher_key,       // cipher key
-                        int block_size,         // cipher block size
-                        uint8_t* ecb_buffer,    // ecb buffer
-                        int* ecb_bsize,         // ecb buffer size
-                        int ecb_mbsize          // ecb max bsize
-);
+/// @brief ECB 加密
+void ecb_encrypt_final(uint8_t* out, int* outl, ECB_CTX* mctx);
 
-/// @brief ECB模式加密final
-/// @param[out]     out         输出
-/// @param[out]     outl        输出长度
-/// @param[in]      encrypt     加密函数
-/// @param[in]      cipher_key  算法密钥
-/// @param[in]      block_size  算法block大小
-/// @param[inout]   ecb_buffer  ECB缓冲区
-/// @param[inout]   ecb_bsize   ECB缓冲区长度
-void ecb_encrypt_final(uint8_t* out,           // output buffer
-                       int* outl,              // output len
-                       CipherEncrypt encrypt,  // encrypt func
-                       void* cipher_key,       // cipher key
-                       int block_size,         // cipher block size
-                       uint8_t* ecb_buffer,    // ecb buffer
-                       int* ecb_bsize          // ecb buffer size
-);
+/// @brief ECB 解密
+void ecb_decrypt_update(uint8_t* out,  ///< [out] 输出
+                        int* outl,     ///< [out] 输出长度
+                        uint8_t* in,   ///< [in]  输入
+                        int inl,       ///< [in]  输入长度
+                        ECB_CTX* mctx);
 
-/// @brief ECB模式加密final
-/// @param[out]     out         输出
-/// @param[out]     outl        输出长度
-/// @param[in]      decrypt     解密函数
-/// @param[in]      cipher_key  算法密钥
-/// @param[in]      block_size  算法block大小
-/// @param[inout]   ecb_buffer  ECB缓冲区
-/// @param[inout]   ecb_bsize   ECB缓冲区长度
+/// @brief ECB 解密
 /// @return 错误码（0表示无错误）
-int ecb_decrypt_final(uint8_t* out,           // output buffer
-                      int* outl,              // output len
-                      CipherDecrypt decrypt,  // decrypt func
-                      void* cipher_key,       // cipher key
-                      int block_size,         // cipher block size
-                      uint8_t* ecb_buffer,    // ecb buffer
-                      int* ecb_bsize          // ecb buffer size
-);
+int ecb_decrypt_final(uint8_t* out, int* outl, ECB_CTX* mctx);
 
-// =========================================
-// ============= CBC Mode ==================
-// =========================================
+// ==========================================
+// ============== CBC MODE ==================
+// ==========================================
 
-/// @brief CBC模式加密update
-/// @param[out]     out         输出
-/// @param[out]     outl        输出长度
-/// @param[in]      in          输入
-/// @param[in]      inl         输入长度
-/// @param[in]      encrypt     加密函数
-/// @param[in]      cipher_key  算法密钥
-/// @param[in]      block_size  算法block大小
-/// @param[inout]   cbc_iv      CBC 初始向量iv
-/// @param[inout]   cbc_buffer  CBC缓冲区
-/// @param[inout]   cbc_bsize   CBC缓冲区长度
-void cbc_encrypt_update(uint8_t* out,           // output buffer
-                        int* outl,              // output len
-                        uint8_t* in,            // input buffer
-                        int inl,                // input len
-                        CipherEncrypt encrypt,  // encrypt func
-                        void* cipher_key,       // cipher key
-                        int block_size,         // cipher block size
-                        uint8_t* cbc_iv,        // cbc iv
-                        uint8_t* cbc_buffer,    // cbc buffer
-                        int* cbc_bsize          // cbc buffer size
-);
+typedef struct CBC_CTX {
+    uint8_t iv[BLOCK_SIZE];
+    uint8_t buffer[BLOCK_SIZE];
+    int bsize;
+    const CipherInfo* cipher;
+    void* cctx;
+} CBC_CTX;
 
-/// @brief CBC模式解密update
-/// @param[out]     out         输出
-/// @param[out]     outl        输出长度
-/// @param[in]      in          输入
-/// @param[in]      inl         输入长度
-/// @param[in]      decrypt     解密函数
-/// @param[in]      cipher_key  算法密钥
-/// @param[in]      block_size  算法block大小
-/// @param[inout]   cbc_iv      CBC 初始向量iv
-/// @param[inout]   cbc_buffer  CBC缓冲区
-/// @param[inout]   cbc_bsize   CBC缓冲区长度
-/// @param[in]      cbc_mbsize  CBC缓冲区上限
-void cbc_decrypt_update(uint8_t* out,           // output buffer
-                        int* outl,              // output len
-                        uint8_t* in,            // input buffer
-                        int inl,                // input len
-                        CipherDecrypt decrypt,  // decrypt func
-                        void* cipher_key,       // cipher key
-                        int block_size,         // cipher block size
-                        uint8_t* cbc_iv,        // cbc iv
-                        uint8_t* cbc_buffer,    // cbc buffer
-                        int* cbc_bsize,         // cbc buffer size
-                        int cbc_mbsize          // cbc max bsize
-);
+/// @brief CBC 模式初始化
+void cbc_init(uint8_t* key,              ///< [in]    用户密钥
+              uint8_t* iv,               ///< [in]    初始向量
+              const CipherInfo* cipher,  ///< [in]    算法
+              void* cctx,                ///< [inout] 算法上下文
+              CBC_CTX* mctx);
 
-/// @brief CBC模式加密final
-/// @param[out]     out         输出
-/// @param[out]     outl        输出长度
-/// @param[in]      encrypt     加密函数
-/// @param[in]      cipher_key  算法密钥
-/// @param[in]      block_size  算法block大小
-/// @param[inout]   cbc_iv      CBC 初始向量iv
-/// @param[inout]   cbc_buffer  CBC缓冲区
-/// @param[inout]   cbc_bsize   CBC缓冲区长度
-void cbc_encrypt_final(uint8_t* out,           // output buffer
-                       int* outl,              // output len
-                       CipherEncrypt encrypt,  // encrypt func
-                       void* cipher_key,       // cipher key
-                       int block_size,         // cipher block size
-                       uint8_t* cbc_iv,        // cbc iv
-                       uint8_t* cbc_buffer,    // cbc buffer
-                       int* cbc_bsize          // cbc buffer size
-);
+/// @brief CBC 加密
+void cbc_encrypt_update(uint8_t* out,  ///< [out] 输出
+                        int* outl,     ///< [out] 输出长度
+                        uint8_t* in,   ///< [in]  输入
+                        int inl,       ///< [in]  输入长度
+                        CBC_CTX* mctx);
 
-/// @brief CBC模式加密final
-/// @param[out]     out         输出
-/// @param[out]     outl        输出长度
-/// @param[in]      decrypt     解密函数
-/// @param[in]      cipher_key  算法密钥
-/// @param[in]      block_size  算法block大小
-/// @param[inout]   cbc_iv      CBC 初始向量iv
-/// @param[inout]   cbc_buffer  CBC缓冲区
-/// @param[inout]   cbc_bsize   CBC缓冲区长度
-int cbc_decrypt_final(uint8_t* out,           // output buffer
-                      int* outl,              // output len
-                      CipherDecrypt decrypt,  // decrypt func
-                      void* cipher_key,       // cipher key
-                      int block_size,         // cipher block size
-                      uint8_t* cbc_iv,        // cbc iv
-                      uint8_t* cbc_buffer,    // cbc buffer
-                      int* cbc_bsize          // cbc buffer size
-);
+/// @brief CBC 加密
+void cbc_encrypt_final(uint8_t* out, int* outl, CBC_CTX* mctx);
 
-// =========================================
-// ============= CTR Mode ==================
-// =========================================
+/// @brief CBC 解密
+void cbc_decrypt_update(uint8_t* out,  ///< [out] 输出
+                        int* outl,     ///< [out] 输出长度
+                        uint8_t* in,   ///< [in]  输入
+                        int inl,       ///< [in]  输入长度
+                        CBC_CTX* mctx);
 
-/// @brief CTR模式update
-/// @param[out]     out         输出
-/// @param[out]     outl        输出长度
-/// @param[in]      in          输入
-/// @param[in]      inl         输入长度
-/// @param[in]      encrypt     加密函数
-/// @param[in]      cipher_key  算法密钥
-/// @param[in]      block_size  算法block大小
-/// @param[inout]   ctr_iv      CTR 初始向量iv
-/// @param[inout]   ctr_buffer  CTR缓冲区
-/// @param[inout]   ctr_bsize   CTR缓冲区长度
-/// @param[in]      ctr_mbsize  CTR缓冲区上限
-void ctr_update(uint8_t* out,           // output buffer
-                int* outl,              // output len
-                uint8_t* in,            // input buffer
-                int inl,                // input len
-                CipherEncrypt encrypt,  // encrypt func
-                void* cipher_key,       // cipher key
-                int block_size,         // cipher block size
-                uint8_t* ctr_iv,        // ctr iv
-                uint8_t* ctr_buffer,    // ctr buffer
-                int* ctr_bsize,         // ctr buffer size
-                int ctr_mbsize          // ctr max bsize
-);
+/// @brief CBC 解密
+/// @return 错误码（0表示无错误）
+int cbc_decrypt_final(uint8_t* out, int* outl, CBC_CTX* mctx);
 
-/// @brief CTR模式final
-/// @param[out]     out         输出
-/// @param[out]     outl        输出长度
-/// @param[in]      encrypt     加密函数
-/// @param[in]      cipher_key  算法密钥
-/// @param[in]      block_size  算法block大小
-/// @param[inout]   ctr_iv      CTR 初始向量iv
-/// @param[inout]   ctr_buffer  CTR缓冲区
-/// @param[inout]   ctr_bsize   CTR缓冲区长度
-void ctr_final(uint8_t* out,           // output buffer
-               int* outl,              // output len
-               CipherEncrypt encrypt,  // encrypt func
-               void* cipher_key,       // cipher key
-               int block_size,         // cipher block size
-               uint8_t* ctr_iv,        // ctr iv
-               uint8_t* ctr_buffer,    // ctr buffer
-               int* ctr_bsize          // ctr buffer size
-);
+// ==========================================
+// ============== GCM MODE ==================
+// ==========================================
+
+// GHashTable 将占用巨大存储空间
+typedef uint64_t GHashTable[256][2];
+
+typedef struct GHash_CTX {
+    uint8_t buffer[BLOCK_SIZE];
+    int bsize;
+    uint8_t X[BLOCK_SIZE];
+    uint8_t H[BLOCK_SIZE];
+    GHashTable* ht;
+} GHash_CTX;
+
+typedef struct GCTR_CTX {
+    uint8_t j0[BLOCK_SIZE];
+    uint8_t j[BLOCK_SIZE];
+    uint8_t buffer[BLOCK_SIZE];
+    int bsize;
+    const CipherInfo* cipher;
+    void* cctx;
+} GCTR_CTX;
+
+typedef struct GCM_CTX {
+    GHash_CTX hctx;
+    GCTR_CTX gctx;
+    int alen, clen;
+} GCM_CTX;
+
+void gcm_init(uint8_t* key,              ///< [in]    用户密钥
+              uint8_t* iv,               ///< [in]    初始向量
+              int ivlen,                 ///< [in]    初始向量长度
+              GHashTable* ht,            ///< [inout] GHash查找表(可为NULL)
+              const CipherInfo* cipher,  ///< [in]    算法
+              void* cctx,                ///< [inout] 算法上下文
+              GCM_CTX* mctx);
+
+void gcm_update_aad(uint8_t* aad, int alen, GCM_CTX* mctx);
+
+/// @brief GCM 加密
+void gcm_encrypt_update(uint8_t* out,  ///< [out] 输出
+                        int* outl,     ///< [out] 输出长度
+                        uint8_t* in,   ///< [in]  输入
+                        int inl,       ///< [in]  输入长度
+                        GCM_CTX* mctx);
+
+/// @brief GCM 加密
+void gcm_encrypt_final(uint8_t* out,  ///< [out] 输出
+                       int* outl,     ///< [out] 输出长度
+                       uint8_t* tag,  ///< [out] tag
+                       int tlen,      ///< [in]  tag长度
+                       GCM_CTX* mctx);
+
+/// @brief GCM 解密
+void gcm_decrypt_update(uint8_t* out,  ///< [out] 输出
+                        int* outl,     ///< [out] 输出长度
+                        uint8_t* in,   ///< [in]  输入
+                        int inl,       ///< [in]  输入长度
+                        GCM_CTX* mctx);
+
+/// @brief GCM 解密
+/// @return 错误码（0表示无错误）
+int gcm_decrypt_final(uint8_t* out,  ///< [out] 输出
+                      int* outl,     ///< [out] 输出长度
+                      uint8_t* tag,  ///< [in]  tag
+                      int tlen,      ///< [in]  tag长度
+                      GCM_CTX* mctx);
 
 #ifdef __cplusplus
 }
 #endif  // __cplusplus
 
-#endif  // MODE_H
+#endif // MODE_H

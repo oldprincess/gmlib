@@ -26,6 +26,10 @@ uint32_t loadu32_be(uint8_t* src);
 /// @param[in]  n
 void storeu32_be(uint8_t* dst, uint32_t n);
 
+/// @brief 以大端形式读取64比特数
+/// @param[in]  src
+uint64_t loadu64_be(uint8_t* src);
+
 /// @brief 以大端形式存储64比特数
 /// @param[out] dst
 /// @param[in]  n

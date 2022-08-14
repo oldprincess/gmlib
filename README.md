@@ -1,50 +1,12 @@
 ﻿# GMLib
 
-支持国密 SM4-ECB/CBC/CTR，SM3，SM2签名/加密，ZUC算法 的密码库，文档页面 https://oldprincess.github.io/gmlib/
+支持国密 SM4-ECB/CBC/GCM，SM3，SM2签名/加密，ZUC算法 的密码库，文档页面 https://oldprincess.github.io/gmlib/
 
 ## 一、快速开始
 
 ### 1.1 文件目录
 
 整个项目主要分为4部分，`include` 目录为 `gmlib` 库向外暴露的接口， `src` 目录为实现的源代码，`test` 目录为测试函数，`demo` 目录为一些调用样例
-
-```tree
-├─include               # include 文件
-│  └─gmlib              # gmlib 库头文件
-│      ├─cipher             # 分组密码
-│      ├─hash               # 哈希函数
-│      ├─publickey          # 公钥密码
-|      └─stream             # 流密码
-|
-├─src                   # gmlib 源代码
-│  ├─bint                   # 大整数运算
-│  ├─cipher                 # 分组密码
-│  │  ├─cipher_mode             # 分组密码工作模式
-│  │  └─sm4                     # SM4 算法
-│  ├─ec                     # 椭圆曲线运算
-│  ├─hash                   # 哈希算法
-│  │  └─sm3                     # SM3 算法
-│  ├─math                   # 数学函数
-│  ├─publickey              # 公钥密码
-│  │   └─sm2                    # SM2 算法
-|  └─stream                 # 流密码
-|      └─zuc                    # ZUC 算法
-├─test                  # 测试文件
-|   ├─bint
-|   ├─cipher
-|   │  └─sm4
-|   ├─ec
-|   ├─hash
-|   │  └─sm3
-|   ├─math
-|   ├─publickey
-|   │   └─sm2
-|   └─stream
-|       └─zuc
-|
-└─demo                  # 样例
-
-```
 
 ### 1.2 通过CMake编译（推荐）
 
@@ -90,14 +52,6 @@ cmake .. -DCMAKE_BUILD_TYPE="Release"
 ```
 
 **注**：在 linux 系统中编译流程同上
-
-### 1.3 通过VS编译
-
-**注**：该方式并未测试
-
-若不想下载 `CMake`，则可使用 VS 创建工程，并在工程中添加 `src` 和 `test` 中的源文件，并添加外部 include_path 为 `gmlib/include` 目录。
-
-为了测试程序能正常运行，需要在编译时添加 `GMLIB_TEST` 宏，使算法中与随机数生成相关的代码生成固定的随机数，否则测试程序将不通过。若无需测试，仅需要使用库中的代码，`test` 目录中的源文件可排除在项目之外，且无需添加 `GMLIB_TEST` 宏。
 
 ## 二、GMLib 库使用
 

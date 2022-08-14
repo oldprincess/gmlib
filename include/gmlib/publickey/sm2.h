@@ -29,9 +29,9 @@ extern EC_CTX SM2_Fp256_CTX;
 typedef struct SM2_SIGN_CTX {
     // Z = H(ENTL || ID || a || b || G.x || G.y || P.x || P.y)
     uint8_t Z[SM3_DIGEST_SIZE];  // 签名者标识
-    EC_CTX ec_ctx;               // 椭圆曲线 Context
+    EC_CTX* ec_ctx;              // 椭圆曲线 Context
     SM3_CTX sm3_ctx;             // sm3 Context
-    BINT da;                     // 签名者私钥
+    BINT* da;                    // 签名者私钥
     BINT da_plus_1_iv;           // (da+1)^-1 % EC.n
 } SM2_SIGN_CTX;
 
@@ -59,9 +59,9 @@ int sm2_sign_final(uint8_t* out, int* outl, SM2_SIGN_CTX* sm2_sign_ctx);
 typedef struct SM2_VERIFY_CTX {
     // Z = H(ENTL || ID || a || b || G.x || G.y || P.x || P.y)
     uint8_t Z[SM3_DIGEST_SIZE];  // 签名者标识
-    EC_CTX ec_ctx;               // 椭圆曲线 Context
+    EC_CTX* ec_ctx;              // 椭圆曲线 Context
     SM3_CTX sm3_ctx;             // sm3 Context
-    ECPoint P;                   // 签名者公钥
+    ECPoint* P;                  // 签名者公钥
 } SM2_VERIFY_CTX;
 
 /// @brief SM2 验签初始化
@@ -109,18 +109,18 @@ typedef struct SM2_CRYPT_CTX {
 } SM2_CRYPT_CTX;
 
 /// @brief SM2 加密初始化(输出C1)
-int sm2_encrypt_init(uint8_t* C1,
-                     int* outl,
-                     int PC,
-                     EC_CTX* ec_ctx,
-                     ECPoint* P,
+int sm2_encrypt_init(uint8_t* C1,     ///< [out] 输出
+                     int* outl,       ///< [out] 输出长度
+                     int PC,          ///< [in]  椭圆曲线点表示方法
+                     EC_CTX* ec_ctx,  ///< [in]  椭圆曲线参数
+                     ECPoint* P,      ///< [in]  接收方公钥
                      SM2_CRYPT_CTX* sm2_crypt_ctx);
 
 /// @brief SM2 加密Update(输出C2)
-void sm2_encrypt_update(uint8_t* out,
-                        int* outl,
-                        uint8_t* in,
-                        int inl,
+void sm2_encrypt_update(uint8_t* out,  ///< [out] 输出
+                        int* outl,     ///< [out] 输出长度
+                        uint8_t* in,   ///< [in]  输入
+                        int inl,       ///< [in]  输入长度
                         SM2_CRYPT_CTX* sm2_crypt_ctx);
 
 /// @brief SM2 加密Final(输出C3)

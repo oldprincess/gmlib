@@ -95,4 +95,3 @@ void sm2_encrypt_final(uint8_t* C3, SM2_CRYPT_CTX* sm2_crypt_ctx) {
     sm3_update(sm2_crypt_ctx->dot2.y, size, sm3_ctx);
     sm3_final(C3, sm3_ctx);
 }
-
