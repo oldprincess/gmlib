@@ -604,25 +604,28 @@
 <span class="c1"># 创建 build 目录，避免污染源代码</span>
 mkdir build
 <span class="nb">cd</span> build
-<span class="c1"># 执行cmake 以 Debug 模式编译</span>
-cmake .. -DCMAKE_BUILD_TYPE<span class="o">=</span><span class="s2">&quot;Debug&quot;</span>
+</code></pre></div>
+<ul>
+<li>执行cmake，以Release模式编译</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1"># linux</span>
+cmake .. -DCMAKE_BUILD_TYPE<span class="o">=</span>Release
 cmake --build .
 </code></pre></div>
-<p>若编译成功，则应该在<code>build/output</code>目录下生成结果文件，在其下的<code>exe</code>和<code>lib</code>目录为生成的测试文件与lib文件</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Windows(VS)</span>
+cmake ..
+cmake --build . --config release
+</code></pre></div>
+<p>若编译成功，则应该在<code>build</code>目录下生成结果文件，在其下的<code>bin</code>和<code>lib</code>目录为生成的测试文件与lib文件</p>
 <ul>
-<li>在控制台中输入下述命令，执行编译出的测试文件 <code>gmlib-test</code></li>
+<li>在控制台中执行 <code>bin</code> 目录下编译出的测试文件 <code>gmlib-test</code></li>
 </ul>
-<div class="highlight"><pre><span></span><code>./output/exe/DEBUG/gmlib-test
-</code></pre></div>
 <p>应当可在控制台中看到输出 <code>test finish!</code>，说明测试结果正确</p>
-<p>上述编译流程默认编译 DEBUG 项目，以 DEBUG 模式编译将开启 <code>GMLib</code> 库的错误 log 功能。若需要关闭该功能，或是想使用 RELEASE 版本，则应当以 RELEASE 模式编译。将 cmake 命令改为</p>
-<div class="highlight"><pre><span></span><code>cmake .. -DCMAKE_BUILD_TYPE<span class="o">=</span><span class="s2">&quot;Release&quot;</span>
-</code></pre></div>
 <p><strong>注</strong>：在 linux 系统中编译流程同上</p>
 <h2 id="gmlib_1">二、GMLib 库使用</h2>
-<p>以 1.2 中的 cmake 方式编译为例，编译完成后生成的库文件位于 <code>gmlib/build/output/lib</code> 目录，其中的 <code>DEBUG</code> 和 <code>RELEASE</code> 子目录分别对应 DEBUG 和 RELEASE 模式的编译输出，库的名称均为 <code>gmlib.lib</code>。</p>
+<p>以 1.2 中的 cmake 方式编译为例，编译完成后生成的库文件位于 <code>gmlib/build/lib</code> 目录，库的名称均为 <code>gmlib</code>。</p>
 <ul>
-<li>DEBUG 模式下会将错误信息输出至 <code>stderr</code>，例如如下代码：</li>
+<li>错误信息输出至 <code>stderr</code>，例如如下代码：</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/bint.h&gt;</span><span class="cp"></span>
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
@@ -633,15 +636,14 @@ cmake --build .
 <span class="p">}</span><span class="w"></span>
 </code></pre></div>
 <ul>
-<li>若使用 DEBUG 模式编译输出的库，则控制台中将提示</li>
+<li>控制台中将提示</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="o">[</span>Error<span class="o">]</span> Bad string input, need <span class="o">[</span><span class="m">0</span>, <span class="m">9</span><span class="o">]</span>, get a. File <span class="sb">`</span>..<span class="se">\s</span>rc<span class="se">\b</span>int<span class="se">\b</span>int_cast.c<span class="sb">`</span>, line <span class="m">68</span>, <span class="k">in</span> <span class="sb">`</span>bint_from_str<span class="sb">`</span>
 </code></pre></div>
-<p>而若使用 RELEASE 模式编译的库，则不会有上述提示</p>
-<p>该错误提示是由 <code>GMLIB_DEBUG</code> 宏控制，若想在 RELEASE 模式中也输出错误 log，可修改 CMakeLists.txt 文件，将下述注释</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># set(CMAKE_C_FLAGS_RELEASE -DGMLIB_DEBUG)</span>
+<p>该错误提示是由 <code>GMLIB_DEBUG</code> 宏控制，若想关闭该提示，可修改 CMakeLists.txt 文件，将该行注释</p>
+<div class="highlight"><pre><span></span><code>set<span class="o">(</span>CMAKE_C_FLAGS -DGMLIB_DEBUG<span class="o">)</span>
 </code></pre></div>
-<p>消去再重新编译工程</p>
+<p>再重新编译工程</p>
 <p>更多使用样例请参考docs文档和demo目录</p>
 <h2 id="_2">三、其它</h2>
 <ul>

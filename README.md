@@ -1,8 +1,8 @@
 ﻿# GMLib
 
-支持国密 SM4-ECB/CBC/GCM，SM3，SM2签名/加密，ZUC算法 的密码库，文档页面 https://oldprincess.github.io/gmlib/
+支持国密 SM4/AES-ECB/CBC/GCM，SM3，SM2签名/加密，ZUC算法 的密码库，文档页面 https://oldprincess.github.io/gmlib/，项目地址 [gmlib](https://github.com/oldprincess/gmlib/)
 
-开发这个库的时候参考了很多密码库，例如 `crypto++`，`openssl`，`gmssl`，`oryx-embedded` 以及 `JAVA JDK`，所以很多地方都能看到这些库的影子
+开发这个库的时候参考了很多密码库，例如 [Crypto++](https://github.com/weidai11/cryptopp)，[openssl](https://github.com/openssl/openssl)，[GmSSL](https://github.com/guanzhi/GmSSL)，[Oryx Embedded](https://www.oryx-embedded.com/doc/) 以及 `JAVA JDK`，所以很多地方都能看到这些库的影子
 
 ## 一、快速开始
 
@@ -32,34 +32,35 @@ cd gmlib
 # 创建 build 目录，避免污染源代码
 mkdir build
 cd build
-# 执行cmake 以 Debug 模式编译
-cmake .. -DCMAKE_BUILD_TYPE="Debug"
+```
+
+* 执行cmake，以Release模式编译
+
+```bash
+# linux
+cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build .
 ```
 
-若编译成功，则应该在`build/output`目录下生成结果文件，在其下的`exe`和`lib`目录为生成的测试文件与lib文件
-
-* 在控制台中输入下述命令，执行编译出的测试文件 `gmlib-test`
-
 ```bash
-./output/exe/DEBUG/gmlib-test
+# Windows(VS)
+cmake ..
+cmake --build . --config release
 ```
+
+若编译成功，则应该在`build`目录下生成结果文件，在其下的`bin`和`lib`目录为生成的测试文件与lib文件
+
+* 在控制台中执行 `bin` 目录下编译出的测试文件 `gmlib-test`
 
 应当可在控制台中看到输出 `test finish!`，说明测试结果正确
-
-上述编译流程默认编译 DEBUG 项目，以 DEBUG 模式编译将开启 `GMLib` 库的错误 log 功能。若需要关闭该功能，或是想使用 RELEASE 版本，则应当以 RELEASE 模式编译。将 cmake 命令改为
-
-```bash
-cmake .. -DCMAKE_BUILD_TYPE="Release"
-```
 
 **注**：在 linux 系统中编译流程同上
 
 ## 二、GMLib 库使用
 
-以 1.2 中的 cmake 方式编译为例，编译完成后生成的库文件位于 `gmlib/build/output/lib` 目录，其中的 `DEBUG` 和 `RELEASE` 子目录分别对应 DEBUG 和 RELEASE 模式的编译输出，库的名称均为 `gmlib.lib`。
+以 1.2 中的 cmake 方式编译为例，编译完成后生成的库文件位于 `gmlib/build/lib` 目录，库的名称均为 `gmlib`。
 
-* DEBUG 模式下会将错误信息输出至 `stderr`，例如如下代码：
+* 错误信息输出至 `stderr`，例如如下代码：
 
 ```c
 #include <gmlib/bint.h>
@@ -71,21 +72,19 @@ int main() {
 }
 ```
 
-* 若使用 DEBUG 模式编译输出的库，则控制台中将提示
+* 控制台中将提示
 
 ```bash
 [Error] Bad string input, need [0, 9], get a. File `..\src\bint\bint_cast.c`, line 68, in `bint_from_str`
 ```
 
-而若使用 RELEASE 模式编译的库，则不会有上述提示
-
-该错误提示是由 `GMLIB_DEBUG` 宏控制，若想在 RELEASE 模式中也输出错误 log，可修改 CMakeLists.txt 文件，将下述注释
+该错误提示是由 `GMLIB_DEBUG` 宏控制，若想关闭该提示，可修改 CMakeLists.txt 文件，将该行注释
 
 ```bash
-# set(CMAKE_C_FLAGS_RELEASE -DGMLIB_DEBUG)
+set(CMAKE_C_FLAGS -DGMLIB_DEBUG)
 ```
 
-消去再重新编译工程
+再重新编译工程
 
 更多使用样例请参考docs文档和demo目录
 
