@@ -7,6 +7,7 @@
 int main() {
     uint8_t x[16];
     clock_t clk1, clk2;
+    double time;
     SM4_CTX ctx;
 
     clk1 = clock();
@@ -14,7 +15,8 @@ int main() {
         sm4_encrypt(x, x, &ctx);
     }
     clk2 = clock();
-    printf("SM4 clk=%ld\n", clk2 - clk1);
+    time = (double)(clk2 - clk1) / CLOCKS_PER_SEC;
+    printf("SM4 clk=%ld, speed=%.4f MB/s\n", clk2 - clk1, 16 / time);
 
     AES_CTX actx;
     aes128_init(x, &actx);
@@ -24,7 +26,8 @@ int main() {
         aes_encrypt(x, x, &actx);
     }
     clk2 = clock();
-    printf("AES clk=%ld\n", clk2 - clk1);
+    time = (double)(clk2 - clk1) / CLOCKS_PER_SEC;
+    printf("AES clk=%ld, speed=%.4f MB/s\n", clk2 - clk1, 16 / time);
 
     return 0;
 }
