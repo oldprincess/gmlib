@@ -1,4 +1,5 @@
 ﻿#include <gmlib/publickey/sm2.h>
+#include <gmlib/utils.h>
 #include <stdio.h>
 
 static uint8_t ID_A[] = {
@@ -30,11 +31,17 @@ int main() {
     // 计算公钥 P = [da]G
     ec_mul(&P, &da, &SM2_Fp256_CTX.G, &SM2_Fp256_CTX);
 
+    puts("msg:");
+    dump_data(msg, sizeof(msg));
+
     // sm2 签名
     SM2_SIGN_CTX sm2_sign_ctx;
     sm2_sign_init(ENTL_A, ID_A, &SM2_Fp256_CTX, &da, &P, &sm2_sign_ctx);
     sm2_sign_update(msg, sizeof(msg), &sm2_sign_ctx);
     sm2_sign_final(signature, &outl, &sm2_sign_ctx);
+
+    puts("signature:");
+    dump_data(signature, outl);
 
     // sm2 验签
     SM2_VERIFY_CTX sm2_verify_ctx;

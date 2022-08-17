@@ -1,3 +1,17 @@
+/**
+ * @file  mode.h
+ * @brief 分组密码工作模式
+ *
+ * 参考资料：<br>
+ * [1]. SP 800-38A Recommendation for Block Cipher Modes of Operation:
+ *      Methods and Techniques <br>
+ * [2]. SP 800-38D Recommendation for Block Cipher Modes of Operation:
+ *      Galois/Counter Mode (GCM) and GMAC <br>
+ * [3]. D. McGrew and J. Viega. The Galois/Counter Mode of Operation (GCM) <br>
+ *
+ * 参考资料[1]与[2]为NIST对称密码工作模式文档，参考资料[3]为GCM模式的查表优化
+ */
+
 #ifndef MODE_H
 #define MODE_H
 
@@ -5,7 +19,7 @@
 extern "C" {
 #endif  // __cplusplus
 
-#include <gmlib/cipher/types.h>
+#include <gmlib/types.h>
 
 #define BLOCK_SIZE 16
 
@@ -14,10 +28,10 @@ extern "C" {
 // ==========================================
 
 typedef struct ECB_CTX {
-    uint8_t buffer[BLOCK_SIZE];
-    int bsize;
-    const CipherInfo* cipher;
-    void* cctx;
+    uint8_t buffer[BLOCK_SIZE];  // 缓冲区
+    int bsize;                   // 当前缓冲区大小
+    const CipherInfo* cipher;    // 算法参数
+    void* cctx;                  // 算法上下文
 } ECB_CTX;
 
 /// @brief ECB 模式初始化
@@ -52,11 +66,11 @@ int ecb_decrypt_final(uint8_t* out, int* outl, ECB_CTX* mctx);
 // ==========================================
 
 typedef struct CBC_CTX {
-    uint8_t iv[BLOCK_SIZE];
-    uint8_t buffer[BLOCK_SIZE];
-    int bsize;
-    const CipherInfo* cipher;
-    void* cctx;
+    uint8_t iv[BLOCK_SIZE];      // 初始向量
+    uint8_t buffer[BLOCK_SIZE];  // 缓冲区
+    int bsize;                   // 当前缓冲区大小
+    const CipherInfo* cipher;    // 算法参数
+    void* cctx;                  // 算法上下文
 } CBC_CTX;
 
 /// @brief CBC 模式初始化
@@ -95,26 +109,27 @@ int cbc_decrypt_final(uint8_t* out, int* outl, CBC_CTX* mctx);
 typedef uint64_t GHashTable[256][2];
 
 typedef struct GHash_CTX {
-    uint8_t buffer[BLOCK_SIZE];
-    int bsize;
-    uint8_t X[BLOCK_SIZE];
-    uint8_t H[BLOCK_SIZE];
-    GHashTable* ht;
+    uint8_t buffer[BLOCK_SIZE];  // 缓冲区
+    int bsize;                   // 当前缓冲区大小
+    uint8_t X[BLOCK_SIZE];       // GHash当前状态X
+    uint8_t H[BLOCK_SIZE];       // 参数H
+    GHashTable* ht;              // 查找表指针
 } GHash_CTX;
 
 typedef struct GCTR_CTX {
-    uint8_t j0[BLOCK_SIZE];
-    uint8_t j[BLOCK_SIZE];
-    uint8_t buffer[BLOCK_SIZE];
-    int bsize;
-    const CipherInfo* cipher;
-    void* cctx;
+    uint8_t j0[BLOCK_SIZE];      // 初始向量
+    uint8_t j[BLOCK_SIZE];       // 初始向量
+    uint8_t buffer[BLOCK_SIZE];  // 缓冲区
+    int bsize;                   // 当前缓冲区大小
+    const CipherInfo* cipher;    // 算法参数
+    void* cctx;                  // 算法上下文
 } GCTR_CTX;
 
 typedef struct GCM_CTX {
-    GHash_CTX hctx;
-    GCTR_CTX gctx;
-    int alen, clen;
+    GHash_CTX hctx;  // GHash上下文
+    GCTR_CTX gctx;   // GCTR上下文
+    int alen;        // AAD长度
+    int clen;        // 密文长度
 } GCM_CTX;
 
 void gcm_init(uint8_t* key,              ///< [in]    用户密钥

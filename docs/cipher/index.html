@@ -1,0 +1,1096 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.4.0">
+    
+    
+      
+        <title>分组密码 - GMLib 文档</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.69437709.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#cipher" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href=".." title="GMLib 文档" class="md-header__button md-logo" aria-label="GMLib 文档" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            GMLib 文档
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              分组密码
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="清空当前内容" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="GMLib 文档" class="md-nav__button md-logo" aria-label="GMLib 文档" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    GMLib 文档
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        快速开始
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          API文档
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="API文档" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          API文档
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../err/" class="md-nav__link">
+        错误处理
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        功能函数
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_3" type="checkbox" id="__nav_2_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_3">
+          大整数库
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="大整数库" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_3">
+          <span class="md-nav__icon md-icon"></span>
+          大整数库
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bint/" class="md-nav__link">
+        基本运算
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../math/" class="md-nav__link">
+        数学函数
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ec/" class="md-nav__link">
+        椭圆曲线
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_5" type="checkbox" id="__nav_2_5" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_5">
+          密码算法
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="密码算法" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_5">
+          <span class="md-nav__icon md-icon"></span>
+          密码算法
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          分组密码
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        分组密码
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    一、类型定义
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    二、密码算法
+  </a>
+  
+    <nav class="md-nav" aria-label="二、密码算法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-sm4" class="md-nav__link">
+    2.1 SM4
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-aes" class="md-nav__link">
+    2.2 AES
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    三、工作模式
+  </a>
+  
+    <nav class="md-nav" aria-label="三、工作模式">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-ecb" class="md-nav__link">
+    3.1 ECB模式
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-cbc" class="md-nav__link">
+    3.2 CBC模式
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-gcm" class="md-nav__link">
+    3.3 GCM模式
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hash/" class="md-nav__link">
+        哈希函数
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../publickey/" class="md-nav__link">
+        公钥密码
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stream/" class="md-nav__link">
+        流密码
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        关于
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    一、类型定义
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    二、密码算法
+  </a>
+  
+    <nav class="md-nav" aria-label="二、密码算法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-sm4" class="md-nav__link">
+    2.1 SM4
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-aes" class="md-nav__link">
+    2.2 AES
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    三、工作模式
+  </a>
+  
+    <nav class="md-nav" aria-label="三、工作模式">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-ecb" class="md-nav__link">
+    3.1 ECB模式
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-cbc" class="md-nav__link">
+    3.2 CBC模式
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-gcm" class="md-nav__link">
+    3.3 GCM模式
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+
+<h1 id="cipher">分组密码Cipher</h1>
+<h2 id="_1">一、类型定义</h2>
+<div class="admonition info">
+<p>file: gmlib/types.h</p>
+</div>
+<p>每个分组密码算法都实现下述函数并定义相应的 <code>CipherInfo</code> 结构变量，用于工作模式的调用</p>
+<ul>
+<li>算法上下文(Context)初始化函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">CipherInit</span><span class="p">)(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>算法加密函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">CipherEncrypt</span><span class="p">)(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>算法解密函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">CipherDecrypt</span><span class="p">)(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>算法信息(Info)结构体</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">CipherInfo</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">CipherInit</span><span class="w"> </span><span class="n">init</span><span class="p">;</span><span class="w">        </span><span class="c1">///&lt; 初始化算法</span>
+<span class="w">    </span><span class="n">CipherEncrypt</span><span class="w"> </span><span class="n">encrypt</span><span class="p">;</span><span class="w">  </span><span class="c1">///&lt; 加密算法</span>
+<span class="w">    </span><span class="n">CipherDecrypt</span><span class="w"> </span><span class="n">decrypt</span><span class="p">;</span><span class="w">  </span><span class="c1">///&lt; 解密算法</span>
+<span class="p">}</span><span class="w"> </span><span class="n">CipherInfo</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
+<h2 id="_2">二、密码算法</h2>
+<h3 id="21-sm4">2.1 SM4</h3>
+<div class="admonition info">
+<p>file: gmlib/cipher/sm4.h</p>
+</div>
+<div class="admonition cite">
+<p class="admonition-title">参考资料</p>
+<ol>
+<li><a href="http://www.gmbz.org.cn/main/bzlb.html">GM/T 0002-2012 SM4分组密码算法</a></li>
+<li>郎欢, 张蕾, 吴文玲. SM4的快速软件实现技术</li>
+</ol>
+</div>
+<ul>
+<li>算法信息(Info)结构体</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="cp">#define SM4_KEYLEN 16</span>
+<span class="cp">#define SM4_BLOCK_SIZE 16</span>
+
+<span class="k">extern</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">CipherInfo</span><span class="w"> </span><span class="n">SM4Info</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>SM4算法上下文(Context)结构</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">SM4_CTX</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">rk</span><span class="p">[</span><span class="mi">32</span><span class="p">];</span><span class="w">  </span><span class="c1">// 32轮轮密钥</span>
+<span class="p">}</span><span class="w"> </span><span class="n">SM4_CTX</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>算法上下文(Context)初始化函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">sm4_init</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">SM4_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>算法加密函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">sm4_encrypt</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w"> </span><span class="n">SM4_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>算法解密函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">sm4_decrypt</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w"> </span><span class="n">SM4_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="highlight"><pre><span></span><code><span class="k">static</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">sm4_key</span><span class="p">[</span><span class="n">SM4_KEYLEN</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0x01</span><span class="p">,</span><span class="w"> </span><span class="mh">0x23</span><span class="p">,</span><span class="w"> </span><span class="mh">0x45</span><span class="p">,</span><span class="w"> </span><span class="mh">0x67</span><span class="p">,</span><span class="w"> </span><span class="mh">0x89</span><span class="p">,</span><span class="w"> </span><span class="mh">0xab</span><span class="p">,</span><span class="w"> </span><span class="mh">0xcd</span><span class="p">,</span><span class="w"> </span><span class="mh">0xef</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0xfe</span><span class="p">,</span><span class="w"> </span><span class="mh">0xdc</span><span class="p">,</span><span class="w"> </span><span class="mh">0xba</span><span class="p">,</span><span class="w"> </span><span class="mh">0x98</span><span class="p">,</span><span class="w"> </span><span class="mh">0x76</span><span class="p">,</span><span class="w"> </span><span class="mh">0x54</span><span class="p">,</span><span class="w"> </span><span class="mh">0x32</span><span class="p">,</span><span class="w"> </span><span class="mh">0x10</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">sm4_pt</span><span class="p">[</span><span class="n">SM4_BLOCK_SIZE</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0x00</span><span class="p">,</span><span class="w"> </span><span class="mh">0x11</span><span class="p">,</span><span class="w"> </span><span class="mh">0x22</span><span class="p">,</span><span class="w"> </span><span class="mh">0x33</span><span class="p">,</span><span class="w"> </span><span class="mh">0x44</span><span class="p">,</span><span class="w"> </span><span class="mh">0x55</span><span class="p">,</span><span class="w"> </span><span class="mh">0x66</span><span class="p">,</span><span class="w"> </span><span class="mh">0x77</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0x88</span><span class="p">,</span><span class="w"> </span><span class="mh">0x99</span><span class="p">,</span><span class="w"> </span><span class="mh">0xaa</span><span class="p">,</span><span class="w"> </span><span class="mh">0xbb</span><span class="p">,</span><span class="w"> </span><span class="mh">0xcc</span><span class="p">,</span><span class="w"> </span><span class="mh">0xdd</span><span class="p">,</span><span class="w"> </span><span class="mh">0xee</span><span class="p">,</span><span class="w"> </span><span class="mh">0xff</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="c1">// 128比特密文输出</span>
+<span class="kt">uint8_t</span><span class="w"> </span><span class="n">out</span><span class="p">[</span><span class="n">SM4_BLOCK_SIZE</span><span class="p">];</span><span class="w"></span>
+
+<span class="n">SM4_CTX</span><span class="w"> </span><span class="n">sm4key</span><span class="p">;</span><span class="w"></span>
+<span class="n">sm4_init</span><span class="p">(</span><span class="n">sm4_key</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sm4key</span><span class="p">);</span><span class="w"></span>
+<span class="n">sm4_encrypt</span><span class="p">(</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">sm4_pt</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sm4key</span><span class="p">);</span><span class="w"></span>
+<span class="c1">// 09 32 5c 48 53 83 2d cb 93 37 a5 98 4f 67 1b 9a</span>
+<span class="n">dump_data</span><span class="p">(</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">SM4_BLOCK_SIZE</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+</div>
+<h3 id="22-aes">2.2 AES</h3>
+<div class="admonition info">
+<p>file: gmlib/cipher/aes.h</p>
+</div>
+<div class="admonition cite">
+<p class="admonition-title">参考资料</p>
+<ol>
+<li><a href="https://csrc.nist.gov/csrc/media/publications/fips/197/final/documents/fips-197.pdf">FIPS 197 Advanced Encryption Standard (AES)</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/42264499">AES 查表优化</a></li>
+</ol>
+</div>
+<ul>
+<li>算法信息(Info)结构体</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="cp">#define AES128_KEYLEN 16</span>
+<span class="cp">#define AES192_KEYLEN 24</span>
+<span class="cp">#define AES256_KEYLEN 32</span>
+<span class="cp">#define AES_BLOCK_SIZE 16</span>
+
+<span class="k">extern</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">CipherInfo</span><span class="w"> </span><span class="n">AES128Info</span><span class="p">;</span><span class="w"></span>
+<span class="k">extern</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">CipherInfo</span><span class="w"> </span><span class="n">AES192Info</span><span class="p">;</span><span class="w"></span>
+<span class="k">extern</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">CipherInfo</span><span class="w"> </span><span class="n">AES256Info</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>AES算法上下文(Context)结构</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">AES_CTX</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">ek</span><span class="p">[</span><span class="mi">4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">15</span><span class="p">];</span><span class="w">  </span><span class="c1">// 加密轮密钥</span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">dk</span><span class="p">[</span><span class="mi">4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">15</span><span class="p">];</span><span class="w">  </span><span class="c1">// 解密轮密钥</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">nr</span><span class="p">;</span><span class="w">               </span><span class="c1">// 加密轮数</span>
+<span class="p">}</span><span class="w"> </span><span class="n">AES_CTX</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>算法上下文(Context)初始化函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">aes_init</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">kbits</span><span class="p">,</span><span class="w"> </span><span class="n">AES_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+
+<span class="c1">/// @brief AES128 初始化</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">aes128_init</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">AES_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="c1">/// @brief AES192 初始化</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">aes192_init</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">AES_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="c1">/// @brief AES256 初始化</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">aes256_init</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">AES_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>算法加密函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">aes_encrypt</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w"> </span><span class="n">AES_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>算法解密函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">aes_decrypt</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w"> </span><span class="n">AES_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<h2 id="_3">三、工作模式</h2>
+<div class="admonition info">
+<p>file: gmlib/cipher/mode.h</p>
+</div>
+<div class="admonition cite">
+<p class="admonition-title">参考资料</p>
+<ol>
+<li><a href="https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf">SP 800-38A Recommendation for Block Cipher Modes of Operation: Methods and Techniques</a></li>
+<li><a href="https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf">SP 800-38D Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC</a></li>
+<li>D. McGrew and J. Viega. <a href="https://luca-giuzzi.unibs.it/corsi/Support/papers-cryptography/gcm-spec.pdf">The Galois/Counter Mode of Operation (GCM)</a></li>
+</ol>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>该版本定义的工作模式仅支持密码分组长度 <code>BLOCK_SIZE</code> 为16字节(128比特)的分组密码算法</p>
+</div>
+<h3 id="31-ecb">3.1 ECB模式</h3>
+<ul>
+<li>工作模式上下文(Context)</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">ECB_CTX</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="n">BLOCK_SIZE</span><span class="p">];</span><span class="w">  </span><span class="c1">// 缓冲区</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">bsize</span><span class="p">;</span><span class="w">                   </span><span class="c1">// 当前缓冲区大小</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">CipherInfo</span><span class="o">*</span><span class="w"> </span><span class="n">cipher</span><span class="p">;</span><span class="w">    </span><span class="c1">// 算法参数</span>
+<span class="w">    </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">cctx</span><span class="p">;</span><span class="w">                  </span><span class="c1">// 算法上下文</span>
+<span class="p">}</span><span class="w"> </span><span class="n">ECB_CTX</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>模式上下文(Context)初始化函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ecb_init</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w">              </span><span class="c1">///&lt; [in]    用户密钥</span>
+<span class="w">              </span><span class="k">const</span><span class="w"> </span><span class="n">CipherInfo</span><span class="o">*</span><span class="w"> </span><span class="n">cipher</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [in]    算法</span>
+<span class="w">              </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">cctx</span><span class="p">,</span><span class="w">                </span><span class="c1">///&lt; [inout] 算法上下文</span>
+<span class="w">              </span><span class="n">ECB_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>模式加密函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ecb_encrypt_update</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [out] 输出</span>
+<span class="w">                        </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">outl</span><span class="p">,</span><span class="w">     </span><span class="c1">///&lt; [out] 输出长度</span>
+<span class="w">                        </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w">   </span><span class="c1">///&lt; [in]  输入</span>
+<span class="w">                        </span><span class="kt">int</span><span class="w"> </span><span class="n">inl</span><span class="p">,</span><span class="w">       </span><span class="c1">///&lt; [in]  输入长度</span>
+<span class="w">                        </span><span class="n">ECB_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ecb_encrypt_final</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="n">ECB_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>执行 <code>init</code> 函数后，多次 <code>update</code> 输入数据，最后 <code>final</code> 处理填充</p>
+</div>
+<ul>
+<li>模式解密函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ecb_decrypt_update</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [out] 输出</span>
+<span class="w">                        </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">outl</span><span class="p">,</span><span class="w">     </span><span class="c1">///&lt; [out] 输出长度</span>
+<span class="w">                        </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w">   </span><span class="c1">///&lt; [in]  输入</span>
+<span class="w">                        </span><span class="kt">int</span><span class="w"> </span><span class="n">inl</span><span class="p">,</span><span class="w">       </span><span class="c1">///&lt; [in]  输入长度</span>
+<span class="w">                        </span><span class="n">ECB_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">ecb_decrypt_final</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="n">ECB_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/cipher/mode.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/cipher/sm4.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/err.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/utils.h&gt;</span><span class="cp"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">sm4_key</span><span class="p">[</span><span class="n">SM4_KEYLEN</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0x01</span><span class="p">,</span><span class="w"> </span><span class="mh">0x23</span><span class="p">,</span><span class="w"> </span><span class="mh">0x45</span><span class="p">,</span><span class="w"> </span><span class="mh">0x67</span><span class="p">,</span><span class="w"> </span><span class="mh">0x89</span><span class="p">,</span><span class="w"> </span><span class="mh">0xab</span><span class="p">,</span><span class="w"> </span><span class="mh">0xcd</span><span class="p">,</span><span class="w"> </span><span class="mh">0xef</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0xfe</span><span class="p">,</span><span class="w"> </span><span class="mh">0xdc</span><span class="p">,</span><span class="w"> </span><span class="mh">0xba</span><span class="p">,</span><span class="w"> </span><span class="mh">0x98</span><span class="p">,</span><span class="w"> </span><span class="mh">0x76</span><span class="p">,</span><span class="w"> </span><span class="mh">0x54</span><span class="p">,</span><span class="w"> </span><span class="mh">0x32</span><span class="p">,</span><span class="w"> </span><span class="mh">0x10</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">sm4_pt</span><span class="p">[</span><span class="n">SM4_BLOCK_SIZE</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0x00</span><span class="p">,</span><span class="w"> </span><span class="mh">0x11</span><span class="p">,</span><span class="w"> </span><span class="mh">0x22</span><span class="p">,</span><span class="w"> </span><span class="mh">0x33</span><span class="p">,</span><span class="w"> </span><span class="mh">0x44</span><span class="p">,</span><span class="w"> </span><span class="mh">0x55</span><span class="p">,</span><span class="w"> </span><span class="mh">0x66</span><span class="p">,</span><span class="w"> </span><span class="mh">0x77</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0x88</span><span class="p">,</span><span class="w"> </span><span class="mh">0x99</span><span class="p">,</span><span class="w"> </span><span class="mh">0xaa</span><span class="p">,</span><span class="w"> </span><span class="mh">0xbb</span><span class="p">,</span><span class="w"> </span><span class="mh">0xcc</span><span class="p">,</span><span class="w"> </span><span class="mh">0xdd</span><span class="p">,</span><span class="w"> </span><span class="mh">0xee</span><span class="p">,</span><span class="w"> </span><span class="mh">0xff</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">out</span><span class="p">[</span><span class="n">SM4_BLOCK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">];</span><span class="w"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">SM4_CTX</span><span class="w"> </span><span class="n">sm4key</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">ECB_CTX</span><span class="w"> </span><span class="n">ctx</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">outptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">ecb_init</span><span class="p">(</span><span class="n">sm4_key</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">SM4Info</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sm4key</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">ecb_encrypt_update</span><span class="p">(</span><span class="n">outptr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="n">sm4_pt</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">sm4_pt</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">ecb_encrypt_final</span><span class="p">(</span><span class="n">outptr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 09 32 5c 48 53 83 2d cb 93 37 a5 98 4f 67 1b 9a</span>
+<span class="w">    </span><span class="c1">// 00 2a 8a 4e fa 86 3c ca d0 24 ac 03 00 bb 40 d2</span>
+<span class="w">    </span><span class="n">dump_data</span><span class="p">(</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">outptr</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">out</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+</div>
+<h3 id="32-cbc">3.2 CBC模式</h3>
+<ul>
+<li>工作模式上下文(Context)</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">CBC_CTX</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">iv</span><span class="p">[</span><span class="n">BLOCK_SIZE</span><span class="p">];</span><span class="w">      </span><span class="c1">// 初始向量</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="n">BLOCK_SIZE</span><span class="p">];</span><span class="w">  </span><span class="c1">// 缓冲区</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">bsize</span><span class="p">;</span><span class="w">                   </span><span class="c1">// 当前缓冲区大小</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">CipherInfo</span><span class="o">*</span><span class="w"> </span><span class="n">cipher</span><span class="p">;</span><span class="w">    </span><span class="c1">// 算法参数</span>
+<span class="w">    </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">cctx</span><span class="p">;</span><span class="w">                  </span><span class="c1">// 算法上下文</span>
+<span class="p">}</span><span class="w"> </span><span class="n">CBC_CTX</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>模式上下文(Context)初始化函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">cbc_init</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w">              </span><span class="c1">///&lt; [in]    用户密钥</span>
+<span class="w">              </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">iv</span><span class="p">,</span><span class="w">               </span><span class="c1">///&lt; [in]    初始向量</span>
+<span class="w">              </span><span class="k">const</span><span class="w"> </span><span class="n">CipherInfo</span><span class="o">*</span><span class="w"> </span><span class="n">cipher</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [in]    算法</span>
+<span class="w">              </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">cctx</span><span class="p">,</span><span class="w">                </span><span class="c1">///&lt; [inout] 算法上下文</span>
+<span class="w">              </span><span class="n">CBC_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>模式加密函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">cbc_encrypt_update</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [out] 输出</span>
+<span class="w">                        </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">outl</span><span class="p">,</span><span class="w">     </span><span class="c1">///&lt; [out] 输出长度</span>
+<span class="w">                        </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w">   </span><span class="c1">///&lt; [in]  输入</span>
+<span class="w">                        </span><span class="kt">int</span><span class="w"> </span><span class="n">inl</span><span class="p">,</span><span class="w">       </span><span class="c1">///&lt; [in]  输入长度</span>
+<span class="w">                        </span><span class="n">CBC_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">cbc_encrypt_final</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="n">CBC_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>模式解密函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">cbc_decrypt_update</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [out] 输出</span>
+<span class="w">                        </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">outl</span><span class="p">,</span><span class="w">     </span><span class="c1">///&lt; [out] 输出长度</span>
+<span class="w">                        </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w">   </span><span class="c1">///&lt; [in]  输入</span>
+<span class="w">                        </span><span class="kt">int</span><span class="w"> </span><span class="n">inl</span><span class="p">,</span><span class="w">       </span><span class="c1">///&lt; [in]  输入长度</span>
+<span class="w">                        </span><span class="n">CBC_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">cbc_decrypt_final</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="n">CBC_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<h3 id="33-gcm">3.3 GCM模式</h3>
+<ul>
+<li>工作模式上下文(Context)</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>GCM模式上下文 <code>GCM_CTX</code> 由GHash上下文 <code>GHash_CTX</code> 和GCTR上下文 <code>GCTR_CTX</code> 共同构成。<code>GHashTable</code> 是GHash操作的查找表，在GCM的 <code>init</code> 函数中可选择传入对应指针或是 <code>NULL</code>，传入指针则采用查表优化，否则采用普通实现</p>
+</div>
+<div class="highlight"><pre><span></span><code><span class="c1">// GHashTable 将占用巨大存储空间</span>
+<span class="k">typedef</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">GHashTable</span><span class="p">[</span><span class="mi">256</span><span class="p">][</span><span class="mi">2</span><span class="p">];</span><span class="w"></span>
+
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">GHash_CTX</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="n">BLOCK_SIZE</span><span class="p">];</span><span class="w">  </span><span class="c1">// 缓冲区</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">bsize</span><span class="p">;</span><span class="w">                   </span><span class="c1">// 当前缓冲区大小</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">X</span><span class="p">[</span><span class="n">BLOCK_SIZE</span><span class="p">];</span><span class="w">       </span><span class="c1">// GHash当前状态X</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">H</span><span class="p">[</span><span class="n">BLOCK_SIZE</span><span class="p">];</span><span class="w">       </span><span class="c1">// 参数H</span>
+<span class="w">    </span><span class="n">GHashTable</span><span class="o">*</span><span class="w"> </span><span class="n">ht</span><span class="p">;</span><span class="w">              </span><span class="c1">// 查找表指针</span>
+<span class="p">}</span><span class="w"> </span><span class="n">GHash_CTX</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">GCTR_CTX</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">j0</span><span class="p">[</span><span class="n">BLOCK_SIZE</span><span class="p">];</span><span class="w">      </span><span class="c1">// 初始向量</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">j</span><span class="p">[</span><span class="n">BLOCK_SIZE</span><span class="p">];</span><span class="w">       </span><span class="c1">// 初始向量</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="n">BLOCK_SIZE</span><span class="p">];</span><span class="w">  </span><span class="c1">// 缓冲区</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">bsize</span><span class="p">;</span><span class="w">                   </span><span class="c1">// 当前缓冲区大小</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">CipherInfo</span><span class="o">*</span><span class="w"> </span><span class="n">cipher</span><span class="p">;</span><span class="w">    </span><span class="c1">// 算法参数</span>
+<span class="w">    </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">cctx</span><span class="p">;</span><span class="w">                  </span><span class="c1">// 算法上下文</span>
+<span class="p">}</span><span class="w"> </span><span class="n">GCTR_CTX</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">GCM_CTX</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">GHash_CTX</span><span class="w"> </span><span class="n">hctx</span><span class="p">;</span><span class="w">  </span><span class="c1">// GHash上下文</span>
+<span class="w">    </span><span class="n">GCTR_CTX</span><span class="w"> </span><span class="n">gctx</span><span class="p">;</span><span class="w">   </span><span class="c1">// GCTR上下文</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">alen</span><span class="p">;</span><span class="w">        </span><span class="c1">// AAD长度</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">clen</span><span class="p">;</span><span class="w">        </span><span class="c1">// 密文长度</span>
+<span class="p">}</span><span class="w"> </span><span class="n">GCM_CTX</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>GCM模式的大致流程为：调用 <code>init</code> 函数初始化，调用 <code>update_aad</code> 函数传入AAD数据，接着 <code>update</code> 和 <code>final</code> 进行加解密</p>
+</div>
+<ul>
+<li>模式上下文(Context)初始化函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">gcm_init</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w">              </span><span class="c1">///&lt; [in]    用户密钥</span>
+<span class="w">              </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">iv</span><span class="p">,</span><span class="w">               </span><span class="c1">///&lt; [in]    初始向量</span>
+<span class="w">              </span><span class="kt">int</span><span class="w"> </span><span class="n">ivlen</span><span class="p">,</span><span class="w">                 </span><span class="c1">///&lt; [in]    初始向量长度</span>
+<span class="w">              </span><span class="n">GHashTable</span><span class="o">*</span><span class="w"> </span><span class="n">ht</span><span class="p">,</span><span class="w">            </span><span class="c1">///&lt; [inout] GHash查找表(可为NULL)</span>
+<span class="w">              </span><span class="k">const</span><span class="w"> </span><span class="n">CipherInfo</span><span class="o">*</span><span class="w"> </span><span class="n">cipher</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [in]    算法</span>
+<span class="w">              </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">cctx</span><span class="p">,</span><span class="w">                </span><span class="c1">///&lt; [inout] 算法上下文</span>
+<span class="w">              </span><span class="n">GCM_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>GCM输入AAD(additional authenticated data)</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">gcm_update_aad</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">aad</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">alen</span><span class="p">,</span><span class="w"> </span><span class="n">GCM_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>模式加密函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">gcm_encrypt_update</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [out] 输出</span>
+<span class="w">                        </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">outl</span><span class="p">,</span><span class="w">     </span><span class="c1">///&lt; [out] 输出长度</span>
+<span class="w">                        </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w">   </span><span class="c1">///&lt; [in]  输入</span>
+<span class="w">                        </span><span class="kt">int</span><span class="w"> </span><span class="n">inl</span><span class="p">,</span><span class="w">       </span><span class="c1">///&lt; [in]  输入长度</span>
+<span class="w">                        </span><span class="n">GCM_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">gcm_encrypt_final</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [out] 输出</span>
+<span class="w">                       </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">outl</span><span class="p">,</span><span class="w">     </span><span class="c1">///&lt; [out] 输出长度</span>
+<span class="w">                       </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">tag</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [out] tag</span>
+<span class="w">                       </span><span class="kt">int</span><span class="w"> </span><span class="n">tlen</span><span class="p">,</span><span class="w">      </span><span class="c1">///&lt; [in]  tag长度</span>
+<span class="w">                       </span><span class="n">GCM_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>模式解密函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">gcm_decrypt_update</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [out] 输出</span>
+<span class="w">                        </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">outl</span><span class="p">,</span><span class="w">     </span><span class="c1">///&lt; [out] 输出长度</span>
+<span class="w">                        </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w">   </span><span class="c1">///&lt; [in]  输入</span>
+<span class="w">                        </span><span class="kt">int</span><span class="w"> </span><span class="n">inl</span><span class="p">,</span><span class="w">       </span><span class="c1">///&lt; [in]  输入长度</span>
+<span class="w">                        </span><span class="n">GCM_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">gcm_decrypt_final</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [out] 输出</span>
+<span class="w">                      </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">outl</span><span class="p">,</span><span class="w">     </span><span class="c1">///&lt; [out] 输出长度</span>
+<span class="w">                      </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">tag</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [in]  tag</span>
+<span class="w">                      </span><span class="kt">int</span><span class="w"> </span><span class="n">tlen</span><span class="p">,</span><span class="w">      </span><span class="c1">///&lt; [in]  tag长度</span>
+<span class="w">                      </span><span class="n">GCM_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+
+
+
+
+              
+            </article>
+            
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="页脚" >
+      
+        
+        <a href="../ec/" class="md-footer__link md-footer__link--prev" aria-label="上一页: 椭圆曲线" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                上一页
+              </span>
+              椭圆曲线
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../hash/" class="md-footer__link md-footer__link--next" aria-label="下一页: 哈希函数" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                下一页
+              </span>
+              哈希函数
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.ecf98df9.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\s\\-\uff0c\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version.title": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.9c69f0bc.min.js"></script>
+      
+    
+  </body>
+</html>

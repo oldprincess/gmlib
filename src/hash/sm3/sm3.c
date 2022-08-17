@@ -9,12 +9,14 @@ static uint32_t SM3_INIT_DIGEST[8] = {
     0xA96F30BC, 0x163138AA, 0xE38DEE4D, 0xB0FB0E4E,
 };
 
+/// @brief SM3 初始化
 void sm3_init(SM3_CTX* ctx) {
     ctx->bsize = 0;
     ctx->dbits = 0;
     memcpy(ctx->state, SM3_INIT_DIGEST, sizeof(SM3_INIT_DIGEST));
 }
 
+/// @brief SM3 更新消息
 void sm3_update(uint8_t* in, int inl, SM3_CTX* ctx) {
     ctx->dbits += inl * 8;  // 更新数据长度
     while (inl) {
@@ -35,6 +37,7 @@ void sm3_update(uint8_t* in, int inl, SM3_CTX* ctx) {
     }
 }
 
+/// @brief SM3 Final 并输出摘要
 void sm3_final(uint8_t* out, SM3_CTX* ctx) {
     // 填充
     int pad_num = (64 + 56 - 1 - ctx->bsize) % 64;  // 计算填充字节

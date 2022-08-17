@@ -38,9 +38,9 @@ static void test_alg1() {
 
     BINT x, y, z1, z2;
     // test add
-    try_goto(bint_from_str(&x, x_dec, BINT_DEC));
-    try_goto(bint_from_str(&y, y_dec, BINT_DEC));
-    try_goto(bint_from_str(&z1, x_add_y_dec, BINT_DEC));
+    try_goto(bint_from_str(&x, x_dec, 10));
+    try_goto(bint_from_str(&y, y_dec, 10));
+    try_goto(bint_from_str(&z1, x_add_y_dec, 10));
 
     try_goto(bint_add(&z2, &x, &y));  // x+y
     if (bint_cmp(&z1, &z2) != 0) {
@@ -60,9 +60,9 @@ static void test_alg1() {
         goto error;
     }
     // test sub
-    try_goto(bint_from_str(&x, x_dec, BINT_DEC));
-    try_goto(bint_from_str(&y, y_dec, BINT_DEC));
-    try_goto(bint_from_str(&z1, x_sub_y_dec, BINT_DEC));
+    try_goto(bint_from_str(&x, x_dec, 10));
+    try_goto(bint_from_str(&y, y_dec, 10));
+    try_goto(bint_from_str(&z1, x_sub_y_dec, 10));
 
     try_goto(bint_sub(&z2, &x, &y));  // x-y
     if (bint_cmp(&z1, &z2) != 0) {
@@ -88,9 +88,9 @@ static void test_alg1() {
     }
 
     // test mul
-    try_goto(bint_from_str(&x, x_dec, BINT_DEC));
-    try_goto(bint_from_str(&y, y_dec, BINT_DEC));
-    try_goto(bint_from_str(&z1, x_mul_y_dec, BINT_DEC));
+    try_goto(bint_from_str(&x, x_dec, 10));
+    try_goto(bint_from_str(&y, y_dec, 10));
+    try_goto(bint_from_str(&z1, x_mul_y_dec, 10));
 
     try_goto(bint_mul(&z2, &x, &y));  // x*y
     if (bint_cmp(&z1, &z2) != 0) {
@@ -110,9 +110,9 @@ static void test_alg1() {
         goto error;
     }
     // test div
-    try_goto(bint_from_str(&x, x_dec, BINT_DEC));
-    try_goto(bint_from_str(&y, y_dec, BINT_DEC));
-    try_goto(bint_from_str(&z1, x_div_y_dec, BINT_DEC));
+    try_goto(bint_from_str(&x, x_dec, 10));
+    try_goto(bint_from_str(&y, y_dec, 10));
+    try_goto(bint_from_str(&z1, x_div_y_dec, 10));
 
     try_goto(bint_divmod(&z2, NULL, &x, &y));  // x/y
     if (bint_cmp(&z1, &z2) != 0) {
@@ -120,7 +120,7 @@ static void test_alg1() {
         goto error;
     }
     // test mod
-    try_goto(bint_from_str(&z1, x_mod_y_dec, BINT_DEC));
+    try_goto(bint_from_str(&z1, x_mod_y_dec, 10));
 
     try_goto(bint_divmod(NULL, &z2, &x, &y));  // x%y
     if (bint_cmp(&z1, &z2) != 0) {
@@ -136,7 +136,7 @@ error:
 static void test_shift() {
     char* x_dec = "307839308792102039737608520265752119502";
     BINT x, z1, z2;
-    try_goto(bint_from_str(&x, x_dec, BINT_DEC));
+    try_goto(bint_from_str(&x, x_dec, 10));
     // text sll
     try_goto(bint_sll(&z1, &x, 12));
     try_goto(bint_mul_u32(&z2, &x, 1 << 12));

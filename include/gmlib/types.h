@@ -12,9 +12,9 @@ typedef void (*CipherEncrypt)(uint8_t* out, uint8_t* in, void* ctx);
 typedef void (*CipherDecrypt)(uint8_t* out, uint8_t* in, void* ctx);
 
 typedef struct CipherInfo {
-    CipherInit init;
-    CipherEncrypt encrypt;
-    CipherDecrypt decrypt;
+    CipherInit init;        ///< 初始化算法
+    CipherEncrypt encrypt;  ///< 加密算法
+    CipherDecrypt decrypt;  ///< 解密算法
 } CipherInfo;
 
 #ifdef __cplusplus

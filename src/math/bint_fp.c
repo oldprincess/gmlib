@@ -10,6 +10,7 @@ int fp_add(BINT* r, BINT* n1, BINT* n2, BINT* p) {
     BINT t;
     try_goto(bint_add(&t, n1, n2));
     try_goto(bint_divmod(NULL, &t, &t, p));
+    // 处理结果，使得结果非负
     if (bint_is_neg(&t)) {
         try_goto(bint_add(&t, &t, p));
     } else {
@@ -30,6 +31,7 @@ int fp_sub(BINT* r, BINT* n1, BINT* n2, BINT* p) {
     BINT t;
     try_goto(bint_sub(&t, n1, n2));
     try_goto(bint_divmod(NULL, &t, &t, p));
+    // 处理结果，使得结果非负
     if (bint_is_neg(&t)) {
         try_goto(bint_add(r, &t, p));
     } else {
@@ -50,6 +52,7 @@ int fp_mul(BINT* r, BINT* n1, BINT* n2, BINT* p) {
     BINT t;
     try_goto(bint_mul(&t, n1, n2));
     try_goto(bint_divmod(NULL, &t, &t, p));
+    // 处理结果，使得结果非负
     if (bint_is_neg(&t)) {
         try_goto(bint_add(r, &t, p));
     } else {
@@ -70,6 +73,7 @@ int fp_mul_u32(BINT* r, BINT* n1, uint32_t n2, BINT* p) {
     BINT t;
     try_goto(bint_mul_u32(&t, n1, n2));
     try_goto(bint_divmod(NULL, &t, &t, p));
+    // 处理结果，使得结果非负
     if (bint_is_neg(&t)) {
         try_goto(bint_add(r, &t, p));
     } else {
@@ -90,6 +94,7 @@ int fp_sqr(BINT* r, BINT* n, BINT* p) {
     BINT t;
     try_goto(bint_sqr(&t, n));
     try_goto(bint_divmod(NULL, &t, &t, p));
+    // 处理结果，使得结果非负
     if (bint_is_neg(&t)) {
         try_goto(bint_add(r, &t, p));
     } else {
@@ -108,7 +113,8 @@ int fp_pow(BINT* r, BINT* n, BINT* e, BINT* p) {
     }
 
     BINT t;
-    try_goto(bint_pow(r, n, e, p));
+    try_goto(bint_pow(&t, n, e, p));
+    // 处理结果，使得结果非负
     if (bint_is_neg(&t)) {
         try_goto(bint_add(r, &t, p));
     } else {

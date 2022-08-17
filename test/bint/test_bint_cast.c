@@ -35,7 +35,7 @@ static void test_str_cast_pos() {
         "11111000001011110100111000001000101100110110";
     BINT x, y;
     char* lst[] = {x_hex, x_dec, x_oct, x_bin};       // 测试数据List
-    int radix[] = {BINT_HEX, BINT_DEC, 8, BINT_BIN};  // 数据对应进制
+    int radix[] = {16, 10, 8, 2};                     // 数据对应进制
     int test_size = 4;                                // 测试数据量
     // 测试 from_str
     for (int i = 0; i < test_size; i++) {
@@ -50,7 +50,7 @@ static void test_str_cast_pos() {
     }
 
     // 测试 to_str
-    try_goto(bint_from_str(&x, x_hex, BINT_HEX));
+    try_goto(bint_from_str(&x, x_hex, 16));
     for (int i = 0; i < test_size; i++) {
         try_goto(bint_to_str(&x, str, radix[i]));
         if (strcmp(str, lst[i]) != 0) {
@@ -60,7 +60,7 @@ static void test_str_cast_pos() {
     }
 
     // 测试 to_str + from_str
-    try_goto(bint_from_str(&x, x_hex, BINT_HEX));
+    try_goto(bint_from_str(&x, x_hex, 16));
     for (int i = 2; i <= 36; i++) {
         try_goto(bint_to_str(&x, str, i));
         try_goto(bint_from_str(&y, str, i));
@@ -92,7 +92,7 @@ static void test_str_cast_neg() {
         "111111000001011110100111000001000101100110110";
     BINT x, y;
     char* lst[] = {x_hex, x_dec, x_oct, x_bin};       // 测试数据List
-    int radix[] = {BINT_HEX, BINT_DEC, 8, BINT_BIN};  // 数据对应进制
+    int radix[] = {16, 10, 8, 2};                     // 数据对应进制
     int test_size = 4;                                // 测试数据量
     // 测试 from_str
     for (int i = 0; i < test_size; i++) {
@@ -107,7 +107,7 @@ static void test_str_cast_neg() {
     }
 
     // 测试 to_str
-    try_goto(bint_from_str(&x, x_hex, BINT_HEX));
+    try_goto(bint_from_str(&x, x_hex, 16));
     for (int i = 0; i < test_size; i++) {
         try_goto(bint_to_str(&x, str, radix[i]));
         if (strcmp(str, lst[i]) != 0) {
@@ -117,7 +117,7 @@ static void test_str_cast_neg() {
     }
 
     // 测试 to_str + from_str
-    try_goto(bint_from_str(&x, x_hex, BINT_HEX));
+    try_goto(bint_from_str(&x, x_hex, 16));
     for (int i = 2; i <= 36; i++) {
         try_goto(bint_to_str(&x, str, i));
         try_goto(bint_from_str(&y, str, i));
@@ -149,7 +149,7 @@ static void test_bytes_cast() {
 
     BINT x, y;
     // 测试 from_bytes
-    try_goto(bint_from_str(&y, x_hex, BINT_HEX));
+    try_goto(bint_from_str(&y, x_hex, 16));
     try_goto(bint_from_bytes(&x, b_be, sizeof(b_be), BINT_BIG_ENDIAN));
     if (bint_cmp(&x, &y) != 0) {
         ERR_LOG("Err in bint_from_bytes");
@@ -184,7 +184,7 @@ void test_u32_cast() {
     char* x_hex = "11223344";
     BINT x, y;
     // test from_u32
-    try_goto(bint_from_str(&y, x_hex, BINT_HEX));
+    try_goto(bint_from_str(&y, x_hex, 16));
     bint_from_u32(&x, u);
     if (bint_cmp(&x, &y) != 0) {
         ERR_LOG("Err in bint_from_u32");
@@ -192,7 +192,7 @@ void test_u32_cast() {
     }
     // test to_u32
     uint32_t a;
-    try_goto(bint_from_str(&y, x_hex, BINT_HEX));
+    try_goto(bint_from_str(&y, x_hex, 16));
     try_goto(bint_to_u32(&a, &y));
     if (a != u) {
         ERR_LOG("Err in bint_to_u32");

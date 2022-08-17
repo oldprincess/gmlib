@@ -4,8 +4,8 @@
 int main() {
     BINT x, y;
     BINT z1, z2, z3;
-    char str1[GMLIB_BINT_BITS + 2];  // 字符串 buffer
-    char str2[GMLIB_BINT_BITS + 2];  // 字符串 buffer
+    static char str1[GMLIB_BINT_BITS + 2];  // 字符串 buffer
+    static char str2[GMLIB_BINT_BITS + 2];  // 字符串 buffer
 
     // 读入字符串
     bint_from_str(&x, "FFFFAAAA", 16);  // 从16进制中读入

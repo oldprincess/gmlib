@@ -1,5 +1,5 @@
 /**
- * @file sm3.h
+ * @file  sm3.h
  * @brief SM3 哈希算法
  *
  * 参考资料：<br>
@@ -30,18 +30,18 @@ typedef struct SM3_CTX {
 } SM3_CTX;
 
 /// @brief SM3 初始化
-/// @param[in]  ctx     SM3算法 Context
+/// @param[in]  ctx     SM3算法上下文
 void sm3_init(SM3_CTX* ctx);
 
 /// @brief SM3 更新消息
 /// @param[in]      in      输入
 /// @param[in]      inl     输入长度
-/// @param[inout]   ctx     SM3算法 Context
+/// @param[inout]   ctx     SM3算法上下文
 void sm3_update(uint8_t* in, int inl, SM3_CTX* ctx);
 
 /// @brief SM3 Final 并输出摘要
 /// @param[out]     out     256比特摘要
-/// @param[inout]   ctx     SM3算法 Context
+/// @param[inout]   ctx     SM3算法上下文
 void sm3_final(uint8_t* out, SM3_CTX* ctx);
 
 #ifdef __cplusplus

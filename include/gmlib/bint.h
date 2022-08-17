@@ -7,8 +7,8 @@
  * [2]. JDK 大整数运算 MutableBigInteger.java、BigInteger.java <br>
  * [3]. openssl 3.0 大整数 bn 模块 <br>
  *
- * 大整数 struct 结构参考 openssl；
- * 大整数各种运算 TAOCP 中的算法为基础，代码实现参考 JAVA JDK；
+ * 大整数 struct 结构参考资料[3]；
+ * 大整数各种运算以参考资料[1]中的算法为基础，代码实现参考资料[2]；
  */
 
 #ifndef BINT_H
@@ -25,10 +25,6 @@ extern "C" {
 
 /// 大整数BINT最大字数（32bit为一个字）
 #define GMLIB_BINT_SIZE (GMLIB_BINT_BITS / 32)
-
-#define BINT_HEX 16
-#define BINT_DEC 10
-#define BINT_BIN 2
 
 #define BINT_BIG_ENDIAN 1
 #define BINT_LITTLE_ENDIAN 0

@@ -1,5 +1,5 @@
 /**
- * @file sm2.h
+ * @file  sm2.h
  * @brief SM2 公钥算法
  *
  * 参考资料：<br>
@@ -20,7 +20,7 @@ extern "C" {
 #include <gmlib/ec.h>
 #include <gmlib/hash/sm3.h>
 
-extern EC_CTX SM2_Fp256_CTX;
+extern EC_CTX SM2_Fp256_CTX;  // SM2 椭圆曲线参数
 
 // ========================================
 // =========== SM2 签名 ===================
@@ -31,16 +31,17 @@ typedef struct SM2_SIGN_CTX {
     uint8_t Z[SM3_DIGEST_SIZE];  // 签名者标识
     EC_CTX* ec_ctx;              // 椭圆曲线 Context
     SM3_CTX sm3_ctx;             // sm3 Context
-    BINT* da;                    // 签名者私钥
+    BINT da;                     // 签名者私钥
     BINT da_plus_1_iv;           // (da+1)^-1 % EC.n
 } SM2_SIGN_CTX;
 
 /// @brief SM2 签名初始化
-int sm2_sign_init(uint8_t ENTL[2],
-                  uint8_t* ID,
-                  EC_CTX* ec_ctx,
-                  BINT* da,
-                  ECPoint* P,
+/// @return 错误码（0表示无错误）
+int sm2_sign_init(uint8_t ENTL[2],  ///< [in] ID比字节长度
+                  uint8_t* ID,      ///< [in] 签名者ID
+                  EC_CTX* ec_ctx,   ///< [in] 椭圆曲线上下文
+                  BINT* da,         ///< [in] 签名者私钥
+                  ECPoint* P,       ///< [in] 签名者公钥
                   SM2_SIGN_CTX* sm2_sign_ctx);
 
 /// @brief SM2 签名重置
@@ -50,6 +51,7 @@ void sm2_sign_reset(SM2_SIGN_CTX* sm2_sign_ctx);
 void sm2_sign_update(uint8_t* in, int inl, SM2_SIGN_CTX* sm2_sign_ctx);
 
 /// @brief SM2 签名Final
+/// @return 错误码（0表示无错误）
 int sm2_sign_final(uint8_t* out, int* outl, SM2_SIGN_CTX* sm2_sign_ctx);
 
 // ========================================
@@ -59,16 +61,17 @@ int sm2_sign_final(uint8_t* out, int* outl, SM2_SIGN_CTX* sm2_sign_ctx);
 typedef struct SM2_VERIFY_CTX {
     // Z = H(ENTL || ID || a || b || G.x || G.y || P.x || P.y)
     uint8_t Z[SM3_DIGEST_SIZE];  // 签名者标识
-    EC_CTX* ec_ctx;              // 椭圆曲线 Context
-    SM3_CTX sm3_ctx;             // sm3 Context
-    ECPoint* P;                  // 签名者公钥
+    EC_CTX* ec_ctx;              // 椭圆曲线上下文
+    SM3_CTX sm3_ctx;             // SM3算法上下文
+    ECPoint P;                   // 签名者公钥
 } SM2_VERIFY_CTX;
 
 /// @brief SM2 验签初始化
-int sm2_verify_init(uint8_t ENTL[2],
-                    uint8_t* ID,
-                    EC_CTX* ec_ctx,
-                    ECPoint* P,
+/// @return 错误码（0表示无错误）
+int sm2_verify_init(uint8_t ENTL[2],  ///< [in] ID比字节长度
+                    uint8_t* ID,      ///< [in] 签名者ID
+                    EC_CTX* ec_ctx,   ///< [in] 椭圆曲线上下文
+                    ECPoint* P,       ///< [in] 签名者公钥
                     SM2_VERIFY_CTX* sm2_verify_ctx);
 
 /// @brief SM2 验签重置
@@ -78,74 +81,37 @@ void sm2_verify_reset(SM2_VERIFY_CTX* sm2_verify_ctx);
 void sm2_verify_update(uint8_t* in, int inl, SM2_VERIFY_CTX* sm2_verify_ctx);
 
 /// @brief SM2 验签Final
-int sm2_verify_final(int* status,
-                     uint8_t* signature,
+/// @return 错误码（0表示无错误）
+int sm2_verify_final(int* status,         ///< [out] 1(成功),0(失败)
+                     uint8_t* signature,  ///< [in]  签名
                      SM2_VERIFY_CTX* sm2_verify_ctx);
 
 // ========================================
-// =========== SM2 加密 ===================
+// =========== SM2 加解密 ==================
 // ========================================
 
 #define SM2_CRYPT_C3_SIZE SM3_DIGEST_SIZE
 
-typedef struct SM2_KDF_CTX {
-    uint32_t ct;
-    SM3_CTX sm3_ctx;
-} SM2_KDF_CTX;
+/// @brief SM2 加密
+/// @return 错误码（0表示无错误）
+int sm2_encrypt(uint8_t* out,    ///< [out] 输出
+                int* outl,       ///< [out] 输出长度
+                uint8_t* in,     ///< [in]  输入
+                int inl,         ///< [in]  输入长度
+                int PC,          ///< [in]  椭圆曲线点表示方法
+                EC_CTX* ec_ctx,  ///< [in]  椭圆曲线参数
+                ECPoint* P       ///< [in]  接收方公钥
+);
 
-typedef struct SM2_CRYPT_CTX {
-    SM3_CTX sm3_ctx;  // SM3
-    // KDF
-    struct {
-        uint8_t key_stream[SM3_DIGEST_SIZE];  // 密钥流缓冲区
-        int kpos;                             // 密钥流指针
-        SM2_KDF_CTX ctx;
-    } kdf;
-    // 存放中间数据 (x2, y2) 的内存区
-    struct {
-        uint8_t y[GMLIB_BINT_BITS / 8];  // y2
-        int bsize;
-    } dot2;  // (x2, y2)
-} SM2_CRYPT_CTX;
-
-/// @brief SM2 加密初始化(输出C1)
-int sm2_encrypt_init(uint8_t* C1,     ///< [out] 输出
-                     int* outl,       ///< [out] 输出长度
-                     int PC,          ///< [in]  椭圆曲线点表示方法
-                     EC_CTX* ec_ctx,  ///< [in]  椭圆曲线参数
-                     ECPoint* P,      ///< [in]  接收方公钥
-                     SM2_CRYPT_CTX* sm2_crypt_ctx);
-
-/// @brief SM2 加密Update(输出C2)
-void sm2_encrypt_update(uint8_t* out,  ///< [out] 输出
-                        int* outl,     ///< [out] 输出长度
-                        uint8_t* in,   ///< [in]  输入
-                        int inl,       ///< [in]  输入长度
-                        SM2_CRYPT_CTX* sm2_crypt_ctx);
-
-/// @brief SM2 加密Final(输出C3)
-void sm2_encrypt_final(uint8_t* C3, SM2_CRYPT_CTX* sm2_crypt_ctx);
-
-// ========================================
-// =========== SM2 解密 ===================
-// ========================================
-
-/// @brief SM2 解密初始化
-int sm2_decrypt_init(uint8_t* C1,
-                     int* read_size,
-                     EC_CTX* ec_ctx,
-                     BINT* da,
-                     SM2_CRYPT_CTX* sm2_crypt_ctx);
-
-/// @brief SM2 解密Update(输出msg)
-void sm2_decrypt_update(uint8_t* out,
-                        int* outl,
-                        uint8_t* in,
-                        int inl,
-                        SM2_CRYPT_CTX* sm2_crypt_ctx);
-
-/// @brief SM2 解密Final
-int sm2_decrypt_final(uint8_t* C3, SM2_CRYPT_CTX* sm2_crypt_ctx);
+/// @brief SM2 解密
+/// @return 错误码（0表示无错误）
+int sm2_decrypt(uint8_t* out,    ///< [out] 输出
+                int* outl,       ///< [out] 输出长度
+                uint8_t* in,     ///< [in]  输入
+                int inl,         ///< [in]  输入长度
+                EC_CTX* ec_ctx,  ///< [in]  椭圆曲线参数
+                BINT* da         ///< [in]  接收者私钥
+);
 
 #ifdef __cplusplus
 }

@@ -13,7 +13,7 @@ int sm2_sign_init(uint8_t* ENTL,
     SM2_SIGN_CTX* ctx = sm2_sign_ctx;
     // 拷贝参数
     ctx->ec_ctx = ec_ctx;
-    ctx->da = da;
+    bint_copy(&ctx->da, da);
 
     // 预计算数据 (da+1)^-1
     BINT da_plus_1;
@@ -49,7 +49,7 @@ int sm2_sign_final(uint8_t* out, int* outl, SM2_SIGN_CTX* sm2_sign_ctx) {
     BINT e, k, r, t;
     ECPoint point;
     EC_CTX* ec_ctx = sm2_sign_ctx->ec_ctx;
-    BINT* da = sm2_sign_ctx->da;
+    BINT* da = &sm2_sign_ctx->da;
     BINT* da_plus_1_iv = &sm2_sign_ctx->da_plus_1_iv;
     // e = H(Z || msg)
     sm3_final(digest, &sm2_sign_ctx->sm3_ctx);

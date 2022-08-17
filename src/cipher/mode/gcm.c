@@ -15,8 +15,8 @@ void gcm_init(uint8_t* key,              ///< [in]    用户密钥
               GCM_CTX* mctx) {
     // 初始化算法
     cipher->init(key, cctx);
-    mctx->gctx.cctx = cctx;
-    mctx->gctx.cipher = cipher;
+    mctx->gctx.cctx = cctx;      // 设置GCTR的算法上下文
+    mctx->gctx.cipher = cipher;  // 设置GCTR的算法信息
     // 初始化GHash
     uint8_t H[BLOCK_SIZE];
     cipher->encrypt(H, ZERO_BUFFER, cctx);

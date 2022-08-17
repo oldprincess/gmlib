@@ -35,14 +35,11 @@ static uint8_t ciphertext[] = {
 };
 
 static uint8_t out[2048];
+static int outl;
 static int PC = EC_PC_NO_ZIP;
-static uint8_t *C1, *C2, *C3;  // (C1,C3,C2)分量指针
 
 static BINT da;    // 私钥
 static ECPoint P;  // 公钥
-
-static void test_encrypt();
-static void test_decrypt();
 
 void test_sm2_crypt() {
     // 初始化双方数据
@@ -50,59 +47,15 @@ void test_sm2_crypt() {
     // P = [da]G
     try_goto(ec_mul(&P, &da, &SM2_Fp256_CTX.G, &SM2_Fp256_CTX));
 
-    test_encrypt();
-    test_decrypt();
-
-    return;
-error:
-    exit(-1);
-}
-
-static void test_encrypt() {
-    int outl;
-    SM2_CRYPT_CTX crypt_ctx;
     // 加密
-    try_goto(sm2_encrypt_init(out, &outl, PC, &SM2_Fp256_CTX, &P, &crypt_ctx));
-    C1 = out;                             // 确定C1的位置
-    C3 = out + outl;                      // 确定C3的位置
-    C2 = out + outl + SM2_CRYPT_C3_SIZE;  // 确定C2的位置
-
-    uint8_t* C2ptr = C2;
-    //    sm2_encrypt_update(C2ptr, &outl, msg, sizeof(msg), &crypt_ctx);
-    //    C2ptr += outl;
-    sm2_encrypt_update(C2ptr, &outl, msg, sizeof(msg) - 2, &crypt_ctx);
-    C2ptr += outl;
-    sm2_encrypt_update(C2ptr, &outl, msg + sizeof(msg) - 2, 2, &crypt_ctx);
-    C2ptr += outl;
-
-    sm2_encrypt_final(C3, &crypt_ctx);
-
-    if (sizeof(ciphertext) != out - C2ptr &&
-        memcmp(out, ciphertext, sizeof(ciphertext)) != 0) {
+    try_goto(sm2_encrypt(out, &outl, msg, sizeof(msg), PC, &SM2_Fp256_CTX, &P));
+    if (memcmp(out, ciphertext, sizeof(ciphertext)) != 0) {
         ERR_LOG("Err in sm2_crypt");
         goto error;
     }
-
-    return;
-error:
-    exit(-1);
-}
-
-static void test_decrypt() {
-    int outl;
-    SM2_CRYPT_CTX ctx;
-    // 加密
-    try_goto(sm2_decrypt_init(ciphertext, &outl, &SM2_Fp256_CTX, &da, &ctx));
-    C1 = ciphertext;                             // 确定C1的位置
-    C3 = ciphertext + outl;                      // 确定C3的位置
-    C2 = ciphertext + outl + SM2_CRYPT_C3_SIZE;  // 确定C2的位置
-
-    // ciphertext 全长 - (C1||C3)的长度
-    int C2_size = sizeof(ciphertext) - (int)(C2 - C1);
-    sm2_decrypt_update(out, &outl, C2, C2_size, &ctx);
-
-    try_goto(sm2_decrypt_final(C3, &ctx));  // 最后校验
-
+    // 解密
+    try_goto(sm2_decrypt(out, &outl, ciphertext, sizeof(ciphertext),
+                         &SM2_Fp256_CTX, &da));
     if (sizeof(msg) != outl && memcmp(out, msg, sizeof(msg)) != 0) {
         ERR_LOG("Err in sm2_crypt");
         goto error;
@@ -112,3 +65,4 @@ static void test_decrypt() {
 error:
     exit(-1);
 }
+

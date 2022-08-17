@@ -3,11 +3,8 @@ cmake_minimum_required(VERSION 3.0)
 # GMLib项目
 project(GMLib LANGUAGES C)
 
-# 设置DEBUG模式时GMLIB_DEBUG宏，开启错误提示
-set(CMAKE_C_FLAGS_DEBUG -DGMLIB_DEBUG)
-
-# 设置RELEASE模式时GMLIB_DEBUG宏，开启错误提示
-# set(CMAKE_C_FLAGS_RELEASE -DGMLIB_DEBUG)
+# 设置GMLIB_DEBUG宏，开启错误提示
+set(CMAKE_C_FLAGS -DGMLIB_DEBUG)
 
 # 设置字符集
 if(MSVC)
@@ -16,12 +13,10 @@ if(MSVC)
 endif()
 
 # 设置可执行文件输出路径
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ./output/exe/DEBUG)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ./output/exe/RELEASE)
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
 # 设置静态库文件输出路径
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ./output/lib/DEBUG)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ./output/lib/RELEASE)
+SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 # 设置全局Include目录
 include_directories(include)

@@ -4,16 +4,16 @@
 #include <memory.h>
 #include "pad.h"
 
-void cbc_init(uint8_t* key,
-              uint8_t* iv,
-              const CipherInfo* cipher,
-              void* cctx,
+void cbc_init(uint8_t* key,              ///< [in]    用户密钥
+              uint8_t* iv,               ///< [in]    初始向量
+              const CipherInfo* cipher,  ///< [in]    算法
+              void* cctx,                ///< [inout] 算法上下文
               CBC_CTX* mctx) {
-    cipher->init(key, cctx);
-    mctx->bsize = 0;
-    mctx->cipher = cipher;
-    mctx->cctx = cctx;
-    memcpy(mctx->iv, iv, BLOCK_SIZE);
+    cipher->init(key, cctx);           // 初始化算法上下文
+    mctx->bsize = 0;                   // 初始化缓冲区
+    mctx->cipher = cipher;             // 拷贝算法信息
+    mctx->cctx = cctx;                 // 拷贝算法上下文指针
+    memcpy(mctx->iv, iv, BLOCK_SIZE);  // 拷贝初始向量
 }
 
 void cbc_encrypt_update(uint8_t* out,
@@ -21,7 +21,7 @@ void cbc_encrypt_update(uint8_t* out,
                         uint8_t* in,
                         int inl,
                         CBC_CTX* mctx) {
-    *outl = 0;
+    *outl = 0;  // 置0
     CipherEncrypt encrypt = mctx->cipher->encrypt;
     while (inl) {
         // copy buffer

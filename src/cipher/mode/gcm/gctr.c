@@ -19,21 +19,15 @@ void gctr_init(uint8_t* iv,  ///< [in]  初始向量
         memcpy(gctx->j0, iv, 96 / 8);
         gctx->j0[BLOCK_SIZE - 1] = 1;
     } else {
-        int s = ivlen % BLOCK_SIZE;
+        // H(IV || 0(s+64) || ivlen(64) )
+        int s = (BLOCK_SIZE - ivlen % BLOCK_SIZE) % BLOCK_SIZE;
         uint8_t tmp[BLOCK_SIZE] = {0};
         GHash_CTX ctx;
         ghash_init(H, ht, &ctx);
         ghash_update(iv, ivlen, &ctx);
-        while (s) {
-            int size = 16;
-            if (size > s) {
-                size = s;
-            }
-            ghash_update(tmp, size, &ctx);
-            s -= size;
-        }
-        storeu64_be(tmp, (uint64_t)(ivlen * 8));
-        ghash_update(tmp, sizeof(uint64_t), &ctx);
+        ghash_update(tmp, s, &ctx);
+        storeu64_be(tmp + BLOCK_SIZE / 2, (uint64_t)(ivlen * 8));
+        ghash_update(tmp, BLOCK_SIZE, &ctx);
         ghash_final(gctx->j0, &ctx);
     }
     gctr_inc32(gctx->j, gctx->j0);

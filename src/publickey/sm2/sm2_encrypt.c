@@ -4,16 +4,19 @@
 #include <gmlib/utils.h>
 #include "sm2_alg.h"
 
-/// @brief SM2 加密初始化(输出C1)
-int sm2_encrypt_init(uint8_t* C1,
-                     int* outl,
-                     int PC,
-                     EC_CTX* ec_ctx,
-                     ECPoint* P,
-                     SM2_CRYPT_CTX* sm2_crypt_ctx) {
+int sm2_encrypt(uint8_t* out,
+                int* outl,
+                uint8_t* in,
+                int inl,
+                int PC,
+                EC_CTX* ec_ctx,
+                ECPoint* P) {
     ECPoint dot;
     BINT k;
     int size = bint_bytes_len(&ec_ctx->p);
+    uint8_t *C1 = out, *C3 = NULL;
+    int output_len;
+    *outl = 0;
 
     // k [1, n-1]
     try_goto(bint_rand_range(&k, &BINT_ONE, &ec_ctx->n));
@@ -27,71 +30,46 @@ int sm2_encrypt_init(uint8_t* C1,
 
     // C1 = [k]G
     try_goto(ec_mul(&dot, &k, &ec_ctx->G, ec_ctx));
-    try_goto(ec_to_bytes(&dot, PC, C1, outl, ec_ctx));
+    try_goto(ec_to_bytes(&dot, PC, C1, &output_len, ec_ctx));
+    *outl += output_len, out += output_len;
+    C3 = C1 + output_len;
+    out += SM2_CRYPT_C3_SIZE, *outl += SM2_CRYPT_C3_SIZE;
 
     // 忽略对余因子 h 的 [k]P!=O 的判断
     // (x2,y2)=[k]P
     try_goto(ec_mul(&dot, &k, P, ec_ctx));
-    sm2_crypt_ctx->dot2.bsize = size;
-    uint8_t x2[GMLIB_BINT_BITS / 8];
-    uint8_t* y2 = sm2_crypt_ctx->dot2.y;
+    uint8_t x2[GMLIB_BINT_BITS / 8], y2[GMLIB_BINT_BITS / 8];
     try_goto(bint_to_bytes(&dot.x, x2, size, BINT_BIG_ENDIAN));
     try_goto(bint_to_bytes(&dot.y, y2, size, BINT_BIG_ENDIAN));
 
-    // 初始化 kdf H(x2||y2||...
-    sm2_kdf_init(&sm2_crypt_ctx->kdf.ctx);
-    sm2_kdf_init_update(x2, size, &sm2_crypt_ctx->kdf.ctx);
-    sm2_kdf_init_update(y2, size, &sm2_crypt_ctx->kdf.ctx);
-    sm2_crypt_ctx->kdf.kpos = SM3_DIGEST_SIZE;
+    // C3 = H(x2||msg||y2)
+    SM3_CTX sm3_ctx;
+    sm3_init(&sm3_ctx);
+    sm3_update(x2, size, &sm3_ctx);
+    sm3_update(in, inl, &sm3_ctx);
+    sm3_update(y2, size, &sm3_ctx);
+    sm3_final(C3, &sm3_ctx);
 
-    // 初始化 SM3 = H(x2||...
-    sm3_init(&sm2_crypt_ctx->sm3_ctx);
-    sm3_update(x2, size, &sm2_crypt_ctx->sm3_ctx);
+    // 初始化 kdf H(x2||y2||...
+    SM2_KDF_CTX kdf;
+    sm2_kdf_init(&kdf);
+    sm2_kdf_init_update(x2, size, &kdf);
+    sm2_kdf_init_update(y2, size, &kdf);
+
+    // 加密
+    uint8_t key_stream[SM3_DIGEST_SIZE];
+    while (inl) {
+        int size = SM3_DIGEST_SIZE;
+        if (size > inl) {
+            size = inl;
+        }
+        sm2_kdf_next(key_stream, &kdf);
+        memxor(out, key_stream, in, size);
+        *outl += size, out += size;
+        inl -= size;
+    }
 
     return ERR_NOERROR;
 error:
     return ERR_RUNTIME_ERROR;
-}
-
-/// @brief SM2 加密Update(输出C2)
-void sm2_encrypt_update(uint8_t* out,
-                        int* outl,
-                        uint8_t* in,
-                        int inl,
-                        SM2_CRYPT_CTX* sm2_crypt_ctx) {
-    SM2_CRYPT_CTX* ctx = sm2_crypt_ctx;
-    *outl = 0;
-    // 更新 SM3 = H(x2||msg
-    sm3_update(in, inl, &ctx->sm3_ctx);
-    // 加密
-    while (inl) {
-        // 生成密钥流
-        if (ctx->kdf.kpos == SM3_DIGEST_SIZE) {
-            sm2_kdf_next(sm2_crypt_ctx->kdf.key_stream,
-                         &sm2_crypt_ctx->kdf.ctx);
-            ctx->kdf.kpos = 0;
-        }
-        // 加密处理数据
-        int size = SM3_DIGEST_SIZE - ctx->kdf.kpos;
-        if (size > inl) {
-            size = inl;
-        }
-        memxor(out, in, ctx->kdf.key_stream + ctx->kdf.kpos, size);  // xor
-        // 更新数据
-        inl -= size;
-        in += size;
-        out += size;
-        *outl += size;
-        ctx->kdf.kpos += size;
-    }
-}
-
-/// @brief SM2 加密Final(输出C3)
-void sm2_encrypt_final(uint8_t* C3, SM2_CRYPT_CTX* sm2_crypt_ctx) {
-    SM3_CTX* sm3_ctx = &sm2_crypt_ctx->sm3_ctx;
-
-    int size = sm2_crypt_ctx->dot2.bsize;
-    // H(x2 || msg || y2)
-    sm3_update(sm2_crypt_ctx->dot2.y, size, sm3_ctx);
-    sm3_final(C3, sm3_ctx);
 }

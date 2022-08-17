@@ -4,6 +4,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
+
 #include <gmlib/hash/sm3.h>
 #include <gmlib/publickey/sm2.h>
 
@@ -14,10 +15,15 @@ int sm2_calculate_z(uint8_t* out,
                     ECPoint* P,
                     EC_CTX* ec_ctx);
 
+typedef struct SM2_KDF_CTX {
+    uint32_t ct;
+    SM3_CTX sm3_ctx;
+} SM2_KDF_CTX;
+
 /// @brief SM2 KDF 初始化
 void sm2_kdf_init(SM2_KDF_CTX* kdf_ctx);
 
-/// @brief SM2 KDF 初始化
+/// @brief SM2 KDF 进一步初始化
 void sm2_kdf_init_update(uint8_t* in, int inl, SM2_KDF_CTX* kdf_ctx);
 
 /// @brief SM2 KDF 生成下一256比特密钥流
