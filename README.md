@@ -1,6 +1,6 @@
 ﻿# GMLib
 
-支持国密 SM4/AES-ECB/CBC/GCM，SM3，SM2签名/加密，ZUC算法 的密码库，文档页面 https://oldprincess.github.io/gmlib/，项目地址 [gmlib](https://github.com/oldprincess/gmlib/)
+支持国密 SM4/AES-ECB/CBC/GCM，SM3，SM2签名/加密，ZUC算法 的密码库，文档页面[GMLib Docs](https://oldprincess.github.io/gmlib/) ，项目地址 [gmlib](https://github.com/oldprincess/gmlib/)
 
 开发这个库的时候参考了很多密码库，例如 [Crypto++](https://github.com/weidai11/cryptopp)，[openssl](https://github.com/openssl/openssl)，[GmSSL](https://github.com/guanzhi/GmSSL)，[Oryx Embedded](https://www.oryx-embedded.com/doc/) 以及 `JAVA JDK`，所以很多地方都能看到这些库的影子
 
