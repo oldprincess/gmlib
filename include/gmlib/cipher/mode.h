@@ -40,6 +40,9 @@ void ecb_init(uint8_t* key,              ///< [in]    用户密钥
               void* cctx,                ///< [inout] 算法上下文
               ECB_CTX* mctx);
 
+/// @brief ECB 模式重置
+void ecb_reset(ECB_CTX* mctx);
+
 /// @brief ECB 加密
 void ecb_encrypt_update(uint8_t* out,  ///< [out] 输出
                         int* outl,     ///< [out] 输出长度
@@ -79,6 +82,9 @@ void cbc_init(uint8_t* key,              ///< [in]    用户密钥
               const CipherInfo* cipher,  ///< [in]    算法
               void* cctx,                ///< [inout] 算法上下文
               CBC_CTX* mctx);
+
+/// @brief CBC 模式重置
+void cbc_reset(uint8_t* iv, CBC_CTX* mctx);
 
 /// @brief CBC 加密
 void cbc_encrypt_update(uint8_t* out,  ///< [out] 输出
@@ -132,6 +138,7 @@ typedef struct GCM_CTX {
     int clen;        // 密文长度
 } GCM_CTX;
 
+/// @brief GCM 模式初始化
 void gcm_init(uint8_t* key,              ///< [in]    用户密钥
               uint8_t* iv,               ///< [in]    初始向量
               int ivlen,                 ///< [in]    初始向量长度
@@ -140,6 +147,12 @@ void gcm_init(uint8_t* key,              ///< [in]    用户密钥
               void* cctx,                ///< [inout] 算法上下文
               GCM_CTX* mctx);
 
+/// @brief GCM 模式重置
+void gcm_reset(uint8_t* iv,  ///< [in]    初始向量
+               int ivlen,    ///< [in]    初始向量长度
+               GCM_CTX* mctx);
+
+/// @brief GCM 更新AAD
 void gcm_update_aad(uint8_t* aad, int alen, GCM_CTX* mctx);
 
 /// @brief GCM 加密

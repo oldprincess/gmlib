@@ -93,7 +93,7 @@ add_library(gmlib STATIC
 )
 
 add_executable(gmlib-demo
-    demo/main.c
+    demo/demo_aesgcm.c
 )
 
 target_link_libraries(gmlib-demo gmlib)

@@ -1,3 +1,5 @@
+/// 该算法有Bug，待完成...
+
 #include "ec_jacobian.h"
 #include <gmlib/err.h>
 #include <gmlib/math.h>

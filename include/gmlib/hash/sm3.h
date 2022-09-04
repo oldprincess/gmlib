@@ -14,7 +14,10 @@
 extern "C" {
 #endif  // __cplusplus
 
+#include <gmlib/types.h>
 #include <stdint.h>
+
+extern const HashInfo SM3Info;
 
 // SM3 摘要字节数
 #define SM3_DIGEST_SIZE (256 / 8)

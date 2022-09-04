@@ -16,6 +16,11 @@ void cbc_init(uint8_t* key,              ///< [in]    用户密钥
     memcpy(mctx->iv, iv, BLOCK_SIZE);  // 拷贝初始向量
 }
 
+void cbc_reset(uint8_t* iv, CBC_CTX* mctx) {
+    mctx->bsize = 0;                   // 初始化缓冲区
+    memcpy(mctx->iv, iv, BLOCK_SIZE);  // 拷贝初始向量
+}
+
 void cbc_encrypt_update(uint8_t* out,
                         int* outl,
                         uint8_t* in,

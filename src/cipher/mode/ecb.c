@@ -13,6 +13,10 @@ void ecb_init(uint8_t* key,
     mctx->cctx = cctx;
 }
 
+void ecb_reset(ECB_CTX* mctx) {
+    mctx->bsize = 0;
+}
+
 void ecb_encrypt_update(uint8_t* out,
                         int* outl,
                         uint8_t* in,

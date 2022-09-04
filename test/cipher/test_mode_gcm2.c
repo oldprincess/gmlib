@@ -80,6 +80,20 @@ void test_mode_gcm2() {
         goto error;
     }
 
+    outptr = out;
+    gcm_reset(gcm_iv, sizeof(gcm_iv), &ctx);
+    gcm_update_aad(gcm_aad, sizeof(gcm_aad), &ctx);
+    gcm_encrypt_update(outptr, &outl, gcm_pt, sizeof(gcm_pt), &ctx);
+    outptr += outl;
+    gcm_encrypt_final(outptr, &outl, tag, sizeof(gcm_tag), &ctx);
+    outptr += outl;
+
+    if (memcmp(tag, gcm_tag, sizeof(gcm_tag)) != 0 ||
+        memcmp(out, gcm_ct, sizeof(gcm_ct)) != 0) {
+        ERR_LOG("Err in aes_gcm");
+        goto error;
+    }
+
     return;
 error:
     exit(-1);

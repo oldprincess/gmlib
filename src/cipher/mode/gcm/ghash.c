@@ -13,6 +13,11 @@ void ghash_init(uint8_t* H, GHashTable* ht, GHash_CTX* ctx) {
     ctx->bsize = 0;
 }
 
+void ghash_reset(GHash_CTX* ctx) {
+    memset(ctx->X, 0, BLOCK_SIZE);
+    ctx->bsize = 0;
+}
+
 void ghash_update(uint8_t* in, int inl, GHash_CTX* ctx) {
     while (inl) {
         // 拷贝缓冲区

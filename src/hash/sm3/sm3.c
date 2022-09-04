@@ -1,8 +1,14 @@
 #include <gmlib/hash/sm3.h>
 #include <gmlib/utils.h>
 #include <memory.h>
-#include <stdint.h>
 #include "sm3_common.h"
+
+const HashInfo SM3Info = {
+    .init = (HashInit)sm3_init,
+    .update = (HashUpdate)sm3_update,
+    .final = (HashFinal)sm3_final,
+    .digest_size = SM3_DIGEST_SIZE,
+};
 
 static uint32_t SM3_INIT_DIGEST[8] = {
     0x7380166F, 0x4914B2B9, 0x172442D7, 0xDA8A0600,

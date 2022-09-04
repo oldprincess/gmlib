@@ -27,6 +27,16 @@ void gcm_init(uint8_t* key,              ///< [in]    用户密钥
     mctx->alen = 0, mctx->clen = 0;
 }
 
+void gcm_reset(uint8_t* iv, int ivlen, GCM_CTX* mctx) {
+    ghash_reset(&mctx->hctx);
+    uint8_t* H = mctx->hctx.H;
+    GHashTable* ht = mctx->hctx.ht;
+    // 初始化 GCTR
+    gctr_init(iv, ivlen, H, ht, &mctx->gctx);
+    // 初始化 GCM
+    mctx->alen = 0, mctx->clen = 0;
+}
+
 void gcm_update_aad(uint8_t* aad, int alen, GCM_CTX* mctx) {
     mctx->alen = alen;
     int rem = (BLOCK_SIZE - alen % BLOCK_SIZE) % BLOCK_SIZE;

@@ -9,6 +9,8 @@ extern "C" {
 
 void ghash_init(uint8_t* H, GHashTable* ht, GHash_CTX* ctx);
 
+void ghash_reset(GHash_CTX* ctx);
+
 void ghash_update(uint8_t* in, int inl, GHash_CTX* ctx);
 
 void ghash_final(uint8_t* out, GHash_CTX* ctx);

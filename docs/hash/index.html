@@ -561,6 +561,35 @@
 
 <h1 id="hash">哈希算法Hash</h1>
 <h2 id="_1">一、类型定义</h2>
+<div class="admonition info">
+<p>file: gmlib/types.h</p>
+</div>
+<p>每个哈希算法都实现下述函数并定义相应的 <code>HashInfo</code> 结构变量</p>
+<ul>
+<li>算法上下文(Context)初始化函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">HashInit</span><span class="p">)(</span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>哈希算法压缩函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">HashUpdate</span><span class="p">)(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">inl</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>哈希算法输出函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">HashFinal</span><span class="p">)(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
+<li>算法信息(Info)结构体</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">HashInfo</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">HashInit</span><span class="w"> </span><span class="n">init</span><span class="p">;</span><span class="w">          </span><span class="c1">///&lt; 初始化算法</span>
+<span class="w">    </span><span class="n">HashUpdate</span><span class="w"> </span><span class="n">update</span><span class="p">;</span><span class="w">      </span><span class="c1">///&lt; 压缩算法</span>
+<span class="w">    </span><span class="n">HashFinal</span><span class="w"> </span><span class="n">final</span><span class="p">;</span><span class="w">        </span><span class="c1">///&lt; 压缩结果输出</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">digest_size</span><span class="p">;</span><span class="w">  </span><span class="c1">///&lt; 摘要长度</span>
+<span class="p">}</span><span class="w"> </span><span class="n">HashInfo</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
 <h2 id="_2">二、哈希算法</h2>
 <h3 id="21-sm3">2.1 SM3算法</h3>
 <div class="admonition info">

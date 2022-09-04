@@ -825,6 +825,15 @@
 <span class="w">              </span><span class="n">ECB_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 <ul>
+<li>模式上下文重置</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ecb_reset</span><span class="p">(</span><span class="n">ECB_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>init</code>操作会初始化算法(轮密钥)，而调用<code>reset</code>函数可重置上下文，无需重复初始化算法</p>
+</div>
+<ul>
 <li>模式加密函数</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ecb_encrypt_update</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [out] 输出</span>
@@ -909,6 +918,11 @@
 <span class="w">              </span><span class="n">CBC_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 <ul>
+<li>模式上下文重置函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">cbc_reset</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">iv</span><span class="p">,</span><span class="w"> </span><span class="n">CBC_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
 <li>模式加密函数</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">cbc_encrypt_update</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">out</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [out] 输出</span>
@@ -981,6 +995,13 @@
 <span class="w">              </span><span class="n">GCM_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 <ul>
+<li>模式上下文重置函数</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">gcm_reset</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">iv</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; [in]    初始向量</span>
+<span class="w">               </span><span class="kt">int</span><span class="w"> </span><span class="n">ivlen</span><span class="p">,</span><span class="w">    </span><span class="c1">///&lt; [in]    初始向量长度</span>
+<span class="w">               </span><span class="n">GCM_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<ul>
 <li>GCM输入AAD(additional authenticated data)</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">gcm_update_aad</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">aad</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">alen</span><span class="p">,</span><span class="w"> </span><span class="n">GCM_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
@@ -1015,6 +1036,93 @@
 <span class="w">                      </span><span class="kt">int</span><span class="w"> </span><span class="n">tlen</span><span class="p">,</span><span class="w">      </span><span class="c1">///&lt; [in]  tag长度</span>
 <span class="w">                      </span><span class="n">GCM_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">mctx</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/cipher/aes.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/cipher/mode.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/err.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gmlib/utils.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;memory.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+
+<span class="cm">/* AES256 key */</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">gcm_key</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0xee</span><span class="p">,</span><span class="w"> </span><span class="mh">0xbc</span><span class="p">,</span><span class="w"> </span><span class="mh">0x1f</span><span class="p">,</span><span class="w"> </span><span class="mh">0x57</span><span class="p">,</span><span class="w"> </span><span class="mh">0x48</span><span class="p">,</span><span class="w"> </span><span class="mh">0x7f</span><span class="p">,</span><span class="w"> </span><span class="mh">0x51</span><span class="p">,</span><span class="w"> </span><span class="mh">0x92</span><span class="p">,</span><span class="w">  </span><span class="c1">//</span>
+<span class="w">    </span><span class="mh">0x1c</span><span class="p">,</span><span class="w"> </span><span class="mh">0x04</span><span class="p">,</span><span class="w"> </span><span class="mh">0x65</span><span class="p">,</span><span class="w"> </span><span class="mh">0x66</span><span class="p">,</span><span class="w"> </span><span class="mh">0x5f</span><span class="p">,</span><span class="w"> </span><span class="mh">0x8a</span><span class="p">,</span><span class="w"> </span><span class="mh">0xe6</span><span class="p">,</span><span class="w"> </span><span class="mh">0xd1</span><span class="p">,</span><span class="w">  </span><span class="c1">//</span>
+<span class="w">    </span><span class="mh">0x65</span><span class="p">,</span><span class="w"> </span><span class="mh">0x8b</span><span class="p">,</span><span class="w"> </span><span class="mh">0xb2</span><span class="p">,</span><span class="w"> </span><span class="mh">0x6d</span><span class="p">,</span><span class="w"> </span><span class="mh">0xe6</span><span class="p">,</span><span class="w"> </span><span class="mh">0xf8</span><span class="p">,</span><span class="w"> </span><span class="mh">0xa0</span><span class="p">,</span><span class="w"> </span><span class="mh">0x69</span><span class="p">,</span><span class="w">  </span><span class="c1">//</span>
+<span class="w">    </span><span class="mh">0xa3</span><span class="p">,</span><span class="w"> </span><span class="mh">0x52</span><span class="p">,</span><span class="w"> </span><span class="mh">0x02</span><span class="p">,</span><span class="w"> </span><span class="mh">0x93</span><span class="p">,</span><span class="w"> </span><span class="mh">0xa5</span><span class="p">,</span><span class="w"> </span><span class="mh">0x72</span><span class="p">,</span><span class="w"> </span><span class="mh">0x07</span><span class="p">,</span><span class="w"> </span><span class="mh">0x8f</span><span class="p">,</span><span class="w">  </span><span class="c1">//</span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="cm">/* Unique initialisation vector */</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">gcm_iv</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0x99</span><span class="p">,</span><span class="w"> </span><span class="mh">0xaa</span><span class="p">,</span><span class="w"> </span><span class="mh">0x3e</span><span class="p">,</span><span class="w"> </span><span class="mh">0x68</span><span class="p">,</span><span class="w"> </span><span class="mh">0xed</span><span class="p">,</span><span class="w"> </span><span class="mh">0x81</span><span class="p">,</span><span class="w"> </span><span class="mh">0x73</span><span class="p">,</span><span class="w"> </span><span class="mh">0xa0</span><span class="p">,</span><span class="w"> </span><span class="mh">0xee</span><span class="p">,</span><span class="w"> </span><span class="mh">0xd0</span><span class="p">,</span><span class="w"> </span><span class="mh">0x66</span><span class="p">,</span><span class="w"> </span><span class="mh">0x84</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="cm">/* Example plaintext to encrypt */</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">gcm_pt</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0xf5</span><span class="p">,</span><span class="w"> </span><span class="mh">0x6e</span><span class="p">,</span><span class="w"> </span><span class="mh">0x87</span><span class="p">,</span><span class="w"> </span><span class="mh">0x05</span><span class="p">,</span><span class="w"> </span><span class="mh">0x5b</span><span class="p">,</span><span class="w"> </span><span class="mh">0xc3</span><span class="p">,</span><span class="w"> </span><span class="mh">0x2d</span><span class="p">,</span><span class="w"> </span><span class="mh">0x0e</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0xeb</span><span class="p">,</span><span class="w"> </span><span class="mh">0x31</span><span class="p">,</span><span class="w"> </span><span class="mh">0xb2</span><span class="p">,</span><span class="w"> </span><span class="mh">0xea</span><span class="p">,</span><span class="w"> </span><span class="mh">0xcc</span><span class="p">,</span><span class="w"> </span><span class="mh">0x2b</span><span class="p">,</span><span class="w"> </span><span class="mh">0xf2</span><span class="p">,</span><span class="w"> </span><span class="mh">0xa5</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Example of Additional Authenticated Data (AAD), i.e. unencrypted data</span>
+<span class="cm"> * which can be authenticated using the generated Tag value.</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">gcm_aad</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0x4d</span><span class="p">,</span><span class="w"> </span><span class="mh">0x23</span><span class="p">,</span><span class="w"> </span><span class="mh">0xc3</span><span class="p">,</span><span class="w"> </span><span class="mh">0xce</span><span class="p">,</span><span class="w"> </span><span class="mh">0xc3</span><span class="p">,</span><span class="w"> </span><span class="mh">0x34</span><span class="p">,</span><span class="w"> </span><span class="mh">0xb4</span><span class="p">,</span><span class="w"> </span><span class="mh">0x9b</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="mh">0xdb</span><span class="p">,</span><span class="w"> </span><span class="mh">0x37</span><span class="p">,</span><span class="w"> </span><span class="mh">0x0c</span><span class="p">,</span><span class="w"> </span><span class="mh">0x43</span><span class="p">,</span><span class="w"> </span><span class="mh">0x7f</span><span class="p">,</span><span class="w"> </span><span class="mh">0xec</span><span class="p">,</span><span class="w"> </span><span class="mh">0x78</span><span class="p">,</span><span class="w"> </span><span class="mh">0xde</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">out</span><span class="p">[</span><span class="n">BLOCK_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">];</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">tag</span><span class="p">[</span><span class="n">BLOCK_SIZE</span><span class="p">];</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">taglen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BLOCK_SIZE</span><span class="p">;</span><span class="w"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">GCM_CTX</span><span class="w"> </span><span class="n">ctx</span><span class="p">;</span><span class="w">      </span><span class="c1">// GCM上下文</span>
+<span class="w">    </span><span class="n">AES_CTX</span><span class="w"> </span><span class="n">aes_ctx</span><span class="p">;</span><span class="w">  </span><span class="c1">// AES上下文</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">outptr</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">CipherInfo</span><span class="o">*</span><span class="w"> </span><span class="n">cipher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">AES256Info</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// 加密</span>
+<span class="w">    </span><span class="n">puts</span><span class="p">(</span><span class="s">&quot;[AES256 GCM]&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">gcm_init</span><span class="p">(</span><span class="n">gcm_key</span><span class="p">,</span><span class="w"> </span><span class="n">gcm_iv</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">gcm_iv</span><span class="p">),</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">cipher</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">aes_ctx</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">gcm_update_aad</span><span class="p">(</span><span class="n">gcm_aad</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">gcm_aad</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">gcm_encrypt_update</span><span class="p">(</span><span class="n">outptr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="n">gcm_pt</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">gcm_pt</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">gcm_encrypt_final</span><span class="p">(</span><span class="n">outptr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">taglen</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// f7 26 44 13 a8 4c 0e 7c d5 36 86 7e b9 f2 17 36</span>
+<span class="w">    </span><span class="n">puts</span><span class="p">(</span><span class="s">&quot;ciphertext:&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">dump_data</span><span class="p">(</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">outptr</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">out</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 67 ba 05 10 26 2a e4 87 d7 37 ee 62 98 f7 7e 0c</span>
+<span class="w">    </span><span class="n">puts</span><span class="p">(</span><span class="s">&quot;tag:&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">dump_data</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">taglen</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// 加密</span>
+<span class="w">    </span><span class="n">puts</span><span class="p">(</span><span class="s">&quot;[AES256 GCM + GHashTable]&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">GHashTable</span><span class="w"> </span><span class="n">ht</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">gcm_init</span><span class="p">(</span><span class="n">gcm_key</span><span class="p">,</span><span class="w"> </span><span class="n">gcm_iv</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">gcm_iv</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ht</span><span class="p">,</span><span class="w"> </span><span class="n">cipher</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">aes_ctx</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">gcm_update_aad</span><span class="p">(</span><span class="n">gcm_aad</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">gcm_aad</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">gcm_encrypt_update</span><span class="p">(</span><span class="n">outptr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="n">gcm_pt</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">gcm_pt</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">gcm_encrypt_final</span><span class="p">(</span><span class="n">outptr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">outl</span><span class="p">,</span><span class="w"> </span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">taglen</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">outptr</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">outl</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// f7 26 44 13 a8 4c 0e 7c d5 36 86 7e b9 f2 17 36</span>
+<span class="w">    </span><span class="n">puts</span><span class="p">(</span><span class="s">&quot;ciphertext:&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">dump_data</span><span class="p">(</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">outptr</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">out</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 67 ba 05 10 26 2a e4 87 d7 37 ee 62 98 f7 7e 0c</span>
+<span class="w">    </span><span class="n">puts</span><span class="p">(</span><span class="s">&quot;tag:&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">dump_data</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span><span class="w"> </span><span class="n">taglen</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="nl">error</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+</div>
 
 
 
