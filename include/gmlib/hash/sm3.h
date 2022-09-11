@@ -47,7 +47,31 @@ void sm3_update(uint8_t* in, int inl, SM3_CTX* ctx);
 /// @param[inout]   ctx     SM3算法上下文
 void sm3_final(uint8_t* out, SM3_CTX* ctx);
 
-typedef uint8_t SM3HMacBuffer[SM3_BLOCK_SIZE];
+// ==================================
+// ============== HMAC ==============
+// ==================================
+
+typedef struct HMAC_SM3_CTX {
+    SM3_CTX hctx;
+    uint8_t hkey[SM3_BLOCK_SIZE];
+} HMAC_SM3_CTX;
+
+/// @brief SM3 HMAC 初始化
+/// @param[in]  key     密钥
+/// @param[in]  klen    密钥长度
+/// @param[in]  hmctx   SM3 HMAC算法上下文
+void hmac_sm3_init(uint8_t* key, int klen, HMAC_SM3_CTX* hmctx);
+
+/// @brief SM3 更新消息
+/// @param[in]      in      输入
+/// @param[in]      inl     输入长度
+/// @param[inout]   hmctx   SM3 HMAC算法上下文
+void hmac_sm3_update(uint8_t* in, int inl, HMAC_SM3_CTX* hmctx);
+
+/// @brief SM3 Final 并输出摘要
+/// @param[out]     out     256比特摘要
+/// @param[inout]   hmctx   SM3 HMAC算法上下文
+void hmac_sm3_final(uint8_t* out, HMAC_SM3_CTX* hmctx);
 
 #ifdef __cplusplus
 }
