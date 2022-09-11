@@ -7,7 +7,8 @@ const HashInfo SM3Info = {
     .init = (HashInit)sm3_init,
     .update = (HashUpdate)sm3_update,
     .final = (HashFinal)sm3_final,
-    .digest_size = SM3_DIGEST_SIZE,
+    .DIGEST_SIZE = SM3_DIGEST_SIZE,
+    .BLOCK_SIZE = SM3_BLOCK_SIZE,
 };
 
 static uint32_t SM3_INIT_DIGEST[8] = {

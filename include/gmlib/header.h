@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief
+ * @brief 没什么用处，为了我新建.h文件后复制extern"C"比较方便而已
  *
  */
 #ifndef HEADER_H

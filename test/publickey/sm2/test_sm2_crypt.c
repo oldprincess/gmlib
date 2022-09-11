@@ -61,6 +61,19 @@ void test_sm2_crypt() {
         goto error;
     }
 
+    // 随机加解密数据测试
+    for (int i = 0; i < 30; i++) {
+        static uint8_t random_pt[512], ct[1024];
+        rand_mem(random_pt, sizeof(random_pt));
+        try_goto(sm2_encrypt(ct, &outl, random_pt, sizeof(random_pt), PC,
+                             &SM2_Fp256_CTX, &P));
+        try_goto(sm2_decrypt(out, &outl, ct, outl, &SM2_Fp256_CTX, &da));
+        if (memcmp(random_pt, out, sizeof(random_pt)) != 0) {
+            ERR_LOG("Err in sm2");
+            goto error;
+        }
+    }
+
     return;
 error:
     exit(-1);

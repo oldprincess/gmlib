@@ -66,7 +66,7 @@ int sm2_encrypt(uint8_t* out,
         sm2_kdf_next(key_stream, &kdf);
         memxor(out, key_stream, in, size);
         *outl += size, out += size;
-        inl -= size;
+        inl -= size, in += size;
     }
 
     return ERR_NOERROR;

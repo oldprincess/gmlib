@@ -52,9 +52,7 @@ cmake --build . --config release
 
 * 在控制台中执行 `bin` 目录下编译出的测试文件 `gmlib-test`
 
-应当可在控制台中看到输出 `test finish!`，说明测试结果正确
-
-**注**：在 linux 系统中编译流程同上
+等待几秒，应当可在控制台中看到输出 `test finish!`，说明测试结果正确
 
 ## 二、GMLib 库使用
 

@@ -33,7 +33,7 @@ typedef struct HashInfo {
     HashInit init;          ///< 初始化算法
     HashUpdate update;      ///< 压缩算法
     HashFinal final;        ///< 压缩结果输出
-    const int digest_size;  ///< 摘要长度
+    const int DIGEST_SIZE;  ///< 摘要长度
 } HashInfo;
 
 #ifdef __cplusplus

@@ -47,6 +47,8 @@ void sm3_update(uint8_t* in, int inl, SM3_CTX* ctx);
 /// @param[inout]   ctx     SM3算法上下文
 void sm3_final(uint8_t* out, SM3_CTX* ctx);
 
+typedef uint8_t SM3HMacBuffer[SM3_BLOCK_SIZE];
+
 #ifdef __cplusplus
 }
 #endif  // __cplusplus

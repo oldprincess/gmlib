@@ -23,6 +23,10 @@ extern "C" {
 
 #define BLOCK_SIZE 16
 
+// 每个工作模式的初始化均会传入算法的cctx，
+// 该值以指针的形式保存，需注意从工作模式init到final整个过程中，
+// cctx指向的内存都不应被释放
+
 // ==========================================
 // ============== ECB MODE ==================
 // ==========================================
@@ -112,6 +116,8 @@ int cbc_decrypt_final(uint8_t* out, int* outl, CBC_CTX* mctx);
 // ==========================================
 
 // GHashTable 将占用巨大存储空间
+// 若使用GHashTable优化策略，则需注意整个GCM模式过程中
+// GHashTable对应的内存都不能被释放
 typedef uint64_t GHashTable[256][2];
 
 typedef struct GHash_CTX {
