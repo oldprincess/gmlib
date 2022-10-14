@@ -25,10 +25,8 @@ extern "C" {
 
 #ifdef GMLIB_DEBUG
 
-#define ERR_LOG(_fmt, ...)                     \
-    fprintf(stderr,                            \
-            "[Error] "_fmt                     \
-            ". File `%s`, line %d, in `%s`\n", \
+#define ERR_LOG(_fmt, ...)                                             \
+    fprintf(stderr, "[Error] " _fmt ". File `%s`, line %d, in `%s`\n", \
             ##__VA_ARGS__, __FILE__, __LINE__, __FUNCTION__)
 
 #else

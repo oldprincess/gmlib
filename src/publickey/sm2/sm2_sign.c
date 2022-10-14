@@ -32,12 +32,6 @@ error:
     return ERR_RUNTIME_ERROR;
 }
 
-/// @brief SM2 签名重置
-void sm2_sign_reset(SM2_SIGN_CTX* sm2_sign_ctx) {
-    sm3_init(&sm2_sign_ctx->sm3_ctx);
-    sm3_update(sm2_sign_ctx->Z, SM3_DIGEST_SIZE, &sm2_sign_ctx->sm3_ctx);
-}
-
 /// @brief SM2 签名Update
 void sm2_sign_update(uint8_t* in, int inl, SM2_SIGN_CTX* sm2_sign_ctx) {
     sm3_update(in, inl, &sm2_sign_ctx->sm3_ctx);

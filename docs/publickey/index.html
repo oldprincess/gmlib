@@ -654,11 +654,6 @@
 <span class="w">                  </span><span class="n">SM2_SIGN_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">sm2_sign_ctx</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 <ul>
-<li>签名上下文(Context)重置</li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">sm2_sign_reset</span><span class="p">(</span><span class="n">SM2_SIGN_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">sm2_sign_ctx</span><span class="p">);</span><span class="w"></span>
-</code></pre></div>
-<ul>
 <li>签名</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">sm2_sign_update</span><span class="p">(</span><span class="kt">uint8_t</span><span class="o">*</span><span class="w"> </span><span class="n">in</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">inl</span><span class="p">,</span><span class="w"> </span><span class="n">SM2_SIGN_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">sm2_sign_ctx</span><span class="p">);</span><span class="w"></span>
@@ -684,11 +679,6 @@
 <span class="w">                    </span><span class="n">EC_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">ec_ctx</span><span class="p">,</span><span class="w">   </span><span class="c1">///&lt; [in] 椭圆曲线上下文</span>
 <span class="w">                    </span><span class="n">ECPoint</span><span class="o">*</span><span class="w"> </span><span class="n">P</span><span class="p">,</span><span class="w">       </span><span class="c1">///&lt; [in] 签名者公钥</span>
 <span class="w">                    </span><span class="n">SM2_VERIFY_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">sm2_verify_ctx</span><span class="p">);</span><span class="w"></span>
-</code></pre></div>
-<ul>
-<li>验签重置</li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">sm2_verify_reset</span><span class="p">(</span><span class="n">SM2_VERIFY_CTX</span><span class="o">*</span><span class="w"> </span><span class="n">sm2_verify_ctx</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
 <ul>
 <li>验签</li>

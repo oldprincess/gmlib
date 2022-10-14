@@ -1,5 +1,7 @@
 #include "bint_div.h"
+
 #include <gmlib/err.h>
+
 #include "bint_cmp.h"
 #include "bint_shift.h"
 
@@ -71,6 +73,9 @@ int bint_divmod(BINT* q, BINT* r, BINT* n1, BINT* n2) {
             }
             if (r != NULL) {
                 r->sign = r_sign;
+                if (r->dsize == 0) {
+                    bint_set_zero(r);
+                }
             }
         }
     }

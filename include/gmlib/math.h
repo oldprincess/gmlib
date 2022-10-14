@@ -9,9 +9,8 @@
  * 素性检测参考资料[1] bn_prime 模块，使用小素数预先过滤；
  * Miller-Rabin 测试、求逆、计算 gcd 等数学算法参考资料[2]；
  */
-
-#ifndef MATH_H
-#define MATH_H
+#ifndef GMLIB_MATH_H
+#define GMLIB_MATH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -120,4 +119,4 @@ int fp_neg(BINT* r, BINT* n, BINT* p);
 }
 #endif  // __cplusplus
 
-#endif // MATH_H
+#endif // GMLIB_MATH_H

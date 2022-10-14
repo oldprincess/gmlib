@@ -44,9 +44,6 @@ int sm2_sign_init(uint8_t ENTL[2],  ///< [in] ID比字节长度
                   ECPoint* P,       ///< [in] 签名者公钥
                   SM2_SIGN_CTX* sm2_sign_ctx);
 
-/// @brief SM2 签名重置
-void sm2_sign_reset(SM2_SIGN_CTX* sm2_sign_ctx);
-
 /// @brief SM2 签名Update
 void sm2_sign_update(uint8_t* in, int inl, SM2_SIGN_CTX* sm2_sign_ctx);
 
@@ -73,9 +70,6 @@ int sm2_verify_init(uint8_t ENTL[2],  ///< [in] ID比字节长度
                     EC_CTX* ec_ctx,   ///< [in] 椭圆曲线上下文
                     ECPoint* P,       ///< [in] 签名者公钥
                     SM2_VERIFY_CTX* sm2_verify_ctx);
-
-/// @brief SM2 验签重置
-void sm2_verify_reset(SM2_VERIFY_CTX* sm2_verify_ctx);
 
 /// @brief SM2 验签Update
 void sm2_verify_update(uint8_t* in, int inl, SM2_VERIFY_CTX* sm2_verify_ctx);

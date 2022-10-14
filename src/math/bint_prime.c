@@ -195,7 +195,7 @@ static int millter_rabin(BINT* n, int* status) {
     BINT q, n_1;
     int k = 0;                               // k = 0
     try_goto(bint_sub(&n_1, n, &BINT_ONE));  // n - 1
-    bint_copy(&q, &n_1);           // q = n - 1
+    bint_copy(&q, &n_1);                     // q = n - 1
     while (!bint_is_odd(&q)) {
         bint_sra(&q, &q, 1);  // q = q / 2
         k++;
@@ -238,23 +238,22 @@ error:
 
 /// @brief 素数判断
 int bint_is_prime(BINT* n, int* status) {
-    BINT un, t;
-    bint_abs(&un, n);
+    BINT t;
     // 偶数
     if (!bint_is_odd(n)) {
         // 是2则为素数
-        *status = bint_cmp(&un, &BINT_TWO) == 0;
+        *status = bint_cmp(n, &BINT_TWO) == 0;
         goto final;
     }
-    // 奇数
-    if (bint_cmp(&un, &BINT_ONE) == 0) {
+    // n<=1
+    if (bint_cmp(n, &BINT_ONE) <= 0) {
         *status = 0;
         goto final;
     }
     // 测试小整数
     for (int i = 0; i < sizeof(LITTLE_PRIME) / sizeof(uint32_t); i++) {
         uint32_t rem = 0;
-        try_goto(bint_divmod_u32(&t, &rem, &un, LITTLE_PRIME[i]));
+        try_goto(bint_divmod_u32(&t, &rem, n, LITTLE_PRIME[i]));
         if (rem == 0) {
             *status = 0;
             goto final;
@@ -265,7 +264,7 @@ int bint_is_prime(BINT* n, int* status) {
         }
     }
     // Millter Rabin
-    try_goto(millter_rabin(&un, status));
+    try_goto(millter_rabin(n, status));
 
 final:
     return ERR_NOERROR;

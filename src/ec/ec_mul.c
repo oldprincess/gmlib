@@ -1,7 +1,6 @@
 #include <gmlib/ec.h>
 #include <gmlib/err.h>
 #include <gmlib/math.h>
-#include "ec_jacobian.h"
 
 /// @brief 椭圆曲线多倍点(仿射坐标)
 int ec_mul(ECPoint* r, BINT* k, ECPoint* n, EC_CTX* ec_ctx) {

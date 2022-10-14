@@ -48,7 +48,6 @@ void test_sm2_sign_verify() {
     SM2_SIGN_CTX sm2_sign_ctx;
     try_goto(
         sm2_sign_init(ENTL_A, ID_A, &SM2_Fp256_CTX, &da, &P, &sm2_sign_ctx));
-    sm2_sign_reset(&sm2_sign_ctx);
     sm2_sign_update(msg, sizeof(msg), &sm2_sign_ctx);
     try_goto(sm2_sign_final(out, &outl, &sm2_sign_ctx));
     if (outl != sizeof(signature) || memcmp(out, signature, outl) != 0) {
@@ -61,7 +60,6 @@ void test_sm2_sign_verify() {
     int status = 0;
     try_goto(
         sm2_verify_init(ENTL_A, ID_A, &SM2_Fp256_CTX, &P, &sm2_verify_ctx));
-    sm2_verify_reset(&sm2_verify_ctx);
     sm2_verify_update(msg, sizeof(msg), &sm2_verify_ctx);
     try_goto(sm2_verify_final(&status, out, &sm2_verify_ctx));
     if (status != 1) {
@@ -71,8 +69,10 @@ void test_sm2_sign_verify() {
 
     // 随机签名验签测试
     for (int i = 0; i < 30; i++) {
-        sm2_sign_reset(&sm2_sign_ctx);
-        sm2_verify_reset(&sm2_verify_ctx);
+        try_goto(sm2_sign_init(ENTL_A, ID_A, &SM2_Fp256_CTX, &da, &P,
+                               &sm2_sign_ctx));
+        try_goto(
+            sm2_verify_init(ENTL_A, ID_A, &SM2_Fp256_CTX, &P, &sm2_verify_ctx));
         static uint8_t random_msg[512];
         rand_mem(random_msg, sizeof(random_msg));
         // 签名
