@@ -4,7 +4,7 @@
 
 开发这个库的时候参考了很多密码库，例如 [Crypto++](https://github.com/weidai11/cryptopp)，[openssl](https://github.com/openssl/openssl)，[GmSSL](https://github.com/guanzhi/GmSSL)，[Oryx Embedded](https://www.oryx-embedded.com/doc/) 以及 `JAVA JDK`，所以很多地方都能看到这些库的影子
 
-**注**：该项目采用的随机数生成为c语言标准库的`rand`函数（见`src/utils.c`），该函数生成的随机数并不是密码学意义上的随机数，存在一定的安全隐患。简易使用`/dev/urandom`（linux）或是`CryptoGetRandom`（windows）生成随机数
+**注**：该项目采用的随机数生成为c语言标准库的`rand`函数（见`src/utils.c`），该函数生成的随机数并不是密码学意义上的随机数，存在一定的安全隐患。建议使用`/dev/urandom`（linux）或是`CryptoGetRandom`（windows）生成随机数
 
 ## 一、快速开始
 
@@ -95,4 +95,4 @@ set(CMAKE_C_FLAGS -DGMLIB_DEBUG)
 我最初学习算法我是通过 `openssl` 库学习的，`openssl` 库代码风格对我而言过于晦涩复杂。之后找到了阅读起来更为易懂的 `oryx-embedded`（一个嵌入式的密码库）。在学习大整数运算时我是阅读 `Java JDK` 的源码学习的，虽然代码风格优秀，但 Java 中全部源码集中在一个文件中，函数调用关系不易捋清，而且英文文档和代码对我而言阅读起来远不及中文方便。
 
 * **后续这个库的开发方向**：
-~~后续主要随着自己的喜好开发，预计先将国密标准的算法全部写完，之后预计增加其它的工作模式和密码算法，再进行些效率上的优化。~~
+~~后续主要随着自己的喜好开发，预计先将国密标准的算法全部写完，之后预计增加其它的工作模式和密码算法，再进行些效率上的优化。~~，后续仅打算修复一些bug，将不再进一步更新
