@@ -22,20 +22,20 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef _GMLIB_CRYPTO_EX_GMAC_CIPHER_PCLMUL_H
-#define _GMLIB_CRYPTO_EX_GMAC_CIPHER_PCLMUL_H
+#ifndef _GMLIB_CRYPTO_HASH_GHASH_H
+#define _GMLIB_CRYPTO_HASH_GHASH_H
 
 #include <stdint.h>
-#include <stddef.h>
+#include <stdio.h>
 
 namespace gmlib {
 
-class GMacCipher_Pclmul
+class GHashCipher
 {
 public:
-    struct GMacPclmulCTX
+    struct GHashCTX
     {
-        uint8_t  H[16]; // LUT TABLE
+        uint64_t T[256][2]; // LUT TABLE
         uint64_t state[2];
 
         uint8_t buf[16];
@@ -45,14 +45,14 @@ public:
 public:
     static constexpr size_t DIGEST_SIZE = 16;
 
-private:
-    struct GMacPclmulCTX ctx;
+//private:
+    struct GHashCTX ctx;
 
 public:
-    GMacCipher_Pclmul(const uint8_t H[16]) noexcept;
-    GMacCipher_Pclmul()                               = default;
-    GMacCipher_Pclmul(const GMacCipher_Pclmul& other) = default;
-    ~GMacCipher_Pclmul()                              = default;
+    GHashCipher(const uint8_t H[16]) noexcept;
+    GHashCipher()                       = default;
+    GHashCipher(const GHashCipher& other) = default;
+    ~GHashCipher()                       = default;
 
 public:
     void set_key(const uint8_t H[16]) noexcept;
@@ -66,4 +66,4 @@ public:
 
 }; // namespace gmlib
 
-#endif // !_GMLIB_CRYPTO_EX_GMAC_CIPHER_PCLMUL_H
+#endif // !_GMLIB_CRYPTO_HASH_GHASH_H

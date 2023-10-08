@@ -22,14 +22,14 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "GMacCipher_Pclmul.h"
+#include "GHashCipher_Pclmul.h"
 #include <stdexcept>
 #include <immintrin.h>
 #include <string.h>
 
-using GMacPclmulCTX = gmlib::GMacCipher_Pclmul::GMacPclmulCTX;
+using GHashPclmulCTX = gmlib::GHashCipher_Pclmul::GHashPclmulCTX;
 
-#pragma region "GMAC PCLMUL CORE"
+#pragma region "GHASH PCLMUL CORE"
 
 /**
  * @cite Intrinsics for Carry-less Multiplication Instruction and Advanced
@@ -98,7 +98,7 @@ static inline void gfmul(__m128i a, __m128i b, __m128i* res)
     *res  = _mm_xor_si128(tmp3, tmp6);
 }
 
-static void gmac_pclmul_update_block(GMacPclmulCTX* ctx, const uint8_t in[16])
+static void ghash_pclmul_update_block(GHashPclmulCTX* ctx, const uint8_t in[16])
 {
     __m128i H     = _mm_loadu_si128((const __m128i*)(ctx->H));
     __m128i state = _mm_loadu_si128((const __m128i*)(ctx->state));
@@ -109,7 +109,7 @@ static void gmac_pclmul_update_block(GMacPclmulCTX* ctx, const uint8_t in[16])
     _mm_storeu_si128((__m128i*)(ctx->state), state);
 }
 
-static void gmac_pclmul_init(GMacPclmulCTX* ctx, const uint8_t H[16])
+static void ghash_pclmul_init(GHashPclmulCTX* ctx, const uint8_t H[16])
 {
     __m128i _H = reflect_xmm(_mm_loadu_si128((const __m128i*)H));
     _mm_storeu_si128((__m128i*)(ctx->H), _H);
@@ -117,22 +117,22 @@ static void gmac_pclmul_init(GMacPclmulCTX* ctx, const uint8_t H[16])
     ctx->buf_size = 0;
 }
 
-static void gmac_pclmul_reset(GMacPclmulCTX* ctx)
+static void ghash_pclmul_reset(GHashPclmulCTX* ctx)
 {
     _mm_storeu_si128((__m128i*)(ctx->state), _mm_setzero_si128());
     ctx->buf_size = 0;
 }
 
-static void gmac_pclmul_update(GMacPclmulCTX* ctx,
-                               const uint8_t* in,
-                               size_t         inl)
+static void ghash_pclmul_update(GHashPclmulCTX* ctx,
+                                const uint8_t*  in,
+                                size_t          inl)
 {
     if (ctx->buf_size == 0)
     {
         size_t block_num = inl / 16;
         while (block_num)
         {
-            gmac_pclmul_update_block(ctx, in);
+            ghash_pclmul_update_block(ctx, in);
             in += 16, inl -= 16, block_num--;
         }
     }
@@ -148,13 +148,13 @@ static void gmac_pclmul_update(GMacPclmulCTX* ctx,
 
         if (ctx->buf_size == 16)
         {
-            gmac_pclmul_update_block(ctx, ctx->buf);
+            ghash_pclmul_update_block(ctx, ctx->buf);
             ctx->buf_size = 0;
         }
     }
 }
 
-static int gmac_pclmul_final(const GMacPclmulCTX* ctx, uint8_t digest[16])
+static int ghash_pclmul_final(const GHashPclmulCTX* ctx, uint8_t digest[16])
 {
     if (ctx->buf_size) return -1;
     __m128i state = _mm_loadu_si128((const __m128i*)(ctx->state));
@@ -166,35 +166,35 @@ static int gmac_pclmul_final(const GMacPclmulCTX* ctx, uint8_t digest[16])
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 // **************************************************
-// ***************** GMAC Cipher ********************
+// ***************** GHASH Cipher ********************
 // **************************************************
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 
 namespace gmlib {
 
-GMacCipher_Pclmul::GMacCipher_Pclmul(const uint8_t H[16]) noexcept
+GHashCipher_Pclmul::GHashCipher_Pclmul(const uint8_t H[16]) noexcept
 {
-    gmac_pclmul_init(&this->ctx, H);
+    ghash_pclmul_init(&this->ctx, H);
 }
 
-void GMacCipher_Pclmul::set_key(const uint8_t H[16]) noexcept
+void GHashCipher_Pclmul::set_key(const uint8_t H[16]) noexcept
 {
-    gmac_pclmul_init(&this->ctx, H);
+    ghash_pclmul_init(&this->ctx, H);
 }
 
-void GMacCipher_Pclmul::reset() noexcept
+void GHashCipher_Pclmul::reset() noexcept
 {
-    gmac_pclmul_reset(&this->ctx);
+    ghash_pclmul_reset(&this->ctx);
 }
 
-void GMacCipher_Pclmul::update(const uint8_t* in, size_t inl) noexcept
+void GHashCipher_Pclmul::update(const uint8_t* in, size_t inl) noexcept
 {
-    gmac_pclmul_update(&this->ctx, in, inl);
+    ghash_pclmul_update(&this->ctx, in, inl);
 }
 
-void GMacCipher_Pclmul::final(uint8_t digest[16])
+void GHashCipher_Pclmul::final(uint8_t digest[16])
 {
-    int err = gmac_pclmul_final(&this->ctx, digest);
+    int err = ghash_pclmul_final(&this->ctx, digest);
     if (err)
     {
         throw std::runtime_error("invalid data length");

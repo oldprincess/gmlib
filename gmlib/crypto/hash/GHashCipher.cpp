@@ -22,19 +22,19 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "GMacCipher.h"
+#include "GHashCipher.h"
 #include <string.h>
 #include <stdexcept>
 
-using GMacCTX = gmlib::GMacCipher::GMacCTX;
+using GHashCTX = gmlib::GHashCipher::GHashCTX;
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 // **************************************************
-// ************* GMAC Core Algorithm ****************
+// ************* GHASH Core Algorithm ****************
 // **************************************************
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 
-#pragma region "GMAC LUT CORE"
+#pragma region "GHASH LUT CORE"
 
 #define MEM_LOAD64BE(src)                        \
     (((uint64_t)(((uint8_t *)(src))[0]) << 56) | \
@@ -142,9 +142,9 @@ static void gf128_init_mul_table(uint64_t T[][2], const uint8_t *H)
     }
 }
 
-static void gmac_lut256_update_block(uint64_t       state[2],
-                                     const uint64_t T[][2],
-                                     const uint8_t  in[16])
+static void ghash_lut256_update_block(uint64_t       state[2],
+                                      const uint64_t T[][2],
+                                      const uint8_t  in[16])
 {
     uint64_t X[2], R[2];
 
@@ -184,7 +184,7 @@ static void gmac_lut256_update_block(uint64_t       state[2],
     state[1] = R[1];
 }
 
-static void gmac_lut256_init(GMacCTX *ctx, const uint8_t H[16])
+static void ghash_lut256_init(GHashCTX *ctx, const uint8_t H[16])
 {
     ctx->state[0] = 0;
     ctx->state[1] = 0;
@@ -192,21 +192,21 @@ static void gmac_lut256_init(GMacCTX *ctx, const uint8_t H[16])
     gf128_init_mul_table(ctx->T, H);
 }
 
-static void gmac_lut256_reset(GMacCTX *ctx)
+static void ghash_lut256_reset(GHashCTX *ctx)
 {
     ctx->state[0] = 0;
     ctx->state[1] = 0;
     ctx->buf_size = 0;
 }
 
-static void gmac_lut256_update(GMacCTX *ctx, const uint8_t *in, size_t inl)
+static void ghash_lut256_update(GHashCTX *ctx, const uint8_t *in, size_t inl)
 {
     if (ctx->buf_size == 0)
     {
         size_t block_num = inl / 16;
         while (block_num)
         {
-            gmac_lut256_update_block(ctx->state, ctx->T, in);
+            ghash_lut256_update_block(ctx->state, ctx->T, in);
             in += 16, inl -= 16, block_num--;
         }
         if (inl)
@@ -228,13 +228,13 @@ static void gmac_lut256_update(GMacCTX *ctx, const uint8_t *in, size_t inl)
 
         if (ctx->buf_size == 16)
         {
-            gmac_lut256_update_block(ctx->state, ctx->T, ctx->buf);
+            ghash_lut256_update_block(ctx->state, ctx->T, ctx->buf);
             ctx->buf_size = 0;
         }
     }
 }
 
-static int gmac_lut256_final(const GMacCTX *ctx, uint8_t digest[16])
+static int ghash_lut256_final(const GHashCTX *ctx, uint8_t digest[16])
 {
     if (ctx->buf_size != 0)
     {
@@ -249,35 +249,35 @@ static int gmac_lut256_final(const GMacCTX *ctx, uint8_t digest[16])
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 // **************************************************
-// ***************** GMAC Cipher ********************
+// ***************** GHASH Cipher ********************
 // **************************************************
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 
 namespace gmlib {
 
-GMacCipher::GMacCipher(const uint8_t H[16]) noexcept
+GHashCipher::GHashCipher(const uint8_t H[16]) noexcept
 {
-    gmac_lut256_init(&this->ctx, H);
+    ghash_lut256_init(&this->ctx, H);
 }
 
-void GMacCipher::set_key(const uint8_t H[16]) noexcept
+void GHashCipher::set_key(const uint8_t H[16]) noexcept
 {
-    gmac_lut256_init(&this->ctx, H);
+    ghash_lut256_init(&this->ctx, H);
 }
 
-void GMacCipher::reset() noexcept
+void GHashCipher::reset() noexcept
 {
-    gmac_lut256_reset(&this->ctx);
+    ghash_lut256_reset(&this->ctx);
 }
 
-void GMacCipher::update(const uint8_t *in, size_t inl) noexcept
+void GHashCipher::update(const uint8_t *in, size_t inl) noexcept
 {
-    gmac_lut256_update(&this->ctx, in, inl);
+    ghash_lut256_update(&this->ctx, in, inl);
 }
 
-void GMacCipher::final(uint8_t digest[16])
+void GHashCipher::final(uint8_t digest[16])
 {
-    int err = gmac_lut256_final(&this->ctx, digest);
+    int err = ghash_lut256_final(&this->ctx, digest);
     if (err)
     {
         throw std::runtime_error("invalid data length");

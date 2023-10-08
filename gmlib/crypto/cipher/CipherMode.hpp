@@ -29,7 +29,7 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <cassert>
 #include <memory>
-#include <gmlib/crypto/mac/GMacCipher.h>
+#include <gmlib/crypto/hash/GHashCipher.h>
 
 namespace gmlib {
 
@@ -208,8 +208,8 @@ static inline void gctr_inc(uint8_t* out, const uint8_t* in) noexcept
     MEM_STORE32BE(out + 12, tmp);
 }
 
-template <class Gmac>
-static void gcm_init_cnt(Gmac*          mac,
+template <class GHash>
+static void gcm_init_cnt(GHash*         mac,
                          uint8_t        counter[16],
                          const uint8_t* iv,
                          size_t         iv_len) noexcept
@@ -236,51 +236,6 @@ static void gcm_init_cnt(Gmac*          mac,
         mac->final(counter);
         mac->reset();
     }
-}
-
-// ++++++++++++++++++++++++++++++++++++++++++++++++++
-// **************************************************
-// *************** Padding Algo *********************
-// **************************************************
-// ++++++++++++++++++++++++++++++++++++++++++++++++++
-
-template <size_t BLOCK_SIZE>
-static inline void pkcs7_pad(uint8_t*       out,
-                             size_t*        outl,
-                             const uint8_t* in,
-                             size_t         inl) noexcept
-{
-    size_t pad_num = BLOCK_SIZE - inl % BLOCK_SIZE;
-    memcpy(out, in, inl);
-    out += inl;
-    for (size_t i = 0; i < pad_num; i++)
-    {
-        out[i] = (uint8_t)pad_num;
-    }
-    *outl = inl + pad_num;
-}
-
-template <size_t BLOCK_SIZE>
-static inline void pkcs7_unpad(uint8_t*       out,
-                               size_t*        outl,
-                               const uint8_t* in,
-                               size_t         inl)
-{
-    size_t pad_num = in[inl - 1];
-    if (!(1 <= pad_num && pad_num <= BLOCK_SIZE))
-    {
-        throw std::exception("a");
-    }
-    const uint8_t* padding = in + inl - pad_num;
-    for (size_t i = 0; i < pad_num; i++)
-    {
-        if (padding[i] != pad_num)
-        {
-            throw std::exception("a");
-        }
-    }
-    memcpy(out, in, inl - pad_num);
-    *outl = inl - pad_num;
 }
 
 }; // namespace CipherModeUtil
@@ -312,7 +267,6 @@ private:
 public:
     CipherCryptor() : buf_size(0)
     {
-
     }
 
 public:
@@ -822,7 +776,7 @@ using CtrDecryptor = CtrCryptor<Cipher>;
 // **************************************************
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 
-template <class Cipher, class Gmac = GMacCipher>
+template <class Cipher, class GHash = GHashCipher>
 class GcmEncryptor : public CipherCryptor<Cipher::BLOCK_SIZE>
 {
     static_assert(Cipher::BLOCK_SIZE == 16,
@@ -834,7 +788,7 @@ public:
 private:
     static constexpr uint8_t ZERO[16] = {0};
 
-    Gmac     mac;
+    GHash    mac;
     Cipher   cipher;
     uint8_t  tag[16];
     uint8_t  counter[16];
@@ -871,8 +825,8 @@ public:
         this->cipher.crypt_block(t, this->ZERO);
         this->mac.set_key(t);
         // init counter
-        CipherModeUtil::gcm_init_cnt<Gmac>(&this->mac, this->counter0, iv,
-                                           iv_len);
+        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
+                                            iv_len);
         CipherModeUtil::gctr_inc(this->counter, this->counter0);
         // gmac aad(additional authenticated data)
         this->mac.update(aad, aad_len);
@@ -888,8 +842,8 @@ public:
                size_t         aad_len)
     {
         this->mac.reset();
-        CipherModeUtil::gcm_init_cnt<Gmac>(&this->mac, this->counter0, iv,
-                                           iv_len);
+        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
+                                            iv_len);
         CipherModeUtil::gctr_inc(this->counter, this->counter0);
         // gmac aad(additional authenticated data)
         this->mac.update(aad, aad_len);
@@ -954,7 +908,7 @@ public:
     }
 };
 
-template <class Cipher, class Gmac = GMacCipher>
+template <class Cipher, class GHash = GHashCipher>
 class GcmDecryptor : public CipherCryptor<Cipher::BLOCK_SIZE>
 {
     static_assert(Cipher::BLOCK_SIZE == 16,
@@ -966,7 +920,7 @@ public:
 private:
     static constexpr uint8_t ZERO[16] = {0};
 
-    Gmac    mac;
+    GHash   mac;
     Cipher  cipher;
     uint8_t tag[16];
     uint8_t counter[16];
@@ -1004,8 +958,8 @@ public:
         this->cipher.crypt_block(t, this->ZERO);
         this->mac.set_key(t);
         // init counter
-        CipherModeUtil::gcm_init_cnt<Gmac>(&this->mac, this->counter0, iv,
-                                           iv_len);
+        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
+                                            iv_len);
         CipherModeUtil::gctr_inc(this->counter, this->counter0);
         // gmac aad(additional authenticated data)
         this->mac.update(aad, aad_len);
@@ -1022,8 +976,8 @@ public:
                size_t         aad_len)
     {
         this->mac.reset();
-        CipherModeUtil::gcm_init_cnt<Gmac>(&this->mac, this->counter0, iv,
-                                           iv_len);
+        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
+                                            iv_len);
         CipherModeUtil::gctr_inc(this->counter, this->counter0);
         // gmac aad(additional authenticated data)
         this->mac.update(aad, aad_len);

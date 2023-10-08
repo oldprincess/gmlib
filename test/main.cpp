@@ -6,14 +6,14 @@ void TestSm3Cipher();
 void TestAesCipher();
 void TestCipherMode();
 void TestGcmMode();
-void TestGMacCipher();
+void TestGHashCipher();
 int  main()
 {
     TestSm3Cipher();
     TestSm4Cipher();
     TestAesCipher();
     TestCipherMode();
-    TestGMacCipher();
+    TestGHashCipher();
     TestGcmMode();
     cout << "test finish!" << endl;
     return 0;
