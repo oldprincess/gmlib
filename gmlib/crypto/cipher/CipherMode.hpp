@@ -326,7 +326,8 @@ template <class Cipher>
 class EcbEncryptor : public CipherCryptor<Cipher::BLOCK_SIZE>
 {
 public:
-    static constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+    static constexpr size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static constexpr size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
 
 private:
     Cipher cipher; // Symmetric Cipher Context
@@ -371,7 +372,8 @@ template <class Cipher>
 class EcbDecryptor : public CipherCryptor<Cipher::BLOCK_SIZE>
 {
 public:
-    static constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+    static constexpr size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static constexpr size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
 
 private:
     Cipher cipher; // Symmetric Cipher Context
@@ -422,7 +424,8 @@ template <class Cipher>
 class CbcEncryptor : public CipherCryptor<Cipher::BLOCK_SIZE>
 {
 public:
-    static constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+    static constexpr size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static constexpr size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
 
 private:
     Cipher  cipher;
@@ -482,7 +485,8 @@ template <class Cipher>
 class CbcDecryptor : public CipherCryptor<Cipher::BLOCK_SIZE>
 {
 public:
-    static constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+    static constexpr size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static constexpr size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
 
 private:
     Cipher  cipher;
@@ -568,7 +572,8 @@ template <class Cipher>
 class CfbEncryptor : public CipherCryptor<Cipher::BLOCK_SIZE>
 {
 public:
-    static constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+    static constexpr size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static constexpr size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
 
 private:
     Cipher  cipher;
@@ -624,7 +629,8 @@ template <class Cipher>
 class CfbDecryptor : public CipherCryptor<Cipher::BLOCK_SIZE>
 {
 public:
-    static constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+    static constexpr size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static constexpr size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
 
 private:
     Cipher  cipher;
@@ -701,7 +707,8 @@ template <class Cipher>
 class OfbCryptor : public CipherCryptor<Cipher::BLOCK_SIZE>
 {
 public:
-    static constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+    static constexpr size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static constexpr size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
 
 private:
     Cipher  cipher;
@@ -788,7 +795,8 @@ template <class Cipher>
 class CtrCryptor : public CipherCryptor<Cipher::BLOCK_SIZE>
 {
 public:
-    static constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+    static constexpr size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static constexpr size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
 
 private:
     Cipher  cipher;
@@ -887,7 +895,8 @@ class GcmEncryptor : public CipherCryptor<Cipher::BLOCK_SIZE>
                   "GCM mode only supports Cipher with BLOCK_SIZE=16");
 
 public:
-    static constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+    static constexpr size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static constexpr size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
 
 private:
     static constexpr uint8_t ZERO[16] = {0};
@@ -1031,7 +1040,8 @@ class GcmDecryptor : public CipherCryptor<Cipher::BLOCK_SIZE>
                   "GCM mode only supports Cipher with BLOCK_SIZE=16");
 
 public:
-    static constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+    static constexpr size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static constexpr size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
 
 private:
     static constexpr uint8_t ZERO[16] = {0};
