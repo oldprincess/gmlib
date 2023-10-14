@@ -53,25 +53,62 @@ static void gcm_test1()
         0xd7, 0x37, 0xee, 0x62, 0x98, 0xf7, 0x7e, 0x0c,
     };
 
-    uint8_t out[sizeof(gcm_pt)], tag[16];
+    uint8_t  out[sizeof(gcm_pt)], tag[16];
+    size_t   outl;
+    uint8_t* outptr;
 
     auto encryptor = GcmEncryptor<Aes256Cipher>(gcm_key, gcm_iv, sizeof(gcm_iv),
                                                 gcm_aad, sizeof(gcm_aad));
-    encryptor.update_blocks(out, gcm_pt, sizeof(gcm_pt) / 16);
-    encryptor.final_block(nullptr, nullptr, 0);
+    outptr         = out;
+    encryptor.update(outptr, &outl, gcm_pt, sizeof(gcm_pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
     encryptor.get_tag(tag);
     if (memcmp(out, gcm_ct, sizeof(gcm_ct)) != 0 ||
-        memcmp(tag, gcm_tag, 16) != 0)
+        memcmp(tag, gcm_tag, 16) != 0 ||
+        (size_t)(outptr - out) != sizeof(gcm_ct))
+    {
+        throw std::exception("err in Gcm Encrypt");
+    }
+
+    outptr = out;
+    encryptor.reset(gcm_iv, sizeof(gcm_iv), gcm_aad, sizeof(gcm_aad));
+    encryptor.update(outptr, &outl, gcm_pt, sizeof(gcm_pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    encryptor.get_tag(tag);
+    if (memcmp(out, gcm_ct, sizeof(gcm_ct)) != 0 ||
+        memcmp(tag, gcm_tag, 16) != 0 ||
+        (size_t)(outptr - out) != sizeof(gcm_ct))
     {
         throw std::exception("err in Gcm Encrypt");
     }
 
     auto decryptor = GcmDecryptor<Aes256Cipher>(gcm_key, gcm_iv, sizeof(gcm_iv),
                                                 gcm_aad, sizeof(gcm_aad));
+    outptr         = out;
     decryptor.set_tag(gcm_tag);
-    decryptor.update_blocks(out, gcm_ct, sizeof(gcm_ct) / 16);
-    decryptor.final_block(nullptr, nullptr, 0);
-    if (memcmp(out, gcm_pt, sizeof(gcm_pt)) != 0)
+    decryptor.update(outptr, &outl, gcm_ct, sizeof(gcm_ct));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (memcmp(out, gcm_pt, sizeof(gcm_pt)) != 0 ||
+        (size_t)(outptr - out) != sizeof(gcm_pt))
+    {
+        throw std::exception("err in Gcm Decrypt");
+    }
+
+    outptr = out;
+    decryptor.reset(gcm_iv, sizeof(gcm_iv), gcm_aad, sizeof(gcm_aad));
+    decryptor.set_tag(gcm_tag);
+    decryptor.update(outptr, &outl, gcm_ct, sizeof(gcm_ct));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (memcmp(out, gcm_pt, sizeof(gcm_pt)) != 0 ||
+        (size_t)(outptr - out) != sizeof(gcm_pt))
     {
         throw std::exception("err in Gcm Decrypt");
     }
@@ -114,9 +151,9 @@ void gcm_test2()
 
     uint8_t* outptr;
 
-    outptr         = out;
     auto encryptor = GcmEncryptor<Aes128Cipher>(gcm_key, gcm_iv, sizeof(gcm_iv),
                                                 gcm_aad, sizeof(gcm_aad));
+    outptr         = out;
     encryptor.update(outptr, &outl, gcm_pt, sizeof(gcm_pt));
     outptr += outl;
     encryptor.final(outptr, &outl);
@@ -129,9 +166,36 @@ void gcm_test2()
         throw std::runtime_error("err in GCM");
     }
 
-    outptr         = out;
+    encryptor.reset(gcm_iv, sizeof(gcm_iv), gcm_aad, sizeof(gcm_aad));
+    outptr = out;
+    encryptor.update(outptr, &outl, gcm_pt, sizeof(gcm_pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    encryptor.get_tag(tag);
+    if (memcmp(tag, gcm_tag, 16) != 0 ||
+        memcmp(out, gcm_ct, sizeof(gcm_ct)) != 0 ||
+        sizeof(gcm_ct) != (size_t)(outptr - out))
+    {
+        throw std::runtime_error("err in GCM");
+    }
+
     auto decryptor = GcmDecryptor<Aes128Cipher>(gcm_key, gcm_iv, sizeof(gcm_iv),
                                                 gcm_aad, sizeof(gcm_aad));
+    outptr         = out;
+    decryptor.set_tag(gcm_tag);
+    decryptor.update(outptr, &outl, gcm_ct, sizeof(gcm_ct));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (memcmp(out, gcm_pt, sizeof(gcm_pt)) != 0 ||
+        sizeof(gcm_pt) != (size_t)(outptr - out))
+    {
+        throw std::runtime_error("err in GCM");
+    }
+
+    decryptor.reset(gcm_iv, sizeof(gcm_iv), gcm_aad, sizeof(gcm_aad));
+    outptr = out;
     decryptor.set_tag(gcm_tag);
     decryptor.update(outptr, &outl, gcm_ct, sizeof(gcm_ct));
     outptr += outl;

@@ -201,10 +201,16 @@ static uint8_t ctr_ct128[] = {
 
 static bool test_Aes128Cipher_EcbEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = EcbEncryptor<Aes128Cipher>(user_key);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes128Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, ecb_ct128, sizeof(ecb_ct128)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = EcbEncryptor<Aes128Cipher>(user_key);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, ecb_ct128, sizeof(ecb_ct128)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(ecb_ct128))
     {
         return false;
     }
@@ -213,11 +219,16 @@ static bool test_Aes128Cipher_EcbEncryptor()
 
 static bool test_Aes128Cipher_EcbDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = EcbDecryptor<Aes128Cipher>(user_key);
-    size_t  block_num = sizeof(ecb_ct128) / Aes128Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, ecb_ct128, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = EcbDecryptor<Aes128Cipher>(user_key);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, ecb_ct128, sizeof(ecb_ct128));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }
@@ -226,10 +237,16 @@ static bool test_Aes128Cipher_EcbDecryptor()
 
 static bool test_Aes128Cipher_CbcEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = CbcEncryptor<Aes128Cipher>(user_key, iv);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes128Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, cbc_ct128, sizeof(cbc_ct128)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = CbcEncryptor<Aes128Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, cbc_ct128, sizeof(cbc_ct128)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(cbc_ct128))
     {
         return false;
     }
@@ -238,11 +255,16 @@ static bool test_Aes128Cipher_CbcEncryptor()
 
 static bool test_Aes128Cipher_CbcDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = CbcDecryptor<Aes128Cipher>(user_key, iv);
-    size_t  block_num = sizeof(cbc_ct128) / Aes128Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, cbc_ct128, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = CbcDecryptor<Aes128Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, cbc_ct128, sizeof(cbc_ct128));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }
@@ -251,10 +273,16 @@ static bool test_Aes128Cipher_CbcDecryptor()
 
 static bool test_Aes128Cipher_CfbEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = CfbEncryptor<Aes128Cipher>(user_key, iv);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes128Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, cfb_ct128, sizeof(cfb_ct128)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = CfbEncryptor<Aes128Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, cfb_ct128, sizeof(cfb_ct128)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(cfb_ct128))
     {
         return false;
     }
@@ -263,11 +291,16 @@ static bool test_Aes128Cipher_CfbEncryptor()
 
 static bool test_Aes128Cipher_CfbDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = CfbDecryptor<Aes128Cipher>(user_key, iv);
-    size_t  block_num = sizeof(cfb_ct128) / Aes128Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, cfb_ct128, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = CfbDecryptor<Aes128Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, cfb_ct128, sizeof(cfb_ct128));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }
@@ -276,10 +309,16 @@ static bool test_Aes128Cipher_CfbDecryptor()
 
 static bool test_Aes128Cipher_OfbEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = OfbEncryptor<Aes128Cipher>(user_key, iv);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes128Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, ofb_ct128, sizeof(ofb_ct128)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = OfbEncryptor<Aes128Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, ofb_ct128, sizeof(ofb_ct128)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(ofb_ct128))
     {
         return false;
     }
@@ -288,11 +327,16 @@ static bool test_Aes128Cipher_OfbEncryptor()
 
 static bool test_Aes128Cipher_OfbDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = OfbDecryptor<Aes128Cipher>(user_key, iv);
-    size_t  block_num = sizeof(ofb_ct128) / Aes128Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, ofb_ct128, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = OfbDecryptor<Aes128Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, ofb_ct128, sizeof(ofb_ct128));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }
@@ -301,10 +345,16 @@ static bool test_Aes128Cipher_OfbDecryptor()
 
 static bool test_Aes128Cipher_CtrEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = CtrEncryptor<Aes128Cipher>(user_key, iv);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes128Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, ctr_ct128, sizeof(ctr_ct128)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = CtrEncryptor<Aes128Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, ctr_ct128, sizeof(ctr_ct128)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(ctr_ct128))
     {
         return false;
     }
@@ -313,11 +363,16 @@ static bool test_Aes128Cipher_CtrEncryptor()
 
 static bool test_Aes128Cipher_CtrDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = CtrDecryptor<Aes128Cipher>(user_key, iv);
-    size_t  block_num = sizeof(ctr_ct128) / Aes128Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, ctr_ct128, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = CtrDecryptor<Aes128Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, ctr_ct128, sizeof(ctr_ct128));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }
@@ -418,10 +473,16 @@ static uint8_t ctr_ct192[] = {
 
 static bool test_Aes192Cipher_EcbEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = EcbEncryptor<Aes192Cipher>(user_key);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes192Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, ecb_ct192, sizeof(ecb_ct192)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = EcbEncryptor<Aes192Cipher>(user_key);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, ecb_ct192, sizeof(ecb_ct192)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(ecb_ct192))
     {
         return false;
     }
@@ -430,11 +491,16 @@ static bool test_Aes192Cipher_EcbEncryptor()
 
 static bool test_Aes192Cipher_EcbDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = EcbDecryptor<Aes192Cipher>(user_key);
-    size_t  block_num = sizeof(ecb_ct192) / Aes192Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, ecb_ct192, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = EcbDecryptor<Aes192Cipher>(user_key);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, ecb_ct192, sizeof(ecb_ct192));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }
@@ -443,10 +509,16 @@ static bool test_Aes192Cipher_EcbDecryptor()
 
 static bool test_Aes192Cipher_CbcEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = CbcEncryptor<Aes192Cipher>(user_key, iv);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes192Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, cbc_ct192, sizeof(cbc_ct192)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = CbcEncryptor<Aes192Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, cbc_ct192, sizeof(cbc_ct192)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(cbc_ct192))
     {
         return false;
     }
@@ -455,11 +527,16 @@ static bool test_Aes192Cipher_CbcEncryptor()
 
 static bool test_Aes192Cipher_CbcDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = CbcDecryptor<Aes192Cipher>(user_key, iv);
-    size_t  block_num = sizeof(cbc_ct192) / Aes192Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, cbc_ct192, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = CbcDecryptor<Aes192Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, cbc_ct192, sizeof(cbc_ct192));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }
@@ -468,10 +545,16 @@ static bool test_Aes192Cipher_CbcDecryptor()
 
 static bool test_Aes192Cipher_CfbEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = CfbEncryptor<Aes192Cipher>(user_key, iv);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes192Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, cfb_ct192, sizeof(cfb_ct192)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = CfbEncryptor<Aes192Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, cfb_ct192, sizeof(cfb_ct192)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(cfb_ct192))
     {
         return false;
     }
@@ -480,11 +563,16 @@ static bool test_Aes192Cipher_CfbEncryptor()
 
 static bool test_Aes192Cipher_CfbDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = CfbDecryptor<Aes192Cipher>(user_key, iv);
-    size_t  block_num = sizeof(cfb_ct192) / Aes192Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, cfb_ct192, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = CfbDecryptor<Aes192Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, cfb_ct192, sizeof(cfb_ct192));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }
@@ -493,10 +581,16 @@ static bool test_Aes192Cipher_CfbDecryptor()
 
 static bool test_Aes192Cipher_OfbEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = OfbEncryptor<Aes192Cipher>(user_key, iv);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes192Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, ofb_ct192, sizeof(ofb_ct192)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = OfbEncryptor<Aes192Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, ofb_ct192, sizeof(ofb_ct192)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(ofb_ct192))
     {
         return false;
     }
@@ -505,11 +599,16 @@ static bool test_Aes192Cipher_OfbEncryptor()
 
 static bool test_Aes192Cipher_OfbDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = OfbDecryptor<Aes192Cipher>(user_key, iv);
-    size_t  block_num = sizeof(ofb_ct192) / Aes192Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, ofb_ct192, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = OfbDecryptor<Aes192Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, ofb_ct192, sizeof(ofb_ct192));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }
@@ -518,10 +617,16 @@ static bool test_Aes192Cipher_OfbDecryptor()
 
 static bool test_Aes192Cipher_CtrEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = CtrEncryptor<Aes192Cipher>(user_key, iv);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes192Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, ctr_ct192, sizeof(ctr_ct192)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = CtrEncryptor<Aes192Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, ctr_ct192, sizeof(ctr_ct192)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(ctr_ct192))
     {
         return false;
     }
@@ -530,11 +635,16 @@ static bool test_Aes192Cipher_CtrEncryptor()
 
 static bool test_Aes192Cipher_CtrDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = CtrDecryptor<Aes192Cipher>(user_key, iv);
-    size_t  block_num = sizeof(ctr_ct192) / Aes192Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, ctr_ct192, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = CtrDecryptor<Aes192Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, ctr_ct192, sizeof(ctr_ct192));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }
@@ -635,10 +745,16 @@ static uint8_t ctr_ct256[] = {
 
 static bool test_Aes256Cipher_EcbEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = EcbEncryptor<Aes256Cipher>(user_key);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes256Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, ecb_ct256, sizeof(ecb_ct256)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = EcbEncryptor<Aes256Cipher>(user_key);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, ecb_ct256, sizeof(ecb_ct256)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(ecb_ct256))
     {
         return false;
     }
@@ -647,11 +763,16 @@ static bool test_Aes256Cipher_EcbEncryptor()
 
 static bool test_Aes256Cipher_EcbDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = EcbDecryptor<Aes256Cipher>(user_key);
-    size_t  block_num = sizeof(ecb_ct256) / Aes256Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, ecb_ct256, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = EcbDecryptor<Aes256Cipher>(user_key);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, ecb_ct256, sizeof(ecb_ct256));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }
@@ -660,10 +781,16 @@ static bool test_Aes256Cipher_EcbDecryptor()
 
 static bool test_Aes256Cipher_CbcEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = CbcEncryptor<Aes256Cipher>(user_key, iv);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes256Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, cbc_ct256, sizeof(cbc_ct256)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = CbcEncryptor<Aes256Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, cbc_ct256, sizeof(cbc_ct256)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(cbc_ct256))
     {
         return false;
     }
@@ -672,11 +799,16 @@ static bool test_Aes256Cipher_CbcEncryptor()
 
 static bool test_Aes256Cipher_CbcDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = CbcDecryptor<Aes256Cipher>(user_key, iv);
-    size_t  block_num = sizeof(cbc_ct256) / Aes256Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, cbc_ct256, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = CbcDecryptor<Aes256Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, cbc_ct256, sizeof(cbc_ct256));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }
@@ -685,10 +817,16 @@ static bool test_Aes256Cipher_CbcDecryptor()
 
 static bool test_Aes256Cipher_CfbEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = CfbEncryptor<Aes256Cipher>(user_key, iv);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes256Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, cfb_ct256, sizeof(cfb_ct256)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = CfbEncryptor<Aes256Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, cfb_ct256, sizeof(cfb_ct256)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(cfb_ct256))
     {
         return false;
     }
@@ -697,11 +835,16 @@ static bool test_Aes256Cipher_CfbEncryptor()
 
 static bool test_Aes256Cipher_CfbDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = CfbDecryptor<Aes256Cipher>(user_key, iv);
-    size_t  block_num = sizeof(cfb_ct256) / Aes256Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, cfb_ct256, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = CfbDecryptor<Aes256Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, cfb_ct256, sizeof(cfb_ct256));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }
@@ -710,10 +853,16 @@ static bool test_Aes256Cipher_CfbDecryptor()
 
 static bool test_Aes256Cipher_OfbEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = OfbEncryptor<Aes256Cipher>(user_key, iv);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes256Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, ofb_ct256, sizeof(ofb_ct256)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = OfbEncryptor<Aes256Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, ofb_ct256, sizeof(ofb_ct256)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(ofb_ct256))
     {
         return false;
     }
@@ -722,11 +871,16 @@ static bool test_Aes256Cipher_OfbEncryptor()
 
 static bool test_Aes256Cipher_OfbDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = OfbDecryptor<Aes256Cipher>(user_key, iv);
-    size_t  block_num = sizeof(ofb_ct256) / Aes256Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, ofb_ct256, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = OfbDecryptor<Aes256Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, ofb_ct256, sizeof(ofb_ct256));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }
@@ -735,10 +889,16 @@ static bool test_Aes256Cipher_OfbDecryptor()
 
 static bool test_Aes256Cipher_CtrEncryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    encryptor = CtrEncryptor<Aes256Cipher>(user_key, iv);
-    encryptor.update_blocks(buffer, pt, sizeof(pt) / Aes256Cipher::BLOCK_SIZE);
-    if (std::memcmp(buffer, ctr_ct256, sizeof(ctr_ct256)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     encryptor          = CtrEncryptor<Aes256Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    encryptor.update(outptr, &outl, pt, sizeof(pt));
+    outptr += outl;
+    encryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, ctr_ct256, sizeof(ctr_ct256)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(ctr_ct256))
     {
         return false;
     }
@@ -747,11 +907,16 @@ static bool test_Aes256Cipher_CtrEncryptor()
 
 static bool test_Aes256Cipher_CtrDecryptor()
 {
-    uint8_t buffer[sizeof(pt)];
-    auto    decryptor = CtrDecryptor<Aes256Cipher>(user_key, iv);
-    size_t  block_num = sizeof(ctr_ct256) / Aes256Cipher::BLOCK_SIZE;
-    decryptor.update_blocks(buffer, ctr_ct256, block_num);
-    if (std::memcmp(buffer, pt, sizeof(pt)) != 0)
+    uint8_t  buffer[sizeof(pt)] = {0};
+    auto     decryptor          = CtrDecryptor<Aes256Cipher>(user_key, iv);
+    uint8_t* outptr             = buffer;
+    size_t   outl;
+    decryptor.update(outptr, &outl, ctr_ct256, sizeof(ctr_ct256));
+    outptr += outl;
+    decryptor.final(outptr, &outl);
+    outptr += outl;
+    if (std::memcmp(buffer, pt, sizeof(pt)) != 0 ||
+        (size_t)(outptr - buffer) != sizeof(pt))
     {
         return false;
     }

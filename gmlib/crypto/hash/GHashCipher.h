@@ -45,7 +45,7 @@ public:
 public:
     static constexpr size_t DIGEST_SIZE = 16;
 
-//private:
+private:
     struct GHashCTX ctx;
 
 public:

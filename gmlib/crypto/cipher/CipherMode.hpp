@@ -240,16 +240,6 @@ static void gcm_init_cnt(GHash*         mac,
 
 }; // namespace CipherModeUtil
 
-class CipherMode
-{
-public:
-    virtual void update_blocks(uint8_t*       out,
-                               const uint8_t* in,
-                               size_t         block_num) = 0;
-
-    virtual void final_block(uint8_t* out, const uint8_t* in, size_t inl) = 0;
-};
-
 template <size_t BLOCK_SIZE>
 class CipherCryptor
 {
@@ -257,17 +247,23 @@ private:
     uint8_t buf[BLOCK_SIZE];
     size_t  buf_size;
 
+public:
+    CipherCryptor() noexcept : buf_size(0)
+    {
+    }
+
+protected:
+    void reset() noexcept
+    {
+        this->buf_size = 0;
+    }
+
 private:
     virtual void update_blocks(uint8_t*       out,
                                const uint8_t* in,
                                size_t         block_num) = 0;
 
     virtual void final_block(uint8_t* out, const uint8_t* in, size_t inl) = 0;
-
-public:
-    CipherCryptor() : buf_size(0)
-    {
-    }
 
 public:
     void update(uint8_t* out, size_t* outl, const uint8_t* in, size_t inl)
@@ -336,11 +332,23 @@ private:
     Cipher cipher; // Symmetric Cipher Context
 
 public:
+    EcbEncryptor() = default;
     EcbEncryptor(const uint8_t* user_key) : cipher(user_key, Cipher::ENCRYPTION)
     {
     }
 
 public:
+    void init(const uint8_t* user_key)
+    {
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
+    }
+
+    void reset() const noexcept
+    {
+        this->CipherCryptor<Cipher::BLOCK_SIZE>::reset();
+    }
+
+private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
         this->cipher.crypt_blocks(out, in, block_num);
@@ -369,11 +377,23 @@ private:
     Cipher cipher; // Symmetric Cipher Context
 
 public:
+    EcbDecryptor() = default;
     EcbDecryptor(const uint8_t* user_key) : cipher(user_key, Cipher::DECRYPTION)
     {
     }
 
 public:
+    void init(const uint8_t* user_key)
+    {
+        this->cipher.set_key(user_key, Cipher::DECRYPTION);
+    }
+
+    void reset() const noexcept
+    {
+        this->CipherCryptor<Cipher::BLOCK_SIZE>::reset();
+    }
+
+private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
         this->cipher.crypt_blocks(out, in, block_num);
@@ -409,6 +429,7 @@ private:
     uint8_t iv[Cipher::BLOCK_SIZE];
 
 public:
+    CbcEncryptor() = default;
     CbcEncryptor(const uint8_t* user_key, const uint8_t* iv)
         : cipher(user_key, Cipher::ENCRYPTION)
     {
@@ -416,6 +437,19 @@ public:
     }
 
 public:
+    void init(const uint8_t* user_key, const uint8_t* iv)
+    {
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
+        memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
+    }
+
+    void reset(const uint8_t* iv) noexcept
+    {
+        this->CipherCryptor<Cipher::BLOCK_SIZE>::reset();
+        memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
+    }
+
+private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
         constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
@@ -455,6 +489,7 @@ private:
     uint8_t iv[Cipher::BLOCK_SIZE];
 
 public:
+    CbcDecryptor() = default;
     CbcDecryptor(const uint8_t* user_key, const uint8_t* iv)
         : cipher(user_key, Cipher::DECRYPTION)
     {
@@ -462,6 +497,19 @@ public:
     }
 
 public:
+    void init(const uint8_t* user_key, const uint8_t* iv)
+    {
+        this->cipher.set_key(user_key, Cipher::DECRYPTION);
+        memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
+    }
+
+    void reset(const uint8_t* iv) noexcept
+    {
+        this->CipherCryptor<Cipher::BLOCK_SIZE>::reset();
+        memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
+    }
+
+private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
         constexpr size_t BLOCK_SIZE     = Cipher::BLOCK_SIZE;
@@ -527,6 +575,7 @@ private:
     uint8_t iv[Cipher::BLOCK_SIZE];
 
 public:
+    CfbEncryptor() = default;
     CfbEncryptor(const uint8_t* user_key, const uint8_t* iv)
         : cipher(user_key, Cipher::ENCRYPTION)
     {
@@ -534,6 +583,19 @@ public:
     }
 
 public:
+    void init(const uint8_t* user_key, const uint8_t* iv)
+    {
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
+        memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
+    }
+
+    void reset(const uint8_t* iv) noexcept
+    {
+        this->CipherCryptor<Cipher::BLOCK_SIZE>::reset();
+        memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
+    }
+
+private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
         constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
@@ -569,6 +631,7 @@ private:
     uint8_t iv[Cipher::BLOCK_SIZE];
 
 public:
+    CfbDecryptor() = default;
     CfbDecryptor(const uint8_t* user_key, const uint8_t* iv)
         : cipher(user_key, Cipher::ENCRYPTION)
     {
@@ -576,6 +639,19 @@ public:
     }
 
 public:
+    void init(const uint8_t* user_key, const uint8_t* iv)
+    {
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
+        memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
+    }
+
+    void reset(const uint8_t* iv) noexcept
+    {
+        this->CipherCryptor<Cipher::BLOCK_SIZE>::reset();
+        memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
+    }
+
+private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
         constexpr size_t BLOCK_SIZE     = Cipher::BLOCK_SIZE;
@@ -631,6 +707,27 @@ private:
     Cipher  cipher;
     uint8_t iv[Cipher::BLOCK_SIZE];
 
+public:
+    OfbCryptor() = default;
+    OfbCryptor(const uint8_t* user_key, const uint8_t* iv)
+        : cipher(user_key, Cipher::ENCRYPTION)
+    {
+        memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
+    }
+
+public:
+    void init(const uint8_t* user_key, const uint8_t* iv)
+    {
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
+        memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
+    }
+
+    void reset(const uint8_t* iv) noexcept
+    {
+        this->CipherCryptor<Cipher::BLOCK_SIZE>::reset();
+        memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
+    }
+
 private:
     void gen_key_stream(uint8_t* out, size_t outl)
     {
@@ -648,14 +745,7 @@ private:
         memcpy(this->iv, pre_ct, BLOCK_SIZE);
     }
 
-public:
-    OfbCryptor(const uint8_t* user_key, const uint8_t* iv)
-        : cipher(user_key, Cipher::ENCRYPTION)
-    {
-        memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
-    }
-
-public:
+private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
         constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
@@ -704,6 +794,27 @@ private:
     Cipher  cipher;
     uint8_t counter[Cipher::BLOCK_SIZE];
 
+public:
+    CtrCryptor() = default;
+    CtrCryptor(const uint8_t* user_key, const uint8_t* iv)
+        : cipher(user_key, Cipher::ENCRYPTION)
+    {
+        memcpy(this->counter, iv, Cipher::BLOCK_SIZE);
+    }
+
+public:
+    void init(const uint8_t* user_key, const uint8_t* iv)
+    {
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
+        memcpy(this->counter, iv, Cipher::BLOCK_SIZE);
+    }
+
+    void reset(const uint8_t* iv) noexcept
+    {
+        this->CipherCryptor<Cipher::BLOCK_SIZE>::reset();
+        memcpy(this->counter, iv, Cipher::BLOCK_SIZE);
+    }
+
 private:
     void gen_block_key_stream(uint8_t* out, size_t block_num)
     {
@@ -723,14 +834,7 @@ private:
         this->cipher.crypt_blocks(out, out, block_num);
     }
 
-public:
-    CtrCryptor(const uint8_t* user_key, const uint8_t* iv)
-        : cipher(user_key, Cipher::ENCRYPTION)
-    {
-        memcpy(this->counter, iv, Cipher::BLOCK_SIZE);
-    }
-
-public:
+private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
         constexpr size_t BLOCK_SIZE     = Cipher::BLOCK_SIZE;
@@ -795,6 +899,62 @@ private:
     uint8_t  counter0[16];
     uint64_t aad_len, ct_len;
 
+public:
+    GcmEncryptor() = default;
+    GcmEncryptor(const uint8_t* user_key,
+                 const uint8_t* iv,
+                 size_t         iv_len,
+                 const uint8_t* aad,
+                 size_t         aad_len)
+    {
+        this->init(user_key, iv, iv_len, aad, aad_len);
+    }
+
+public:
+    void init(const uint8_t* user_key,
+              const uint8_t* iv,
+              size_t         iv_len,
+              const uint8_t* aad,
+              size_t         aad_len)
+    {
+        uint8_t t[16];
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
+        this->cipher.crypt_block(t, this->ZERO);
+        this->mac.set_key(t);
+        // init counter
+        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
+                                            iv_len);
+        CipherModeUtil::gctr_inc(this->counter, this->counter0);
+        // gmac aad(additional authenticated data)
+        this->mac.update(aad, aad_len);
+        this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16);
+        this->aad_len = aad_len;
+        this->ct_len  = 0;
+    }
+
+    void reset(const uint8_t* iv,
+               size_t         iv_len,
+               const uint8_t* aad,
+               size_t         aad_len)
+    {
+        this->CipherCryptor<Cipher::BLOCK_SIZE>::reset();
+        this->mac.reset();
+        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
+                                            iv_len);
+        CipherModeUtil::gctr_inc(this->counter, this->counter0);
+        // gmac aad(additional authenticated data)
+        this->mac.update(aad, aad_len);
+        this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16);
+
+        this->aad_len = aad_len;
+        this->ct_len  = 0;
+    }
+
+    void get_tag(uint8_t tag[16]) const noexcept
+    {
+        memcpy(tag, this->tag, 16);
+    }
+
 private:
     void gen_block_key_stream(uint8_t* out, size_t block_num)
     {
@@ -813,46 +973,7 @@ private:
         this->cipher.crypt_blocks(out, out, block_num);
     }
 
-public:
-    GcmEncryptor(const uint8_t* user_key,
-                 const uint8_t* iv,
-                 size_t         iv_len,
-                 const uint8_t* aad,
-                 size_t         aad_len)
-        : cipher(user_key, Cipher::ENCRYPTION)
-    {
-        uint8_t t[16];
-        this->cipher.crypt_block(t, this->ZERO);
-        this->mac.set_key(t);
-        // init counter
-        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
-                                            iv_len);
-        CipherModeUtil::gctr_inc(this->counter, this->counter0);
-        // gmac aad(additional authenticated data)
-        this->mac.update(aad, aad_len);
-        this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16);
-        this->aad_len = aad_len;
-        this->ct_len  = 0;
-    }
-
-public:
-    void reset(const uint8_t* iv,
-               size_t         iv_len,
-               const uint8_t* aad,
-               size_t         aad_len)
-    {
-        this->mac.reset();
-        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
-                                            iv_len);
-        CipherModeUtil::gctr_inc(this->counter, this->counter0);
-        // gmac aad(additional authenticated data)
-        this->mac.update(aad, aad_len);
-        this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16);
-
-        this->aad_len = aad_len;
-        this->ct_len  = 0;
-    }
-
+private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
         if (block_num == 0) return;
@@ -883,7 +1004,7 @@ public:
 
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
-        assert(0 <= inl && inl < 16);
+        assert(0 <= inl && inl <= 16);
         if (inl != 0)
         {
             uint8_t key_stream[16];
@@ -901,11 +1022,6 @@ public:
         this->cipher.crypt_block(t, this->counter0);
         CipherModeUtil::memxor<16>(this->tag, this->tag, t);
     }
-
-    void get_tag(uint8_t tag[16]) const noexcept
-    {
-        memcpy(tag, this->tag, 16);
-    }
 };
 
 template <class Cipher, class GHash = GHashCipher>
@@ -920,12 +1036,69 @@ public:
 private:
     static constexpr uint8_t ZERO[16] = {0};
 
-    GHash   mac;
-    Cipher  cipher;
-    uint8_t tag[16];
-    uint8_t counter[16];
-    uint8_t counter0[16];
-    size_t  aad_len, ct_len;
+    GHash    mac;
+    Cipher   cipher;
+    uint8_t  tag[16];
+    uint8_t  counter[16];
+    uint8_t  counter0[16];
+    uint64_t aad_len, ct_len;
+
+public:
+    GcmDecryptor() = default;
+    GcmDecryptor(const uint8_t* user_key,
+                 const uint8_t* iv,
+                 size_t         iv_len,
+                 const uint8_t* aad,
+                 size_t         aad_len)
+    {
+        this->init(user_key, iv, iv_len, aad, aad_len);
+    }
+
+public:
+    void init(const uint8_t* user_key,
+              const uint8_t* iv,
+              size_t         iv_len,
+              const uint8_t* aad,
+              size_t         aad_len)
+    {
+        uint8_t t[16];
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
+        this->cipher.crypt_block(t, this->ZERO);
+        this->mac.set_key(t);
+        // init counter
+        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
+                                            iv_len);
+        CipherModeUtil::gctr_inc(this->counter, this->counter0);
+        // gmac aad(additional authenticated data)
+        this->mac.update(aad, aad_len);
+        this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16);
+
+        this->aad_len = aad_len;
+        this->ct_len  = 0;
+    }
+
+    void reset(const uint8_t* iv,
+               size_t         iv_len,
+               const uint8_t* aad,
+               size_t         aad_len)
+    {
+        this->CipherCryptor<Cipher::BLOCK_SIZE>::reset();
+        this->mac.reset();
+        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
+                                            iv_len);
+        CipherModeUtil::gctr_inc(this->counter, this->counter0);
+        // gmac aad(additional authenticated data)
+        this->mac.update(aad, aad_len);
+        this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16);
+
+        this->aad_len = aad_len;
+        this->ct_len  = 0;
+    }
+
+    void set_tag(const uint8_t tag[16]) noexcept
+    {
+        memcpy(this->tag, tag, 16);
+    }
 
 private:
     void gen_block_key_stream(uint8_t* out, size_t block_num)
@@ -943,48 +1116,6 @@ private:
         CipherModeUtil::gctr_inc(this->counter, cur_counter);
         // generate key stream
         this->cipher.crypt_blocks(out, out, block_num);
-    }
-
-public:
-    // additional authenticated data
-    GcmDecryptor(const uint8_t* user_key,
-                 const uint8_t* iv,
-                 size_t         iv_len,
-                 const uint8_t* aad,
-                 size_t         aad_len)
-        : cipher(user_key, Cipher::ENCRYPTION)
-    {
-        uint8_t t[16];
-        this->cipher.crypt_block(t, this->ZERO);
-        this->mac.set_key(t);
-        // init counter
-        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
-                                            iv_len);
-        CipherModeUtil::gctr_inc(this->counter, this->counter0);
-        // gmac aad(additional authenticated data)
-        this->mac.update(aad, aad_len);
-        this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16);
-
-        this->aad_len = aad_len;
-        this->ct_len  = 0;
-    }
-
-public:
-    void reset(const uint8_t* iv,
-               size_t         iv_len,
-               const uint8_t* aad,
-               size_t         aad_len)
-    {
-        this->mac.reset();
-        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
-                                            iv_len);
-        CipherModeUtil::gctr_inc(this->counter, this->counter0);
-        // gmac aad(additional authenticated data)
-        this->mac.update(aad, aad_len);
-        this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16);
-
-        this->aad_len = aad_len;
-        this->ct_len  = 0;
     }
 
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
@@ -1041,11 +1172,6 @@ public:
         {
             throw std::runtime_error("GCM tag check fail");
         }
-    }
-
-    void set_tag(const uint8_t tag[16]) noexcept
-    {
-        memcpy(this->tag, tag, 16);
     }
 };
 
