@@ -939,6 +939,7 @@ public:
         this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16);
         this->aad_len = aad_len;
         this->ct_len  = 0;
+        memset(this->tag, 0, sizeof(tag));
     }
 
     void reset(const uint8_t* iv,
@@ -957,6 +958,7 @@ public:
 
         this->aad_len = aad_len;
         this->ct_len  = 0;
+        memset(this->tag, 0, sizeof(tag));
     }
 
     void get_tag(uint8_t tag[16]) const noexcept
@@ -1085,6 +1087,7 @@ public:
 
         this->aad_len = aad_len;
         this->ct_len  = 0;
+        memset(this->tag, 0, sizeof(tag));
     }
 
     void reset(const uint8_t* iv,
@@ -1103,6 +1106,7 @@ public:
 
         this->aad_len = aad_len;
         this->ct_len  = 0;
+        memset(this->tag, 0, sizeof(tag));
     }
 
     void set_tag(const uint8_t tag[16]) noexcept
