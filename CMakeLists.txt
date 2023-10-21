@@ -32,12 +32,14 @@ set(GMLIB_SRC
 
 set(GMLIB_EX_HEADER
     "gmlib/crypto_ex/GHashCipher_Pclmul.h"
+    "gmlib/crypto_ex/UBlockCipher_Standard.h"
     "gmlib/crypto_ex/win/WinRng.hpp"
     "gmlib/crypto_ex/win/WinRng2.hpp"
 )
 
 set(GMLIB_EX_SRC
     "gmlib/crypto_ex/GHashCipher_Pclmul.cpp"
+    "gmlib/crypto_ex/UBlockCipher_Standard.cpp"
 )
 
 set(TEST_SRC 
@@ -47,6 +49,8 @@ set(TEST_SRC
     "test/crypto/cipher/TestCipherMode.cpp"
     "test/crypto/hash/TestGHashCipher.cpp"
     "test/crypto/hash/TestSm3Cipher.cpp"
+
+    "test/crypto_ex/TestUBlockCipher_Standard.cpp"
     "test/main.cpp"
 )
 
