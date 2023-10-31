@@ -25,43 +25,52 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef _GMLIB_CRYPTO_EX_GHASH_CIPHER_PCLMUL_H
 #define _GMLIB_CRYPTO_EX_GHASH_CIPHER_PCLMUL_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include <TinyCrypto/hash/ghash/ghash_pclmul.h>
+#include <stdexcept>
 
 namespace gmlib {
 
 class GHashCipher_Pclmul
 {
 public:
-    struct GHashPclmulCTX
-    {
-        uint8_t  H[16]; // LUT TABLE
-        uint64_t state[2];
-
-        uint8_t buf[16];
-        size_t  buf_size;
-    };
-
-public:
-    static constexpr size_t DIGEST_SIZE = 16;
+    static constexpr size_t DIGEST_SIZE = GHASH_DIGEST_SIZE;
 
 private:
-    struct GHashPclmulCTX ctx;
+    tc::GHashPclmulCTX ctx;
 
 public:
-    GHashCipher_Pclmul(const uint8_t H[16]) noexcept;
-    GHashCipher_Pclmul()                               = default;
+    GHashCipher_Pclmul(const uint8_t H[16]) noexcept
+    {
+        this->set_key(H);
+    }
+
+    GHashCipher_Pclmul()                                = default;
     GHashCipher_Pclmul(const GHashCipher_Pclmul& other) = default;
-    ~GHashCipher_Pclmul()                              = default;
+    ~GHashCipher_Pclmul()                               = default;
 
 public:
-    void set_key(const uint8_t H[16]) noexcept;
+    void set_key(const uint8_t H[16]) noexcept
+    {
+        tc::ghash_pclmul_init(&this->ctx, H);
+    }
 
-    void reset() noexcept;
+    void reset() noexcept
+    {
+        tc::ghash_pclmul_reset(&this->ctx);
+    }
 
-    void update(const uint8_t* in, size_t inl) noexcept;
+    void update(const uint8_t* in, size_t inl) noexcept
+    {
+        tc::ghash_pclmul_update(&this->ctx, in, inl);
+    }
 
-    void final(uint8_t digest[16]);
+    void final(uint8_t digest[16])
+    {
+        if (tc::ghash_pclmul_final(&this->ctx, digest))
+        {
+            throw std::runtime_error("ghash invalid data length");
+        }
+    }
 };
 
 }; // namespace gmlib

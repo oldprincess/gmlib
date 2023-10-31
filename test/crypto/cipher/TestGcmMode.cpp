@@ -1,5 +1,5 @@
 #include <iostream>
-#include <gmlib/crypto/cipher/CipherMode.hpp>
+#include <gmlib/crypto/cipher/CipherMode.h>
 #include <gmlib/crypto/cipher/AesCipher.h>
 
 #include <stdlib.h>

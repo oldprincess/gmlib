@@ -13,7 +13,7 @@ set(GMLIB_HEADER
     # cipher
     "gmlib/crypto/cipher/AesCipher.h"
     "gmlib/crypto/cipher/Sm4Cipher.h"
-    "gmlib/crypto/cipher/CipherMode.hpp"
+    "gmlib/crypto/cipher/CipherMode.h"
     # hash
     "gmlib/crypto/hash/GHashCipher.h"
     "gmlib/crypto/hash/Sm3Cipher.h"
@@ -21,25 +21,27 @@ set(GMLIB_HEADER
     "gmlib/crypto/rng/RngCipher.h"
 )
 
-set(GMLIB_SRC 
-    # cipher
-    "gmlib/crypto/cipher/AesCipher.cpp"
-    "gmlib/crypto/cipher/Sm4Cipher.cpp"
-    # hash
-    "gmlib/crypto/hash/GHashCipher.cpp"
-    "gmlib/crypto/hash/Sm3Cipher.cpp"
+set(TINY_CRYPTO_SRC
+    "TinyCrypto/cipher/aes/aes_lut.cpp"
+    "TinyCrypto/cipher/sm4/sm4_lut.cpp"
+    "TinyCrypto/hash/ghash/ghash_lut256.cpp"
+    "TinyCrypto/hash/sm3/sm3_fast.cpp"
 )
+
+set(TINY_CRYPTO_EX_SRC
+    "TinyCrypto/cipher/ublock/ublock_standard.cpp"
+    "TinyCrypto/hash/ghash/ghash_pclmul.cpp"
+)
+
+# set(GMLIB_SRC 
+
+# )
 
 set(GMLIB_EX_HEADER
     "gmlib/crypto_ex/GHashCipher_Pclmul.h"
     "gmlib/crypto_ex/UBlockCipher_Standard.h"
-    "gmlib/crypto_ex/win/WinRng.hpp"
-    "gmlib/crypto_ex/win/WinRng2.hpp"
-)
-
-set(GMLIB_EX_SRC
-    "gmlib/crypto_ex/GHashCipher_Pclmul.cpp"
-    "gmlib/crypto_ex/UBlockCipher_Standard.cpp"
+    "gmlib/crypto_ex/win/WinRng.h"
+    "gmlib/crypto_ex/win/WinRng2.h"
 )
 
 set(TEST_SRC 
@@ -54,6 +56,8 @@ set(TEST_SRC
     "test/main.cpp"
 )
 
-add_library(gmlib STATIC ${GMLIB_SRC} ${GMLIB_HEADER} ${GMLIB_EX_SRC} ${GMLIB_EX_HEADER})
+add_library(gmlib STATIC 
+    ${TINY_CRYPTO_SRC} ${TINY_CRYPTO_EX_SRC}
+    ${GMLIB_HEADER} ${GMLIB_EX_SRC} ${GMLIB_EX_HEADER})
 add_executable(gmlib_test ${TEST_SRC})
 target_link_libraries(gmlib_test gmlib)

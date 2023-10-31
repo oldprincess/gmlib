@@ -1,5 +1,5 @@
-#ifndef _GMLIB_CRYPTO_EX_WIN_RNG2_HPP
-#define _GMLIB_CRYPTO_EX_WIN_RNG2_HPP
+#ifndef _GMLIB_CRYPTO_EX_WIN_RNG2_H
+#define _GMLIB_CRYPTO_EX_WIN_RNG2_H
 
 #include <gmlib/crypto/rng/RngCipher.h>
 #include <stdexcept>
@@ -63,4 +63,4 @@ public:
 
 }; // namespace gmlib
 
-#endif // !_GMLIB_CRYPTO_EX_WIN_RNG2_HPP
+#endif // !_GMLIB_CRYPTO_EX_WIN_RNG2_H

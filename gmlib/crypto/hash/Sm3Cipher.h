@@ -24,47 +24,47 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef _GMLIB_CRYPTO_HASH_SM3_CIPHER_H
 #define _GMLIB_CRYPTO_HASH_SM3_CIPHER_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include <TinyCrypto/hash/sm3/sm3_fast.h>
+#include <stdexcept>
 
 namespace gmlib {
 
 class Sm3Cipher
 {
 public:
-    static constexpr size_t BLOCK_SIZE  = 64;
-    static constexpr size_t DIGEST_SIZE = 32;
-
-public:
-    struct Sm3CTX
-    {
-        uint32_t state[8];
-        uint64_t data_bits; // input bits < 2^64
-
-        uint8_t buf[64];
-        size_t  buf_size;
-    };
+    static constexpr size_t BLOCK_SIZE  = SM3_BLOCK_SIZE;
+    static constexpr size_t DIGEST_SIZE = SM3_DIGEST_SIZE;
 
 private:
-    struct Sm3CTX ctx;
+    tc::Sm3FastCTX ctx;
 
 public:
-    Sm3Cipher() noexcept;
+    Sm3Cipher() noexcept
+    {
+        tc::sm3_fast_init(&this->ctx);
+    }
+
     Sm3Cipher(const Sm3Cipher& other) = default;
     ~Sm3Cipher()                      = default;
 
 public:
-    const char* name() noexcept
+    void reset() noexcept
     {
-        return "Sm3Cipher";
+        tc::sm3_fast_reset(&this->ctx);
     }
 
-public:
-    void reset() noexcept;
+    void update(const uint8_t* in, size_t inl)
+    {
+        if (tc::sm3_fast_update(&this->ctx, in, inl))
+        {
+            throw std::runtime_error("sm3 input bits overflow");
+        }
+    }
 
-    void update(const uint8_t* in, size_t inl);
-
-    void final(uint8_t digest[32]) noexcept;
+    void final(uint8_t digest[32]) noexcept
+    {
+        tc::sm3_fast_final(&this->ctx, digest);
+    }
 };
 
 }; // namespace gmlib

@@ -31,8 +31,7 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef _GMLIB_CRYPTO_EX_UBLOCK_CIPHER_STANDARD_H
 #define _GMLIB_CRYPTO_EX_UBLOCK_CIPHER_STANDARD_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include <TinyCrypto/cipher/ublock/ublock_standard.h>
 
 namespace gmlib {
 
@@ -43,27 +42,77 @@ public:
     static constexpr int DECRYPTION = 0;
 
 public:
-    static constexpr size_t BLOCK_SIZE   = 16;
+    static constexpr size_t BLOCK_SIZE   = UBLOCK128128_BLOCK_SIZE;
     static constexpr size_t PARALLEL_NUM = 1;
-    static constexpr size_t USER_KEY_LEN = 16;
+    static constexpr size_t USER_KEY_LEN = UBLOCK128128_USER_KEY_LEN;
 
 private:
-    uint8_t sub_key[17][32];
-    int     mode;
+    tc::UBlockStandardCTX ctx;
+    int                   mode;
 
 public:
-    UBlock128128Cipher_Standard(const uint8_t* user_key, int mode) noexcept;
+    UBlock128128Cipher_Standard(const uint8_t* user_key, int mode) noexcept
+    {
+        this->set_key(user_key, mode);
+    }
+
     UBlock128128Cipher_Standard()                                   = default;
     UBlock128128Cipher_Standard(const UBlock128128Cipher_Standard&) = default;
     ~UBlock128128Cipher_Standard()                                  = default;
 
 public:
-    void set_key(const uint8_t* user_key, int mode) noexcept;
-    void crypt_block(uint8_t out[16], const uint8_t in[16]) const noexcept;
+    void set_key(const uint8_t* user_key, int mode) noexcept
+    {
+        this->mode = mode;
+        if (mode == UBlock128128Cipher_Standard::ENCRYPTION)
+        {
+            tc::ublock128128_standard_enc_key_init(&this->ctx, user_key);
+        }
+        else
+        {
+            tc::ublock128128_standard_dec_key_init(&this->ctx, user_key);
+        }
+    }
+
+    void crypt_block(uint8_t out[16], const uint8_t in[16]) const noexcept
+    {
+        if (mode == UBlock128128Cipher_Standard::ENCRYPTION)
+        {
+            tc::ublock128128_standard_enc_block(&this->ctx, out, in);
+        }
+        else
+        {
+            tc::ublock128128_standard_dec_block(&this->ctx, out, in);
+        }
+    }
+
     void crypt_blocks(uint8_t*       out,
                       const uint8_t* in,
-                      size_t         block_num) const noexcept;
-    void crypt_blocks_parallel(uint8_t* out, const uint8_t* in) const noexcept;
+                      size_t         block_num) const noexcept
+    {
+        if (mode == UBlock128128Cipher_Standard::ENCRYPTION)
+        {
+            tc::ublock128128_standard_enc_blocks(&this->ctx, out, in,
+                                                 block_num);
+        }
+        else
+        {
+            tc::ublock128128_standard_dec_blocks(&this->ctx, out, in,
+                                                 block_num);
+        }
+    }
+
+    void crypt_blocks_parallel(uint8_t* out, const uint8_t* in) const noexcept
+    {
+        if (mode == UBlock128128Cipher_Standard::ENCRYPTION)
+        {
+            tc::ublock128128_standard_enc_block(&this->ctx, out, in);
+        }
+        else
+        {
+            tc::ublock128128_standard_dec_block(&this->ctx, out, in);
+        }
+    }
 };
 
 class UBlock128256Cipher_Standard
@@ -73,27 +122,77 @@ public:
     static constexpr int DECRYPTION = 0;
 
 public:
-    static constexpr size_t BLOCK_SIZE   = 16;
+    static constexpr size_t BLOCK_SIZE   = UBLOCK128256_BLOCK_SIZE;
     static constexpr size_t PARALLEL_NUM = 1;
-    static constexpr size_t USER_KEY_LEN = 32;
+    static constexpr size_t USER_KEY_LEN = UBLOCK128256_USER_KEY_LEN;
 
 private:
-    uint8_t sub_key[25][32];
-    int     mode;
+    tc::UBlockStandardCTX ctx;
+    int                   mode;
 
 public:
-    UBlock128256Cipher_Standard(const uint8_t* user_key, int mode) noexcept;
+    UBlock128256Cipher_Standard(const uint8_t* user_key, int mode) noexcept
+    {
+        this->set_key(user_key, mode);
+    }
+
     UBlock128256Cipher_Standard()                                   = default;
     UBlock128256Cipher_Standard(const UBlock128256Cipher_Standard&) = default;
     ~UBlock128256Cipher_Standard()                                  = default;
 
 public:
-    void set_key(const uint8_t* user_key, int mode) noexcept;
-    void crypt_block(uint8_t out[16], const uint8_t in[16]) const noexcept;
+    void set_key(const uint8_t* user_key, int mode) noexcept
+    {
+        this->mode = mode;
+        if (mode == UBlock128256Cipher_Standard::ENCRYPTION)
+        {
+            tc::ublock128256_standard_enc_key_init(&this->ctx, user_key);
+        }
+        else
+        {
+            tc::ublock128256_standard_dec_key_init(&this->ctx, user_key);
+        }
+    }
+
+    void crypt_block(uint8_t out[16], const uint8_t in[16]) const noexcept
+    {
+        if (mode == UBlock128256Cipher_Standard::ENCRYPTION)
+        {
+            tc::ublock128256_standard_enc_block(&this->ctx, out, in);
+        }
+        else
+        {
+            tc::ublock128256_standard_dec_block(&this->ctx, out, in);
+        }
+    }
+
     void crypt_blocks(uint8_t*       out,
                       const uint8_t* in,
-                      size_t         block_num) const noexcept;
-    void crypt_blocks_parallel(uint8_t* out, const uint8_t* in) const noexcept;
+                      size_t         block_num) const noexcept
+    {
+        if (mode == UBlock128256Cipher_Standard::ENCRYPTION)
+        {
+            tc::ublock128256_standard_enc_blocks(&this->ctx, out, in,
+                                                 block_num);
+        }
+        else
+        {
+            tc::ublock128256_standard_dec_blocks(&this->ctx, out, in,
+                                                 block_num);
+        }
+    }
+
+    void crypt_blocks_parallel(uint8_t* out, const uint8_t* in) const noexcept
+    {
+        if (mode == UBlock128256Cipher_Standard::ENCRYPTION)
+        {
+            tc::ublock128256_standard_enc_block(&this->ctx, out, in);
+        }
+        else
+        {
+            tc::ublock128256_standard_dec_block(&this->ctx, out, in);
+        }
+    }
 };
 
 class UBlock256256Cipher_Standard
@@ -103,27 +202,77 @@ public:
     static constexpr int DECRYPTION = 0;
 
 public:
-    static constexpr size_t BLOCK_SIZE   = 32;
+    static constexpr size_t BLOCK_SIZE   = UBLOCK256256_BLOCK_SIZE;
     static constexpr size_t PARALLEL_NUM = 1;
-    static constexpr size_t USER_KEY_LEN = 32;
+    static constexpr size_t USER_KEY_LEN = UBLOCK256256_USER_KEY_LEN;
 
 private:
-    uint8_t sub_key[25][64];
-    int     mode;
+    tc::UBlockStandardCTX ctx;
+    int                   mode;
 
 public:
-    UBlock256256Cipher_Standard(const uint8_t* user_key, int mode) noexcept;
+    UBlock256256Cipher_Standard(const uint8_t* user_key, int mode) noexcept
+    {
+        this->set_key(user_key, mode);
+    }
+
     UBlock256256Cipher_Standard()                                   = default;
     UBlock256256Cipher_Standard(const UBlock256256Cipher_Standard&) = default;
     ~UBlock256256Cipher_Standard()                                  = default;
 
 public:
-    void set_key(const uint8_t* user_key, int mode) noexcept;
-    void crypt_block(uint8_t out[32], const uint8_t in[32]) const noexcept;
+    void set_key(const uint8_t* user_key, int mode) noexcept
+    {
+        this->mode = mode;
+        if (mode == UBlock256256Cipher_Standard::ENCRYPTION)
+        {
+            tc::ublock256256_standard_enc_key_init(&this->ctx, user_key);
+        }
+        else
+        {
+            tc::ublock256256_standard_dec_key_init(&this->ctx, user_key);
+        }
+    }
+
+    void crypt_block(uint8_t out[16], const uint8_t in[16]) const noexcept
+    {
+        if (mode == UBlock256256Cipher_Standard::ENCRYPTION)
+        {
+            tc::ublock256256_standard_enc_block(&this->ctx, out, in);
+        }
+        else
+        {
+            tc::ublock256256_standard_dec_block(&this->ctx, out, in);
+        }
+    }
+
     void crypt_blocks(uint8_t*       out,
                       const uint8_t* in,
-                      size_t         block_num) const noexcept;
-    void crypt_blocks_parallel(uint8_t* out, const uint8_t* in) const noexcept;
+                      size_t         block_num) const noexcept
+    {
+        if (mode == UBlock256256Cipher_Standard::ENCRYPTION)
+        {
+            tc::ublock256256_standard_enc_blocks(&this->ctx, out, in,
+                                                 block_num);
+        }
+        else
+        {
+            tc::ublock256256_standard_dec_blocks(&this->ctx, out, in,
+                                                 block_num);
+        }
+    }
+
+    void crypt_blocks_parallel(uint8_t* out, const uint8_t* in) const noexcept
+    {
+        if (mode == UBlock256256Cipher_Standard::ENCRYPTION)
+        {
+            tc::ublock256256_standard_enc_block(&this->ctx, out, in);
+        }
+        else
+        {
+            tc::ublock256256_standard_dec_block(&this->ctx, out, in);
+        }
+    }
 };
 
 }; // namespace gmlib

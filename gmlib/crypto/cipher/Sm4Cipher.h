@@ -25,8 +25,7 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef _GMLIB_CRYPTO_CIPHER_SM4_CIPHER_H
 #define _GMLIB_CRYPTO_CIPHER_SM4_CIPHER_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include <TinyCrypto/cipher/sm4/sm4_lut.h>
 
 namespace gmlib {
 
@@ -37,26 +36,75 @@ public:
     static constexpr int DECRYPTION = 0;
 
 public:
-    static constexpr size_t BLOCK_SIZE   = 16;
+    static constexpr size_t BLOCK_SIZE   = SM4_BLOCK_SIZE;
     static constexpr size_t PARALLEL_NUM = 4;
-    static constexpr size_t USER_KEY_LEN = 16;
+    static constexpr size_t USER_KEY_LEN = SM4_USER_KEY_LEN;
 
 private:
-    uint32_t round_key[32];
+    tc::Sm4LutCTX ctx;
+    int           mode;
 
 public:
-    Sm4Cipher(const uint8_t* user_key, int mode) noexcept;
+    Sm4Cipher(const uint8_t* user_key, int mode) noexcept
+    {
+        this->set_key(user_key, mode);
+    }
+
     Sm4Cipher()                       = default;
     Sm4Cipher(const Sm4Cipher& other) = default;
     ~Sm4Cipher()                      = default;
 
 public:
-    void set_key(const uint8_t* user_key, int mode) noexcept;
-    void crypt_block(uint8_t out[16], const uint8_t in[16]) const noexcept;
+    void set_key(const uint8_t* user_key, int mode) noexcept
+    {
+        this->mode = mode;
+        if (mode == Sm4Cipher::ENCRYPTION)
+        {
+            tc::sm4_lut_enc_key_init(&this->ctx, user_key);
+        }
+        else
+        {
+            tc::sm4_lut_dec_key_init(&this->ctx, user_key);
+        }
+    }
+
+    void crypt_block(uint8_t out[16], const uint8_t in[16]) const noexcept
+    {
+        if (mode == Sm4Cipher::ENCRYPTION)
+        {
+            tc::sm4_lut_enc_block(&this->ctx, out, in);
+        }
+        else
+        {
+            tc::sm4_lut_dec_block(&this->ctx, out, in);
+        }
+    }
+
     void crypt_blocks(uint8_t*       out,
                       const uint8_t* in,
-                      size_t         block_num) const noexcept;
-    void crypt_blocks_parallel(uint8_t* out, const uint8_t* in) const noexcept;
+                      size_t         block_num) const noexcept
+    {
+        if (mode == Sm4Cipher::ENCRYPTION)
+        {
+            tc::sm4_lut_enc_blocks(&this->ctx, out, in, block_num);
+        }
+        else
+        {
+            tc::sm4_lut_dec_blocks(&this->ctx, out, in, block_num);
+        }
+    }
+
+    void crypt_blocks_parallel(uint8_t* out, const uint8_t* in) const noexcept
+    {
+        if (mode == Sm4Cipher::ENCRYPTION)
+        {
+            tc::sm4_lut_enc_block_x4(&this->ctx, out, in);
+        }
+        else
+        {
+            tc::sm4_lut_dec_block_x4(&this->ctx, out, in);
+        }
+    }
 };
 
 }; // namespace gmlib

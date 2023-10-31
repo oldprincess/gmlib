@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <iostream>
-#include <gmlib/crypto_ex/win/WinRng.hpp>
+#include <gmlib/crypto_ex/win/WinRng.h>
 #include <gmlib/crypto_ex/GHashCipher_Pclmul.h>
 using namespace gmlib;
 using namespace std;

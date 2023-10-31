@@ -25,43 +25,52 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef _GMLIB_CRYPTO_HASH_GHASH_H
 #define _GMLIB_CRYPTO_HASH_GHASH_H
 
-#include <stdint.h>
-#include <stdio.h>
+#include <TinyCrypto/hash/ghash/ghash_lut256.h>
+#include <stdexcept>
 
 namespace gmlib {
 
 class GHashCipher
 {
 public:
-    struct GHashCTX
-    {
-        uint64_t T[256][2]; // LUT TABLE
-        uint64_t state[2];
-
-        uint8_t buf[16];
-        size_t  buf_size;
-    };
-
-public:
-    static constexpr size_t DIGEST_SIZE = 16;
+    static constexpr size_t DIGEST_SIZE = GHASH_DIGEST_SIZE;
 
 private:
-    struct GHashCTX ctx;
+    tc::GHashLut256CTX ctx;
 
 public:
-    GHashCipher(const uint8_t H[16]) noexcept;
-    GHashCipher()                       = default;
+    GHashCipher(const uint8_t H[16]) noexcept
+    {
+        this->set_key(H);
+    }
+
+    GHashCipher()                         = default;
     GHashCipher(const GHashCipher& other) = default;
-    ~GHashCipher()                       = default;
+    ~GHashCipher()                        = default;
 
 public:
-    void set_key(const uint8_t H[16]) noexcept;
+    void set_key(const uint8_t H[16]) noexcept
+    {
+        tc::ghash_lut256_init(&this->ctx, H);
+    }
 
-    void reset() noexcept;
+    void reset() noexcept
+    {
+        tc::ghash_lut256_reset(&this->ctx);
+    }
 
-    void update(const uint8_t* in, size_t inl) noexcept;
+    void update(const uint8_t* in, size_t inl) noexcept
+    {
+        tc::ghash_lut256_update(&this->ctx, in, inl);
+    }
 
-    void final(uint8_t digest[16]);
+    void final(uint8_t digest[16])
+    {
+        if (tc::ghash_lut256_final(&this->ctx, digest))
+        {
+            throw std::runtime_error("ghash invalid data length");
+        }
+    }
 };
 
 }; // namespace gmlib

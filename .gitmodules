@@ -1,0 +1,3 @@
+[submodule "TinyCrypto"]
+	path = TinyCrypto
+	url = https://github.com/oldprincess/TinyCrypto.git
