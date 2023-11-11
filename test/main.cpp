@@ -8,15 +8,24 @@ void TestCipherMode();
 void TestGcmMode();
 void TestGHashCipher();
 void TestUBlockCipher_Standard();
-int  main()
+
+int main()
 {
-    TestSm3Cipher();
-    TestSm4Cipher();
-    TestAesCipher();
-    TestCipherMode();
-    TestGHashCipher();
-    TestGcmMode();
-    TestUBlockCipher_Standard();
+    try
+    {
+        TestSm3Cipher();
+        TestSm4Cipher();
+        TestAesCipher();
+        TestCipherMode();
+        TestGHashCipher();
+        TestGcmMode();
+        TestUBlockCipher_Standard();
+    }
+    catch (exception& e)
+    {
+        cout << e.what() << endl;
+        std::exit(-1);
+    }
     cout << "test finish!" << endl;
     return 0;
 }
