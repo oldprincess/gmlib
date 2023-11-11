@@ -178,10 +178,22 @@ static inline void ctr_inc16(uint8_t* out, const uint8_t* in) noexcept
     MEM_STORE32BE(out + 0, tmp & UINT32_MAX);
 }
 
+static void ctr_inc_n(uint8_t* out, const uint8_t* in, size_t n) noexcept
+{
+    uint16_t t = 1;
+    for (size_t i = 0; i < n; i++)
+    {
+        size_t pos = n - 1 - i;
+        t += (uint16_t)in[pos];
+        out[pos] = t & 0xFF;
+        t >>= 8;
+    }
+}
+
 template <size_t BLOCK_SIZE>
 inline void ctr_inc(uint8_t* out, const uint8_t* in) noexcept
 {
-    assert(0);
+    ctr_inc_n(out, in, BLOCK_SIZE);
 }
 
 template <>
