@@ -16,6 +16,8 @@ set(GMLIB_HEADER
     "gmlib/crypto/cipher/CipherMode.h"
     # hash
     "gmlib/crypto/hash/GHashCipher.h"
+    "gmlib/crypto/hash/Md5Cipher.h"
+    "gmlib/crypto/hash/Sha1Cipher.h"
     "gmlib/crypto/hash/Sm3Cipher.h"
     # rng
     "gmlib/crypto/rng/RngCipher.h"
