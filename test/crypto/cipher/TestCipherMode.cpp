@@ -5,7 +5,6 @@
 #include <cstdlib>
 using namespace gmlib;
 
-static bool test_Aes128Cipher_class();
 static bool test_Aes128Cipher_EcbEncryptor();
 static bool test_Aes128Cipher_EcbDecryptor();
 static bool test_Aes128Cipher_CbcEncryptor();
@@ -17,7 +16,6 @@ static bool test_Aes128Cipher_OfbDecryptor();
 static bool test_Aes128Cipher_CtrEncryptor();
 static bool test_Aes128Cipher_CtrDecryptor();
 
-static bool test_Aes192Cipher_class();
 static bool test_Aes192Cipher_EcbEncryptor();
 static bool test_Aes192Cipher_EcbDecryptor();
 static bool test_Aes192Cipher_CbcEncryptor();
@@ -29,7 +27,6 @@ static bool test_Aes192Cipher_OfbDecryptor();
 static bool test_Aes192Cipher_CtrEncryptor();
 static bool test_Aes192Cipher_CtrDecryptor();
 
-static bool test_Aes256Cipher_class();
 static bool test_Aes256Cipher_EcbEncryptor();
 static bool test_Aes256Cipher_EcbDecryptor();
 static bool test_Aes256Cipher_CbcEncryptor();

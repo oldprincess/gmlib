@@ -29,6 +29,7 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <cassert>
 #include <memory>
+#include <cstring>
 #include <gmlib/crypto/hash/GHashCipher.h>
 #include <gmlib/crypto/utils/ErrorTrace.h>
 
@@ -286,7 +287,11 @@ public:
     void update(uint8_t* out, size_t* outl, const uint8_t* in, size_t inl)
     {
         ErrorTrace_Begin();
-        if (inl == 0) goto end;
+        if (inl == 0)
+        {
+            ErrorTrace_SetNoneError();
+            return;
+        }
         uint8_t* out_base = out;
         if (this->buf_size == 0)
         {
@@ -297,7 +302,8 @@ public:
 
             memcpy(this->buf, in, inl);
             this->buf_size = inl, *outl = (size_t)(out - out_base);
-            goto end;
+            ErrorTrace_SetNoneError();
+            return;
         }
         {
             size_t size = BLOCK_SIZE - this->buf_size;
@@ -323,9 +329,7 @@ public:
 
             memcpy(this->buf, in, inl);
             this->buf_size = inl, *outl = (size_t)(out - out_base);
-            goto end;
         }
-    end:
         ErrorTrace_End();
     }
 
@@ -387,7 +391,11 @@ private:
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
         ErrorTrace_Begin();
-        if (inl == 0) goto end;
+        if (inl == 0)
+        {
+            ErrorTrace_SetNoneError();
+            return;
+        }
         // input len != 0
         if (inl != Cipher::BLOCK_SIZE)
         {
@@ -396,7 +404,6 @@ private:
                                      "be an integer multiple of BLOCK_SIZE");
         }
         _t(this->cipher.crypt_block(out, in));
-    end:
         ErrorTrace_End();
     }
 };
@@ -444,7 +451,11 @@ private:
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
         ErrorTrace_Begin();
-        if (inl == 0) goto end;
+        if (inl == 0)
+        {
+            ErrorTrace_SetNoneError();
+            return;
+        }
         // input len != 0
         if (inl != Cipher::BLOCK_SIZE)
         {
@@ -453,7 +464,6 @@ private:
                                      "be an integer multiple of BLOCK_SIZE");
         }
         _t(this->cipher.crypt_block(out, in););
-    end:
         ErrorTrace_End();
     }
 };
@@ -520,7 +530,11 @@ private:
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
         ErrorTrace_Begin();
-        if (inl == 0) goto end;
+        if (inl == 0)
+        {
+            ErrorTrace_SetNoneError();
+            return;
+        }
         // input len != 0
         if (inl != Cipher::BLOCK_SIZE)
         {
@@ -529,7 +543,6 @@ private:
                                      "be an integer multiple of BLOCK_SIZE");
         }
         _t(this->update_blocks(out, in, 1););
-    end:
         ErrorTrace_End();
     }
 };
@@ -610,7 +623,11 @@ private:
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
         ErrorTrace_Begin();
-        if (inl == 0) goto end;
+        if (inl == 0)
+        {
+            ErrorTrace_SetNoneError();
+            return;
+        }
         // input len != 0
         if (inl != Cipher::BLOCK_SIZE)
         {
@@ -619,7 +636,6 @@ private:
                                      "be an integer multiple of BLOCK_SIZE");
         }
         _t(this->update_blocks(out, in, 1););
-    end:
         ErrorTrace_End();
     }
 };
@@ -686,10 +702,13 @@ private:
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
         ErrorTrace_Begin();
-        if (inl == 0) goto end;
+        if (inl == 0)
+        {
+            ErrorTrace_SetNoneError();
+            return;
+        }
         _t(this->cipher.crypt_block(this->iv, this->iv););
         CipherModeUtil::memxor_n(out, this->iv, in, inl);
-    end:
         ErrorTrace_End();
     }
 };
@@ -765,10 +784,13 @@ private:
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
         ErrorTrace_Begin();
-        if (inl == 0) goto end;
+        if (inl == 0)
+        {
+            ErrorTrace_SetNoneError();
+            return;
+        }
         _t(this->cipher.crypt_block(this->iv, this->iv););
         CipherModeUtil::memxor_n(out, in, this->iv, inl);
-    end:
         ErrorTrace_End();
     }
 };
@@ -854,11 +876,14 @@ private:
         ErrorTrace_Begin();
         constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
 
-        if (inl == 0) goto end;
+        if (inl == 0)
+        {
+            ErrorTrace_SetNoneError();
+            return;
+        }
         uint8_t key_stream[BLOCK_SIZE];
         _t(this->gen_key_stream(key_stream, BLOCK_SIZE););
         CipherModeUtil::memxor_n(out, in, key_stream, inl);
-    end:
         ErrorTrace_End();
     }
 };
@@ -914,7 +939,11 @@ private:
     void gen_block_key_stream(uint8_t* out, size_t block_num)
     {
         ErrorTrace_Begin();
-        if (block_num == 0) goto end;
+        if (block_num == 0)
+        {
+            ErrorTrace_SetNoneError();
+            return;
+        }
         constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
         // generate counter
         uint8_t* cur_counter = out;
@@ -928,7 +957,6 @@ private:
         CipherModeUtil::ctr_inc<BLOCK_SIZE>(this->counter, cur_counter);
         // generate key stream
         _t(this->cipher.crypt_blocks(out, out, block_num););
-    end:
         ErrorTrace_End();
     }
 
@@ -960,12 +988,15 @@ private:
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
         ErrorTrace_Begin();
-        if (inl == 0) goto end;
+        if (inl == 0)
+        {
+            ErrorTrace_SetNoneError();
+            return;
+        }
         constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
         uint8_t          key_stream[BLOCK_SIZE];
         _t(this->gen_block_key_stream(key_stream, 1););
         CipherModeUtil::memxor_n(out, key_stream, in, inl);
-    end:
         ErrorTrace_End();
     }
 };
@@ -1070,7 +1101,11 @@ private:
     void gen_block_key_stream(uint8_t* out, size_t block_num)
     {
         ErrorTrace_Begin();
-        if (block_num == 0) goto end;
+        if (block_num == 0)
+        {
+            ErrorTrace_SetNoneError();
+            return;
+        }
         // generate counter
         uint8_t* cur_counter = out;
         memcpy(cur_counter, this->counter, 16);
@@ -1083,7 +1118,6 @@ private:
         CipherModeUtil::gctr_inc(this->counter, cur_counter);
         // generate key stream
         _t(this->cipher.crypt_blocks(out, out, block_num););
-    end:
         ErrorTrace_End();
     }
 
@@ -1091,7 +1125,11 @@ private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
         ErrorTrace_Begin();
-        if (block_num == 0) goto end;
+        if (block_num == 0)
+        {
+            ErrorTrace_SetNoneError();
+            return;
+        }
         constexpr size_t BLOCK_SIZE     = Cipher::BLOCK_SIZE;
         constexpr size_t PARALLEL_NUM   = Cipher::PARALLEL_NUM;
         constexpr size_t PARALLEL_BYTES = BLOCK_SIZE * PARALLEL_NUM;
@@ -1115,7 +1153,6 @@ private:
         // gmac
         _t(this->mac.update(base_out, (size_t)(out - base_out)););
         this->ct_len += (size_t)(out - base_out);
-    end:
         ErrorTrace_End();
     }
 
@@ -1231,7 +1268,11 @@ private:
     void gen_block_key_stream(uint8_t* out, size_t block_num)
     {
         ErrorTrace_Begin();
-        if (block_num == 0) goto end;
+        if (block_num == 0)
+        {
+            ErrorTrace_SetNoneError();
+            return;
+        }
         // generate counter
         uint8_t* cur_counter = out;
         memcpy(cur_counter, this->counter, 16);
@@ -1244,14 +1285,17 @@ private:
         CipherModeUtil::gctr_inc(this->counter, cur_counter);
         // generate key stream
         _t(this->cipher.crypt_blocks(out, out, block_num););
-    end:
         ErrorTrace_End();
     }
 
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
         ErrorTrace_Begin();
-        if (block_num == 0) goto end;
+        if (block_num == 0)
+        {
+            ErrorTrace_SetNoneError();
+            return;
+        }
         // gmac
         _t(this->mac.update(in, block_num * Cipher::BLOCK_SIZE););
         this->ct_len += block_num * Cipher::BLOCK_SIZE;
@@ -1276,7 +1320,6 @@ private:
             _t(this->gen_block_key_stream(key_stream, block_num););
             CipherModeUtil::memxor_n(out, in, key_stream, remain_bytes);
         }
-    end:
         ErrorTrace_End();
     }
 

@@ -69,7 +69,7 @@ static void gcm_test1()
         memcmp(tag, gcm_tag, 16) != 0 ||
         (size_t)(outptr - out) != sizeof(gcm_ct))
     {
-        throw std::exception("err in Gcm Encrypt");
+        throw std::runtime_error("err in Gcm Encrypt");
     }
 
     outptr = out;
@@ -83,7 +83,7 @@ static void gcm_test1()
         memcmp(tag, gcm_tag, 16) != 0 ||
         (size_t)(outptr - out) != sizeof(gcm_ct))
     {
-        throw std::exception("err in Gcm Encrypt");
+        throw std::runtime_error("err in Gcm Encrypt");
     }
 
     auto decryptor = GcmDecryptor<Aes256Cipher>(gcm_key, gcm_iv, sizeof(gcm_iv),
@@ -97,7 +97,7 @@ static void gcm_test1()
     if (memcmp(out, gcm_pt, sizeof(gcm_pt)) != 0 ||
         (size_t)(outptr - out) != sizeof(gcm_pt))
     {
-        throw std::exception("err in Gcm Decrypt");
+        throw std::runtime_error("err in Gcm Decrypt");
     }
 
     outptr = out;
@@ -110,7 +110,7 @@ static void gcm_test1()
     if (memcmp(out, gcm_pt, sizeof(gcm_pt)) != 0 ||
         (size_t)(outptr - out) != sizeof(gcm_pt))
     {
-        throw std::exception("err in Gcm Decrypt");
+        throw std::runtime_error("err in Gcm Decrypt");
     }
 }
 void gcm_test2()

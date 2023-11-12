@@ -32,23 +32,23 @@ void TestUBlockCipher_Standard()
     ublock128128.crypt_block(out, pt128128);
     if (memcmp(ct128128, out, UBlock128128CipherEx::BLOCK_SIZE) != 0)
     {
-        throw std::exception("Error in UBlockCipher Encryption Mode");
+        throw std::runtime_error("Error in UBlockCipher Encryption Mode");
     }
     ublock128128.crypt_blocks(out, pt128128, 1);
     if (memcmp(ct128128, out, UBlock128128CipherEx::BLOCK_SIZE) != 0)
     {
-        throw std::exception("Error in UBlockCipher Encryption Mode");
+        throw std::runtime_error("Error in UBlockCipher Encryption Mode");
     }
     ublock128128.set_key(key128128, UBlock128128CipherEx::DECRYPTION);
     ublock128128.crypt_block(out, ct128128);
     if (memcmp(pt128128, out, UBlock128128CipherEx::BLOCK_SIZE) != 0)
     {
-        throw std::exception("Error in UBlockCipher Decryption Mode");
+        throw std::runtime_error("Error in UBlockCipher Decryption Mode");
     }
     ublock128128.crypt_blocks(out, ct128128, 1);
     if (memcmp(pt128128, out, UBlock128128CipherEx::BLOCK_SIZE) != 0)
     {
-        throw std::exception("Error in UBlockCipher Decryption Mode");
+        throw std::runtime_error("Error in UBlockCipher Decryption Mode");
     }
 
     static uint8_t key128256[32] = {
@@ -71,23 +71,23 @@ void TestUBlockCipher_Standard()
     ublock128256.crypt_block(out, pt128256);
     if (memcmp(ct128256, out, UBlock128256CipherEx::BLOCK_SIZE) != 0)
     {
-        throw std::exception("Error in UBlockCipher Encryption Mode");
+        throw std::runtime_error("Error in UBlockCipher Encryption Mode");
     }
     ublock128256.crypt_blocks(out, pt128256, 1);
     if (memcmp(ct128256, out, UBlock128256CipherEx::BLOCK_SIZE) != 0)
     {
-        throw std::exception("Error in UBlockCipher Encryption Mode");
+        throw std::runtime_error("Error in UBlockCipher Encryption Mode");
     }
     ublock128256.set_key(key128256, UBlock128256CipherEx::DECRYPTION);
     ublock128256.crypt_block(out, ct128256);
     if (memcmp(pt128256, out, UBlock128256CipherEx::BLOCK_SIZE) != 0)
     {
-        throw std::exception("Error in UBlockCipher Decryption Mode");
+        throw std::runtime_error("Error in UBlockCipher Decryption Mode");
     }
     ublock128256.crypt_blocks(out, ct128256, 1);
     if (memcmp(pt128256, out, UBlock128256CipherEx::BLOCK_SIZE) != 0)
     {
-        throw std::exception("Error in UBlockCipher Decryption Mode");
+        throw std::runtime_error("Error in UBlockCipher Decryption Mode");
     }
 
     static uint8_t key256256[32] = {
@@ -114,22 +114,22 @@ void TestUBlockCipher_Standard()
     ublock256256.crypt_block(out, pt256256);
     if (memcmp(ct256256, out, UBlock256256CipherEx::BLOCK_SIZE) != 0)
     {
-        throw std::exception("Error in UBlockCipher Encryption Mode");
+        throw std::runtime_error("Error in UBlockCipher Encryption Mode");
     }
     ublock256256.crypt_blocks(out, pt256256, 1);
     if (memcmp(ct256256, out, UBlock256256CipherEx::BLOCK_SIZE) != 0)
     {
-        throw std::exception("Error in UBlockCipher Encryption Mode");
+        throw std::runtime_error("Error in UBlockCipher Encryption Mode");
     }
     ublock256256.set_key(key256256, UBlock256256CipherEx::DECRYPTION);
     ublock256256.crypt_block(out, ct256256);
     if (memcmp(pt256256, out, UBlock256256CipherEx::BLOCK_SIZE) != 0)
     {
-        throw std::exception("Error in UBlockCipher Decryption Mode");
+        throw std::runtime_error("Error in UBlockCipher Decryption Mode");
     }
     ublock256256.crypt_blocks(out, ct256256, 1);
     if (memcmp(pt256256, out, UBlock256256CipherEx::BLOCK_SIZE) != 0)
     {
-        throw std::exception("Error in UBlockCipher Decryption Mode");
+        throw std::runtime_error("Error in UBlockCipher Decryption Mode");
     }
 }

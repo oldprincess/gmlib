@@ -48,12 +48,12 @@ void TestSm4Cipher()
     cipher.crypt_blocks(buffer, pt, block_num);
     if (memcmp(buffer, ct, size) != 0)
     {
-        throw std::exception("Error in Sm4Cipher Encryption Mode");
+        throw std::runtime_error("Error in Sm4Cipher Encryption Mode");
     }
     cipher.set_key(user_key, Sm4Cipher::DECRYPTION);
     cipher.crypt_blocks(buffer, ct, block_num);
     if (memcmp(buffer, pt, size) != 0)
     {
-        throw std::exception("Error in Sm4Cipher Decryption Mode");
+        throw std::runtime_error("Error in Sm4Cipher Decryption Mode");
     }
 }

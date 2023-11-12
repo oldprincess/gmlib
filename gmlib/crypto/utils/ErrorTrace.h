@@ -70,6 +70,7 @@ public:
 #define ErrorTrace_Trace(exp) exp
 #define ErrorTrace_Raise()
 #define ErrorTrace_End()
+#define ErrorTrace_SetNoneError()
 
 #else
 
@@ -78,8 +79,9 @@ public:
 #define ErrorTrace_Trace(exp)   \
     _err_trace.trace(__LINE__); \
     exp
-#define ErrorTrace_Raise() _err_trace.trace(__LINE__)
-#define ErrorTrace_End()   _err_trace.clear()
+#define ErrorTrace_Raise()        _err_trace.trace(__LINE__)
+#define ErrorTrace_End()          _err_trace.clear()
+#define ErrorTrace_SetNoneError() _err_trace.clear()
 
 #endif
 

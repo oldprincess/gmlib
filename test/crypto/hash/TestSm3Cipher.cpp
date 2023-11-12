@@ -21,7 +21,7 @@ void TestSm3Cipher()
     if (memcmp(digest, need_digest, sizeof(need_digest)) != 0)
     {
         for (int i = 0; i < 32; i++) printf("%02x ", digest[i]);
-        throw std::exception("Err in Sm3 Hash");
+        throw std::runtime_error("Err in Sm3 Hash");
     }
     
 
@@ -30,6 +30,6 @@ void TestSm3Cipher()
     hash.final(digest);
     if (memcmp(digest, need_digest, sizeof(need_digest)) != 0)
     {
-        throw std::exception("Err in Sm3 Hash");
+        throw std::runtime_error("Err in Sm3 Hash");
     }
 }

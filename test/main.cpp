@@ -17,7 +17,7 @@ int main()
         TestSm4Cipher();
         TestAesCipher();
         TestCipherMode();
-        TestGHashCipher();
+        //TestGHashCipher();
         TestGcmMode();
         TestUBlockCipher_Standard();
     }

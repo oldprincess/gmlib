@@ -78,38 +78,38 @@ void TestAesCipher()
     aes128.crypt_blocks(buffer, pt, block_num);
     if (memcmp(buffer, ct128, size) != 0)
     {
-        throw std::exception("Error in Aes128Cipher Encryption Mode");
+        throw std::runtime_error("Error in Aes128Cipher Encryption Mode");
     }
     aes128.set_key(user_key, Aes128Cipher::DECRYPTION);
     aes128.crypt_blocks(buffer, ct128, block_num);
     if (memcmp(buffer, pt, size) != 0)
     {
-        throw std::exception("Error in Aes128Cipher Decryption Mode");
+        throw std::runtime_error("Error in Aes128Cipher Decryption Mode");
     }
 
     auto aes192 = Aes192Cipher(user_key, Aes192Cipher::ENCRYPTION);
     aes192.crypt_blocks(buffer, pt, block_num);
     if (memcmp(buffer, ct192, size) != 0)
     {
-        throw std::exception("Error in Aes192Cipher Encryption Mode");
+        throw std::runtime_error("Error in Aes192Cipher Encryption Mode");
     }
     aes192.set_key(user_key, Aes192Cipher::DECRYPTION);
     aes192.crypt_blocks(buffer, ct192, block_num);
     if (memcmp(buffer, pt, size) != 0)
     {
-        throw std::exception("Error in Aes192Cipher Decryption Mode");
+        throw std::runtime_error("Error in Aes192Cipher Decryption Mode");
     }
 
     auto aes256 = Aes256Cipher(user_key, Aes256Cipher::ENCRYPTION);
     aes256.crypt_blocks(buffer, pt, block_num);
     if (memcmp(buffer, ct256, size) != 0)
     {
-        throw std::exception("Error in Aes256Cipher Encryption Mode");
+        throw std::runtime_error("Error in Aes256Cipher Encryption Mode");
     }
     aes256.set_key(user_key, Aes256Cipher::DECRYPTION);
     aes256.crypt_blocks(buffer, ct256, block_num);
     if (memcmp(buffer, pt, size) != 0)
     {
-        throw std::exception("Error in Aes256Cipher Decryption Mode");
+        throw std::runtime_error("Error in Aes256Cipher Decryption Mode");
     }
 }
