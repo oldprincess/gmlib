@@ -10,6 +10,7 @@ else()
 endif()
 
 include_directories("./")
+include_directories("./spdlog/include")
 
 set(GMLIB_HEADER
     # cipher
@@ -39,9 +40,8 @@ set(TINY_CRYPTO_EX_SRC
     "TinyCrypto/hash/ghash/ghash_pclmul.cpp"
 )
 
-set(GMLIB_SRC 
-    "gmlib/crypto/utils/ErrorTrace.cpp"
-)
+# set(GMLIB_SRC 
+# )
 
 set(GMLIB_EX_HEADER
     "gmlib/crypto_ex/GHashCipher_Pclmul.h"
@@ -63,7 +63,7 @@ set(TEST_SRC
 )
 
 add_library(gmlib STATIC 
-    ${TINY_CRYPTO_SRC} ${TINY_CRYPTO_EX_SRC} ${GMLIB_SRC}
+    ${TINY_CRYPTO_SRC} ${TINY_CRYPTO_EX_SRC} # ${GMLIB_SRC}
     ${GMLIB_HEADER} ${GMLIB_EX_SRC} ${GMLIB_EX_HEADER})
 add_executable(gmlib_test ${TEST_SRC})
 target_link_libraries(gmlib_test gmlib)

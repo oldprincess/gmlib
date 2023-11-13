@@ -1,29 +1,20 @@
 #ifndef _GMLIB_CRYPTO_ERR_TRACE_H
 #define _GMLIB_CRYPTO_ERR_TRACE_H
 
-#include <ostream>
-#include <iostream>
+#include <spdlog/spdlog.h>
 
 namespace gmlib {
-
-std::ostream& ErrorTrace_get_err_fpout();
-void          ErrorTrace_set_err_fpout(std::ostream& fpout);
 
 class ErrorTrace
 {
 private:
-    std::ostream& fpout;
-    size_t        line;
-    bool          err;
-    const char*   func;
-    const char*   file;
+    size_t      line;
+    bool        err;
+    const char* func;
+    const char* file;
 
 public:
-    ErrorTrace(size_t        line,
-               const char*   func,
-               const char*   file,
-               std::ostream& fpout = ErrorTrace_get_err_fpout()) noexcept
-        : fpout(fpout)
+    ErrorTrace(size_t line, const char* func, const char* file) noexcept
     {
         this->err  = true;
         this->line = line;
@@ -37,15 +28,15 @@ public:
         {
             if (this->err)
             {
-                this->fpout << "[error] catch exception"
-                            << ", in file: " << this->file
-                            << ", in line: " << this->line
-                            << ", in func: " << this->func << std::endl;
+                spdlog::error("gmlib catch exception\n"
+                              "\tin file: {}\n"
+                              "\tin line: {}\n"
+                              "\tin func: {}",
+                              this->file, this->line, this->func);
             }
         }
-        catch (std::exception& e)
+        catch(...)
         {
-            std::cerr << e.what();
             std::terminate();
         }
     }
