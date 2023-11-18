@@ -24,8 +24,9 @@ set(GMLIB_HEADER
     "gmlib/crypto/hash/Sm3Cipher.h"
     # rng
     "gmlib/crypto/rng/RngCipher.h"
-    # utils
-    "gmlib/crypto/utils/ErrorTrace.h"
+
+    "gmlib/exception.h"
+    "gmlib/crypto.h"
 )
 
 set(TINY_CRYPTO_SRC

@@ -25,7 +25,7 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #define _GMLIB_CRYPTO_HASH_SHA1_CIPHER_H
 
 #include <TinyCrypto/hash/sha1/sha1_standard.h>
-#include <stdexcept>
+#include <gmlib/exception.h>
 
 namespace gmlib {
 
@@ -57,7 +57,7 @@ public:
     {
         if (tc::sha1_standard_update(&this->ctx, in, inl))
         {
-            throw std::runtime_error("sha1 input bits overflow");
+            throw gmlib::Exception("sha1 input bits overflow");
         }
     }
 

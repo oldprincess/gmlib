@@ -26,14 +26,9 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef _GMLIB_CRYPTO_CIPHER_CIPHER_MODE_H
 #define _GMLIB_CRYPTO_CIPHER_CIPHER_MODE_H
 
-#include <stdexcept>
-#include <cassert>
-#include <memory>
 #include <cstring>
 #include <gmlib/crypto/hash/GHashCipher.h>
-#include <gmlib/crypto/utils/ErrorTrace.h>
-
-#define _t(exp) ErrorTrace_Trace(exp)
+#include <gmlib/exception.h>
 
 namespace gmlib {
 
@@ -230,7 +225,6 @@ static void gcm_init_cnt(GHash*         mac,
                          const uint8_t* iv,
                          size_t         iv_len)
 {
-    ErrorTrace_Begin();
     static const uint8_t ZERO[16] = {0};
     // mac->reset();
     if (iv_len == 12)
@@ -245,15 +239,14 @@ static void gcm_init_cnt(GHash*         mac,
     {
         uint8_t t[16];
         // H(IV || 0(s+64) || ivlen(64) )
-        _t(mac->update(iv, iv_len););
-        _t(mac->update(ZERO, (16 - (iv_len % 16)) % 16););
+        mac->update(iv, iv_len);
+        mac->update(ZERO, (16 - (iv_len % 16)) % 16);
         MEM_STORE64BE(t + 0, 0);
         MEM_STORE64BE(t + 8, iv_len * 8);
-        _t(mac->update(t, 16););
-        _t(mac->final(counter););
-        _t(mac->reset(););
+        mac->update(t, 16);
+        mac->final(counter);
+        mac->reset();
     }
-    ErrorTrace_End();
 }
 
 }; // namespace CipherModeUtil
@@ -266,8 +259,9 @@ private:
     size_t  buf_size;
 
 public:
-    CipherCryptor() noexcept : buf_size(0)
+    CipherCryptor() noexcept
     {
+        this->buf_size = 0;
     }
 
 protected:
@@ -286,10 +280,8 @@ private:
 public:
     void update(uint8_t* out, size_t* outl, const uint8_t* in, size_t inl)
     {
-        ErrorTrace_Begin();
         if (inl == 0)
         {
-            ErrorTrace_SetNoneError();
             return;
         }
         uint8_t* out_base = out;
@@ -297,12 +289,12 @@ public:
         {
             size_t block_num = inl / BLOCK_SIZE;
             size_t size      = block_num * BLOCK_SIZE;
-            _t(this->update_blocks(out, in, block_num););
+            this->update_blocks(out, in, block_num);
             out += size, in += size, inl -= size;
 
             memcpy(this->buf, in, inl);
             this->buf_size = inl, *outl = (size_t)(out - out_base);
-            ErrorTrace_SetNoneError();
+
             return;
         }
         {
@@ -316,7 +308,7 @@ public:
 
             if (this->buf_size == BLOCK_SIZE)
             {
-                _t(this->update_blocks(out, this->buf, 1););
+                this->update_blocks(out, this->buf, 1);
                 this->buf_size = 0, out += BLOCK_SIZE;
             }
         }
@@ -324,21 +316,18 @@ public:
         {
             size_t block_num = inl / BLOCK_SIZE;
             size_t size      = block_num * BLOCK_SIZE;
-            _t(this->update_blocks(out, in, block_num););
+            this->update_blocks(out, in, block_num);
             out += size, in += size, inl -= size;
 
             memcpy(this->buf, in, inl);
             this->buf_size = inl, *outl = (size_t)(out - out_base);
         }
-        ErrorTrace_End();
     }
 
     void final(uint8_t* out, size_t* outl)
     {
-        ErrorTrace_Begin();
-        _t(this->final_block(out, this->buf, this->buf_size););
+        this->final_block(out, this->buf, this->buf_size);
         *outl = this->buf_size;
-        ErrorTrace_End();
     }
 };
 
@@ -362,17 +351,13 @@ public:
     EcbEncryptor() = default;
     EcbEncryptor(const uint8_t* user_key)
     {
-        ErrorTrace_Begin();
-        _t(this->init(user_key););
-        ErrorTrace_End();
+        this->init(user_key);
     }
 
 public:
     void init(const uint8_t* user_key)
     {
-        ErrorTrace_Begin();
-        _t(this->cipher.set_key(user_key, Cipher::ENCRYPTION););
-        ErrorTrace_End();
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
     }
 
     void reset() const noexcept
@@ -383,28 +368,22 @@ public:
 private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
-        ErrorTrace_Begin();
-        _t(this->cipher.crypt_blocks(out, in, block_num););
-        ErrorTrace_End();
+        this->cipher.crypt_blocks(out, in, block_num);
     }
 
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
-        ErrorTrace_Begin();
         if (inl == 0)
         {
-            ErrorTrace_SetNoneError();
             return;
         }
         // input len != 0
         if (inl != Cipher::BLOCK_SIZE)
         {
-            ErrorTrace_Raise();
-            throw std::runtime_error("input data length in ECB mode needs to "
-                                     "be an integer multiple of BLOCK_SIZE");
+            throw gmlib::Exception("input data length in ECB mode needs to "
+                                   "be an integer multiple of BLOCK_SIZE");
         }
-        _t(this->cipher.crypt_block(out, in));
-        ErrorTrace_End();
+        this->cipher.crypt_block(out, in);
     }
 };
 
@@ -422,17 +401,13 @@ public:
     EcbDecryptor() = default;
     EcbDecryptor(const uint8_t* user_key)
     {
-        ErrorTrace_Begin();
-        _t(this->init(user_key););
-        ErrorTrace_End();
+        this->init(user_key);
     }
 
 public:
     void init(const uint8_t* user_key)
     {
-        ErrorTrace_Begin();
-        _t(this->cipher.set_key(user_key, Cipher::DECRYPTION););
-        ErrorTrace_End();
+        this->cipher.set_key(user_key, Cipher::DECRYPTION);
     }
 
     void reset() const noexcept
@@ -443,28 +418,22 @@ public:
 private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
-        ErrorTrace_Begin();
-        _t(this->cipher.crypt_blocks(out, in, block_num););
-        ErrorTrace_End();
+        this->cipher.crypt_blocks(out, in, block_num);
     }
 
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
-        ErrorTrace_Begin();
         if (inl == 0)
         {
-            ErrorTrace_SetNoneError();
             return;
         }
         // input len != 0
         if (inl != Cipher::BLOCK_SIZE)
         {
-            ErrorTrace_Raise();
-            throw std::runtime_error("input data length in ECB mode needs to "
-                                     "be an integer multiple of BLOCK_SIZE");
+            throw gmlib::Exception("input data length in ECB mode needs to "
+                                   "be an integer multiple of BLOCK_SIZE");
         }
-        _t(this->cipher.crypt_block(out, in););
-        ErrorTrace_End();
+        this->cipher.crypt_block(out, in);
     }
 };
 
@@ -489,18 +458,14 @@ public:
     CbcEncryptor() = default;
     CbcEncryptor(const uint8_t* user_key, const uint8_t* iv)
     {
-        ErrorTrace_Begin();
-        _t(this->init(user_key, iv););
-        ErrorTrace_End();
+        this->init(user_key, iv);
     }
 
 public:
     void init(const uint8_t* user_key, const uint8_t* iv)
     {
-        ErrorTrace_Begin();
-        _t(this->cipher.set_key(user_key, Cipher::ENCRYPTION););
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
         memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
-        ErrorTrace_End();
     }
 
     void reset(const uint8_t* iv) noexcept
@@ -512,38 +477,32 @@ public:
 private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
-        ErrorTrace_Begin();
         constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
 
         uint8_t* cur_iv = this->iv;
         while (block_num)
         {
             CipherModeUtil::memxor<BLOCK_SIZE>(this->iv, in, cur_iv);
-            _t(this->cipher.crypt_block(out, this->iv););
+            this->cipher.crypt_block(out, this->iv);
             cur_iv = out;
             in += BLOCK_SIZE, out += BLOCK_SIZE, block_num--;
         }
         memcpy(this->iv, cur_iv, BLOCK_SIZE);
-        ErrorTrace_End();
     }
 
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
-        ErrorTrace_Begin();
         if (inl == 0)
         {
-            ErrorTrace_SetNoneError();
             return;
         }
         // input len != 0
         if (inl != Cipher::BLOCK_SIZE)
         {
-            ErrorTrace_Raise();
-            throw std::runtime_error("input data length in CBC mode needs to "
-                                     "be an integer multiple of BLOCK_SIZE");
+            throw gmlib::Exception("input data length in CBC mode needs to "
+                                   "be an integer multiple of BLOCK_SIZE");
         }
-        _t(this->update_blocks(out, in, 1););
-        ErrorTrace_End();
+        this->update_blocks(out, in, 1);
     }
 };
 
@@ -562,18 +521,14 @@ public:
     CbcDecryptor() = default;
     CbcDecryptor(const uint8_t* user_key, const uint8_t* iv)
     {
-        ErrorTrace_Begin();
-        _t(this->init(user_key, iv););
-        ErrorTrace_End();
+        this->init(user_key, iv);
     }
 
 public:
     void init(const uint8_t* user_key, const uint8_t* iv)
     {
-        ErrorTrace_Begin();
-        _t(this->cipher.set_key(user_key, Cipher::DECRYPTION););
+        this->cipher.set_key(user_key, Cipher::DECRYPTION);
         memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
-        ErrorTrace_End();
     }
 
     void reset(const uint8_t* iv) noexcept
@@ -585,7 +540,6 @@ public:
 private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
-        ErrorTrace_Begin();
         constexpr size_t BLOCK_SIZE     = Cipher::BLOCK_SIZE;
         constexpr size_t PARALLEL_NUM   = Cipher::PARALLEL_NUM;
         constexpr size_t PARALLEL_BYTES = BLOCK_SIZE * PARALLEL_NUM;
@@ -596,7 +550,7 @@ private:
         {
             memcpy(next_iv, in + REMAIN, BLOCK_SIZE);
 
-            _t(this->cipher.crypt_blocks_parallel(buffer, in););
+            this->cipher.crypt_blocks_parallel(buffer, in);
             CipherModeUtil::memxor<BLOCK_SIZE>(out, buffer, this->iv);
             uint8_t *ptr1 = out + BLOCK_SIZE, *ptr2 = buffer + BLOCK_SIZE;
             CipherModeUtil::memxor<REMAIN>(ptr1, ptr2, in);
@@ -610,33 +564,28 @@ private:
             size_t remain = (block_num - 1) * BLOCK_SIZE;
             memcpy(next_iv, in + remain, BLOCK_SIZE);
 
-            _t(this->cipher.crypt_blocks(buffer, in, block_num););
+            this->cipher.crypt_blocks(buffer, in, block_num);
             CipherModeUtil::memxor<BLOCK_SIZE>(out, buffer, this->iv);
             uint8_t *ptr1 = out + BLOCK_SIZE, *ptr2 = buffer + BLOCK_SIZE;
             CipherModeUtil::memxor_n(ptr1, ptr2, in, remain);
 
             memcpy(this->iv, next_iv, BLOCK_SIZE);
         }
-        ErrorTrace_End();
     }
 
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
-        ErrorTrace_Begin();
         if (inl == 0)
         {
-            ErrorTrace_SetNoneError();
             return;
         }
         // input len != 0
         if (inl != Cipher::BLOCK_SIZE)
         {
-            ErrorTrace_Raise();
-            throw std::runtime_error("input data length in CBC mode needs to "
-                                     "be an integer multiple of BLOCK_SIZE");
+            throw gmlib::Exception("input data length in CBC mode needs to "
+                                   "be an integer multiple of BLOCK_SIZE");
         }
-        _t(this->update_blocks(out, in, 1););
-        ErrorTrace_End();
+        this->update_blocks(out, in, 1);
     }
 };
 
@@ -661,18 +610,14 @@ public:
     CfbEncryptor() = default;
     CfbEncryptor(const uint8_t* user_key, const uint8_t* iv)
     {
-        ErrorTrace_Begin();
-        _t(this->init(user_key, iv););
-        ErrorTrace_End();
+        this->init(user_key, iv);
     }
 
 public:
     void init(const uint8_t* user_key, const uint8_t* iv)
     {
-        ErrorTrace_Begin();
-        _t(this->cipher.set_key(user_key, Cipher::ENCRYPTION););
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
         memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
-        ErrorTrace_End();
     }
 
     void reset(const uint8_t* iv) noexcept
@@ -684,32 +629,27 @@ public:
 private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
-        ErrorTrace_Begin();
         constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
 
         uint8_t* pre_ct = this->iv;
         while (block_num)
         {
-            _t(this->cipher.crypt_block(this->iv, pre_ct););
+            this->cipher.crypt_block(this->iv, pre_ct);
             CipherModeUtil::memxor<BLOCK_SIZE>(out, in, this->iv);
             pre_ct = out;
             in += BLOCK_SIZE, out += BLOCK_SIZE, block_num--;
         }
         memcpy(this->iv, pre_ct, BLOCK_SIZE);
-        ErrorTrace_End();
     }
 
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
-        ErrorTrace_Begin();
         if (inl == 0)
         {
-            ErrorTrace_SetNoneError();
             return;
         }
-        _t(this->cipher.crypt_block(this->iv, this->iv););
+        this->cipher.crypt_block(this->iv, this->iv);
         CipherModeUtil::memxor_n(out, this->iv, in, inl);
-        ErrorTrace_End();
     }
 };
 
@@ -728,18 +668,14 @@ public:
     CfbDecryptor() = default;
     CfbDecryptor(const uint8_t* user_key, const uint8_t* iv)
     {
-        ErrorTrace_Begin();
-        _t(this->init(user_key, iv));
-        ErrorTrace_End();
+        this->init(user_key, iv);
     }
 
 public:
     void init(const uint8_t* user_key, const uint8_t* iv)
     {
-        ErrorTrace_Begin();
-        _t(this->cipher.set_key(user_key, Cipher::ENCRYPTION););
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
         memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
-        ErrorTrace_End();
     }
 
     void reset(const uint8_t* iv) noexcept
@@ -751,7 +687,6 @@ public:
 private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
-        ErrorTrace_Begin();
         constexpr size_t BLOCK_SIZE     = Cipher::BLOCK_SIZE;
         constexpr size_t PARALLEL_NUM   = Cipher::PARALLEL_NUM;
         constexpr size_t PARALLEL_BYTES = BLOCK_SIZE * PARALLEL_NUM;
@@ -763,7 +698,7 @@ private:
             memcpy(buffer, this->iv, BLOCK_SIZE);
             memcpy(buffer + BLOCK_SIZE, in, REMAIN);
             memcpy(this->iv, in + REMAIN, BLOCK_SIZE);
-            _t(this->cipher.crypt_blocks_parallel(buffer, buffer););
+            this->cipher.crypt_blocks_parallel(buffer, buffer);
             CipherModeUtil::memxor<PARALLEL_BYTES>(out, in, buffer);
             out += PARALLEL_BYTES;
             in += PARALLEL_BYTES, block_num -= PARALLEL_NUM;
@@ -775,23 +710,19 @@ private:
             memcpy(buffer, this->iv, BLOCK_SIZE);
             memcpy(buffer + BLOCK_SIZE, in, remain_bytes - BLOCK_SIZE);
             memcpy(this->iv, nxt_iv, BLOCK_SIZE);
-            _t(this->cipher.crypt_blocks(buffer, buffer, block_num););
+            this->cipher.crypt_blocks(buffer, buffer, block_num);
             CipherModeUtil::memxor_n(out, in, buffer, remain_bytes);
         }
-        ErrorTrace_End();
     }
 
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
-        ErrorTrace_Begin();
         if (inl == 0)
         {
-            ErrorTrace_SetNoneError();
             return;
         }
-        _t(this->cipher.crypt_block(this->iv, this->iv););
+        this->cipher.crypt_block(this->iv, this->iv);
         CipherModeUtil::memxor_n(out, in, this->iv, inl);
-        ErrorTrace_End();
     }
 };
 
@@ -816,18 +747,14 @@ public:
     OfbCryptor() = default;
     OfbCryptor(const uint8_t* user_key, const uint8_t* iv)
     {
-        ErrorTrace_Begin();
-        _t(this->init(user_key, iv););
-        ErrorTrace_End();
+        this->init(user_key, iv);
     }
 
 public:
     void init(const uint8_t* user_key, const uint8_t* iv)
     {
-        ErrorTrace_Begin();
-        _t(this->cipher.set_key(user_key, Cipher::ENCRYPTION););
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
         memcpy(this->iv, iv, Cipher::BLOCK_SIZE);
-        ErrorTrace_End();
     }
 
     void reset(const uint8_t* iv) noexcept
@@ -841,50 +768,43 @@ private:
     {
         assert(outl % Cipher::BLOCK_SIZE == 0);
 
-        ErrorTrace_Begin();
         constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
 
         uint8_t* pre_ct = this->iv;
         do
         {
-            _t(this->cipher.crypt_block(out, pre_ct););
+            this->cipher.crypt_block(out, pre_ct);
             pre_ct = out;
             out += BLOCK_SIZE, outl -= BLOCK_SIZE;
         } while (outl >= BLOCK_SIZE);
         memcpy(this->iv, pre_ct, BLOCK_SIZE);
-        ErrorTrace_End();
     }
 
 private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
-        ErrorTrace_Begin();
         constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
 
         uint8_t key_stream[BLOCK_SIZE];
         while (block_num)
         {
-            _t(this->gen_key_stream(key_stream, BLOCK_SIZE););
+            this->gen_key_stream(key_stream, BLOCK_SIZE);
             CipherModeUtil::memxor<BLOCK_SIZE>(out, in, key_stream);
             in += BLOCK_SIZE, out += BLOCK_SIZE, block_num--;
         }
-        ErrorTrace_End();
     }
 
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
-        ErrorTrace_Begin();
         constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
 
         if (inl == 0)
         {
-            ErrorTrace_SetNoneError();
             return;
         }
         uint8_t key_stream[BLOCK_SIZE];
-        _t(this->gen_key_stream(key_stream, BLOCK_SIZE););
+        this->gen_key_stream(key_stream, BLOCK_SIZE);
         CipherModeUtil::memxor_n(out, in, key_stream, inl);
-        ErrorTrace_End();
     }
 };
 
@@ -915,18 +835,14 @@ public:
     CtrCryptor() = default;
     CtrCryptor(const uint8_t* user_key, const uint8_t* iv)
     {
-        ErrorTrace_Begin();
-        _t(this->init(user_key, iv););
-        ErrorTrace_End();
+        this->init(user_key, iv);
     }
 
 public:
     void init(const uint8_t* user_key, const uint8_t* iv)
     {
-        ErrorTrace_Begin();
-        _t(this->cipher.set_key(user_key, Cipher::ENCRYPTION););
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
         memcpy(this->counter, iv, Cipher::BLOCK_SIZE);
-        ErrorTrace_End();
     }
 
     void reset(const uint8_t* iv) noexcept
@@ -938,10 +854,8 @@ public:
 private:
     void gen_block_key_stream(uint8_t* out, size_t block_num)
     {
-        ErrorTrace_Begin();
         if (block_num == 0)
         {
-            ErrorTrace_SetNoneError();
             return;
         }
         constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
@@ -956,14 +870,12 @@ private:
         }
         CipherModeUtil::ctr_inc<BLOCK_SIZE>(this->counter, cur_counter);
         // generate key stream
-        _t(this->cipher.crypt_blocks(out, out, block_num););
-        ErrorTrace_End();
+        this->cipher.crypt_blocks(out, out, block_num);
     }
 
 private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
-        ErrorTrace_Begin();
         constexpr size_t BLOCK_SIZE     = Cipher::BLOCK_SIZE;
         constexpr size_t PARALLEL_NUM   = Cipher::PARALLEL_NUM;
         constexpr size_t PARALLEL_BYTES = BLOCK_SIZE * PARALLEL_NUM;
@@ -971,7 +883,7 @@ private:
         uint8_t key_stream[PARALLEL_BYTES];
         while (block_num >= PARALLEL_NUM)
         {
-            _t(this->gen_block_key_stream(key_stream, PARALLEL_NUM););
+            this->gen_block_key_stream(key_stream, PARALLEL_NUM);
             CipherModeUtil::memxor<PARALLEL_BYTES>(out, in, key_stream);
             in += PARALLEL_BYTES, out += PARALLEL_BYTES;
             block_num -= PARALLEL_NUM;
@@ -979,25 +891,21 @@ private:
         if (block_num)
         {
             size_t remain_bytes = block_num * BLOCK_SIZE;
-            _t(this->gen_block_key_stream(key_stream, block_num););
+            this->gen_block_key_stream(key_stream, block_num);
             CipherModeUtil::memxor_n(out, in, key_stream, remain_bytes);
         }
-        ErrorTrace_End();
     }
 
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
-        ErrorTrace_Begin();
         if (inl == 0)
         {
-            ErrorTrace_SetNoneError();
             return;
         }
         constexpr size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
         uint8_t          key_stream[BLOCK_SIZE];
-        _t(this->gen_block_key_stream(key_stream, 1););
+        this->gen_block_key_stream(key_stream, 1);
         CipherModeUtil::memxor_n(out, key_stream, in, inl);
-        ErrorTrace_End();
     }
 };
 
@@ -1041,9 +949,7 @@ public:
                  const uint8_t* aad,
                  size_t         aad_len)
     {
-        ErrorTrace_Begin();
-        _t(this->init(user_key, iv, iv_len, aad, aad_len););
-        ErrorTrace_End();
+        this->init(user_key, iv, iv_len, aad, aad_len);
     }
 
 public:
@@ -1053,22 +959,20 @@ public:
               const uint8_t* aad,
               size_t         aad_len)
     {
-        ErrorTrace_Begin();
         uint8_t t[16];
-        _t(this->cipher.set_key(user_key, Cipher::ENCRYPTION););
-        _t(this->cipher.crypt_block(t, this->ZERO););
-        _t(this->mac.set_key(t););
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
+        this->cipher.crypt_block(t, this->ZERO);
+        this->mac.set_key(t);
         // init counter
-        _t(CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
-                                               iv_len););
+        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
+                                            iv_len);
         CipherModeUtil::gctr_inc(this->counter, this->counter0);
         // gmac aad(additional authenticated data)
-        _t(this->mac.update(aad, aad_len););
-        _t(this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16););
+        this->mac.update(aad, aad_len);
+        this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16);
         this->aad_len = aad_len;
         this->ct_len  = 0;
         memset(this->tag, 0, sizeof(tag));
-        ErrorTrace_End();
     }
 
     void reset(const uint8_t* iv,
@@ -1076,20 +980,18 @@ public:
                const uint8_t* aad,
                size_t         aad_len)
     {
-        ErrorTrace_Begin();
         this->CipherCryptor<Cipher::BLOCK_SIZE>::reset();
-        _t(this->mac.reset(););
-        _t(CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
-                                               iv_len););
+        this->mac.reset();
+        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
+                                            iv_len);
         CipherModeUtil::gctr_inc(this->counter, this->counter0);
         // gmac aad(additional authenticated data)
-        _t(this->mac.update(aad, aad_len););
-        _t(this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16););
+        this->mac.update(aad, aad_len);
+        this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16);
 
         this->aad_len = aad_len;
         this->ct_len  = 0;
         memset(this->tag, 0, sizeof(tag));
-        ErrorTrace_End();
     }
 
     void get_tag(uint8_t tag[16]) const noexcept
@@ -1100,10 +1002,8 @@ public:
 private:
     void gen_block_key_stream(uint8_t* out, size_t block_num)
     {
-        ErrorTrace_Begin();
         if (block_num == 0)
         {
-            ErrorTrace_SetNoneError();
             return;
         }
         // generate counter
@@ -1117,17 +1017,14 @@ private:
         }
         CipherModeUtil::gctr_inc(this->counter, cur_counter);
         // generate key stream
-        _t(this->cipher.crypt_blocks(out, out, block_num););
-        ErrorTrace_End();
+        this->cipher.crypt_blocks(out, out, block_num);
     }
 
 private:
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
-        ErrorTrace_Begin();
         if (block_num == 0)
         {
-            ErrorTrace_SetNoneError();
             return;
         }
         constexpr size_t BLOCK_SIZE     = Cipher::BLOCK_SIZE;
@@ -1139,7 +1036,7 @@ private:
         uint8_t key_stream[PARALLEL_BYTES];
         while (block_num >= PARALLEL_NUM)
         {
-            _t(this->gen_block_key_stream(key_stream, PARALLEL_NUM););
+            this->gen_block_key_stream(key_stream, PARALLEL_NUM);
             CipherModeUtil::memxor<PARALLEL_BYTES>(out, in, key_stream);
             in += PARALLEL_BYTES, out += PARALLEL_BYTES;
             block_num -= PARALLEL_NUM;
@@ -1147,35 +1044,32 @@ private:
         if (block_num)
         {
             size_t remain_bytes = block_num * BLOCK_SIZE;
-            _t(this->gen_block_key_stream(key_stream, block_num););
+            this->gen_block_key_stream(key_stream, block_num);
             CipherModeUtil::memxor_n(out, in, key_stream, remain_bytes);
         }
         // gmac
-        _t(this->mac.update(base_out, (size_t)(out - base_out)););
+        this->mac.update(base_out, (size_t)(out - base_out));
         this->ct_len += (size_t)(out - base_out);
-        ErrorTrace_End();
     }
 
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
-        ErrorTrace_Begin();
         if (inl != 0)
         {
             uint8_t key_stream[16];
-            _t(this->gen_block_key_stream(key_stream, 1););
+            this->gen_block_key_stream(key_stream, 1);
             CipherModeUtil::memxor_n(out, key_stream, in, inl);
-            _t(this->mac.update(out, inl););
-            _t(this->mac.update(this->ZERO, (16 - inl % 16) % 16););
+            this->mac.update(out, inl);
+            this->mac.update(this->ZERO, (16 - inl % 16) % 16);
             this->ct_len += inl;
         }
         uint8_t t[16];
         CipherModeUtil::MEM_STORE64BE(t + 0, this->aad_len * 8);
         CipherModeUtil::MEM_STORE64BE(t + 8, this->ct_len * 8);
-        _t(this->mac.update(t, 16););
-        _t(this->mac.final(this->tag););
-        _t(this->cipher.crypt_block(t, this->counter0););
+        this->mac.update(t, 16);
+        this->mac.final(this->tag);
+        this->cipher.crypt_block(t, this->counter0);
         CipherModeUtil::memxor<16>(this->tag, this->tag, t);
-        ErrorTrace_End();
     }
 };
 
@@ -1207,9 +1101,7 @@ public:
                  const uint8_t* aad,
                  size_t         aad_len)
     {
-        ErrorTrace_Begin();
-        _t(this->init(user_key, iv, iv_len, aad, aad_len););
-        ErrorTrace_End();
+        this->init(user_key, iv, iv_len, aad, aad_len);
     }
 
 public:
@@ -1219,23 +1111,21 @@ public:
               const uint8_t* aad,
               size_t         aad_len)
     {
-        ErrorTrace_Begin();
         uint8_t t[16];
-        _t(this->cipher.set_key(user_key, Cipher::ENCRYPTION););
-        _t(this->cipher.crypt_block(t, this->ZERO););
-        _t(this->mac.set_key(t););
+        this->cipher.set_key(user_key, Cipher::ENCRYPTION);
+        this->cipher.crypt_block(t, this->ZERO);
+        this->mac.set_key(t);
         // init counter
-        _t(CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
-                                               iv_len););
+        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
+                                            iv_len);
         CipherModeUtil::gctr_inc(this->counter, this->counter0);
         // gmac aad(additional authenticated data)
-        _t(this->mac.update(aad, aad_len););
-        _t(this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16););
+        this->mac.update(aad, aad_len);
+        this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16);
 
         this->aad_len = aad_len;
         this->ct_len  = 0;
         memset(this->tag, 0, sizeof(tag));
-        ErrorTrace_End();
     }
 
     void reset(const uint8_t* iv,
@@ -1243,20 +1133,18 @@ public:
                const uint8_t* aad,
                size_t         aad_len)
     {
-        ErrorTrace_Begin();
         this->CipherCryptor<Cipher::BLOCK_SIZE>::reset();
-        _t(this->mac.reset(););
-        _t(CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
-                                               iv_len););
+        this->mac.reset();
+        CipherModeUtil::gcm_init_cnt<GHash>(&this->mac, this->counter0, iv,
+                                            iv_len);
         CipherModeUtil::gctr_inc(this->counter, this->counter0);
         // gmac aad(additional authenticated data)
-        _t(this->mac.update(aad, aad_len););
-        _t(this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16););
+        this->mac.update(aad, aad_len);
+        this->mac.update(this->ZERO, (16 - (aad_len % 16)) % 16);
 
         this->aad_len = aad_len;
         this->ct_len  = 0;
         memset(this->tag, 0, sizeof(tag));
-        ErrorTrace_End();
     }
 
     void set_tag(const uint8_t tag[16]) noexcept
@@ -1267,10 +1155,8 @@ public:
 private:
     void gen_block_key_stream(uint8_t* out, size_t block_num)
     {
-        ErrorTrace_Begin();
         if (block_num == 0)
         {
-            ErrorTrace_SetNoneError();
             return;
         }
         // generate counter
@@ -1284,20 +1170,17 @@ private:
         }
         CipherModeUtil::gctr_inc(this->counter, cur_counter);
         // generate key stream
-        _t(this->cipher.crypt_blocks(out, out, block_num););
-        ErrorTrace_End();
+        this->cipher.crypt_blocks(out, out, block_num);
     }
 
     void update_blocks(uint8_t* out, const uint8_t* in, size_t block_num)
     {
-        ErrorTrace_Begin();
         if (block_num == 0)
         {
-            ErrorTrace_SetNoneError();
             return;
         }
         // gmac
-        _t(this->mac.update(in, block_num * Cipher::BLOCK_SIZE););
+        this->mac.update(in, block_num * Cipher::BLOCK_SIZE);
         this->ct_len += block_num * Cipher::BLOCK_SIZE;
 
         constexpr size_t BLOCK_SIZE     = Cipher::BLOCK_SIZE;
@@ -1309,7 +1192,7 @@ private:
         uint8_t key_stream[PARALLEL_BYTES];
         while (block_num >= PARALLEL_NUM)
         {
-            _t(this->gen_block_key_stream(key_stream, PARALLEL_NUM););
+            this->gen_block_key_stream(key_stream, PARALLEL_NUM);
             CipherModeUtil::memxor<PARALLEL_BYTES>(out, in, key_stream);
             in += PARALLEL_BYTES, out += PARALLEL_BYTES;
             block_num -= PARALLEL_NUM;
@@ -1317,44 +1200,38 @@ private:
         if (block_num)
         {
             size_t remain_bytes = block_num * BLOCK_SIZE;
-            _t(this->gen_block_key_stream(key_stream, block_num););
+            this->gen_block_key_stream(key_stream, block_num);
             CipherModeUtil::memxor_n(out, in, key_stream, remain_bytes);
         }
-        ErrorTrace_End();
     }
 
     void final_block(uint8_t* out, const uint8_t* in, size_t inl)
     {
-        ErrorTrace_Begin();
         if (inl != 0)
         {
-            _t(this->mac.update(in, inl););
-            _t(this->mac.update(this->ZERO, (16 - inl % 16) % 16););
+            this->mac.update(in, inl);
+            this->mac.update(this->ZERO, (16 - inl % 16) % 16);
             this->ct_len += inl;
 
             uint8_t key_stream[16];
-            _t(this->gen_block_key_stream(key_stream, 1););
+            this->gen_block_key_stream(key_stream, 1);
             CipherModeUtil::memxor_n(out, key_stream, in, inl);
         }
         uint8_t t[16], t1[16];
         CipherModeUtil::MEM_STORE64BE(t + 0, this->aad_len * 8);
         CipherModeUtil::MEM_STORE64BE(t + 8, this->ct_len * 8);
-        _t(this->mac.update(t, 16););
-        _t(this->mac.final(t););
+        this->mac.update(t, 16);
+        this->mac.final(t);
 
-        _t(this->cipher.crypt_block(t1, this->counter0););
+        this->cipher.crypt_block(t1, this->counter0);
         CipherModeUtil::memxor<16>(t, t1, t);
         if (memcmp(this->tag, t, 16) != 0)
         {
-            ErrorTrace_Raise();
-            throw std::runtime_error("GCM tag check fail");
+            throw gmlib::Exception("GCM tag check fail");
         }
-        ErrorTrace_End();
     }
 };
 
 }; // namespace gmlib
-
-#undef _t // ErrorTrace_trace
 
 #endif

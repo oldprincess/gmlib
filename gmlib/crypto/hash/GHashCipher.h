@@ -26,7 +26,7 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #define _GMLIB_CRYPTO_HASH_GHASH_H
 
 #include <TinyCrypto/hash/ghash/ghash_lut256.h>
-#include <stdexcept>
+#include <gmlib/exception.h>
 
 namespace gmlib {
 
@@ -68,7 +68,7 @@ public:
     {
         if (tc::ghash_lut256_final(&this->ctx, digest))
         {
-            throw std::runtime_error("ghash invalid data length");
+            throw gmlib::Exception("ghash invalid data length");
         }
     }
 };

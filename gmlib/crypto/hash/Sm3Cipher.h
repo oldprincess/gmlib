@@ -25,7 +25,7 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #define _GMLIB_CRYPTO_HASH_SM3_CIPHER_H
 
 #include <TinyCrypto/hash/sm3/sm3_fast.h>
-#include <stdexcept>
+#include <gmlib/exception.h>
 
 namespace gmlib {
 
@@ -57,7 +57,7 @@ public:
     {
         if (tc::sm3_fast_update(&this->ctx, in, inl))
         {
-            throw std::runtime_error("sm3 input bits overflow");
+            throw gmlib::Exception("sm3 input bits overflow");
         }
     }
 
