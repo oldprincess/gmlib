@@ -65,6 +65,13 @@ public:
     {
         tc::sm3_fast_final(&this->ctx, digest);
     }
+
+    static void compute(uint8_t digest[32], const uint8_t* msg, size_t msg_len)
+    {
+        Sm3Cipher h;
+        h.update(msg, msg_len);
+        h.final(digest);
+    }
 };
 
 }; // namespace gmlib

@@ -57,9 +57,18 @@ public:
         tc::md5_standard_update(&this->ctx, in, inl);
     }
 
-    void final(uint8_t digest[32]) noexcept
+    void final(uint8_t digest[16]) noexcept
     {
         tc::md5_standard_final(&this->ctx, digest);
+    }
+
+    static void compute(uint8_t        digest[16],
+                        const uint8_t* msg,
+                        size_t         msg_len) noexcept
+    {
+        Md5Cipher h;
+        h.update(msg, msg_len);
+        h.final(digest);
     }
 };
 

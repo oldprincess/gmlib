@@ -71,6 +71,16 @@ public:
             throw gmlib::Exception("ghash invalid data length");
         }
     }
+
+    static void compute(uint8_t        digest[16],
+                        const uint8_t  H[16],
+                        const uint8_t* msg,
+                        size_t         msg_len)
+    {
+        auto h = GHashCipher(H);
+        h.update(msg, msg_len);
+        h.final(digest);
+    }
 };
 
 }; // namespace gmlib

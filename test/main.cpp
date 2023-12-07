@@ -8,7 +8,7 @@ void TestCipherMode();
 void TestGcmMode();
 void TestGHashCipher();
 void TestUBlockCipher_Standard();
-
+void TestHMacCipher();
 int main()
 {
     try
@@ -20,6 +20,7 @@ int main()
         // TestGHashCipher();
         TestGcmMode();
         TestUBlockCipher_Standard();
+        TestHMacCipher();
     }
     catch (exception& e)
     {
