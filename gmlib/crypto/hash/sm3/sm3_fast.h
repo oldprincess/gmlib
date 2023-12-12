@@ -21,15 +21,61 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#ifndef _GMLIB_CRYPTO_HASH_SM3_CIPHER_H
-#define _GMLIB_CRYPTO_HASH_SM3_CIPHER_H
+#ifndef _GMLIB_CRYPTO_HASH_SM3_FAST_H
+#define _GMLIB_CRYPTO_HASH_SM3_FAST_H
 
-#include <gmlib/crypto/hash/sm3/sm3_fast.h>
+#include <TinyCrypto/hash/sm3/sm3_fast.h>
+#include <gmlib/exception.h>
 
 namespace gmlib {
 
-using Sm3Cipher = sm3_fast::Sm3Cipher;
+namespace sm3_fast {
+
+class Sm3Cipher
+{
+public:
+    static constexpr size_t BLOCK_SIZE  = SM3_BLOCK_SIZE;
+    static constexpr size_t DIGEST_SIZE = SM3_DIGEST_SIZE;
+
+private:
+    tc::Sm3FastCTX ctx;
+
+public:
+    Sm3Cipher() noexcept
+    {
+        tc::sm3_fast_init(&this->ctx);
+    }
+
+public:
+    void reset() noexcept
+    {
+        tc::sm3_fast_reset(&this->ctx);
+    }
+
+    void update(const uint8_t* in, size_t inl)
+    {
+        if (tc::sm3_fast_update(&this->ctx, in, inl))
+        {
+            throw gmlib::Exception("sm3 input bits overflow");
+        }
+    }
+
+    void final(uint8_t digest[32]) noexcept
+    {
+        tc::sm3_fast_final(&this->ctx, digest);
+    }
+
+public:
+    static void compute(uint8_t digest[32], const uint8_t* msg, size_t msg_len)
+    {
+        Sm3Cipher h;
+        h.update(msg, msg_len);
+        h.final(digest);
+    }
+};
+
+} // namespace sm3_fast
 
 }; // namespace gmlib
 
-#endif // !_GMLIB_CRYPTO_HASH_SM3_CIPHER_H
+#endif // !_GMLIB_CRYPTO_HASH_SM3_FAST_H
