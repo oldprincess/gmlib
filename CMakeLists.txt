@@ -15,23 +15,10 @@ set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 # set thirdparty include path
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/spdlog/include)
 
 file(GLOB_RECURSE GMLIB_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/gmlib/*.h)
 file(GLOB_RECURSE GMLIB_TEST_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp)
 
-# set(GMLIB_TEST_SOURCE_FILES
-#     "test/crypto/cipher/TestAesCipher.cpp"
-#     "test/crypto/cipher/TestSm4Cipher.cpp"
-#     "test/crypto/cipher/TestGcmMode.cpp"
-#     "test/crypto/cipher/TestCipherMode.cpp"
-#     #"test/crypto/hash/TestGHashCipher.cpp"
-#     "test/crypto/hash/TestSm3Cipher.cpp"
-
-#     "test/crypto_ex/TestUBlockCipher_Standard.cpp"
-#     "test/main.cpp"
-# )
-
 add_subdirectory(TinyCrypto)
 add_executable(gmlib_test ${GMLIB_TEST_SOURCE_FILES} ${GMLIB_HEADER_FILES})
-target_link_libraries(gmlib_test tinycrypto)
+target_link_libraries(gmlib_test static_tinycrypto)
