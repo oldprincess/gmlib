@@ -1,15 +1,15 @@
 #include <gmlib/crypto/hash/GHashCipher.h>
+#include <gmlib/crypto/rng/OsRngCipher.h>
 #include <stdexcept>
 #include <cstdlib>
 #include <iostream>
-#include <gmlib/crypto_ex/win/WinRng.h>
 using namespace gmlib;
 using namespace std;
 
 void TestGHashCipher()
 {
-    uint8_t buf[1024], d1[16], d2[16], H[16];
-    WinRng  rng;
+    uint8_t     buf[1024], d1[16], d2[16], H[16];
+    OsRngCipher rng;
     for (int i = 0; i < 100; i++)
     {
         size_t size = sizeof(buf);

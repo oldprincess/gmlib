@@ -1,36 +1,36 @@
-#ifndef _GMLIB_CRYPTO_EX_WIN_RNG_H
-#define _GMLIB_CRYPTO_EX_WIN_RNG_H
+#ifndef _GMLIB_CRYPTO_RNG_OS_WINCRYPT_RNG_H
+#define _GMLIB_CRYPTO_RNG_OS_WINCRYPT_RNG_H
 
 #include <gmlib/crypto/rng/RngCipher.h>
-#include <stdexcept>
+#include <gmlib/exception.h>
 #include <Windows.h>
 #include <wincrypt.h>
 
 namespace gmlib {
 
-class WinRng : public RngCipher
+namespace wincrypt_rng {
+
+class WinRngCipher : public RngCipher
 {
 private:
     HCRYPTPROV hCryptProv;
 
 public:
-    WinRng()
+    WinRngCipher()
     {
         BOOL ret;
-        ret = CryptAcquireContext(&(this->hCryptProv),
-                                  NULL,
-                                  NULL,
-                                  PROV_RSA_FULL,
-                                  CRYPT_VERIFYCONTEXT | CRYPT_SILENT);
+        ret =
+            CryptAcquireContext(&(this->hCryptProv), NULL, NULL, PROV_RSA_FULL,
+                                CRYPT_VERIFYCONTEXT | CRYPT_SILENT);
         if (ret == FALSE)
         {
-            throw std::runtime_error("Err in call CryptAcquireContext");
+            throw gmlib::Exception("Err in call CryptAcquireContext");
         }
     }
 
-    WinRng(const WinRng& other) = delete;
+    WinRngCipher(const WinRngCipher& other) = delete;
 
-    ~WinRng()
+    ~WinRngCipher()
     {
         BOOL ret;
         ret = CryptReleaseContext(this->hCryptProv, 0);
@@ -44,7 +44,7 @@ public:
 public:
     const char* name() noexcept
     {
-        return "WinRng(CryptGenRandom)";
+        return "WinRngCipher(CryptGenRandom)";
     }
 
 public:
@@ -71,7 +71,7 @@ public:
             ret = CryptGenRandom(this->hCryptProv, MAXDWORD, out);
             if (ret == FALSE)
             {
-                throw std::runtime_error("Err in call CryptGenRandom");
+                throw gmlib::Exception("Err in call CryptGenRandom");
             }
             out += MAXDWORD, len -= MAXDWORD;
         }
@@ -80,12 +80,14 @@ public:
             ret = CryptGenRandom(this->hCryptProv, (DWORD)len, out);
             if (ret == FALSE)
             {
-                throw std::runtime_error("Err in call CryptGenRandom");
+                throw gmlib::Exception("Err in call CryptGenRandom");
             }
         }
     }
 };
 
+} // namespace wincrypt_rng
+
 }; // namespace gmlib
 
-#endif // !_GMLIB_CRYPTO_EX_WIN_RNG_H
+#endif // !_GMLIB_CRYPTO_RNG_WIN_WINCRYPT_RNG_H

@@ -1,8 +1,8 @@
-#ifndef _GMLIB_CRYPTO_EX_WIN_RNG2_H
-#define _GMLIB_CRYPTO_EX_WIN_RNG2_H
+#ifndef _GMLIB_CRYPTO_RNG_OS_BCRYPT_RNG_H
+#define _GMLIB_CRYPTO_RNG_OS_BCRYPT_RNG_H
 
 #include <gmlib/crypto/rng/RngCipher.h>
-#include <stdexcept>
+#include <gmlib/exception.h>
 #include <Windows.h>
 #include <bcrypt.h>
 
@@ -10,17 +10,14 @@
 
 namespace gmlib {
 
-class WinRng2 : public RngCipher
-{
-public:
-    WinRng2()                     = default;
-    WinRng2(const WinRng2& other) = default;
-    ~WinRng2()                    = default;
+namespace bcrypt_rng {
 
+class WinRngCipher : public RngCipher
+{
 public:
     const char* name() noexcept
     {
-        return "WinRng2(BCryptGenRandom)";
+        return "WinRngCipher(BCryptGenRandom)";
     }
 
 public:
@@ -37,30 +34,28 @@ public:
         NTSTATUS ret;
         while (len >= ULONG_MAX)
         {
-            ret = BCryptGenRandom(NULL,
-                                  out,
-                                  ULONG_MAX,
+            ret = BCryptGenRandom(NULL, out, ULONG_MAX,
                                   BCRYPT_USE_SYSTEM_PREFERRED_RNG);
             if (ret < 0)
             {
-                throw std::runtime_error("Err in call BCryptGenRandom");
+                throw gmlib::Exception("Err in call BCryptGenRandom");
             }
             out += ULONG_MAX, len -= ULONG_MAX;
         }
         if (len)
         {
-            ret = BCryptGenRandom(NULL,
-                                  out,
-                                  ULONG(len),
+            ret = BCryptGenRandom(NULL, out, (ULONG)len,
                                   BCRYPT_USE_SYSTEM_PREFERRED_RNG);
             if (ret < 0)
             {
-                throw std::runtime_error("Err in call BCryptGenRandom");
+                throw gmlib::Exception("Err in call BCryptGenRandom");
             }
         }
     }
 };
 
+} // namespace bcrypt_rng
+
 }; // namespace gmlib
 
-#endif // !_GMLIB_CRYPTO_EX_WIN_RNG2_H
+#endif // !_GMLIB_CRYPTO_RNG_WIN_BCRYPT_RNG2_H
