@@ -22,15 +22,17 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef _GMLIB_CRYPTO_EX_GHASH_CIPHER_PCLMUL_H
-#define _GMLIB_CRYPTO_EX_GHASH_CIPHER_PCLMUL_H
+#ifndef _GMLIB_CRYPTO_HASH_GHASH_PCLMUL_H
+#define _GMLIB_CRYPTO_HASH_GHASH_PCLMUL_H
 
 #include <TinyCrypto/hash/ghash/ghash_pclmul.h>
-#include <stdexcept>
+#include <gmlib/exception.h>
 
 namespace gmlib {
 
-class GHashCipher_Pclmul
+namespace ghash_pclmul {
+
+class GHashCipher
 {
 public:
     static constexpr size_t DIGEST_SIZE = GHASH_DIGEST_SIZE;
@@ -39,14 +41,12 @@ private:
     tc::GHashPclmulCTX ctx;
 
 public:
-    GHashCipher_Pclmul(const uint8_t H[16]) noexcept
+    GHashCipher(const uint8_t H[16]) noexcept
     {
         this->set_key(H);
     }
 
-    GHashCipher_Pclmul()                                = default;
-    GHashCipher_Pclmul(const GHashCipher_Pclmul& other) = default;
-    ~GHashCipher_Pclmul()                               = default;
+    GHashCipher() = default;
 
 public:
     void set_key(const uint8_t H[16]) noexcept
@@ -68,11 +68,24 @@ public:
     {
         if (tc::ghash_pclmul_final(&this->ctx, digest))
         {
-            throw std::runtime_error("ghash invalid data length");
+            throw gmlib::Exception("ghash invalid data length");
         }
+    }
+
+public:
+    static void compute(uint8_t        digest[16],
+                        const uint8_t  H[16],
+                        const uint8_t* msg,
+                        size_t         msg_len)
+    {
+        auto h = GHashCipher(H);
+        h.update(msg, msg_len);
+        h.final(digest);
     }
 };
 
+} // namespace gmlib_pclmul
+
 }; // namespace gmlib
 
-#endif // !_GMLIB_CRYPTO_EX_GHASH_CIPHER_PCLMUL_H
+#endif // !_GMLIB_CRYPTO_HASH_GHASH_PCLMUL_H

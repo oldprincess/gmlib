@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <gmlib/crypto_ex/win/WinRng.h>
-#include <gmlib/crypto_ex/GHashCipher_Pclmul.h>
 using namespace gmlib;
 using namespace std;
 
@@ -21,7 +20,7 @@ void TestGHashCipher()
         gmac.update(buf, size);
         gmac.final(d1);
 
-        auto gmac2 = GHashCipher_Pclmul(H);
+        auto gmac2 = ghash_common::GHashCipher(H);
         gmac2.update(buf, size);
         gmac2.final(d2);
         if (memcmp(d1, d2, 16) != 0)

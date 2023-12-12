@@ -25,63 +25,17 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef _GMLIB_CRYPTO_HASH_GHASH_H
 #define _GMLIB_CRYPTO_HASH_GHASH_H
 
-#include <TinyCrypto/hash/ghash/ghash_lut256.h>
-#include <gmlib/exception.h>
+#include <gmlib/crypto/hash/ghash/ghash_common.h>
+#include <gmlib/crypto/hash/ghash/ghash_lut256.h>
+#include <gmlib/crypto/hash/ghash/ghash_pclmul.h>
 
 namespace gmlib {
 
-class GHashCipher
-{
-public:
-    static constexpr size_t DIGEST_SIZE = GHASH_DIGEST_SIZE;
+// using GHashCipher = ghash_common::GHashCipher;
 
-private:
-    tc::GHashLut256CTX ctx;
+// using GHashCipher = ghash_lut256::GHashCipher;
 
-public:
-    GHashCipher(const uint8_t H[16]) noexcept
-    {
-        this->set_key(H);
-    }
-
-    GHashCipher()                         = default;
-    GHashCipher(const GHashCipher& other) = default;
-    ~GHashCipher()                        = default;
-
-public:
-    void set_key(const uint8_t H[16]) noexcept
-    {
-        tc::ghash_lut256_init(&this->ctx, H);
-    }
-
-    void reset() noexcept
-    {
-        tc::ghash_lut256_reset(&this->ctx);
-    }
-
-    void update(const uint8_t* in, size_t inl) noexcept
-    {
-        tc::ghash_lut256_update(&this->ctx, in, inl);
-    }
-
-    void final(uint8_t digest[16])
-    {
-        if (tc::ghash_lut256_final(&this->ctx, digest))
-        {
-            throw gmlib::Exception("ghash invalid data length");
-        }
-    }
-
-    static void compute(uint8_t        digest[16],
-                        const uint8_t  H[16],
-                        const uint8_t* msg,
-                        size_t         msg_len)
-    {
-        auto h = GHashCipher(H);
-        h.update(msg, msg_len);
-        h.final(digest);
-    }
-};
+using GHashCipher = ghash_pclmul::GHashCipher;
 
 }; // namespace gmlib
 
