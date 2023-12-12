@@ -1,4 +1,5 @@
 #include <iostream>
+#include <gmlib/exception.h>
 using namespace std;
 
 void TestSm4Cipher();
@@ -7,9 +8,9 @@ void TestAesCipher();
 void TestCipherMode();
 void TestGcmMode();
 void TestGHashCipher();
-void TestUBlockCipher_Standard();
+void TestUBlockCipher();
 void TestHMacCipher();
-int main()
+int  main()
 {
     try
     {
@@ -19,8 +20,14 @@ int main()
         TestCipherMode();
         // TestGHashCipher();
         TestGcmMode();
-        TestUBlockCipher_Standard();
+        TestUBlockCipher();
         TestHMacCipher();
+    }
+    catch (gmlib::Exception& e)
+    {
+        cout << e.trace << endl;
+        cout << e.what() << endl;
+        std::exit(-1);
     }
     catch (exception& e)
     {
