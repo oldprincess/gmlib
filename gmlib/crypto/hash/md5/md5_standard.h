@@ -21,15 +21,59 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#ifndef _GMLIB_CRYPTO_HASH_MD5_CIPHER_H
-#define _GMLIB_CRYPTO_HASH_MD5_CIPHER_H
+#ifndef _GMLIB_CRYPTO_HASH_MD5_STANDARD_H
+#define _GMLIB_CRYPTO_HASH_MD5_STANDARD_H
 
-#include <gmlib/crypto/hash/md5/md5_standard.h>
+#include <TinyCrypto/hash/md5/md5_standard.h>
 
 namespace gmlib {
 
-using Md5Cipher = md5_standard::Md5Cipher;
+namespace md5_standard {
+
+class Md5Cipher
+{
+public:
+    static constexpr size_t BLOCK_SIZE  = MD5_BLOCK_SIZE;
+    static constexpr size_t DIGEST_SIZE = MD5_DIGEST_SIZE;
+
+private:
+    tc::Md5StandardCTX ctx;
+
+public:
+    Md5Cipher() noexcept
+    {
+        tc::md5_standard_init(&this->ctx);
+    }
+
+public:
+    void reset() noexcept
+    {
+        tc::md5_standard_reset(&this->ctx);
+    }
+
+    void update(const uint8_t* in, size_t inl) noexcept
+    {
+        tc::md5_standard_update(&this->ctx, in, inl);
+    }
+
+    void final(uint8_t digest[16]) noexcept
+    {
+        tc::md5_standard_final(&this->ctx, digest);
+    }
+
+public:
+    static void compute(uint8_t        digest[16],
+                        const uint8_t* msg,
+                        size_t         msg_len) noexcept
+    {
+        Md5Cipher h;
+        h.update(msg, msg_len);
+        h.final(digest);
+    }
+};
+
+} // namespace md5_standard
 
 }; // namespace gmlib
 
-#endif // !_GMLIB_CRYPTO_HASH_MD5_CIPHER_H
+#endif // !_GMLIB_CRYPTO_HASH_MD5_STANDARD_H
