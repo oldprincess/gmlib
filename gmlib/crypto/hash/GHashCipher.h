@@ -22,8 +22,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef _GMLIB_CRYPTO_HASH_GHASH_H
-#define _GMLIB_CRYPTO_HASH_GHASH_H
+#ifndef _GMLIB_CRYPTO_HASH_GHASH_CIPHER_H
+#define _GMLIB_CRYPTO_HASH_GHASH_CIPHER_H
 
 #include <gmlib/crypto/hash/ghash/ghash_common.h>
 #include <gmlib/crypto/hash/ghash/ghash_lut256.h>
@@ -39,4 +39,4 @@ using GHashCipher = ghash_pclmul::GHashCipher;
 
 }; // namespace gmlib
 
-#endif // !_GMLIB_CRYPTO_HASH_GHASH_H
+#endif // !_GMLIB_CRYPTO_HASH_GHASH_CIPHER_H
