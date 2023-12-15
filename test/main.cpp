@@ -10,6 +10,7 @@ void TestGcmMode();
 void TestGHashCipher();
 void TestUBlockCipher();
 void TestHMacCipher();
+void TestPBKDF2();
 int  main()
 {
     try
@@ -22,6 +23,7 @@ int  main()
         TestGcmMode();
         TestUBlockCipher();
         TestHMacCipher();
+        TestPBKDF2();
     }
     catch (gmlib::Exception& e)
     {
