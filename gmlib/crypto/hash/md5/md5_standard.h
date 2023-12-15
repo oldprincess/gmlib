@@ -25,12 +25,13 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #define _GMLIB_CRYPTO_HASH_MD5_STANDARD_H
 
 #include <TinyCrypto/hash/md5/md5_standard.h>
+#include <gmlib/crypto/hash/HashBase.h>
 
 namespace gmlib {
 
 namespace md5_standard {
 
-class Md5Cipher
+class Md5Cipher : public HashBase
 {
 public:
     static constexpr size_t BLOCK_SIZE  = MD5_BLOCK_SIZE;

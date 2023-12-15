@@ -26,16 +26,17 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #define _GMLIB_CRYPTO_HASH_GHASH_COMMON_H
 
 #include <TinyCrypto/hash/ghash/ghash_common.h>
-#include <gmlib/exception.h>
+#include <gmlib/crypto/hash/HashBase.h>
 
 namespace gmlib {
 
 namespace ghash_common {
 
-class GHashCipher
+class GHashCipher : public HashBase
 {
 public:
     static constexpr size_t DIGEST_SIZE = GHASH_DIGEST_SIZE;
+    static constexpr size_t BLOCK_SIZE  = GHASH_BLOCK_SIZE;
 
 private:
     tc::GHashCommonCTX ctx;
@@ -84,7 +85,7 @@ public:
     }
 };
 
-} // namespace gmlib_common
+} // namespace ghash_common
 
 }; // namespace gmlib
 

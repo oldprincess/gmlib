@@ -25,13 +25,13 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #define _GMLIB_CRYPTO_HASH_SHA1_STANDARD_H
 
 #include <TinyCrypto/hash/sha1/sha1_standard.h>
-#include <gmlib/exception.h>
+#include <gmlib/crypto/hash/HashBase.h>
 
 namespace gmlib {
 
 namespace sha1_standard {
 
-class Sha1Cipher
+class Sha1Cipher : public HashBase
 {
 public:
     static constexpr size_t BLOCK_SIZE  = SHA1_BLOCK_SIZE;
@@ -52,7 +52,7 @@ public:
         tc::sha1_standard_reset(&this->ctx);
     }
 
-    void update(const uint8_t* in, size_t inl) noexcept
+    void update(const uint8_t* in, size_t inl)
     {
         if (tc::sha1_standard_update(&this->ctx, in, inl))
         {

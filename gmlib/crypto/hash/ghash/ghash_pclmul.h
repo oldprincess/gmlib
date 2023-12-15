@@ -26,16 +26,17 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #define _GMLIB_CRYPTO_HASH_GHASH_PCLMUL_H
 
 #include <TinyCrypto/hash/ghash/ghash_pclmul.h>
-#include <gmlib/exception.h>
+#include <gmlib/crypto/hash/HashBase.h>
 
 namespace gmlib {
 
 namespace ghash_pclmul {
 
-class GHashCipher
+class GHashCipher : public HashBase
 {
 public:
     static constexpr size_t DIGEST_SIZE = GHASH_DIGEST_SIZE;
+    static constexpr size_t BLOCK_SIZE  = GHASH_BLOCK_SIZE;
 
 private:
     tc::GHashPclmulCTX ctx;
@@ -84,7 +85,7 @@ public:
     }
 };
 
-} // namespace gmlib_pclmul
+} // namespace ghash_pclmul
 
 }; // namespace gmlib
 

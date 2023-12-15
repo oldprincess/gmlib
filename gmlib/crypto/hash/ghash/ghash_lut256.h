@@ -26,16 +26,17 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #define _GMLIB_CRYPTO_HASH_GHASH_LUT256_H
 
 #include <TinyCrypto/hash/ghash/ghash_lut256.h>
-#include <gmlib/exception.h>
+#include <gmlib/crypto/hash/HashBase.h>
 
 namespace gmlib {
 
 namespace ghash_lut256 {
 
-class GHashCipher
+class GHashCipher : public HashBase
 {
 public:
     static constexpr size_t DIGEST_SIZE = GHASH_DIGEST_SIZE;
+    static constexpr size_t BLOCK_SIZE  = GHASH_BLOCK_SIZE;
 
 private:
     tc::GHashLut256CTX ctx;
@@ -84,7 +85,7 @@ public:
     }
 };
 
-} // namespace gmlib_lut256
+} // namespace ghash_lut256
 
 }; // namespace gmlib
 

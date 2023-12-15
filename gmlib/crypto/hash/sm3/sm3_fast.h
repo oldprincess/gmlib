@@ -25,13 +25,13 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 #define _GMLIB_CRYPTO_HASH_SM3_FAST_H
 
 #include <TinyCrypto/hash/sm3/sm3_fast.h>
-#include <gmlib/exception.h>
+#include <gmlib/crypto/hash/HashBase.h>
 
 namespace gmlib {
 
 namespace sm3_fast {
 
-class Sm3Cipher
+class Sm3Cipher : public HashBase
 {
 public:
     static constexpr size_t BLOCK_SIZE  = SM3_BLOCK_SIZE;
