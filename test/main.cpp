@@ -11,6 +11,7 @@ void TestGHashCipher();
 void TestUBlockCipher();
 void TestHMacCipher();
 void TestPBKDF2();
+void TestSm2Cipher();
 int  main()
 {
     try
@@ -19,11 +20,12 @@ int  main()
         TestSm4Cipher();
         TestAesCipher();
         TestCipherMode();
-        // TestGHashCipher();
+        TestGHashCipher();
         TestGcmMode();
         TestUBlockCipher();
         TestHMacCipher();
         TestPBKDF2();
+        TestSm2Cipher();
     }
     catch (gmlib::Exception& e)
     {
