@@ -13,6 +13,7 @@ set(THIRD_PARTY
     sm3
     sm4
     sm9
+    ublock
 )
 
 # *************************************
@@ -20,6 +21,7 @@ set(THIRD_PARTY
 # *************************************
 
 # add_definitions(-DCPU_FLAG_SSE2)
+# add_definitions(-DCPU_FLAG_SSSE3)
 # add_definitions(-DCPU_FLAG_AVX2)
 # add_definitions(-DCPU_FLAG_AES)
 # add_definitions(-DCPU_FLAG_MOVBE)
@@ -27,10 +29,9 @@ set(THIRD_PARTY
 # add_definitions(-DCPU_FLAG_RDSEED)
 # add_definitions(-DCPU_FLAG_RDRAND)
 # add_definitions(-DCPU_FLAG_PCLMUL)
-add_definitions(-DSUPPORT_SM3_YANG15)
-add_definitions(-DSUPPORT_SM4_LANG18)
-
-# set(PROJECT_COMPILE_OPTIONS -msse2 -mavx2 -maes -mmovbe -mbmi2 -mrdseed -mrdrnd -mpclmul)
+# add_definitions(-DSUPPORT_SM3_YANG15)
+# add_definitions(-DSUPPORT_SM4_LANG18)
+# set(PROJECT_COMPILE_OPTIONS -msse2 -mssse3 -mavx2 -maes -mmovbe -mbmi2 -mrdseed -mrdrnd -mpclmul)
 
 #######################################################
 ## ================================================= ##

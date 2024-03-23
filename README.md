@@ -59,6 +59,7 @@ python tools/cpuid.py
 
 ```
 add_definitions(-DCPU_FLAG_SSE2)
+add_definitions(-DCPU_FLAG_SSSE3)
 add_definitions(-DCPU_FLAG_AVX2)
 add_definitions(-DCPU_FLAG_AES)
 add_definitions(-DCPU_FLAG_MOVBE)
@@ -68,7 +69,7 @@ add_definitions(-DCPU_FLAG_RDRAND)
 add_definitions(-DCPU_FLAG_PCLMUL)
 add_definitions(-DSUPPORT_SM3_YANG15)
 add_definitions(-DSUPPORT_SM4_LANG18)
-set(PROJECT_COMPILE_OPTIONS -msse2 -mavx2 -maes -mmovbe -mbmi2 -mrdseed -mrdrnd -mpclmul)
+set(PROJECT_COMPILE_OPTIONS -msse2 -mssse3 -mavx2 -maes -mmovbe -mbmi2 -mrdseed -mrdrnd -mpclmul)
 ```
 
 将上述内容添加至`CMakeLists.txt`文件中，文件中有说明添加的具体位置
@@ -78,6 +79,7 @@ set(PROJECT_COMPILE_OPTIONS -msse2 -mavx2 -maes -mmovbe -mbmi2 -mrdseed -mrdrnd 
 |宏定义|含义|
 |:-:|:-:|
 |CPU_FLAG_SSE2|SSE2指令集|
+|CPU_FLAG_SSSE3|SSSE3指令集|
 |CPU_FLAG_AVX2|AVX2指令集|
 |CPU_FLAG_AES|AES指令集，AES算法加解密|
 |CPU_FLAG_MOVBE|MOVBE指令集，大端读取数据|

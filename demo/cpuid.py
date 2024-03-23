@@ -199,10 +199,13 @@ def support_flag() -> tuple:
     """
     cpu = CPUID()
     support_flag_list = []
-    compile_options_list = ["-O3"]
+    compile_options_list = []
     if is_set(cpu, 1, 0, 3, 26) == "Yes":
         support_flag_list.append("SSE2")
         compile_options_list.append("-msse2")
+    if is_set(cpu, 1, 0, 2, 9) == "Yes":
+        support_flag_list.append("SSSE3")
+        compile_options_list.append("-mssse3")
     if is_set(cpu, 7, 0, 1, 5) == "Yes":
         support_flag_list.append("AVX2")
         compile_options_list.append("-mavx2")
@@ -234,4 +237,4 @@ if __name__ == "__main__":
     print("add_definitions(-DSUPPORT_SM3_YANG15)")
     print("add_definitions(-DSUPPORT_SM4_LANG18)")
     
-    print("add_compile_options({})".format(" ".join(options)))
+    print("set(PROJECT_COMPILE_OPTIONS {})".format(" ".join(options)))
