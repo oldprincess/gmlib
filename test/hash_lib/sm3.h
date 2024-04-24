@@ -296,8 +296,9 @@ static void sm3_fast_final(Sm3FastCTX* ctx, uint8_t digest[32])
 class SM3 : public hash_lib::Hash<SM3_BLOCK_SIZE>
 {
 public:
-    static constexpr std::size_t BLOCK_SIZE  = SM3_BLOCK_SIZE;
-    static constexpr std::size_t DIGEST_SIZE = SM3_DIGEST_SIZE;
+    static constexpr std::size_t BLOCK_SIZE        = SM3_BLOCK_SIZE;
+    static constexpr std::size_t DIGEST_SIZE       = SM3_DIGEST_SIZE;
+    static constexpr std::size_t SECURITY_STRENGTH = SM3_DIGEST_SIZE / 2;
 
 private:
     sm3_internal::Sm3FastCTX ctx_;
@@ -308,9 +309,9 @@ public:
         sm3_internal::sm3_fast_init(&ctx_);
     }
 
-    void reset() noexcept
+    void reset() noexcept override
     {
-        this->Hash<SM3_BLOCK_SIZE>::reset();
+        this->Hash<SM3_BLOCK_SIZE>::reset_();
         sm3_internal::sm3_fast_reset(&ctx_);
     }
 

@@ -49,9 +49,9 @@ public:
     /**
      * @brief SM3 Context Reset (re-init)
      */
-    void reset() noexcept
+    void reset() noexcept override
     {
-        this->Hash<alg::SM3_BLOCK_SIZE>::reset();
+        this->Hash<alg::SM3_BLOCK_SIZE>::reset_();
         alg::sm3_reset(&ctx_);
     }
 

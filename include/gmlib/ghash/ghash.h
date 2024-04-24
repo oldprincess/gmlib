@@ -35,7 +35,7 @@ public:
         alg::ghash_init(&ctx_, H);
     }
 
-    void reset() noexcept
+    void reset() noexcept override
     {
         alg::ghash_reset(&ctx_);
     }

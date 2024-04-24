@@ -7,8 +7,24 @@
 
 namespace hash_lib {
 
+class Hash_Base
+{
+public:
+    virtual ~Hash_Base() = default;
+
+    virtual void reset() = 0;
+
+    virtual void update(const std::uint8_t* in, std::size_t inl) = 0;
+
+    virtual void do_final(std::uint8_t*       digest,
+                          const std::uint8_t* in  = nullptr,
+                          std::size_t         inl = 0) = 0;
+
+    virtual const char* name() const noexcept = 0;
+};
+
 template <std::size_t BLOCK_SIZE>
-class Hash
+class Hash : public Hash_Base
 {
 private:
     std::uint8_t buf_[BLOCK_SIZE];
@@ -19,16 +35,14 @@ public:
     {
     }
 
-    virtual ~Hash() = default;
-
 protected:
-    void reset() noexcept
+    void reset_() noexcept
     {
         buf_size_ = 0;
     }
 
 public:
-    void update(const std::uint8_t* in, std::size_t inl)
+    void update(const std::uint8_t* in, std::size_t inl) override
     {
         if (inl == 0)
         {
@@ -79,16 +93,10 @@ public:
 
     void do_final(std::uint8_t*       digest,
                   const std::uint8_t* in  = nullptr,
-                  std::size_t         inl = 0)
+                  std::size_t         inl = 0) override
     {
         this->update(in, inl);
         this->final_block(digest, buf_, buf_size_);
-    }
-
-public:
-    virtual const char* name() const noexcept
-    {
-        return "Hash";
     }
 
 private:

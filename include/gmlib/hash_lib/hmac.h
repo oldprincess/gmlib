@@ -1,6 +1,8 @@
 #ifndef HASH_LIB_HMAC_H
 #define HASH_LIB_HMAC_H
 
+#include <gmlib/hash_lib/hash_type_traits.h>
+
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -10,6 +12,9 @@ namespace hash_lib {
 template <class Hash>
 class HMac
 {
+    static_assert(hash_type_traits::is_valid<Hash>::value,
+                  "invalid hash class");
+
 public:
     static constexpr std::size_t DIGEST_SIZE = Hash::DIGEST_SIZE;
 
