@@ -13,11 +13,6 @@ public:
     static constexpr int DECRYPTION = 0;
 
 public:
-    static constexpr std::size_t BLOCK_SIZE   = 0;
-    static constexpr std::size_t USER_KEY_LEN = 0;
-    static constexpr std::size_t PARALLEL_NUM = 0;
-
-public:
     virtual ~BlockCipher() = default;
 
 public:

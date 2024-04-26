@@ -7,8 +7,22 @@
 
 namespace block_cipher_mode {
 
+class BlockCipherMode_Base
+{
+public:
+    virtual void update(std::uint8_t*       out,
+                        std::size_t*        outl,
+                        const std::uint8_t* in,
+                        std::size_t         inl) = 0;
+
+    virtual void do_final(std::uint8_t*       out,
+                          std::size_t*        outl,
+                          const std::uint8_t* in  = nullptr,
+                          std::size_t         inl = 0) = 0;
+};
+
 template <std::size_t BLOCK_SIZE>
-class BlockCipherMode
+class BlockCipherMode : public BlockCipherMode_Base
 {
 private:
     std::uint8_t buf_[BLOCK_SIZE];
@@ -22,7 +36,7 @@ protected:
     {
     }
 
-    void reset() noexcept
+    void reset_() noexcept
     {
         buf_size_ = 0;
     }
@@ -31,7 +45,7 @@ public:
     void update(std::uint8_t*       out,
                 std::size_t*        outl,
                 const std::uint8_t* in,
-                std::size_t         inl)
+                std::size_t         inl) override
     {
         if (inl == 0)
         {
@@ -81,7 +95,7 @@ public:
     void do_final(std::uint8_t*       out,
                   std::size_t*        outl,
                   const std::uint8_t* in  = nullptr,
-                  std::size_t         inl = 0)
+                  std::size_t         inl = 0) override
     {
         this->update(out, outl, in, inl);
         out += *outl;

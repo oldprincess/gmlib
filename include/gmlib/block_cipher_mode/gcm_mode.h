@@ -2,6 +2,7 @@
 #define BLOCK_CIPHER_MODE_GCM_MODE_H
 
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>
+#include <gmlib/block_cipher_mode/cipher_type_traits.h>
 #include <gmlib/block_cipher_mode/internal/gctr_inc.h>
 #include <gmlib/ghash/ghash.h>
 #include <gmlib/memory_utils/memxor.h>
@@ -11,6 +12,8 @@ namespace block_cipher_mode {
 template <class Cipher>
 class GctrCryptor : public BlockCipherMode<Cipher::BLOCK_SIZE>
 {
+    static_assert(cipher_type_traits::is_valid<Cipher>::value,
+                  "invalid block cipher class");
     static_assert(Cipher::BLOCK_SIZE == 16, "gctr need BLOCK_SIZE=16");
 
 public:
@@ -141,6 +144,8 @@ protected:
 template <class Cipher>
 class GcmEncryptor : public GctrCryptor<Cipher>
 {
+    static_assert(cipher_type_traits::is_valid<Cipher>::value,
+                  "invalid block cipher class");
     static_assert(Cipher::BLOCK_SIZE == 16, "gcm need BLOCK_SIZE=16");
 
 public:
@@ -240,6 +245,8 @@ private:
 template <class Cipher>
 class GcmDecryptor : public GctrCryptor<Cipher>
 {
+    static_assert(cipher_type_traits::is_valid<Cipher>::value,
+                  "invalid block cipher class");
     static_assert(Cipher::BLOCK_SIZE == 16, "gcm need BLOCK_SIZE=16");
 
 public:

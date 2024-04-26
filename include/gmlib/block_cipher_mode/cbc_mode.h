@@ -2,6 +2,7 @@
 #define BLOCK_CIPHER_MODE_CBC_MODE_H
 
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>
+#include <gmlib/block_cipher_mode/cipher_type_traits.h>
 #include <gmlib/memory_utils/memxor.h>
 
 #include <stdexcept>
@@ -11,6 +12,9 @@ namespace block_cipher_mode {
 template <class Cipher>
 class CbcEncryptor : public BlockCipherMode<Cipher::BLOCK_SIZE>
 {
+    static_assert(cipher_type_traits::is_valid<Cipher>::value,
+                  "invalid block cipher class");
+
 public:
     static constexpr std::size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
     static constexpr std::size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
@@ -36,7 +40,7 @@ public:
 
     void reset(const std::uint8_t* iv) noexcept
     {
-        this->BlockCipherMode<Cipher::BLOCK_SIZE>::reset();
+        this->BlockCipherMode<Cipher::BLOCK_SIZE>::reset_();
         std::memcpy(iv_, iv, Cipher::BLOCK_SIZE);
     }
 
@@ -79,6 +83,9 @@ private:
 template <class Cipher>
 class CbcDecryptor : public BlockCipherMode<Cipher::BLOCK_SIZE>
 {
+    static_assert(cipher_type_traits::is_valid<Cipher>::value,
+                  "invalid block cipher class");
+
 public:
     static constexpr std::size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
     static constexpr std::size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
@@ -104,7 +111,7 @@ public:
 
     void reset(const std::uint8_t* iv) noexcept
     {
-        this->BlockCipherMode<Cipher::BLOCK_SIZE>::reset();
+        this->BlockCipherMode<Cipher::BLOCK_SIZE>::reset_();
         std::memcpy(iv_, iv, Cipher::BLOCK_SIZE);
     }
 
