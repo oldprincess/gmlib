@@ -26,11 +26,14 @@ namespace sm3 {
 class SM3 : public hash_lib::Hash<alg::SM3_BLOCK_SIZE>
 {
 public:
-    /// @brief SM4 Block Size (in bytes)
+    /// @brief SM3 Block Size (in bytes)
     static constexpr std::size_t BLOCK_SIZE = alg::SM3_BLOCK_SIZE;
 
-    /// @brief SM4 Digest Size (in bytes)
+    /// @brief SM3 Digest Size (in bytes)
     static constexpr std::size_t DIGEST_SIZE = alg::SM3_DIGEST_SIZE;
+
+    /// @brief SM3 Security Strength (in bytes)
+    static constexpr std::size_t SECURITY_STRENGTH = alg::SM3_SECURITY_STRENGTH;
 
 private:
     /// @brief SM3 private Context

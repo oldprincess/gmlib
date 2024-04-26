@@ -6,8 +6,9 @@
 
 namespace sm3::internal::common {
 
-constexpr std::size_t SM3_BLOCK_SIZE  = 64;
-constexpr std::size_t SM3_DIGEST_SIZE = 32;
+constexpr std::size_t SM3_BLOCK_SIZE        = 64;
+constexpr std::size_t SM3_DIGEST_SIZE       = 32;
+constexpr std::size_t SM3_SECURITY_STRENGTH = 16;
 
 typedef struct Sm3CTX
 {
