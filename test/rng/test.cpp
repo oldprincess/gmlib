@@ -1,4 +1,5 @@
 #include <gmlib/rng/cstd_rng.h>
+#include <gmlib/rng/drbg.h>
 #include <gmlib/rng/hardware_rng/rdrand32_rng.h>
 #include <gmlib/rng/hardware_rng/rdrand64_rng.h>
 #include <gmlib/rng/hardware_rng/rdseed32_rng.h>
@@ -7,6 +8,8 @@
 
 #include <cstdio>
 #include <iostream>
+
+#include "sm3.h"
 
 using namespace rng;
 using namespace std;
@@ -39,6 +42,12 @@ int main()
          << endl;
 #endif
 
+    HashDrbg<SM3> hash_drbg;
+    cout << hash_drbg.name() << ", rand int: " << hash_drbg.rand<int>() << endl;
+
+    HMacDrbg<SM3> hmac_drbg;
+    cout << hmac_drbg.name() << ", rand int: " << hmac_drbg.rand<int>() << endl;
+    
     cout << "rng test finish!" << endl;
     return 0;
 }
