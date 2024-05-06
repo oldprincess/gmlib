@@ -1,6 +1,8 @@
-#include "test.h"
 #include <gmlib/sm4/sm4_mode.h>
+
 #include <cstring>
+
+#include "test.h"
 
 using namespace sm4;
 
@@ -246,5 +248,16 @@ void test_sm4_cbc_mode()
     if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
     {
         throw std::runtime_error("err in Cbc_mode");
+    }
+
+    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
+            SM4CbcEncryptor>() == false)
+    {
+        throw std::runtime_error("err in sm4-cbc impl");
+    }
+    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
+            SM4CbcDecryptor>() == false)
+    {
+        throw std::runtime_error("err in sm4-cbc impl");
     }
 }

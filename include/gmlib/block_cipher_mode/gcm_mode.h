@@ -2,7 +2,6 @@
 #define BLOCK_CIPHER_MODE_GCM_MODE_H
 
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>
-#include <gmlib/block_cipher_mode/cipher_type_traits.h>
 #include <gmlib/block_cipher_mode/internal/gctr_inc.h>
 #include <gmlib/ghash/ghash.h>
 #include <gmlib/memory_utils/memxor.h>
@@ -10,9 +9,9 @@
 namespace block_cipher_mode {
 
 template <class Cipher>
-class GctrCryptor : public BlockCipherMode<Cipher::BLOCK_SIZE>
+class GctrCryptor : public BlockCipherModeImpl<Cipher::BLOCK_SIZE>
 {
-    static_assert(cipher_type_traits::is_valid<Cipher>::value,
+    static_assert(type_traits::is_valid_cipher<Cipher>::value,
                   "invalid block cipher class");
     static_assert(Cipher::BLOCK_SIZE == 16, "gctr need BLOCK_SIZE=16");
 
@@ -144,13 +143,50 @@ protected:
 template <class Cipher>
 class GcmEncryptor : public GctrCryptor<Cipher>
 {
-    static_assert(cipher_type_traits::is_valid<Cipher>::value,
+    static_assert(type_traits::is_valid_cipher<Cipher>::value,
                   "invalid block cipher class");
     static_assert(Cipher::BLOCK_SIZE == 16, "gcm need BLOCK_SIZE=16");
 
 public:
-    static constexpr std::size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static constexpr const char* NAME_SUFFIX = "/GCM-ENC";
+
+    static constexpr std::size_t NAME_STR_LEN = Cipher::NAME_STR_LEN + 8;
+
+    static constexpr std::size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+
     static constexpr std::size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        static char name[NAME_STR_LEN + 1] = {0};
+        static bool inited                 = false;
+        if (inited == false)
+        {
+            char* name_part1 = name;
+            char* name_part2 = name + Cipher::NAME_STR_LEN;
+            std::memcpy(name_part1, cipher_.fetch_name(), Cipher::NAME_STR_LEN);
+            std::memcpy(name_part2, NAME_SUFFIX,
+                        NAME_STR_LEN - Cipher::NAME_STR_LEN);
+            inited = true;
+        }
+        return name;
+    }
+
+    std::size_t fetch_name_str_len() const noexcept override
+    {
+        return NAME_STR_LEN;
+    }
+
+    std::size_t fetch_block_size() const noexcept override
+    {
+        return BLOCK_SIZE;
+    }
+
+    std::size_t fetch_user_key_len() const noexcept override
+    {
+        return USER_KEY_LEN;
+    }
 
 private:
     ghash::GHash  hash_;
@@ -245,13 +281,50 @@ private:
 template <class Cipher>
 class GcmDecryptor : public GctrCryptor<Cipher>
 {
-    static_assert(cipher_type_traits::is_valid<Cipher>::value,
+    static_assert(type_traits::is_valid_cipher<Cipher>::value,
                   "invalid block cipher class");
     static_assert(Cipher::BLOCK_SIZE == 16, "gcm need BLOCK_SIZE=16");
 
 public:
-    static constexpr std::size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static constexpr const char* NAME_SUFFIX = "/GCM-DEC";
+
+    static constexpr std::size_t NAME_STR_LEN = Cipher::NAME_STR_LEN + 8;
+
+    static constexpr std::size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+
     static constexpr std::size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        static char name[NAME_STR_LEN + 1] = {0};
+        static bool inited                 = false;
+        if (inited == false)
+        {
+            char* name_part1 = name;
+            char* name_part2 = name + Cipher::NAME_STR_LEN;
+            std::memcpy(name_part1, cipher_.fetch_name(), Cipher::NAME_STR_LEN);
+            std::memcpy(name_part2, NAME_SUFFIX,
+                        NAME_STR_LEN - Cipher::NAME_STR_LEN);
+            inited = true;
+        }
+        return name;
+    }
+
+    std::size_t fetch_name_str_len() const noexcept override
+    {
+        return NAME_STR_LEN;
+    }
+
+    std::size_t fetch_block_size() const noexcept override
+    {
+        return BLOCK_SIZE;
+    }
+
+    std::size_t fetch_user_key_len() const noexcept override
+    {
+        return USER_KEY_LEN;
+    }
 
 private:
     ghash::GHash  hash_;

@@ -5,6 +5,7 @@ set(THIRD_PARTY
     memory_utils
     ghash
     hash_lib
+    sm4 # for test
 )
 
 add_definitions(-DCPU_FLAG_SSE2)

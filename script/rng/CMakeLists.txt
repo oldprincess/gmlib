@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 set(PROJECT_NAME_ rng)
 set(THIRD_PARTY 
     hash_lib
+    sm3 # for test
 )
 
 add_definitions(-DCPU_FLAG_RDRAND)

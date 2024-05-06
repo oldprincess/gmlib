@@ -23,9 +23,13 @@ namespace sm3 {
  * @brief   SM3 cryptographic hash algorithm
  * @details GB/T 32905-2016
  */
-class SM3 : public hash_lib::Hash<alg::SM3_BLOCK_SIZE>
+class SM3 : public hash_lib::HashImpl<alg::SM3_BLOCK_SIZE>
 {
 public:
+    static constexpr const char* NAME = "SM3";
+
+    static constexpr std::size_t NAME_STR_LEN = 3;
+
     /// @brief SM3 Block Size (in bytes)
     static constexpr std::size_t BLOCK_SIZE = alg::SM3_BLOCK_SIZE;
 
@@ -50,21 +54,42 @@ public:
 
 public:
     /**
+     * @brief   get the Name of Hash Algorithm
+     * @return  Name of Hash Algorithm
+     */
+    const char* fetch_name() const noexcept override
+    {
+        return NAME;
+    }
+
+    std::size_t fetch_name_str_len() const noexcept override
+    {
+        return NAME_STR_LEN;
+    }
+
+    std::size_t fetch_block_size() const noexcept override
+    {
+        return BLOCK_SIZE;
+    }
+
+    std::size_t fetch_digest_size() const noexcept override
+    {
+        return DIGEST_SIZE;
+    }
+
+    std::size_t fetch_security_strength() const noexcept override
+    {
+        return SECURITY_STRENGTH;
+    }
+
+public:
+    /**
      * @brief SM3 Context Reset (re-init)
      */
     void reset() noexcept override
     {
-        this->Hash<alg::SM3_BLOCK_SIZE>::reset_();
+        this->HashImpl<alg::SM3_BLOCK_SIZE>::reset();
         alg::sm3_reset(&ctx_);
-    }
-
-    /**
-     * @brief   get the Name of Hash Algorithm
-     * @return  Name of Hash Algorithm
-     */
-    const char* name() const noexcept override
-    {
-        return "SM3";
     }
 
 private:

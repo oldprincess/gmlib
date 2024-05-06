@@ -1,10 +1,11 @@
 #include <gmlib/block_cipher_mode/ecb_mode.h>
+#include <gmlib/sm4/sm4.h>
 
 #include <cstring>
 
-#include "sm4.h"
 #include "test.h"
 
+using namespace sm4;
 using namespace block_cipher_mode;
 using SM4EcbEncryptor = EcbEncryptor<SM4>;
 using SM4EcbDecryptor = EcbDecryptor<SM4>;
@@ -247,5 +248,16 @@ void test_ecb_mode()
     if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
     {
         throw std::runtime_error("err in ecb_mode");
+    }
+
+    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
+            SM4EcbEncryptor>() == false)
+    {
+        throw std::runtime_error("err in sm4-ecb impl");
+    }
+    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
+            SM4EcbDecryptor>() == false)
+    {
+        throw std::runtime_error("err in sm4-ecb impl");
     }
 }

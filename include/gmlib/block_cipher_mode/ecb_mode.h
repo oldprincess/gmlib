@@ -2,21 +2,57 @@
 #define BLOCK_CIPHER_MODE_ECB_MODE_H
 
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>
-#include <gmlib/block_cipher_mode/cipher_type_traits.h>
 
 #include <stdexcept>
 
 namespace block_cipher_mode {
 
 template <class Cipher>
-class EcbEncryptor : public BlockCipherMode<Cipher::BLOCK_SIZE>
+class EcbEncryptor : public BlockCipherModeImpl<Cipher::BLOCK_SIZE>
 {
-    static_assert(cipher_type_traits::is_valid<Cipher>::value,
+    static_assert(type_traits::is_valid_cipher<Cipher>::value,
                   "invalid block cipher class");
 
 public:
-    static constexpr std::size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static constexpr const char* NAME_SUFFIX = "/ECB-ENC";
+
+    static constexpr std::size_t NAME_STR_LEN = Cipher::NAME_STR_LEN + 8;
+
+    static constexpr std::size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+
     static constexpr std::size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        static char name[NAME_STR_LEN + 1] = {0};
+        static bool inited                 = false;
+        if (inited == false)
+        {
+            char* name_part1 = name;
+            char* name_part2 = name + Cipher::NAME_STR_LEN;
+            std::memcpy(name_part1, cipher_.fetch_name(), Cipher::NAME_STR_LEN);
+            std::memcpy(name_part2, NAME_SUFFIX,
+                        NAME_STR_LEN - Cipher::NAME_STR_LEN);
+            inited = true;
+        }
+        return name;
+    }
+
+    std::size_t fetch_name_str_len() const noexcept override
+    {
+        return NAME_STR_LEN;
+    }
+
+    std::size_t fetch_block_size() const noexcept override
+    {
+        return BLOCK_SIZE;
+    }
+
+    std::size_t fetch_user_key_len() const noexcept override
+    {
+        return USER_KEY_LEN;
+    }
 
 private:
     Cipher cipher_;
@@ -37,7 +73,7 @@ public:
 
     void reset() noexcept
     {
-        this->BlockCipherMode<Cipher::BLOCK_SIZE>::reset_();
+        this->BlockCipherModeImpl<Cipher::BLOCK_SIZE>::reset();
     }
 
 private:
@@ -67,14 +103,51 @@ private:
 };
 
 template <class Cipher>
-class EcbDecryptor : public BlockCipherMode<Cipher::BLOCK_SIZE>
+class EcbDecryptor : public BlockCipherModeImpl<Cipher::BLOCK_SIZE>
 {
-    static_assert(cipher_type_traits::is_valid<Cipher>::value,
+    static_assert(type_traits::is_valid_cipher<Cipher>::value,
                   "invalid block cipher class");
 
 public:
-    static constexpr size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
-    static constexpr size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
+    static constexpr const char* NAME_SUFFIX = "/ECB-DEC";
+
+    static constexpr std::size_t NAME_STR_LEN = Cipher::NAME_STR_LEN + 8;
+
+    static constexpr std::size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+
+    static constexpr std::size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        static char name[NAME_STR_LEN + 1] = {0};
+        static bool inited                 = false;
+        if (inited == false)
+        {
+            char* name_part1 = name;
+            char* name_part2 = name + Cipher::NAME_STR_LEN;
+            std::memcpy(name_part1, cipher_.fetch_name(), Cipher::NAME_STR_LEN);
+            std::memcpy(name_part2, NAME_SUFFIX,
+                        NAME_STR_LEN - Cipher::NAME_STR_LEN);
+            inited = true;
+        }
+        return name;
+    }
+
+    std::size_t fetch_name_str_len() const noexcept override
+    {
+        return NAME_STR_LEN;
+    }
+
+    std::size_t fetch_block_size() const noexcept override
+    {
+        return BLOCK_SIZE;
+    }
+
+    std::size_t fetch_user_key_len() const noexcept override
+    {
+        return USER_KEY_LEN;
+    }
 
 private:
     Cipher cipher_; // Symmetric Cipher Context
@@ -95,7 +168,7 @@ public:
 
     void reset() noexcept
     {
-        this->BlockCipherMode<Cipher::BLOCK_SIZE>::reset_();
+        this->BlockCipherModeImpl<Cipher::BLOCK_SIZE>::reset();
     }
 
 private:

@@ -5,14 +5,14 @@
 #include <gmlib/rng/hardware_rng/rdseed32_rng.h>
 #include <gmlib/rng/hardware_rng/rdseed64_rng.h>
 #include <gmlib/rng/std_rng.h>
+#include <gmlib/sm3/sm3.h>
 
 #include <cstdio>
 #include <iostream>
 
-#include "sm3.h"
-
 using namespace rng;
 using namespace std;
+using namespace sm3;
 
 int main()
 {
@@ -47,7 +47,7 @@ int main()
 
     HMacDrbg<SM3> hmac_drbg;
     cout << hmac_drbg.name() << ", rand int: " << hmac_drbg.rand<int>() << endl;
-    
+
     cout << "rng test finish!" << endl;
     return 0;
 }

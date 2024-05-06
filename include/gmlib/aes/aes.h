@@ -13,12 +13,15 @@ namespace alg = internal::aesni;
 namespace alg = internal::lut;
 #endif
 
-class AES128 : public block_cipher_mode::BlockCipher
+class AES128 : public block_cipher_mode::BlockCipherImpl
 {
 public:
-    static constexpr std::size_t BLOCK_SIZE   = alg::AES128_BLOCK_SIZE;
-    static constexpr std::size_t USER_KEY_LEN = alg::AES128_USER_KEY_LEN;
-    static constexpr std::size_t PARALLEL_NUM = alg::AES128_PARALLEL_NUM;
+    static constexpr const char* NAME              = "AES128";
+    static constexpr std::size_t NAME_STR_LEN      = 6;
+    static constexpr std::size_t BLOCK_SIZE        = alg::AES128_BLOCK_SIZE;
+    static constexpr std::size_t USER_KEY_LEN      = alg::AES128_USER_KEY_LEN;
+    static constexpr std::size_t PARALLEL_NUM      = alg::AES128_PARALLEL_NUM;
+    static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
     alg::Aes128CTX ctx_;
@@ -29,6 +32,37 @@ public:
     AES128(const std::uint8_t* user_key, int enc) noexcept
     {
         this->set_key(user_key, enc);
+    }
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        return NAME;
+    }
+
+    std::size_t fetch_name_str_len() const noexcept override
+    {
+        return NAME_STR_LEN;
+    }
+
+    std::size_t fetch_block_size() const noexcept override
+    {
+        return BLOCK_SIZE;
+    }
+
+    std::size_t fetch_user_key_len() const noexcept override
+    {
+        return USER_KEY_LEN;
+    }
+
+    std::size_t fetch_parallel_num() const noexcept override
+    {
+        return PARALLEL_NUM;
+    }
+
+    std::size_t fetch_security_strength() const noexcept override
+    {
+        return SECURITY_STRENGTH;
     }
 
 public:
@@ -71,12 +105,15 @@ public:
     }
 };
 
-class AES192 : public block_cipher_mode::BlockCipher
+class AES192 : public block_cipher_mode::BlockCipherImpl
 {
 public:
-    static constexpr std::size_t BLOCK_SIZE   = alg::AES192_BLOCK_SIZE;
-    static constexpr std::size_t USER_KEY_LEN = alg::AES192_USER_KEY_LEN;
-    static constexpr std::size_t PARALLEL_NUM = alg::AES192_PARALLEL_NUM;
+    static constexpr const char* NAME              = "AES192";
+    static constexpr std::size_t NAME_STR_LEN      = 6;
+    static constexpr std::size_t BLOCK_SIZE        = alg::AES192_BLOCK_SIZE;
+    static constexpr std::size_t USER_KEY_LEN      = alg::AES192_USER_KEY_LEN;
+    static constexpr std::size_t PARALLEL_NUM      = alg::AES192_PARALLEL_NUM;
+    static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
     alg::Aes192CTX ctx_;
@@ -87,6 +124,37 @@ public:
     AES192(const std::uint8_t* user_key, int enc) noexcept
     {
         this->set_key(user_key, enc);
+    }
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        return NAME;
+    }
+
+    std::size_t fetch_name_str_len() const noexcept override
+    {
+        return NAME_STR_LEN;
+    }
+
+    std::size_t fetch_block_size() const noexcept override
+    {
+        return BLOCK_SIZE;
+    }
+
+    std::size_t fetch_user_key_len() const noexcept override
+    {
+        return USER_KEY_LEN;
+    }
+
+    std::size_t fetch_parallel_num() const noexcept override
+    {
+        return PARALLEL_NUM;
+    }
+
+    std::size_t fetch_security_strength() const noexcept override
+    {
+        return SECURITY_STRENGTH;
     }
 
 public:
@@ -129,12 +197,15 @@ public:
     }
 };
 
-class AES256 : public block_cipher_mode::BlockCipher
+class AES256 : public block_cipher_mode::BlockCipherImpl
 {
 public:
-    static constexpr std::size_t BLOCK_SIZE   = alg::AES256_BLOCK_SIZE;
-    static constexpr std::size_t USER_KEY_LEN = alg::AES256_USER_KEY_LEN;
-    static constexpr std::size_t PARALLEL_NUM = alg::AES256_PARALLEL_NUM;
+    static constexpr const char* NAME              = "AES256";
+    static constexpr std::size_t NAME_STR_LEN      = 6;
+    static constexpr std::size_t BLOCK_SIZE        = alg::AES256_BLOCK_SIZE;
+    static constexpr std::size_t USER_KEY_LEN      = alg::AES256_USER_KEY_LEN;
+    static constexpr std::size_t PARALLEL_NUM      = alg::AES256_PARALLEL_NUM;
+    static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
     alg::Aes256CTX ctx_;
@@ -145,6 +216,37 @@ public:
     AES256(const std::uint8_t* user_key, int enc) noexcept
     {
         this->set_key(user_key, enc);
+    }
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        return NAME;
+    }
+
+    std::size_t fetch_name_str_len() const noexcept override
+    {
+        return NAME_STR_LEN;
+    }
+
+    std::size_t fetch_block_size() const noexcept override
+    {
+        return BLOCK_SIZE;
+    }
+
+    std::size_t fetch_user_key_len() const noexcept override
+    {
+        return USER_KEY_LEN;
+    }
+
+    std::size_t fetch_parallel_num() const noexcept override
+    {
+        return PARALLEL_NUM;
+    }
+
+    std::size_t fetch_security_strength() const noexcept override
+    {
+        return SECURITY_STRENGTH;
     }
 
 public:

@@ -18,11 +18,13 @@ namespace alg = ghash::internal::lut256;
 
 namespace ghash {
 
-class GHash : public hash_lib::Hash<alg::GHASH_BLOCK_SIZE>
+class GHash : public hash_lib::HashImpl<alg::GHASH_BLOCK_SIZE>
 {
 public:
-    static constexpr std::size_t BLOCK_SIZE  = alg::GHASH_BLOCK_SIZE;
-    static constexpr std::size_t DIGEST_SIZE = alg::GHASH_DIGEST_SIZE;
+    static constexpr const char* NAME         = "GHash";
+    static constexpr std::size_t NAME_STR_LEN = 5;
+    static constexpr std::size_t BLOCK_SIZE   = alg::GHASH_BLOCK_SIZE;
+    static constexpr std::size_t DIGEST_SIZE  = alg::GHASH_DIGEST_SIZE;
 
 private:
     alg::GHashCTX ctx_;
@@ -45,9 +47,25 @@ public:
         alg::ghash_init(&ctx_, H);
     }
 
-    const char* name() const noexcept override
+public:
+    const char* fetch_name() const noexcept override
     {
-        return "GHash";
+        return NAME;
+    }
+
+    std::size_t fetch_name_str_len() const noexcept override
+    {
+        return NAME_STR_LEN;
+    }
+
+    std::size_t fetch_block_size() const noexcept override
+    {
+        return BLOCK_SIZE;
+    }
+
+    std::size_t fetch_digest_size() const noexcept override
+    {
+        return DIGEST_SIZE;
     }
 
 private:

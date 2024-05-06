@@ -1,10 +1,11 @@
 #include <gmlib/block_cipher_mode/ctr_mode.h>
+#include <gmlib/sm4/sm4.h>
 
 #include <cstring>
 
-#include "sm4.h"
 #include "test.h"
 
+using namespace sm4;
 using namespace block_cipher_mode;
 using SM4CtrEncryptor = CtrEncryptor<SM4>;
 using SM4CtrDecryptor = CtrDecryptor<SM4>;
@@ -251,5 +252,16 @@ void test_ctr_mode()
     if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
     {
         throw std::runtime_error("err in ctr_mode");
+    }
+
+    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
+            SM4CtrEncryptor>() == false)
+    {
+        throw std::runtime_error("err in sm4-ctr impl");
+    }
+    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
+            SM4CtrDecryptor>() == false)
+    {
+        throw std::runtime_error("err in sm4-ctr impl");
     }
 }

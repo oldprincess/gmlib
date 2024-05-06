@@ -1,18 +1,20 @@
 #include <gmlib/hash_lib/hmac.h>
+#include <gmlib/sm3/sm3.h>
 
 #include <cstring>
 #include <stdexcept>
 
-#include "sm3.h"
 #include "test.h"
+
+using namespace sm3;
 
 using SM3HMac = hash_lib::HMac<SM3>;
 
 static std::uint8_t msg[64] = {0};
-static std::uint8_t out[SM3_DIGEST_SIZE];
+static std::uint8_t out[SM3::DIGEST_SIZE];
 
-static std::uint8_t key_1[16]                 = {0};
-static std::uint8_t digest_1[SM3_DIGEST_SIZE] = {
+static std::uint8_t key_1[16]                  = {0};
+static std::uint8_t digest_1[SM3::DIGEST_SIZE] = {
     0xAB, 0xBC, 0xED, 0x41, 0x5D, 0xF5, 0xCA, 0x97, //
     0x4A, 0x87, 0xAF, 0xCC, 0x7D, 0xA6, 0x87, 0x57, //
     0x18, 0xCB, 0x2C, 0x70, 0x3D, 0x61, 0xA1, 0x8C, //
@@ -158,8 +160,8 @@ static std::uint8_t digest_2[32] = {
     0xaa, 0xaf, 0x21, 0xda, 0x92, 0x7d, 0x06, 0x2d, 0x61, 0x41,
 };
 
-static std::uint8_t key_3[SM3_BLOCK_SIZE]     = {0};
-static std::uint8_t digest_3[SM3_DIGEST_SIZE] = {
+static std::uint8_t key_3[SM3::BLOCK_SIZE]     = {0};
+static std::uint8_t digest_3[SM3::DIGEST_SIZE] = {
     0xAB, 0xBC, 0xED, 0x41, 0x5D, 0xF5, 0xCA, 0x97, //
     0x4A, 0x87, 0xAF, 0xCC, 0x7D, 0xA6, 0x87, 0x57, //
     0x18, 0xCB, 0x2C, 0x70, 0x3D, 0x61, 0xA1, 0x8C, //

@@ -1,6 +1,10 @@
-#include "test.h"
-#include "sm3.h"
+#include <gmlib/sm3/sm3.h>
+
 #include <cstring>
+
+#include "test.h"
+
+using namespace sm3;
 
 static std::uint8_t data[1124] = {
     0x10, 0x01, 0x09, 0x5f, 0xd9, 0xdb, 0x69, 0xd8, 0x48, 0x52, 0x28, 0x10,

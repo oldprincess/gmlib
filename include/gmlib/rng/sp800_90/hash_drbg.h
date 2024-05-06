@@ -2,7 +2,7 @@
 #ifndef RNG_SP800_90_HASH_DRBG_H
 #define RNG_SP800_90_HASH_DRBG_H
 
-#include <gmlib/hash_lib/hash_type_traits.h>
+#include <gmlib/hash_lib/hash.h>
 #include <gmlib/memory_utils/endian.h>
 #include <gmlib/rng/rng.h>
 #include <gmlib/rng/sp800_90/internal/bn.h>
@@ -20,7 +20,7 @@ namespace rng::sp800_90 {
 template <class Hash>
 class HashDrbg : public Rng
 {
-    static_assert(hash_lib::hash_type_traits::is_valid<Hash>::value,
+    static_assert(hash_lib::type_traits::is_valid_hash<Hash>::value,
                   "invalid hash class");
 
 public:

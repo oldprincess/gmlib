@@ -13,9 +13,13 @@ namespace alg = internal::standard;
 namespace alg = internal::common;
 #endif
 
-class uBlock128128 : public block_cipher_mode::BlockCipher
+class uBlock128128 : public block_cipher_mode::BlockCipherImpl
 {
 public:
+    static constexpr const char* NAME = "uBlock-128-128";
+
+    static constexpr std::size_t NAME_STR_LEN = 14;
+
     /// @brief uBlock128128 Block Size (in bytes)
     static constexpr std::size_t BLOCK_SIZE = alg::UBLOCK128128_BLOCK_SIZE;
 
@@ -24,6 +28,8 @@ public:
 
     /// @brief uBlock128128 Maximum Number of Parallel Encryption and Decryption
     static constexpr std::size_t PARALLEL_NUM = alg::UBLOCK128128_PARALLEL_NUM;
+
+    static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
     /// @brief uBlock128128 private Context
@@ -45,6 +51,37 @@ public:
     uBlock128128(const std::uint8_t* user_key, int enc) noexcept
     {
         this->set_key(user_key, enc);
+    }
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        return NAME;
+    }
+
+    std::size_t fetch_name_str_len() const noexcept override
+    {
+        return NAME_STR_LEN;
+    }
+
+    std::size_t fetch_block_size() const noexcept override
+    {
+        return BLOCK_SIZE;
+    }
+
+    std::size_t fetch_user_key_len() const noexcept override
+    {
+        return USER_KEY_LEN;
+    }
+
+    std::size_t fetch_parallel_num() const noexcept override
+    {
+        return PARALLEL_NUM;
+    }
+
+    std::size_t fetch_security_strength() const noexcept override
+    {
+        return SECURITY_STRENGTH;
     }
 
 public:
@@ -115,9 +152,13 @@ public:
     }
 };
 
-class uBlock128256 : public block_cipher_mode::BlockCipher
+class uBlock128256 : public block_cipher_mode::BlockCipherImpl
 {
 public:
+    static constexpr const char* NAME = "uBlock-128-256";
+
+    static constexpr std::size_t NAME_STR_LEN = 14;
+
     /// @brief uBlock128256 Block Size (in bytes)
     static constexpr std::size_t BLOCK_SIZE = alg::UBLOCK128256_BLOCK_SIZE;
 
@@ -126,6 +167,8 @@ public:
 
     /// @brief uBlock128256 Maximum Number of Parallel Encryption and Decryption
     static constexpr std::size_t PARALLEL_NUM = alg::UBLOCK128256_PARALLEL_NUM;
+
+    static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
     /// @brief uBlock128256 private Context
@@ -147,6 +190,37 @@ public:
     uBlock128256(const std::uint8_t* user_key, int enc) noexcept
     {
         this->set_key(user_key, enc);
+    }
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        return NAME;
+    }
+
+    std::size_t fetch_name_str_len() const noexcept override
+    {
+        return NAME_STR_LEN;
+    }
+
+    std::size_t fetch_block_size() const noexcept override
+    {
+        return BLOCK_SIZE;
+    }
+
+    std::size_t fetch_user_key_len() const noexcept override
+    {
+        return USER_KEY_LEN;
+    }
+
+    std::size_t fetch_parallel_num() const noexcept override
+    {
+        return PARALLEL_NUM;
+    }
+
+    std::size_t fetch_security_strength() const noexcept override
+    {
+        return SECURITY_STRENGTH;
     }
 
 public:
@@ -217,9 +291,13 @@ public:
     }
 };
 
-class uBlock256256 : public block_cipher_mode::BlockCipher
+class uBlock256256 : public block_cipher_mode::BlockCipherImpl
 {
 public:
+    static constexpr const char* NAME = "uBlock-256-256";
+
+    static constexpr std::size_t NAME_STR_LEN = 14;
+
     /// @brief uBlock256256 Block Size (in bytes)
     static constexpr std::size_t BLOCK_SIZE = alg::UBLOCK256256_BLOCK_SIZE;
 
@@ -228,6 +306,8 @@ public:
 
     /// @brief uBlock256256 Maximum Number of Parallel Encryption and Decryption
     static constexpr std::size_t PARALLEL_NUM = alg::UBLOCK256256_PARALLEL_NUM;
+
+    static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
     /// @brief uBlock256256 private Context
@@ -249,6 +329,37 @@ public:
     uBlock256256(const std::uint8_t* user_key, int enc) noexcept
     {
         this->set_key(user_key, enc);
+    }
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        return NAME;
+    }
+
+    std::size_t fetch_name_str_len() const noexcept override
+    {
+        return NAME_STR_LEN;
+    }
+
+    std::size_t fetch_block_size() const noexcept override
+    {
+        return BLOCK_SIZE;
+    }
+
+    std::size_t fetch_user_key_len() const noexcept override
+    {
+        return USER_KEY_LEN;
+    }
+
+    std::size_t fetch_parallel_num() const noexcept override
+    {
+        return PARALLEL_NUM;
+    }
+
+    std::size_t fetch_security_strength() const noexcept override
+    {
+        return SECURITY_STRENGTH;
     }
 
 public:

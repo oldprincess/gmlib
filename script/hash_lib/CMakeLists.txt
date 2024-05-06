@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 set(PROJECT_NAME_ hash_lib)
 set(THIRD_PARTY 
-
+    sm3 # for test
 )
 
 add_definitions(-DCPU_FLAG_SSE2)

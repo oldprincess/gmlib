@@ -199,4 +199,9 @@ void test_sm4()
     {
         throw std::runtime_error("err in sm4");
     }
+    if (block_cipher_mode::type_traits::test_is_valid_cipher<sm4::SM4>() ==
+        false)
+    {
+        throw std::runtime_error("err in sm4 impl");
+    }
 }

@@ -84,4 +84,10 @@ void test_sm3()
     {
         throw std::runtime_error("err in sm3");
     }
+
+    // test virtual function
+    if (hash_lib::type_traits::test_is_valid_hash<SM3>() == false)
+    {
+        throw std::runtime_error("err in sm3 impl");
+    }
 }
