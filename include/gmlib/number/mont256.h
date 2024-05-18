@@ -6,12 +6,7 @@
 namespace number {
 using namespace number::internal::x64;
 
-static inline void mont256_set_uint32(const Mont256CTX* ctx,
-                                      std::uint64_t     ret[4],
-                                      std::uint32_t     num) noexcept
-{
-    mont256_set_uint64(ctx, ret, num);
-}
+#define mont256_set_uint32 mont256_set_uint64
 
 } // namespace number
 
