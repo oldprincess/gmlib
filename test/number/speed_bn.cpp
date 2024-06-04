@@ -1,9 +1,9 @@
-#if defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2)
+#include <gmlib/number/bn.h>
+
 #include <cstdio>
 #include <ctime>
 #include <random>
 
-#include "gmlib/number/internal/uint256_x64.h"
 #include "speed.h"
 
 static void rand_mem(void* mem, std::size_t size)
@@ -17,30 +17,29 @@ static void rand_mem(void* mem, std::size_t size)
     }
 }
 
-using namespace number::internal::x64;
+using namespace number;
 
 constexpr int LOOP = 10000000;
 
-void speed_uint256_x64()
+void speed_bn()
 {
+    // init
+    std::vector<std::uint8_t> bytes(32);
+    rand_mem(bytes.data(), 32);
+    BigNum a1 = BigNum::from_bytes(bytes);
+    BigNum a2 = BigNum::from_bytes(bytes);
+    BigNum b  = BigNum::from_uint32(0);
     // speed
+    std::size_t  cnt;
     std::clock_t st, et;
     double       time_s, speed_opt_s;
 
-    uint256_t    a, b, c[2];
-    std::size_t  cnt = 0;
-    std::uint8_t a_data[32], b_data[32];
-    rand_mem(a_data, 32);
-    rand_mem(b_data, 32);
-    uint256_from_bytes(a, a_data);
-    uint256_from_bytes(b, b_data);
-
-    std::printf("speed uint256 x64 mul ... ");
+    std::printf("speed bn256 mul bn256 ... ");
     cnt = 0;
     st  = std::clock();
     for (int i = 0; i < LOOP; i++)
     {
-        uint256_mul(c[0], a, b);
+        b = a1 * a2;
         cnt++;
     }
     et          = std::clock();
@@ -48,12 +47,13 @@ void speed_uint256_x64()
     speed_opt_s = cnt / time_s;
     std::printf("%e opt/s\n", speed_opt_s);
 
-    std::printf("speed uint256 x64 sqr ... ");
+    std::printf("speed bn512 div bn256...");
+    a1  = a1 * a2;
     cnt = 0;
     st  = std::clock();
     for (int i = 0; i < LOOP; i++)
     {
-        uint256_sqr(c[0], a);
+        b = a1 / a2;
         cnt++;
     }
     et          = std::clock();
@@ -61,8 +61,3 @@ void speed_uint256_x64()
     speed_opt_s = cnt / time_s;
     std::printf("%e opt/s\n", speed_opt_s);
 }
-#else
-void speed_uint256_x64()
-{
-}
-#endif

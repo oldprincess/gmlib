@@ -51,7 +51,7 @@ void speed_uint256_common()
     st  = std::clock();
     for (int i = 0; i < LOOP; i++)
     {
-        uint256_sqr(a, a);
+        uint256_sqr(c[0], a);
         cnt++;
     }
     et          = std::clock();

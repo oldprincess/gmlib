@@ -10,6 +10,7 @@ int main(int argc, char* argv[])
 {
     try
     {
+        test_bn();
         test_uint256_common();
         test_mont256_common();
         test_mpz_common();
@@ -25,6 +26,7 @@ int main(int argc, char* argv[])
     std::cout << "test number finish!" << std::endl;
     if (argc == 2 && std::strcmp(argv[1], "speed") == 0)
     {
+        speed_bn();
         speed_uint256_common();
         speed_mont256_common();
         speed_uint256_x64();

@@ -1,6 +1,7 @@
 #ifndef TEST_H
 #define TEST_H
 
+void test_bn();
 void test_uint256_common();
 void test_mont256_common();
 void test_mpz_common();
