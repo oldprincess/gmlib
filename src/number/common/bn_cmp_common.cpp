@@ -6,7 +6,7 @@ namespace number::internal::common {
 
 #define u_ge_zero(i) ((i) < (std::size_t)(-1))
 
-int bn_cmp(const BigNum_st* a, const BigNum_st* b)
+int bn_cmp(const BigNum_st* a, const BigNum_st* b) noexcept
 {
     if (a->sign > b->sign)
     {
@@ -31,12 +31,12 @@ int bn_cmp(const BigNum_st* a, const BigNum_st* b)
     }
 }
 
-int bn_cmp_zero(const BigNum_st* a)
+int bn_cmp_zero(const BigNum_st* a) noexcept
 {
     return a->sign;
 }
 
-int bn_cmp_u32(const BigNum_st* a, uint32_t b)
+int bn_cmp_u32(const BigNum_st* a, uint32_t b) noexcept
 {
     int bSign    = (b == 0) ? 0 : 1;
     int bDataLen = (b == 0) ? 0 : 1;
@@ -70,7 +70,7 @@ int bn_cmp_u32(const BigNum_st* a, uint32_t b)
     return 0;
 }
 
-int bn_ucmp(const BigNum_st* a, const BigNum_st* b)
+int bn_ucmp(const BigNum_st* a, const BigNum_st* b) noexcept
 {
     if (a->data_len > b->data_len)
     {
@@ -95,7 +95,7 @@ int bn_ucmp(const BigNum_st* a, const BigNum_st* b)
     return 0;
 }
 
-int bn_ucmp_zero(const BigNum_st* a)
+int bn_ucmp_zero(const BigNum_st* a) noexcept
 {
     return a->data_len > 0;
 }

@@ -22,7 +22,7 @@ namespace number::internal::common {
 #define _bn_umul32_uadd32(r, a, mul_val, add_val) \
     GMLIB_CATCH_ERROR(bn_umul32_uadd32(r, a, mul_val, add_val))
 
-int bn_from_u32(BigNum_st *r, std::uint32_t a)
+int bn_from_u32(BigNum_st *r, std::uint32_t a) noexcept
 {
     int err_code = 0;
     if (a == 0)
@@ -49,7 +49,7 @@ end:
 int bn_to_str(char                      *s,
               const BigNum_st           *a,
               int                        radix,
-              std::pmr::memory_resource *mp)
+              std::pmr::memory_resource *mp) noexcept
 {
     // GMLIB_ASSERT(2 <= radix && radix <= 36);
     if (!(2 <= radix && radix <= 36))
@@ -95,7 +95,7 @@ end:
     return err_code;
 }
 
-int bn_from_str(BigNum_st *r, const char *s, int radix)
+int bn_from_str(BigNum_st *r, const char *s, int radix) noexcept
 {
     // GMLIB_ASSERT(2 <= radix && radix <= 36);
     if (!(2 <= radix && radix <= 36))
@@ -172,7 +172,7 @@ end:
 int bn_from_bytes(BigNum_st          *r,
                   const std::uint8_t *bytes,
                   std::size_t         bytes_len,
-                  int                 is_big_endian)
+                  int                 is_big_endian) noexcept
 {
     int err_code = 0;
     if (bytes_len == 0)
@@ -220,7 +220,7 @@ end:
 int bn_to_bytes(std::uint8_t    *bytes,
                 std::size_t      bytes_len,
                 const BigNum_st *a,
-                int              is_big_endian)
+                int              is_big_endian) noexcept
 {
     std::size_t nbsize = (bn_bits_length(a) + 7) / 8;
     if (nbsize > bytes_len)

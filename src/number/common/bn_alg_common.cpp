@@ -16,7 +16,7 @@
 
 namespace number::internal::common {
 
-static int bn_uadd(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)
+static int bn_uadd(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
 {
     const BigNum_st* big   = a->data_len > b->data_len ? a : b;
     const BigNum_st* small = a->data_len > b->data_len ? b : a;
@@ -57,7 +57,7 @@ end:
     return err_code;
 }
 
-static int bn_usub(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)
+static int bn_usub(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
 {
     assert(bn_ucmp(a, b) >= 0);
 
@@ -89,7 +89,7 @@ end:
     return err_code;
 }
 
-int bn_add(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)
+int bn_add(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
 {
     int err_code = 0;
     if (a->sign == b->sign)
@@ -121,7 +121,7 @@ end:
     return err_code;
 }
 
-int bn_sub(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)
+int bn_sub(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
 {
     int err_code = 0;
     if (a->sign != b->sign)
@@ -153,7 +153,7 @@ end:
     return err_code;
 }
 
-static int bn_umul(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)
+static int bn_umul(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
 {
     int err_code = 0;
     if (r->MAX_DSIZE < a->data_len + b->data_len)
@@ -186,7 +186,7 @@ end:
     return err_code;
 }
 
-int bn_mul(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)
+int bn_mul(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
 {
     int        err_code = 0;
     BigNum_st* t        = NULL;
@@ -221,7 +221,7 @@ end:
 int bn_umul32_uadd32(BigNum_st*       r,
                      const BigNum_st* a,
                      std::uint32_t    mul_val,
-                     std::uint32_t    add_val)
+                     std::uint32_t    add_val)noexcept
 {
     int err_code = 0;
     if (mul_val == 0)

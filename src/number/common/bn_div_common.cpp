@@ -20,7 +20,7 @@ namespace number::internal::common {
 
 static inline std::uint32_t divmod(std::uint32_t *q,
                                    std::uint64_t  a,
-                                   std::uint32_t  b)
+                                   std::uint32_t  b) noexcept
 {
     assert(b != 0);
     *q = (a / b) & UINT32_MAX;
@@ -30,7 +30,7 @@ static inline std::uint32_t divmod(std::uint32_t *q,
 int bn_udivmod32(BigNum_st       *q,
                  std::uint32_t   *r,
                  const BigNum_st *a,
-                 std::uint32_t    b)
+                 std::uint32_t    b) noexcept
 {
     int err_code = 0;
     if (b == 0)
@@ -60,7 +60,9 @@ end:
     return err_code;
 }
 
-static int bn_umod32(std::uint32_t *r, const BigNum_st *a, std::uint32_t b)
+static int bn_umod32(std::uint32_t   *r,
+                     const BigNum_st *a,
+                     std::uint32_t    b) noexcept
 {
     if (b == 0)
     {
@@ -82,7 +84,7 @@ static void mem_sll(std::uint32_t       *r,
                     size_t              *rLen,
                     const std::uint32_t *d,
                     size_t               dLen,
-                    size_t               bits)
+                    size_t               bits) noexcept
 {
     *rLen = dLen;
     if (bits == 0)
@@ -110,7 +112,7 @@ static void mem_srl(std::uint32_t       *r,
                     size_t              *rLen,
                     const std::uint32_t *d,
                     size_t               dLen,
-                    size_t               bits)
+                    size_t               bits) noexcept
 {
     *rLen = dLen;
     if (bits == 0)
@@ -134,7 +136,7 @@ static void mem_srl(std::uint32_t       *r,
     }
 }
 
-static int msb32(std::uint32_t n)
+static int msb32(std::uint32_t n) noexcept
 {
     int bits = 0;
     while (n != 0)
@@ -150,7 +152,7 @@ static int bn_div_knuth(BigNum_st       *q,
                         const BigNum_st *a,
                         const BigNum_st *b,
                         std::uint32_t   *u,
-                        std::uint32_t   *v)
+                        std::uint32_t   *v) noexcept
 {
     int err_code = 0;
     //
@@ -271,7 +273,7 @@ int bn_divmod(BigNum_st                 *q,
               BigNum_st                 *r,
               const BigNum_st           *a,
               const BigNum_st           *b,
-              std::pmr::memory_resource *mp)
+              std::pmr::memory_resource *mp) noexcept
 {
     if (bn_cmp_zero(b) == 0)
     {
@@ -368,7 +370,7 @@ end:
 int bn_div(BigNum_st                 *r,
            const BigNum_st           *a,
            const BigNum_st           *b,
-           std::pmr::memory_resource *mp)
+           std::pmr::memory_resource *mp) noexcept
 {
     int err_code = 0;
     GMLIB_CATCH_ERROR(bn_divmod(r, NULL, a, b, mp));
@@ -379,7 +381,7 @@ end:
 int bn_mod(BigNum_st                 *r,
            const BigNum_st           *a,
            const BigNum_st           *b,
-           std::pmr::memory_resource *mp)
+           std::pmr::memory_resource *mp) noexcept
 {
     int err_code = 0;
     GMLIB_CATCH_ERROR(bn_divmod(NULL, r, a, b, mp));

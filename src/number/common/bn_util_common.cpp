@@ -4,7 +4,9 @@
 
 namespace number::internal::common {
 
-int bn_alloc(BigNum_st **n, std::size_t bits, std::pmr::memory_resource *mp)
+int bn_alloc(BigNum_st                **n,
+             std::size_t                bits,
+             std::pmr::memory_resource *mp) noexcept
 {
     int         err_code = 0;
     std::size_t data_len = (bits + 31) / 32;
@@ -28,12 +30,12 @@ end:
     return err_code;
 }
 
-void bn_free(BigNum_st *n, std::pmr::memory_resource *mp)
+void bn_free(BigNum_st *n, std::pmr::memory_resource *mp) noexcept
 {
     mp->deallocate(n, sizeof(BigNum_st) + 4 * n->MAX_DSIZE);
 }
 
-int bn_test(const BigNum_st *a, std::size_t i)
+int bn_test(const BigNum_st *a, std::size_t i) noexcept
 {
     std::size_t index_u32 = i / 32;
     std::size_t index_bit = i % 32;
@@ -44,12 +46,12 @@ int bn_test(const BigNum_st *a, std::size_t i)
     return (a->data[index_u32] >> index_bit) & 1;
 }
 
-void bn_set_zero(BigNum_st *a)
+void bn_set_zero(BigNum_st *a) noexcept
 {
     a->sign = 0, a->data_len = 0;
 }
 
-int bn_cpy(BigNum_st *r, const BigNum_st *a)
+int bn_cpy(BigNum_st *r, const BigNum_st *a) noexcept
 {
     if (r->MAX_DSIZE < a->data_len)
     {
@@ -64,7 +66,7 @@ int bn_cpy(BigNum_st *r, const BigNum_st *a)
     return 0;
 }
 
-std::size_t bn_bits_length(const BigNum_st *a)
+std::size_t bn_bits_length(const BigNum_st *a) noexcept
 {
     if (a->data_len == 0)
     {

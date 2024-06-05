@@ -4,6 +4,7 @@
 #include <gmlib/number/internal/bn_common.h>
 
 #include <algorithm>
+#include <memory>
 #include <stdexcept>
 #include <tuple>
 #include <vector>
@@ -122,27 +123,27 @@ public:
         }
     }
 
-    bool operator==(const BigNum& other) const
+    bool operator==(const BigNum& other) const noexcept
     {
         return alg::bn_cmp(ctx_, other.ctx_) == 0;
     }
 
-    bool operator<(const BigNum& other) const
+    bool operator<(const BigNum& other) const noexcept
     {
         return alg::bn_cmp(ctx_, other.ctx_) < 0;
     }
 
-    bool operator>(const BigNum& other) const
+    bool operator>(const BigNum& other) const noexcept
     {
         return alg::bn_cmp(ctx_, other.ctx_) > 0;
     }
 
-    bool operator<=(const BigNum& other) const
+    bool operator<=(const BigNum& other) const noexcept
     {
         return alg::bn_cmp(ctx_, other.ctx_) <= 0;
     }
 
-    bool operator>=(const BigNum& other) const
+    bool operator>=(const BigNum& other) const noexcept
     {
         return alg::bn_cmp(ctx_, other.ctx_) >= 0;
     }
@@ -162,17 +163,24 @@ public:
 
     std::string to_str(int radix = 10) const
     {
-        char* ret = (char*)mp_->allocate(ctx_->data_len * 32 + 1);
-        if (alg::bn_to_str(ret, ctx_, radix, mp_) == -1)
+        char* tmp = (char*)mp_->allocate(ctx_->data_len * 32 + 1);
+        if (alg::bn_to_str(tmp, ctx_, radix, mp_) == -1)
         {
             throw std::runtime_error("err in to_str");
         }
-        return std::string(ret);
+        std::string ret = std::string(tmp);
+        mp_->deallocate(tmp, ctx_->data_len * 32 + 1);
+        return ret;
     }
 
     std::size_t bits_lenth() const noexcept
     {
         return alg::bn_bits_length(ctx_);
+    }
+
+    int test(std::size_t idx) const noexcept
+    {
+        return alg::bn_test(ctx_, idx);
     }
 
     std::vector<std::uint8_t> to_bytes(std::size_t bytes_len,
@@ -197,7 +205,7 @@ public:
         {
             throw std::runtime_error("err in to_str");
         }
-        return std::move(ret);
+        return ret;
     }
 
     static BigNum from_bytes(
