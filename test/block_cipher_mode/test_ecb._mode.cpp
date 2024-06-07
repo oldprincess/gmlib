@@ -193,8 +193,10 @@ static std::uint8_t ct[1024] = {
 
 void test_ecb_mode()
 {
-    std::uint8_t buf[1024];
-    std::size_t  size, n;
+    std::uint8_t   buf[1024];
+    std::size_t    size, n;
+    ConstParameter c_param;
+    Parameter      param;
 
     auto e = SM4EcbEncryptor(user_key);
     e.do_final(buf, &size, pt, 1024);
@@ -223,6 +225,20 @@ void test_ecb_mode()
         throw std::runtime_error("err in ecb_mode");
     }
 
+    c_param.clear();
+    c_param[ParamKey::USER_KEY] = std::make_pair(user_key, sizeof(user_key));
+    e.init(c_param);
+    e.update(buf, &n, pt, 100);
+    size = n;
+    e.update(buf + size, &n, pt + 100, 1024 - 100);
+    size += n;
+    e.do_final(buf + size, &n, nullptr, 0);
+    size += n;
+    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
+    {
+        throw std::runtime_error("err in ecb_mode");
+    }
+
     auto d = SM4EcbDecryptor(user_key);
     d.do_final(buf, &size, ct, 1024);
     if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
@@ -239,6 +255,20 @@ void test_ecb_mode()
         throw std::runtime_error("err in ecb_mode");
     }
     d.reset();
+    d.update(buf, &n, ct, 100);
+    size = n;
+    d.update(buf + size, &n, ct + 100, 1024 - 100);
+    size += n;
+    d.do_final(buf + size, &n, nullptr, 0);
+    size += n;
+    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
+    {
+        throw std::runtime_error("err in ecb_mode");
+    }
+
+    c_param.clear();
+    c_param[ParamKey::USER_KEY] = std::make_pair(user_key, sizeof(user_key));
+    d.init(c_param);
     d.update(buf, &n, ct, 100);
     size = n;
     d.update(buf + size, &n, ct + 100, 1024 - 100);

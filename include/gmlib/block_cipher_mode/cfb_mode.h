@@ -55,6 +55,36 @@ public:
         return USER_KEY_LEN;
     }
 
+public:
+    std::size_t init(const ConstParameter& params) override
+    {
+        const auto& item_user_key = params.find(ParamKey::USER_KEY);
+        const auto& item_iv       = params.find(ParamKey::IV);
+
+        if (item_user_key == params.end())
+        {
+            throw std::runtime_error("init need user_key");
+        }
+        if (item_user_key->second.second != USER_KEY_LEN)
+        {
+            throw std::runtime_error("invalid user_key len");
+        }
+        if (item_iv == params.end())
+        {
+            throw std::runtime_error("init need iv");
+        }
+        if (item_iv->second.second != BLOCK_SIZE)
+        {
+            throw std::runtime_error("invalid iv len");
+        }
+
+        this->init(
+            static_cast<const std::uint8_t*>(item_user_key->second.first), //
+            static_cast<const std::uint8_t*>(item_iv->second.first)        //
+        );
+        return ParamKey::USER_KEY | ParamKey::IV;
+    }
+
 private:
     Cipher       cipher_;
     std::uint8_t iv_[Cipher::BLOCK_SIZE];
@@ -168,6 +198,36 @@ public:
     CfbDecryptor(const std::uint8_t* user_key, const std::uint8_t* iv)
     {
         this->init(user_key, iv);
+    }
+
+public:
+    std::size_t init(const ConstParameter& params) override
+    {
+        const auto& item_user_key = params.find(ParamKey::USER_KEY);
+        const auto& item_iv       = params.find(ParamKey::IV);
+
+        if (item_user_key == params.end())
+        {
+            throw std::runtime_error("init need user_key");
+        }
+        if (item_user_key->second.second != USER_KEY_LEN)
+        {
+            throw std::runtime_error("invalid user_key len");
+        }
+        if (item_iv == params.end())
+        {
+            throw std::runtime_error("init need iv");
+        }
+        if (item_iv->second.second != BLOCK_SIZE)
+        {
+            throw std::runtime_error("invalid iv len");
+        }
+
+        this->init(
+            static_cast<const std::uint8_t*>(item_user_key->second.first), //
+            static_cast<const std::uint8_t*>(item_iv->second.first)        //
+        );
+        return ParamKey::USER_KEY | ParamKey::IV;
     }
 
 public:

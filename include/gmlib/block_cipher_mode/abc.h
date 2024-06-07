@@ -4,9 +4,22 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <map>
 #include <type_traits>
+#include <utility>
 
 namespace block_cipher_mode {
+
+enum ParamKey : std::size_t
+{
+    IV       = 0b0001,
+    USER_KEY = 0b0010,
+    AAD      = 0b0100,
+    TAG      = 0b1000,
+};
+
+using ConstParameter = std::map<ParamKey, std::pair<const void*, std::size_t>>;
+using Parameter      = std::map<ParamKey, std::pair<void*, std::size_t>>;
 
 namespace abc {
 
@@ -66,6 +79,13 @@ public:
 
 public:
     virtual const BlockCipher& fetch_cipher_ctx() const noexcept = 0;
+
+public:
+    virtual std::size_t init(const ConstParameter& params) = 0;
+
+    virtual std::size_t set(const ConstParameter& params) = 0;
+
+    virtual std::size_t get(const Parameter& params) = 0;
 
 public:
     virtual void update(std::uint8_t*       out,

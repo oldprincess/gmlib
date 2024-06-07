@@ -188,6 +188,62 @@ public:
         return USER_KEY_LEN;
     }
 
+public:
+    std::size_t init(const ConstParameter& params) override
+    {
+        const auto& item_user_key = params.find(ParamKey::USER_KEY);
+        const auto& item_iv       = params.find(ParamKey::IV);
+        const auto& item_aad      = params.find(ParamKey::AAD);
+
+        const std::uint8_t* aad     = nullptr;
+        std::size_t         aad_len = 0;
+
+        std::size_t ret = 0;
+        if (item_user_key == params.end())
+        {
+            throw std::runtime_error("init need user_key");
+        }
+        if (item_user_key->second.second != USER_KEY_LEN)
+        {
+            throw std::runtime_error("invalid user_key len");
+        }
+        if (item_iv == params.end())
+        {
+            throw std::runtime_error("init need iv");
+        }
+        if (item_aad != params.end())
+        {
+            aad     = static_cast<const std::uint8_t*>(item_aad->second.first);
+            aad_len = item_aad->second.second;
+            ret     = ret | ParamKey::AAD;
+        }
+
+        this->init(
+            static_cast<const std::uint8_t*>(item_user_key->second.first), //
+            static_cast<const std::uint8_t*>(item_iv->second.first),       //
+            item_iv->second.second,                                        //
+            aad,                                                           //
+            aad_len                                                        //
+        );
+        return ParamKey::USER_KEY | ParamKey::IV | ret;
+    }
+
+    std::size_t get(const Parameter& params) override
+    {
+        const auto& item_tag = params.find(ParamKey::TAG);
+        std::size_t ret      = 0;
+        if (item_tag != params.end())
+        {
+            if (item_tag->second.second != sizeof(tag_))
+            {
+                throw std::runtime_error("gcm only support tag=16");
+            }
+            this->get_tag(static_cast<std::uint8_t*>(item_tag->second.first));
+            ret = ret | ParamKey::TAG;
+        }
+        return ret;
+    }
+
 private:
     ghash::GHash  hash_;
     std::uint8_t  tag_[16];
@@ -324,6 +380,75 @@ public:
     std::size_t fetch_user_key_len() const noexcept override
     {
         return USER_KEY_LEN;
+    }
+
+public:
+    std::size_t init(const ConstParameter& params) override
+    {
+        const auto& item_user_key = params.find(ParamKey::USER_KEY);
+        const auto& item_iv       = params.find(ParamKey::IV);
+        const auto& item_aad      = params.find(ParamKey::AAD);
+        const auto& item_tag      = params.find(ParamKey::TAG);
+
+        const std::uint8_t* aad     = nullptr;
+        std::size_t         aad_len = 0;
+
+        std::size_t ret = 0;
+        if (item_user_key == params.end())
+        {
+            throw std::runtime_error("init need user_key");
+        }
+        if (item_user_key->second.second != USER_KEY_LEN)
+        {
+            throw std::runtime_error("invalid user_key len");
+        }
+        if (item_iv == params.end())
+        {
+            throw std::runtime_error("init need iv");
+        }
+        if (item_aad != params.end())
+        {
+            aad     = static_cast<const std::uint8_t*>(item_aad->second.first);
+            aad_len = item_aad->second.second;
+            ret     = ret | ParamKey::AAD;
+        }
+        if (item_tag != params.end())
+        {
+            if (item_tag->second.second != sizeof(tag_))
+            {
+                throw std::runtime_error("gcm only support tag=16");
+            }
+            this->set_tag(
+                static_cast<const std::uint8_t*>(item_tag->second.first));
+            ret = ret | ParamKey::TAG;
+        }
+
+        this->init(
+            static_cast<const std::uint8_t*>(item_user_key->second.first), //
+            static_cast<const std::uint8_t*>(item_iv->second.first),       //
+            item_iv->second.second,                                        //
+            aad,                                                           //
+            aad_len                                                        //
+        );
+        return ParamKey::USER_KEY | ParamKey::IV;
+    }
+
+    std::size_t set(const ConstParameter& params) override
+    {
+        const auto& item_tag = params.find(ParamKey::TAG);
+        std::size_t ret      = 0;
+        if (item_tag != params.end())
+        {
+            if (item_tag->second.second != sizeof(tag_))
+            {
+                throw std::runtime_error("gcm only support tag=16");
+            }
+            this->set_tag(
+                static_cast<const std::uint8_t*>(item_tag->second.first) //
+            );
+            ret = ret | ParamKey::TAG;
+        }
+        return ret;
     }
 
 private:

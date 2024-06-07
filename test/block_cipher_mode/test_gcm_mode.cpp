@@ -205,8 +205,10 @@ static std::uint8_t tag[16] = {
 
 void test_gcm_mode()
 {
-    std::uint8_t buf[1024], get_tag[16];
-    std::size_t  size, n;
+    std::uint8_t   buf[1024], get_tag[16];
+    std::size_t    size, n;
+    ConstParameter c_param;
+    Parameter      param;
 
     auto e = SM4GcmEncryptor(user_key, iv, 16, aad, 16);
     e.do_final(buf, &size, pt, 1024);
@@ -241,6 +243,27 @@ void test_gcm_mode()
         throw std::runtime_error("err in gcm_mode");
     }
 
+    c_param.clear();
+    param.clear();
+    c_param[ParamKey::USER_KEY] = std::make_pair(user_key, sizeof(user_key));
+    c_param[ParamKey::IV]       = std::make_pair(iv, sizeof(iv));
+    c_param[ParamKey::AAD]      = std::make_pair(aad, sizeof(aad));
+    param[ParamKey::TAG]        = std::make_pair(get_tag, sizeof(get_tag));
+
+    e.init(c_param);
+    e.update(buf, &n, pt, 100);
+    size = n;
+    e.update(buf + size, &n, pt + 100, 1024 - 100);
+    size += n;
+    e.do_final(buf + size, &n, nullptr, 0);
+    size += n;
+    e.get(param);
+    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024 ||
+        std::memcmp(tag, get_tag, 16) != 0)
+    {
+        throw std::runtime_error("err in gcm_mode");
+    }
+
     auto d = SM4GcmDecryptor(user_key, iv, 16, aad, 16);
     d.set_tag(tag);
     d.do_final(buf, &size, ct, 1024);
@@ -259,6 +282,25 @@ void test_gcm_mode()
         throw std::runtime_error("err in gcm_mode");
     }
     d = SM4GcmDecryptor(user_key, iv, 16, aad, 16);
+    d.set_tag(tag);
+    d.update(buf, &n, ct, 100);
+    size = n;
+    d.update(buf + size, &n, ct + 100, 1024 - 100);
+    size += n;
+    d.do_final(buf + size, &n, nullptr, 0);
+    size += n;
+    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
+    {
+        throw std::runtime_error("err in gcm_mode");
+    }
+
+    c_param.clear();
+    c_param[ParamKey::USER_KEY] = std::make_pair(user_key, sizeof(user_key));
+    c_param[ParamKey::IV]       = std::make_pair(iv, sizeof(iv));
+    c_param[ParamKey::AAD]      = std::make_pair(aad, sizeof(aad));
+    c_param[ParamKey::TAG]      = std::make_pair(tag, sizeof(tag));
+
+    d.init(c_param);
     d.set_tag(tag);
     d.update(buf, &n, ct, 100);
     size = n;
