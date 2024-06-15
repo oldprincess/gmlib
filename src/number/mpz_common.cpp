@@ -97,7 +97,7 @@ int mpz_add_carry(std::uint32_t*       r,
                   int                  carry,
                   std::size_t          limb_size) noexcept
 {
-    if (limb_size == 0) return 0;
+    if (limb_size == 0) return carry;
 
     for (std::size_t i = 0; i < limb_size; i++)
     {
@@ -112,7 +112,7 @@ int mpz_sub_borrow(std::uint32_t*       r,
                    int                  borrow,
                    std::size_t          limb_size) noexcept
 {
-    if (limb_size == 0) return 0;
+    if (limb_size == 0) return borrow;
 
     for (std::size_t i = 0; i < limb_size; i++)
     {
