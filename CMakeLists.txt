@@ -47,6 +47,8 @@ if(MSVC)
 
 else()
     add_compile_options(${PROJECT_COMPILE_OPTIONS})
+    add_compile_options(-std=c++17)
+    add_compile_options(-fvisibility=hidden)
 endif()
 
 set(BASE_INCLUDE_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -57,7 +59,7 @@ include_directories(${BASE_INCLUDE_DIRECTORY})
 file(GLOB_RECURSE PROJECT_INCLUDE  ${BASE_INCLUDE_DIRECTORY}/*.h)
 file(GLOB_RECURSE PROJECT_LIB_SRC  ${BASE_LIB_SRC_DIRECTORY}/*.cpp)
 
-add_library(${PROJECT_NAME_} STATIC ${PROJECT_LIB_SRC} ${PROJECT_INCLUDE})
+add_library(${PROJECT_NAME_}_static STATIC ${PROJECT_LIB_SRC} ${PROJECT_INCLUDE})
 
 foreach(THIRD_PARTY_NAME ${THIRD_PARTY})
     file(   
@@ -73,6 +75,19 @@ foreach(THIRD_PARTY_NAME ${THIRD_PARTY})
     target_link_libraries(
         ${THIRD_PARTY_NAME}_test
         PUBLIC
-        ${PROJECT_NAME_}
+        ${PROJECT_NAME_}_static
     )
 endforeach()
+
+add_library(${PROJECT_NAME_} SHARED ${PROJECT_LIB_SRC} ${PROJECT_INCLUDE})
+target_compile_definitions(${PROJECT_NAME_} PUBLIC GMLIB_BUILD_DLL)
+add_executable(
+    ${PROJECT_NAME_}_test
+    ${PROJECT_INCLUDE}
+    ${BASE_TEST_SRC_DIRECTORY}/test.cpp
+)
+target_link_libraries(
+    ${PROJECT_NAME_}_test
+    PUBLIC
+    ${PROJECT_NAME_}
+)
