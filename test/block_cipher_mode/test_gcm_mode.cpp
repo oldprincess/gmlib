@@ -218,6 +218,14 @@ void test_gcm_mode()
     {
         throw std::runtime_error("err in gcm_mode");
     }
+    e.reset(iv, 16, aad, 16);
+    e.do_final(buf, &size, pt, 1024);
+    e.get_tag(get_tag);
+    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024 ||
+        std::memcmp(tag, get_tag, 16) != 0)
+    {
+        throw std::runtime_error("err in gcm_mode");
+    }
     e = SM4GcmEncryptor(user_key, iv, 16, aad, 16);
     e.update(buf, &n, pt, 100);
     size = n;
@@ -265,6 +273,13 @@ void test_gcm_mode()
     }
 
     auto d = SM4GcmDecryptor(user_key, iv, 16, aad, 16);
+    d.set_tag(tag);
+    d.do_final(buf, &size, ct, 1024);
+    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
+    {
+        throw std::runtime_error("err in gcm_mode");
+    }
+    d.reset(iv, 16, aad, 16);
     d.set_tag(tag);
     d.do_final(buf, &size, ct, 1024);
     if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)

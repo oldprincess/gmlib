@@ -75,6 +75,34 @@ public:
         internal::gctr_inc(counter_, counter0_);
     }
 
+    void reset(const std::uint8_t* iv, std::size_t iv_len, ghash::GHash& hash)
+    {
+        static const std::uint8_t ZERO[16] = {0};
+        std::uint8_t              t[16];
+
+        this->BlockCipherModeImpl<Cipher::BLOCK_SIZE>::reset();
+        hash.reset();
+        // init counter
+        if (iv_len == 12)
+        {
+            std::memcpy(counter0_, iv, 12);
+            counter0_[12] = 0, counter0_[13] = 0;
+            counter0_[14] = 0, counter0_[15] = 1;
+        }
+        else
+        {
+            // H(IV || 0(s+64) || ivlen(64) )
+            hash.update(iv, iv_len);
+            hash.update(ZERO, (16 - (iv_len % 16)) % 16);
+            memory_utils::store64_be(t + 0, 0);
+            memory_utils::store64_be(t + 8, iv_len * 8);
+            hash.update(t, 16);
+            hash.do_final(counter0_);
+            hash.reset();
+        }
+        internal::gctr_inc(counter_, counter0_);
+    }
+
 private:
     void gen_block_key_stream(std::uint8_t* out, std::size_t block_num)
     {
@@ -274,6 +302,26 @@ public:
                 "additional authenticated data length too loog");
         }
         this->GctrCryptor<Cipher>::init(user_key, iv, iv_len, hash_);
+        // gmac aad(additional authenticated data)
+        static std::uint8_t ZERO[16] = {0};
+        hash_.update(aad, aad_len);
+        hash_.update(ZERO, (16 - (aad_len % 16)) % 16);
+        aad_len_ = (std::uint64_t)aad_len;
+        ct_len_  = 0;
+        std::memset(tag_, 0, 16);
+    }
+
+    void reset(const std::uint8_t* iv,
+               std::size_t         iv_len,
+               const std::uint8_t* aad,
+               std::size_t         aad_len)
+    {
+        if (aad_len > UINT64_MAX / 8)
+        {
+            throw std::runtime_error(
+                "additional authenticated data length too loog");
+        }
+        this->GctrCryptor<Cipher>::reset(iv, iv_len, hash_);
         // gmac aad(additional authenticated data)
         static std::uint8_t ZERO[16] = {0};
         hash_.update(aad, aad_len);
@@ -487,6 +535,26 @@ public:
         hash_.update(ZERO, (16 - (aad_len % 16)) % 16);
         aad_len_ = aad_len;
         ct_len_  = 0;
+    }
+
+    void reset(const std::uint8_t* iv,
+               std::size_t         iv_len,
+               const std::uint8_t* aad,
+               std::size_t         aad_len)
+    {
+        if (aad_len > UINT64_MAX / 8)
+        {
+            throw std::runtime_error(
+                "additional authenticated data length too loog");
+        }
+        this->GctrCryptor<Cipher>::reset(iv, iv_len, hash_);
+        // gmac aad(additional authenticated data)
+        static std::uint8_t ZERO[16] = {0};
+        hash_.update(aad, aad_len);
+        hash_.update(ZERO, (16 - (aad_len % 16)) % 16);
+        aad_len_ = (std::uint64_t)aad_len;
+        ct_len_  = 0;
+        std::memset(tag_, 0, 16);
     }
 
     void set_tag(const std::uint8_t tag[16]) noexcept
