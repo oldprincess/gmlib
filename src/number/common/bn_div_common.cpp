@@ -1,6 +1,7 @@
 #include <gmlib/number/internal/bn_common.h>
 
 #include <cassert>
+#include <cstring>
 
 #include "bn.inc.h"
 
@@ -32,7 +33,9 @@ int bn_udivmod32(BigNum_st       *q,
                  const BigNum_st *a,
                  std::uint32_t    b) noexcept
 {
-    int err_code = 0;
+    int           err_code = 0;
+    std::uint64_t rem      = 0, tmp;
+    
     if (b == 0)
     {
         return -1;
@@ -43,7 +46,6 @@ int bn_udivmod32(BigNum_st       *q,
         goto end;
     }
 
-    std::uint64_t rem = 0, tmp;
     for (size_t i = a->data_len - 1; u_ge_zero(i); i--)
     {
         tmp = (rem << 32) | a->data[i];

@@ -193,7 +193,7 @@ public:
         {
             char* name_part1 = name;
             char* name_part2 = name + Cipher::NAME_STR_LEN;
-            std::memcpy(name_part1, cipher_.fetch_name(), Cipher::NAME_STR_LEN);
+            std::memcpy(name_part1, Cipher::NAME, Cipher::NAME_STR_LEN);
             std::memcpy(name_part2, NAME_SUFFIX,
                         NAME_STR_LEN - Cipher::NAME_STR_LEN);
             inited = true;
@@ -407,7 +407,7 @@ public:
         {
             char* name_part1 = name;
             char* name_part2 = name + Cipher::NAME_STR_LEN;
-            std::memcpy(name_part1, cipher_.fetch_name(), Cipher::NAME_STR_LEN);
+            std::memcpy(name_part1, Cipher::NAME, Cipher::NAME_STR_LEN);
             std::memcpy(name_part2, NAME_SUFFIX,
                         NAME_STR_LEN - Cipher::NAME_STR_LEN);
             inited = true;

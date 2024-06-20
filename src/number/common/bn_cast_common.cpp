@@ -62,8 +62,10 @@ int bn_to_str(char                      *s,
         return 0;
     }
 
-    int        err_code = 0;
-    BigNum_st *t        = NULL;
+    int         err_code = 0;
+    BigNum_st  *t        = NULL;
+    char       *cur_str  = NULL;
+    std::size_t s_len    = 0;
     _bn_alloc(&t, 32 * a->data_len, mp);
     _bn_cpy(t, a);
 
@@ -72,7 +74,7 @@ int bn_to_str(char                      *s,
         *s = '-', s += 1;
     }
 
-    char *cur_str = s;
+    cur_str = s;
     while (bn_ucmp_zero(t) != 0)
     {
         std::uint32_t r = 0;
@@ -82,7 +84,7 @@ int bn_to_str(char                      *s,
     }
     *cur_str = '\0';
     //
-    std::size_t s_len = (std::size_t)cur_str - (std::size_t)s;
+    s_len = (std::size_t)cur_str - (std::size_t)s;
     for (std::size_t i = 0; i < s_len / 2; i++)
     {
         char c           = s[i];
@@ -174,13 +176,14 @@ int bn_from_bytes(BigNum_st          *r,
                   std::size_t         bytes_len,
                   int                 is_big_endian) noexcept
 {
-    int err_code = 0;
+    int         err_code = 0;
+    std::size_t data_len = 0;
     if (bytes_len == 0)
     {
         bn_set_zero(r);
         goto end;
     }
-    std::size_t data_len = (bytes_len + 3) / 4;
+    data_len = (bytes_len + 3) / 4;
     if (r->MAX_DSIZE < data_len)
     {
         err_code = -1;

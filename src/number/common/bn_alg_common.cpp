@@ -16,20 +16,23 @@
 
 namespace number::internal::common {
 
-static int bn_uadd(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
+static int bn_uadd(BigNum_st*       r,
+                   const BigNum_st* a,
+                   const BigNum_st* b) noexcept
 {
     const BigNum_st* big   = a->data_len > b->data_len ? a : b;
     const BigNum_st* small = a->data_len > b->data_len ? b : a;
 
-    int err_code = 0;
+    int         err_code = 0;
+    std::size_t i        = 0;
+    int         carry    = 0;
+
     if (r->MAX_DSIZE < big->data_len)
     {
         err_code = -1;
         goto end;
     }
 
-    std::size_t i     = 0;
-    int         carry = 0;
     for (; i < small->data_len; i++)
     {
         carry = _add_carry(&r->data[i], big->data[i], small->data[i], carry);
@@ -57,11 +60,16 @@ end:
     return err_code;
 }
 
-static int bn_usub(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
+static int bn_usub(BigNum_st*       r,
+                   const BigNum_st* a,
+                   const BigNum_st* b) noexcept
 {
     assert(bn_ucmp(a, b) >= 0);
 
-    int err_code = 0;
+    int         err_code = 0;
+    std::size_t i        = 0;
+    int         borrow   = 0;
+
     if (r->MAX_DSIZE < a->data_len)
     {
         err_code = -1;
@@ -69,8 +77,6 @@ static int bn_usub(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
         goto end;
     }
 
-    std::size_t i      = 0;
-    int         borrow = 0;
     for (; i < b->data_len; i++)
     {
         borrow = _sub_borrow(&r->data[i], a->data[i], b->data[i], borrow);
@@ -89,9 +95,10 @@ end:
     return err_code;
 }
 
-int bn_add(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
+int bn_add(BigNum_st* r, const BigNum_st* a, const BigNum_st* b) noexcept
 {
     int err_code = 0;
+    int cmp      = 0;
     if (a->sign == b->sign)
     {
         // (0) + (0) -> (0)
@@ -102,7 +109,7 @@ int bn_add(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
         goto end;
     }
 
-    int cmp = bn_ucmp(a, b);
+    cmp = bn_ucmp(a, b);
     if (cmp == 1)
     {
         r->sign = a->sign;
@@ -121,9 +128,10 @@ end:
     return err_code;
 }
 
-int bn_sub(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
+int bn_sub(BigNum_st* r, const BigNum_st* a, const BigNum_st* b) noexcept
 {
     int err_code = 0;
+    int cmp      = 0;
     if (a->sign != b->sign)
     {
         // (+) - (0) -> (+), (+) - (-) -> (+)
@@ -134,7 +142,7 @@ int bn_sub(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
         goto end;
     }
 
-    int cmp = bn_ucmp(a, b);
+    cmp = bn_ucmp(a, b);
     if (cmp == 1)
     {
         r->sign = a->sign;
@@ -153,7 +161,9 @@ end:
     return err_code;
 }
 
-static int bn_umul(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
+static int bn_umul(BigNum_st*       r,
+                   const BigNum_st* a,
+                   const BigNum_st* b) noexcept
 {
     int err_code = 0;
     if (r->MAX_DSIZE < a->data_len + b->data_len)
@@ -186,7 +196,7 @@ end:
     return err_code;
 }
 
-int bn_mul(BigNum_st* r, const BigNum_st* a, const BigNum_st* b)noexcept
+int bn_mul(BigNum_st* r, const BigNum_st* a, const BigNum_st* b) noexcept
 {
     int        err_code = 0;
     BigNum_st* t        = NULL;
@@ -221,9 +231,10 @@ end:
 int bn_umul32_uadd32(BigNum_st*       r,
                      const BigNum_st* a,
                      std::uint32_t    mul_val,
-                     std::uint32_t    add_val)noexcept
+                     std::uint32_t    add_val) noexcept
 {
-    int err_code = 0;
+    int           err_code = 0;
+    std::uint32_t carry    = 0;
     if (mul_val == 0)
     {
         if (add_val == 0)
@@ -244,7 +255,7 @@ int bn_umul32_uadd32(BigNum_st*       r,
         goto end;
     }
 
-    std::uint32_t carry = add_val;
+    carry = add_val;
     for (std::size_t i = 0; i < a->data_len; i++)
     {
         carry = _mul_carry(&r->data[i], a->data[i], mul_val, carry);
