@@ -2,7 +2,7 @@
 #include <gmlib/_debug.h>
 #include <gmlib/aes/aes_mode.h>
 
-#include <limits>
+#include "c_api_cipher.h"
 
 using namespace aes;
 
@@ -12,79 +12,47 @@ using namespace aes;
 
 size_t gmlib_aes192_ecb_encrypt_ctx_size()
 {
-    return sizeof(AES192EcbEncryptor);
+    return c_api::cipher_ecb_encrypt_ctx_size<AES192EcbEncryptor>();
 }
 
 void* gmlib_aes192_ecb_encrypt_ctx_alloc()
 {
-    return new (std::nothrow) AES192EcbEncryptor();
+    return c_api::cipher_ecb_encrypt_ctx_alloc<AES192EcbEncryptor>();
 }
 
 int gmlib_aes192_ecb_encrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<AES192EcbEncryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(
+        c_api::cipher_ecb_encrypt_ctx_free<AES192EcbEncryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_ecb_encrypt_get_user_key_len()
 {
-    return AES192EcbEncryptor::USER_KEY_LEN;
+    return c_api::cipher_ecb_encrypt_get_user_key_len<AES192EcbEncryptor>();
 }
 
 size_t gmlib_aes192_ecb_encrypt_get_block_size()
 {
-    return AES192EcbEncryptor::BLOCK_SIZE;
+    return c_api::cipher_ecb_encrypt_get_block_size<AES192EcbEncryptor>();
 }
 
 int gmlib_aes192_ecb_encrypt_ctx_init(void*          ctx,
                                       const uint8_t* user_key,
                                       size_t         user_key_len)
 {
-    if (ctx == nullptr || user_key == nullptr ||
-        user_key_len != AES192EcbEncryptor::USER_KEY_LEN)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192EcbEncryptor*>(ctx);
-        ptr->init(user_key);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192EcbEncryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_encrypt_ctx_init<AES192EcbEncryptor>(
+                    ctx, user_key, user_key_len) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_ecb_encrypt_ctx_reset(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192EcbEncryptor*>(ctx);
-        ptr->reset();
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192EcbEncryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(
+        c_api::cipher_ecb_encrypt_ctx_reset<AES192EcbEncryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
@@ -94,23 +62,9 @@ int gmlib_aes192_ecb_encrypt_ctx_update(void*          ctx,
                                         const uint8_t* in,
                                         size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192EcbEncryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192EcbEncryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_encrypt_ctx_update<AES192EcbEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -120,122 +74,63 @@ int gmlib_aes192_ecb_encrypt_ctx_final_ex(void*          ctx,
                                           const uint8_t* in,
                                           size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192EcbEncryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192EcbEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_encrypt_ctx_final_ex<AES192EcbEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_ecb_encrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192EcbEncryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192EcbEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_encrypt_ctx_final<AES192EcbEncryptor>(
+                    ctx, out, outl) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_ecb_decrypt_ctx_size()
 {
-    return sizeof(AES192EcbDecryptor);
+    return c_api::cipher_ecb_decrypt_ctx_size<AES192EcbDecryptor>();
 }
 
 void* gmlib_aes192_ecb_decrypt_ctx_alloc()
 {
-    return new (std::nothrow) AES192EcbDecryptor();
+    return c_api::cipher_ecb_decrypt_ctx_alloc<AES192EcbDecryptor>();
 }
 
 int gmlib_aes192_ecb_decrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<AES192EcbDecryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(
+        c_api::cipher_ecb_decrypt_ctx_free<AES192EcbDecryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_ecb_decrypt_get_user_key_len()
 {
-    return AES192EcbDecryptor::USER_KEY_LEN;
+    return c_api::cipher_ecb_decrypt_get_user_key_len<AES192EcbDecryptor>();
 }
 
 size_t gmlib_aes192_ecb_decrypt_get_block_size()
 {
-    return AES192EcbDecryptor::BLOCK_SIZE;
+    return c_api::cipher_ecb_decrypt_get_block_size<AES192EcbDecryptor>();
 }
 
 int gmlib_aes192_ecb_decrypt_ctx_init(void*          ctx,
                                       const uint8_t* user_key,
                                       size_t         user_key_len)
 {
-    if (ctx == nullptr || user_key == nullptr ||
-        user_key_len != AES192EcbDecryptor::USER_KEY_LEN)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192EcbDecryptor*>(ctx);
-        ptr->init(user_key);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192EcbDecryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_decrypt_ctx_init<AES192EcbDecryptor>(
+                    ctx, user_key, user_key_len) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_ecb_decrypt_ctx_reset(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192EcbDecryptor*>(ctx);
-        ptr->reset();
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192EcbDecryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(
+        c_api::cipher_ecb_decrypt_ctx_reset<AES192EcbDecryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
@@ -245,23 +140,9 @@ int gmlib_aes192_ecb_decrypt_ctx_update(void*          ctx,
                                         const uint8_t* in,
                                         size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192EcbDecryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192EcbDecryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_decrypt_ctx_update<AES192EcbDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -271,44 +152,17 @@ int gmlib_aes192_ecb_decrypt_ctx_final_ex(void*          ctx,
                                           const uint8_t* in,
                                           size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192EcbDecryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192EcbDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_decrypt_ctx_final_ex<AES192EcbDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_ecb_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192EcbDecryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192EcbDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_decrypt_ctx_final<AES192EcbDecryptor>(
+                    ctx, out, outl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -318,40 +172,35 @@ int gmlib_aes192_ecb_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 
 size_t gmlib_aes192_cbc_encrypt_ctx_size()
 {
-    return sizeof(AES192CbcEncryptor);
+    return c_api::cipher_cbc_encrypt_ctx_size<AES192CbcEncryptor>();
 }
 
 void* gmlib_aes192_cbc_encrypt_ctx_alloc()
 {
-    return new (std::nothrow) AES192CbcEncryptor();
+    return c_api::cipher_cbc_encrypt_ctx_alloc<AES192CbcEncryptor>();
 }
 
 int gmlib_aes192_cbc_encrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<AES192CbcEncryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(
+        c_api::cipher_cbc_encrypt_ctx_free<AES192CbcEncryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_cbc_encrypt_get_user_key_len()
 {
-    return AES192CbcEncryptor::USER_KEY_LEN;
+    return c_api::cipher_cbc_encrypt_get_user_key_len<AES192CbcEncryptor>();
 }
 
 size_t gmlib_aes192_cbc_encrypt_get_iv_len()
 {
-    return AES192CbcEncryptor::BLOCK_SIZE;
+    return c_api::cipher_cbc_encrypt_get_iv_len<AES192CbcEncryptor>();
 }
 
 size_t gmlib_aes192_cbc_encrypt_get_block_size()
 {
-    return AES192CbcEncryptor::BLOCK_SIZE;
+    return c_api::cipher_cbc_encrypt_get_block_size<AES192CbcEncryptor>();
 }
 
 int gmlib_aes192_cbc_encrypt_ctx_init(void*          ctx,
@@ -360,26 +209,9 @@ int gmlib_aes192_cbc_encrypt_ctx_init(void*          ctx,
                                       const uint8_t* iv,
                                       size_t         iv_len)
 {
-    if (ctx == nullptr ||                                   //
-        user_key == nullptr ||                              //
-        user_key_len != AES192CbcEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                    //
-        iv_len != AES192CbcEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CbcEncryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CbcEncryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_encrypt_ctx_init<AES192CbcEncryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -387,23 +219,9 @@ int gmlib_aes192_cbc_encrypt_ctx_reset(void*          ctx,
                                        const uint8_t* iv,
                                        size_t         iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != AES192CbcEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CbcEncryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CbcEncryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_encrypt_ctx_reset<AES192CbcEncryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -413,23 +231,9 @@ int gmlib_aes192_cbc_encrypt_ctx_update(void*          ctx,
                                         const uint8_t* in,
                                         size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CbcEncryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CbcEncryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_encrypt_ctx_update<AES192CbcEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -439,83 +243,51 @@ int gmlib_aes192_cbc_encrypt_ctx_final_ex(void*          ctx,
                                           const uint8_t* in,
                                           size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CbcEncryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CbcEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_encrypt_ctx_final_ex<AES192CbcEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_cbc_encrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CbcEncryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CbcEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_encrypt_ctx_final<AES192CbcEncryptor>(
+                    ctx, out, outl) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_cbc_decrypt_ctx_size()
 {
-    return sizeof(AES192CbcDecryptor);
+    return c_api::cipher_cbc_decrypt_ctx_size<AES192CbcDecryptor>();
 }
 
 void* gmlib_aes192_cbc_decrypt_ctx_alloc()
 {
-    return new (std::nothrow) AES192CbcDecryptor();
+    return c_api::cipher_cbc_decrypt_ctx_alloc<AES192CbcDecryptor>();
 }
 
 int gmlib_aes192_cbc_decrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<AES192CbcDecryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(
+        c_api::cipher_cbc_decrypt_ctx_free<AES192CbcDecryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_cbc_decrypt_get_user_key_len()
 {
-    return AES192CbcDecryptor::USER_KEY_LEN;
+    return c_api::cipher_cbc_decrypt_get_user_key_len<AES192CbcDecryptor>();
 }
 
 size_t gmlib_aes192_cbc_decrypt_get_iv_len()
 {
-    return AES192CbcDecryptor::BLOCK_SIZE;
+    return c_api::cipher_cbc_decrypt_get_iv_len<AES192CbcDecryptor>();
 }
 
 size_t gmlib_aes192_cbc_decrypt_get_block_size()
 {
-    return AES192CbcDecryptor::BLOCK_SIZE;
+    return c_api::cipher_cbc_decrypt_get_block_size<AES192CbcDecryptor>();
 }
 
 int gmlib_aes192_cbc_decrypt_ctx_init(void*          ctx,
@@ -524,26 +296,9 @@ int gmlib_aes192_cbc_decrypt_ctx_init(void*          ctx,
                                       const uint8_t* iv,
                                       size_t         iv_len)
 {
-    if (ctx == nullptr ||                                   //
-        user_key == nullptr ||                              //
-        user_key_len != AES192CbcEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                    //
-        iv_len != AES192CbcEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CbcDecryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CbcDecryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_decrypt_ctx_init<AES192CbcDecryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -551,23 +306,9 @@ int gmlib_aes192_cbc_decrypt_ctx_reset(void*          ctx,
                                        const uint8_t* iv,
                                        size_t         iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != AES192CbcEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CbcDecryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CbcDecryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_decrypt_ctx_reset<AES192CbcDecryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -577,23 +318,9 @@ int gmlib_aes192_cbc_decrypt_ctx_update(void*          ctx,
                                         const uint8_t* in,
                                         size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CbcDecryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CbcDecryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_decrypt_ctx_update<AES192CbcDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -603,44 +330,17 @@ int gmlib_aes192_cbc_decrypt_ctx_final_ex(void*          ctx,
                                           const uint8_t* in,
                                           size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CbcDecryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CbcDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_decrypt_ctx_final_ex<AES192CbcDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_cbc_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CbcDecryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CbcDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_decrypt_ctx_final<AES192CbcDecryptor>(
+                    ctx, out, outl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -650,40 +350,35 @@ int gmlib_aes192_cbc_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 
 size_t gmlib_aes192_cfb_encrypt_ctx_size()
 {
-    return sizeof(AES192CfbEncryptor);
+    return c_api::cipher_cfb_encrypt_ctx_size<AES192CfbEncryptor>();
 }
 
 void* gmlib_aes192_cfb_encrypt_ctx_alloc()
 {
-    return new (std::nothrow) AES192CfbEncryptor();
+    return c_api::cipher_cfb_encrypt_ctx_alloc<AES192CfbEncryptor>();
 }
 
 int gmlib_aes192_cfb_encrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<AES192CfbEncryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(
+        c_api::cipher_cfb_encrypt_ctx_free<AES192CfbEncryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_cfb_encrypt_get_user_key_len()
 {
-    return AES192CfbEncryptor::USER_KEY_LEN;
+    return c_api::cipher_cfb_encrypt_get_user_key_len<AES192CfbEncryptor>();
 }
 
 size_t gmlib_aes192_cfb_encrypt_get_iv_len()
 {
-    return AES192CfbEncryptor::BLOCK_SIZE;
+    return c_api::cipher_cfb_encrypt_get_iv_len<AES192CfbEncryptor>();
 }
 
 size_t gmlib_aes192_cfb_encrypt_get_block_size()
 {
-    return AES192CfbEncryptor::BLOCK_SIZE;
+    return c_api::cipher_cfb_encrypt_get_block_size<AES192CfbEncryptor>();
 }
 
 int gmlib_aes192_cfb_encrypt_ctx_init(void*          ctx,
@@ -692,26 +387,9 @@ int gmlib_aes192_cfb_encrypt_ctx_init(void*          ctx,
                                       const uint8_t* iv,
                                       size_t         iv_len)
 {
-    if (ctx == nullptr ||                                   //
-        user_key == nullptr ||                              //
-        user_key_len != AES192CfbEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                    //
-        iv_len != AES192CfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CfbEncryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CfbEncryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_encrypt_ctx_init<AES192CfbEncryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -719,23 +397,9 @@ int gmlib_aes192_cfb_encrypt_ctx_reset(void*          ctx,
                                        const uint8_t* iv,
                                        size_t         iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != AES192CfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CfbEncryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CfbEncryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_encrypt_ctx_reset<AES192CfbEncryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -745,23 +409,9 @@ int gmlib_aes192_cfb_encrypt_ctx_update(void*          ctx,
                                         const uint8_t* in,
                                         size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CfbEncryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CfbEncryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_encrypt_ctx_update<AES192CfbEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -771,83 +421,51 @@ int gmlib_aes192_cfb_encrypt_ctx_final_ex(void*          ctx,
                                           const uint8_t* in,
                                           size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CfbEncryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CfbEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_encrypt_ctx_final_ex<AES192CfbEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_cfb_encrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CfbEncryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CfbEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_encrypt_ctx_final<AES192CfbEncryptor>(
+                    ctx, out, outl) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_cfb_decrypt_ctx_size()
 {
-    return sizeof(AES192CfbDecryptor);
+    return c_api::cipher_cfb_decrypt_ctx_size<AES192CfbDecryptor>();
 }
 
 void* gmlib_aes192_cfb_decrypt_ctx_alloc()
 {
-    return new (std::nothrow) AES192CfbDecryptor();
+    return c_api::cipher_cfb_decrypt_ctx_alloc<AES192CfbDecryptor>();
 }
 
 int gmlib_aes192_cfb_decrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<AES192CfbDecryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(
+        c_api::cipher_cfb_decrypt_ctx_free<AES192CfbDecryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_cfb_decrypt_get_user_key_len()
 {
-    return AES192CfbDecryptor::USER_KEY_LEN;
+    return c_api::cipher_cfb_decrypt_get_user_key_len<AES192CfbDecryptor>();
 }
 
 size_t gmlib_aes192_cfb_decrypt_get_iv_len()
 {
-    return AES192CfbDecryptor::BLOCK_SIZE;
+    return c_api::cipher_cfb_decrypt_get_iv_len<AES192CfbDecryptor>();
 }
 
 size_t gmlib_aes192_cfb_decrypt_get_block_size()
 {
-    return AES192CfbDecryptor::BLOCK_SIZE;
+    return c_api::cipher_cfb_decrypt_get_block_size<AES192CfbDecryptor>();
 }
 
 int gmlib_aes192_cfb_decrypt_ctx_init(void*          ctx,
@@ -856,26 +474,9 @@ int gmlib_aes192_cfb_decrypt_ctx_init(void*          ctx,
                                       const uint8_t* iv,
                                       size_t         iv_len)
 {
-    if (ctx == nullptr ||                                   //
-        user_key == nullptr ||                              //
-        user_key_len != AES192CfbEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                    //
-        iv_len != AES192CfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CfbDecryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CfbDecryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_decrypt_ctx_init<AES192CfbDecryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -883,23 +484,9 @@ int gmlib_aes192_cfb_decrypt_ctx_reset(void*          ctx,
                                        const uint8_t* iv,
                                        size_t         iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != AES192CfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CfbDecryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CfbDecryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_decrypt_ctx_reset<AES192CfbDecryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -909,23 +496,9 @@ int gmlib_aes192_cfb_decrypt_ctx_update(void*          ctx,
                                         const uint8_t* in,
                                         size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CfbDecryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CfbDecryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_decrypt_ctx_update<AES192CfbDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -935,44 +508,17 @@ int gmlib_aes192_cfb_decrypt_ctx_final_ex(void*          ctx,
                                           const uint8_t* in,
                                           size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CfbDecryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CfbDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_decrypt_ctx_final_ex<AES192CfbDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_cfb_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CfbDecryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CfbDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_decrypt_ctx_final<AES192CfbDecryptor>(
+                    ctx, out, outl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -982,40 +528,35 @@ int gmlib_aes192_cfb_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 
 size_t gmlib_aes192_ofb_encrypt_ctx_size()
 {
-    return sizeof(AES192OfbEncryptor);
+    return c_api::cipher_ofb_encrypt_ctx_size<AES192OfbEncryptor>();
 }
 
 void* gmlib_aes192_ofb_encrypt_ctx_alloc()
 {
-    return new (std::nothrow) AES192OfbEncryptor();
+    return c_api::cipher_ofb_encrypt_ctx_alloc<AES192OfbEncryptor>();
 }
 
 int gmlib_aes192_ofb_encrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<AES192OfbEncryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(
+        c_api::cipher_ofb_encrypt_ctx_free<AES192OfbEncryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_ofb_encrypt_get_user_key_len()
 {
-    return AES192OfbEncryptor::USER_KEY_LEN;
+    return c_api::cipher_ofb_encrypt_get_user_key_len<AES192OfbEncryptor>();
 }
 
 size_t gmlib_aes192_ofb_encrypt_get_iv_len()
 {
-    return AES192OfbEncryptor::BLOCK_SIZE;
+    return c_api::cipher_ofb_encrypt_get_iv_len<AES192OfbEncryptor>();
 }
 
 size_t gmlib_aes192_ofb_encrypt_get_block_size()
 {
-    return AES192OfbEncryptor::BLOCK_SIZE;
+    return c_api::cipher_ofb_encrypt_get_block_size<AES192OfbEncryptor>();
 }
 
 int gmlib_aes192_ofb_encrypt_ctx_init(void*          ctx,
@@ -1024,26 +565,9 @@ int gmlib_aes192_ofb_encrypt_ctx_init(void*          ctx,
                                       const uint8_t* iv,
                                       size_t         iv_len)
 {
-    if (ctx == nullptr ||                                   //
-        user_key == nullptr ||                              //
-        user_key_len != AES192OfbEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                    //
-        iv_len != AES192OfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192OfbEncryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192OfbEncryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_encrypt_ctx_init<AES192OfbEncryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1051,23 +575,9 @@ int gmlib_aes192_ofb_encrypt_ctx_reset(void*          ctx,
                                        const uint8_t* iv,
                                        size_t         iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != AES192OfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192OfbEncryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192OfbEncryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_encrypt_ctx_reset<AES192OfbEncryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1077,23 +587,9 @@ int gmlib_aes192_ofb_encrypt_ctx_update(void*          ctx,
                                         const uint8_t* in,
                                         size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192OfbEncryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192OfbEncryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_encrypt_ctx_update<AES192OfbEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1103,83 +599,51 @@ int gmlib_aes192_ofb_encrypt_ctx_final_ex(void*          ctx,
                                           const uint8_t* in,
                                           size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192OfbEncryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192OfbEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_encrypt_ctx_final_ex<AES192OfbEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_ofb_encrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192OfbEncryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192OfbEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_encrypt_ctx_final<AES192OfbEncryptor>(
+                    ctx, out, outl) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_ofb_decrypt_ctx_size()
 {
-    return sizeof(AES192OfbDecryptor);
+    return c_api::cipher_ofb_decrypt_ctx_size<AES192OfbDecryptor>();
 }
 
 void* gmlib_aes192_ofb_decrypt_ctx_alloc()
 {
-    return new (std::nothrow) AES192OfbDecryptor();
+    return c_api::cipher_ofb_decrypt_ctx_alloc<AES192OfbDecryptor>();
 }
 
 int gmlib_aes192_ofb_decrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<AES192OfbDecryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(
+        c_api::cipher_ofb_decrypt_ctx_free<AES192OfbDecryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_ofb_decrypt_get_user_key_len()
 {
-    return AES192OfbDecryptor::USER_KEY_LEN;
+    return c_api::cipher_ofb_decrypt_get_user_key_len<AES192OfbDecryptor>();
 }
 
 size_t gmlib_aes192_ofb_decrypt_get_iv_len()
 {
-    return AES192OfbDecryptor::BLOCK_SIZE;
+    return c_api::cipher_ofb_decrypt_get_iv_len<AES192OfbDecryptor>();
 }
 
 size_t gmlib_aes192_ofb_decrypt_get_block_size()
 {
-    return AES192OfbDecryptor::BLOCK_SIZE;
+    return c_api::cipher_ofb_decrypt_get_block_size<AES192OfbDecryptor>();
 }
 
 int gmlib_aes192_ofb_decrypt_ctx_init(void*          ctx,
@@ -1188,26 +652,9 @@ int gmlib_aes192_ofb_decrypt_ctx_init(void*          ctx,
                                       const uint8_t* iv,
                                       size_t         iv_len)
 {
-    if (ctx == nullptr ||                                   //
-        user_key == nullptr ||                              //
-        user_key_len != AES192OfbEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                    //
-        iv_len != AES192OfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192OfbDecryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192OfbDecryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_decrypt_ctx_init<AES192OfbDecryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1215,23 +662,9 @@ int gmlib_aes192_ofb_decrypt_ctx_reset(void*          ctx,
                                        const uint8_t* iv,
                                        size_t         iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != AES192OfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192OfbDecryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192OfbDecryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_decrypt_ctx_reset<AES192OfbDecryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1241,23 +674,9 @@ int gmlib_aes192_ofb_decrypt_ctx_update(void*          ctx,
                                         const uint8_t* in,
                                         size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192OfbDecryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192OfbDecryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_decrypt_ctx_update<AES192OfbDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1267,44 +686,17 @@ int gmlib_aes192_ofb_decrypt_ctx_final_ex(void*          ctx,
                                           const uint8_t* in,
                                           size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192OfbDecryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192OfbDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_decrypt_ctx_final_ex<AES192OfbDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_ofb_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192OfbDecryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192OfbDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_decrypt_ctx_final<AES192OfbDecryptor>(
+                    ctx, out, outl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1314,40 +706,35 @@ int gmlib_aes192_ofb_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 
 size_t gmlib_aes192_ctr_encrypt_ctx_size()
 {
-    return sizeof(AES192CtrEncryptor);
+    return c_api::cipher_ctr_encrypt_ctx_size<AES192CtrEncryptor>();
 }
 
 void* gmlib_aes192_ctr_encrypt_ctx_alloc()
 {
-    return new (std::nothrow) AES192CtrEncryptor();
+    return c_api::cipher_ctr_encrypt_ctx_alloc<AES192CtrEncryptor>();
 }
 
 int gmlib_aes192_ctr_encrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<AES192CtrEncryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(
+        c_api::cipher_ctr_encrypt_ctx_free<AES192CtrEncryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_ctr_encrypt_get_user_key_len()
 {
-    return AES192CtrEncryptor::USER_KEY_LEN;
+    return c_api::cipher_ctr_encrypt_get_user_key_len<AES192CtrEncryptor>();
 }
 
 size_t gmlib_aes192_ctr_encrypt_get_iv_len()
 {
-    return AES192CtrEncryptor::BLOCK_SIZE;
+    return c_api::cipher_ctr_encrypt_get_iv_len<AES192CtrEncryptor>();
 }
 
 size_t gmlib_aes192_ctr_encrypt_get_block_size()
 {
-    return AES192CtrEncryptor::BLOCK_SIZE;
+    return c_api::cipher_ctr_encrypt_get_block_size<AES192CtrEncryptor>();
 }
 
 int gmlib_aes192_ctr_encrypt_ctx_init(void*          ctx,
@@ -1356,26 +743,9 @@ int gmlib_aes192_ctr_encrypt_ctx_init(void*          ctx,
                                       const uint8_t* iv,
                                       size_t         iv_len)
 {
-    if (ctx == nullptr ||                                   //
-        user_key == nullptr ||                              //
-        user_key_len != AES192CtrEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                    //
-        iv_len != AES192CtrEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CtrEncryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CtrEncryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_encrypt_ctx_init<AES192CtrEncryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1383,23 +753,9 @@ int gmlib_aes192_ctr_encrypt_ctx_reset(void*          ctx,
                                        const uint8_t* iv,
                                        size_t         iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != AES192CtrEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CtrEncryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CtrEncryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_encrypt_ctx_reset<AES192CtrEncryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1409,23 +765,9 @@ int gmlib_aes192_ctr_encrypt_ctx_update(void*          ctx,
                                         const uint8_t* in,
                                         size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CtrEncryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CtrEncryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_encrypt_ctx_update<AES192CtrEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1435,83 +777,51 @@ int gmlib_aes192_ctr_encrypt_ctx_final_ex(void*          ctx,
                                           const uint8_t* in,
                                           size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CtrEncryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CtrEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_encrypt_ctx_final_ex<AES192CtrEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_ctr_encrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CtrEncryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CtrEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_encrypt_ctx_final<AES192CtrEncryptor>(
+                    ctx, out, outl) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_ctr_decrypt_ctx_size()
 {
-    return sizeof(AES192CtrDecryptor);
+    return c_api::cipher_ctr_decrypt_ctx_size<AES192CtrDecryptor>();
 }
 
 void* gmlib_aes192_ctr_decrypt_ctx_alloc()
 {
-    return new (std::nothrow) AES192CtrDecryptor();
+    return c_api::cipher_ctr_decrypt_ctx_alloc<AES192CtrDecryptor>();
 }
 
 int gmlib_aes192_ctr_decrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<AES192CtrDecryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(
+        c_api::cipher_ctr_decrypt_ctx_free<AES192CtrDecryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_ctr_decrypt_get_user_key_len()
 {
-    return AES192CtrDecryptor::USER_KEY_LEN;
+    return c_api::cipher_ctr_decrypt_get_user_key_len<AES192CtrDecryptor>();
 }
 
 size_t gmlib_aes192_ctr_decrypt_get_iv_len()
 {
-    return AES192CtrDecryptor::BLOCK_SIZE;
+    return c_api::cipher_ctr_decrypt_get_iv_len<AES192CtrDecryptor>();
 }
 
 size_t gmlib_aes192_ctr_decrypt_get_block_size()
 {
-    return AES192CtrDecryptor::BLOCK_SIZE;
+    return c_api::cipher_ctr_decrypt_get_block_size<AES192CtrDecryptor>();
 }
 
 int gmlib_aes192_ctr_decrypt_ctx_init(void*          ctx,
@@ -1520,26 +830,9 @@ int gmlib_aes192_ctr_decrypt_ctx_init(void*          ctx,
                                       const uint8_t* iv,
                                       size_t         iv_len)
 {
-    if (ctx == nullptr ||                                   //
-        user_key == nullptr ||                              //
-        user_key_len != AES192CtrEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                    //
-        iv_len != AES192CtrEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CtrDecryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CtrDecryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_decrypt_ctx_init<AES192CtrDecryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1547,23 +840,9 @@ int gmlib_aes192_ctr_decrypt_ctx_reset(void*          ctx,
                                        const uint8_t* iv,
                                        size_t         iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != AES192CtrEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CtrDecryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CtrDecryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_decrypt_ctx_reset<AES192CtrDecryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1573,23 +852,9 @@ int gmlib_aes192_ctr_decrypt_ctx_update(void*          ctx,
                                         const uint8_t* in,
                                         size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CtrDecryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CtrDecryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_decrypt_ctx_update<AES192CtrDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1599,44 +864,17 @@ int gmlib_aes192_ctr_decrypt_ctx_final_ex(void*          ctx,
                                           const uint8_t* in,
                                           size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CtrDecryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CtrDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_decrypt_ctx_final_ex<AES192CtrDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_ctr_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192CtrDecryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192CtrDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_decrypt_ctx_final<AES192CtrDecryptor>(
+                    ctx, out, outl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1646,45 +884,40 @@ int gmlib_aes192_ctr_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 
 size_t gmlib_aes192_gcm_encrypt_ctx_size()
 {
-    return sizeof(AES192GcmEncryptor);
+    return c_api::cipher_gcm_encrypt_ctx_size<AES192GcmEncryptor>();
 }
 
 void* gmlib_aes192_gcm_encrypt_ctx_alloc()
 {
-    return new (std::nothrow) AES192GcmEncryptor();
+    return c_api::cipher_gcm_encrypt_ctx_alloc<AES192GcmEncryptor>();
 }
 
 int gmlib_aes192_gcm_encrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<AES192GcmEncryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(
+        c_api::cipher_gcm_encrypt_ctx_free<AES192GcmEncryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_gcm_encrypt_get_user_key_len()
 {
-    return AES192GcmEncryptor::USER_KEY_LEN;
+    return c_api::cipher_gcm_encrypt_get_user_key_len<AES192GcmEncryptor>();
 }
 
 size_t gmlib_aes192_gcm_encrypt_get_default_iv_len()
 {
-    return 12;
+    return c_api::cipher_gcm_encrypt_get_default_iv_len<AES192GcmEncryptor>();
 }
 
 size_t gmlib_aes192_gcm_encrypt_get_block_size()
 {
-    return AES192GcmEncryptor::BLOCK_SIZE;
+    return c_api::cipher_gcm_encrypt_get_block_size<AES192GcmEncryptor>();
 }
 
 size_t gmlib_aes192_gcm_encrypt_get_tag_len()
 {
-    return 16;
+    return c_api::cipher_gcm_encrypt_get_tag_len<AES192GcmEncryptor>();
 }
 
 int gmlib_aes192_gcm_encrypt_ctx_init(void*          ctx,
@@ -1695,26 +928,9 @@ int gmlib_aes192_gcm_encrypt_ctx_init(void*          ctx,
                                       const uint8_t* aad,
                                       size_t         aad_len)
 {
-    if (ctx == nullptr ||                                   //
-        user_key == nullptr ||                              //
-        user_key_len != AES192GcmEncryptor::USER_KEY_LEN || //
-        (iv == nullptr && iv_len != 0) ||                   //
-        (aad == nullptr && aad_len != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192GcmEncryptor*>(ctx);
-        ptr->init(user_key, iv, iv_len, aad, aad_len);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192GcmEncryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_init<AES192GcmEncryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len, aad, aad_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1724,24 +940,9 @@ int gmlib_aes192_gcm_encrypt_ctx_reset(void*          ctx,
                                        const uint8_t* aad,
                                        size_t         aad_len)
 {
-    if (ctx == nullptr ||                 //
-        (iv == nullptr && iv_len != 0) || //
-        (aad == nullptr && aad_len != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192GcmEncryptor*>(ctx);
-        ptr->reset(iv, iv_len, aad, aad_len);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192GcmEncryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_reset<AES192GcmEncryptor>(
+                    ctx, iv, iv_len, aad, aad_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1751,23 +952,9 @@ int gmlib_aes192_gcm_encrypt_ctx_update(void*          ctx,
                                         const uint8_t* in,
                                         size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192GcmEncryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192GcmEncryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_update<AES192GcmEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1777,109 +964,64 @@ int gmlib_aes192_gcm_encrypt_ctx_final_ex(void*          ctx,
                                           const uint8_t* in,
                                           size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192GcmEncryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192GcmEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_final_ex<AES192GcmEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_gcm_encrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192GcmEncryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192GcmEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_final<AES192GcmEncryptor>(
+                    ctx, out, outl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_gcm_encrypt_ctx_get_tag(void* ctx, uint8_t* tag)
 {
-    if (ctx == nullptr || tag == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192GcmEncryptor*>(ctx);
-        ptr->get_tag(tag);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192GcmEncryptor::get_tag");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_get_tag<AES192GcmEncryptor>(
+                    ctx, tag) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_gcm_decrypt_ctx_size()
 {
-    return sizeof(AES192GcmDecryptor);
+    return c_api::cipher_gcm_decrypt_ctx_size<AES192GcmDecryptor>();
 }
 
 void* gmlib_aes192_gcm_decrypt_ctx_alloc()
 {
-    return new (std::nothrow) AES192GcmDecryptor();
+    return c_api::cipher_gcm_decrypt_ctx_alloc<AES192GcmDecryptor>();
 }
 
 int gmlib_aes192_gcm_decrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<AES192GcmDecryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(
+        c_api::cipher_gcm_decrypt_ctx_free<AES192GcmDecryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
 size_t gmlib_aes192_gcm_decrypt_get_user_key_len()
 {
-    return AES192GcmDecryptor::USER_KEY_LEN;
+    return c_api::cipher_gcm_decrypt_get_user_key_len<AES192GcmDecryptor>();
 }
 
 size_t gmlib_aes192_gcm_decrypt_get_default_iv_len()
 {
-    return 12;
+    return c_api::cipher_gcm_decrypt_get_default_iv_len<AES192GcmDecryptor>();
 }
 
 size_t gmlib_aes192_gcm_decrypt_get_block_size()
 {
-    return AES192GcmDecryptor::BLOCK_SIZE;
+    return c_api::cipher_gcm_decrypt_get_block_size<AES192GcmDecryptor>();
 }
 
 size_t gmlib_aes192_gcm_decrypt_get_tag_len()
 {
-    return 16;
+    return c_api::cipher_gcm_decrypt_get_tag_len<AES192GcmDecryptor>();
 }
 
 int gmlib_aes192_gcm_decrypt_ctx_init(void*          ctx,
@@ -1890,26 +1032,9 @@ int gmlib_aes192_gcm_decrypt_ctx_init(void*          ctx,
                                       const uint8_t* aad,
                                       size_t         aad_len)
 {
-    if (ctx == nullptr ||                                   //
-        user_key == nullptr ||                              //
-        user_key_len != AES192GcmEncryptor::USER_KEY_LEN || //
-        (iv == nullptr && iv_len != 0) ||                   //
-        (aad == nullptr && aad_len != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192GcmDecryptor*>(ctx);
-        ptr->init(user_key, iv, iv_len, aad, aad_len);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192GcmDecryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_decrypt_ctx_init<AES192GcmDecryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len, aad, aad_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1919,24 +1044,9 @@ int gmlib_aes192_gcm_decrypt_ctx_reset(void*          ctx,
                                        const uint8_t* aad,
                                        size_t         aad_len)
 {
-    if (ctx == nullptr ||                 //
-        (iv == nullptr && iv_len != 0) || //
-        (aad == nullptr && aad_len != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192GcmDecryptor*>(ctx);
-        ptr->reset(iv, iv_len, aad, aad_len);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192GcmDecryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_decrypt_ctx_reset<AES192GcmDecryptor>(
+                    ctx, iv, iv_len, aad, aad_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1946,23 +1056,9 @@ int gmlib_aes192_gcm_decrypt_ctx_update(void*          ctx,
                                         const uint8_t* in,
                                         size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192GcmDecryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192GcmDecryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_decrypt_ctx_update<AES192GcmDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1972,64 +1068,24 @@ int gmlib_aes192_gcm_decrypt_ctx_final_ex(void*          ctx,
                                           const uint8_t* in,
                                           size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192GcmDecryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192GcmDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_decrypt_ctx_final_ex<AES192GcmDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_gcm_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192GcmDecryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192GcmDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_decrypt_ctx_final<AES192GcmDecryptor>(
+                    ctx, out, outl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_aes192_gcm_encrypt_ctx_set_tag(void* ctx, const uint8_t* tag)
 {
-    if (ctx == nullptr || tag == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<AES192GcmDecryptor*>(ctx);
-        ptr->set_tag(tag);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened AES192GcmDecryptor::set_tag");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_set_tag<AES192GcmDecryptor>(
+                    ctx, tag) == 0,
+                { return -1; });
     return 0;
 }

@@ -2,89 +2,55 @@
 #include <gmlib/_sm4.h>
 #include <gmlib/sm4/sm4_mode.h>
 
-#include <limits>
+#include "c_api_cipher.h"
 
 using namespace sm4;
 
 // ******************************************
-// ************** SM4-ECB *******************
+// ***************** SM4-ECB ****************
 // ******************************************
 
 size_t gmlib_sm4_ecb_encrypt_ctx_size()
 {
-    return sizeof(SM4EcbEncryptor);
+    return c_api::cipher_ecb_encrypt_ctx_size<SM4EcbEncryptor>();
 }
 
 void* gmlib_sm4_ecb_encrypt_ctx_alloc()
 {
-    return new (std::nothrow) SM4EcbEncryptor();
+    return c_api::cipher_ecb_encrypt_ctx_alloc<SM4EcbEncryptor>();
 }
 
 int gmlib_sm4_ecb_encrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<SM4EcbEncryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(c_api::cipher_ecb_encrypt_ctx_free<SM4EcbEncryptor>(ctx) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_ecb_encrypt_get_user_key_len()
 {
-    return SM4EcbEncryptor::USER_KEY_LEN;
+    return c_api::cipher_ecb_encrypt_get_user_key_len<SM4EcbEncryptor>();
 }
 
 size_t gmlib_sm4_ecb_encrypt_get_block_size()
 {
-    return SM4EcbEncryptor::BLOCK_SIZE;
+    return c_api::cipher_ecb_encrypt_get_block_size<SM4EcbEncryptor>();
 }
 
 int gmlib_sm4_ecb_encrypt_ctx_init(void*          ctx,
                                    const uint8_t* user_key,
                                    size_t         user_key_len)
 {
-    if (ctx == nullptr || user_key == nullptr ||
-        user_key_len != SM4EcbEncryptor::USER_KEY_LEN)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4EcbEncryptor*>(ctx);
-        ptr->init(user_key);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4EcbEncryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_encrypt_ctx_init<SM4EcbEncryptor>(
+                    ctx, user_key, user_key_len) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_ecb_encrypt_ctx_reset(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4EcbEncryptor*>(ctx);
-        ptr->reset();
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4EcbEncryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_encrypt_ctx_reset<SM4EcbEncryptor>(ctx) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -94,23 +60,9 @@ int gmlib_sm4_ecb_encrypt_ctx_update(void*          ctx,
                                      const uint8_t* in,
                                      size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4EcbEncryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4EcbEncryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_encrypt_ctx_update<SM4EcbEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -120,122 +72,61 @@ int gmlib_sm4_ecb_encrypt_ctx_final_ex(void*          ctx,
                                        const uint8_t* in,
                                        size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4EcbEncryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4EcbEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_encrypt_ctx_final_ex<SM4EcbEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_ecb_encrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4EcbEncryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4EcbEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_encrypt_ctx_final<SM4EcbEncryptor>(ctx, out,
+                                                                     outl) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_ecb_decrypt_ctx_size()
 {
-    return sizeof(SM4EcbDecryptor);
+    return c_api::cipher_ecb_decrypt_ctx_size<SM4EcbDecryptor>();
 }
 
 void* gmlib_sm4_ecb_decrypt_ctx_alloc()
 {
-    return new (std::nothrow) SM4EcbDecryptor();
+    return c_api::cipher_ecb_decrypt_ctx_alloc<SM4EcbDecryptor>();
 }
 
 int gmlib_sm4_ecb_decrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<SM4EcbDecryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(c_api::cipher_ecb_decrypt_ctx_free<SM4EcbDecryptor>(ctx) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_ecb_decrypt_get_user_key_len()
 {
-    return SM4EcbDecryptor::USER_KEY_LEN;
+    return c_api::cipher_ecb_decrypt_get_user_key_len<SM4EcbDecryptor>();
 }
 
 size_t gmlib_sm4_ecb_decrypt_get_block_size()
 {
-    return SM4EcbDecryptor::BLOCK_SIZE;
+    return c_api::cipher_ecb_decrypt_get_block_size<SM4EcbDecryptor>();
 }
 
 int gmlib_sm4_ecb_decrypt_ctx_init(void*          ctx,
                                    const uint8_t* user_key,
                                    size_t         user_key_len)
 {
-    if (ctx == nullptr || user_key == nullptr ||
-        user_key_len != SM4EcbDecryptor::USER_KEY_LEN)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4EcbDecryptor*>(ctx);
-        ptr->init(user_key);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4EcbDecryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_decrypt_ctx_init<SM4EcbDecryptor>(
+                    ctx, user_key, user_key_len) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_ecb_decrypt_ctx_reset(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4EcbDecryptor*>(ctx);
-        ptr->reset();
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4EcbDecryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_decrypt_ctx_reset<SM4EcbDecryptor>(ctx) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -245,23 +136,9 @@ int gmlib_sm4_ecb_decrypt_ctx_update(void*          ctx,
                                      const uint8_t* in,
                                      size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4EcbDecryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4EcbDecryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_decrypt_ctx_update<SM4EcbDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -271,87 +148,54 @@ int gmlib_sm4_ecb_decrypt_ctx_final_ex(void*          ctx,
                                        const uint8_t* in,
                                        size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4EcbDecryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4EcbDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_decrypt_ctx_final_ex<SM4EcbDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_ecb_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4EcbDecryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4EcbDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ecb_decrypt_ctx_final<SM4EcbDecryptor>(ctx, out,
+                                                                     outl) == 0,
+                { return -1; });
     return 0;
 }
 
 // ******************************************
-// ************** SM4-CBC *******************
+// ***************** SM4-CBC ****************
 // ******************************************
 
 size_t gmlib_sm4_cbc_encrypt_ctx_size()
 {
-    return sizeof(SM4CbcEncryptor);
+    return c_api::cipher_cbc_encrypt_ctx_size<SM4CbcEncryptor>();
 }
 
 void* gmlib_sm4_cbc_encrypt_ctx_alloc()
 {
-    return new (std::nothrow) SM4CbcEncryptor();
+    return c_api::cipher_cbc_encrypt_ctx_alloc<SM4CbcEncryptor>();
 }
 
 int gmlib_sm4_cbc_encrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<SM4CbcEncryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(c_api::cipher_cbc_encrypt_ctx_free<SM4CbcEncryptor>(ctx) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_cbc_encrypt_get_user_key_len()
 {
-    return SM4CbcEncryptor::USER_KEY_LEN;
+    return c_api::cipher_cbc_encrypt_get_user_key_len<SM4CbcEncryptor>();
 }
 
 size_t gmlib_sm4_cbc_encrypt_get_iv_len()
 {
-    return SM4CbcEncryptor::BLOCK_SIZE;
+    return c_api::cipher_cbc_encrypt_get_iv_len<SM4CbcEncryptor>();
 }
 
 size_t gmlib_sm4_cbc_encrypt_get_block_size()
 {
-    return SM4CbcEncryptor::BLOCK_SIZE;
+    return c_api::cipher_cbc_encrypt_get_block_size<SM4CbcEncryptor>();
 }
 
 int gmlib_sm4_cbc_encrypt_ctx_init(void*          ctx,
@@ -360,48 +204,17 @@ int gmlib_sm4_cbc_encrypt_ctx_init(void*          ctx,
                                    const uint8_t* iv,
                                    size_t         iv_len)
 {
-    if (ctx == nullptr ||                                //
-        user_key == nullptr ||                           //
-        user_key_len != SM4CbcEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                 //
-        iv_len != SM4CbcEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CbcEncryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CbcEncryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_encrypt_ctx_init<SM4CbcEncryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_cbc_encrypt_ctx_reset(void* ctx, const uint8_t* iv, size_t iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != SM4CbcEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CbcEncryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CbcEncryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_encrypt_ctx_reset<SM4CbcEncryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -411,23 +224,9 @@ int gmlib_sm4_cbc_encrypt_ctx_update(void*          ctx,
                                      const uint8_t* in,
                                      size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CbcEncryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CbcEncryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_encrypt_ctx_update<SM4CbcEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -437,83 +236,50 @@ int gmlib_sm4_cbc_encrypt_ctx_final_ex(void*          ctx,
                                        const uint8_t* in,
                                        size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CbcEncryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CbcEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_encrypt_ctx_final_ex<SM4CbcEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_cbc_encrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CbcEncryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CbcEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_encrypt_ctx_final<SM4CbcEncryptor>(ctx, out,
+                                                                     outl) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_cbc_decrypt_ctx_size()
 {
-    return sizeof(SM4CbcDecryptor);
+    return c_api::cipher_cbc_decrypt_ctx_size<SM4CbcDecryptor>();
 }
 
 void* gmlib_sm4_cbc_decrypt_ctx_alloc()
 {
-    return new (std::nothrow) SM4CbcDecryptor();
+    return c_api::cipher_cbc_decrypt_ctx_alloc<SM4CbcDecryptor>();
 }
 
 int gmlib_sm4_cbc_decrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<SM4CbcDecryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(c_api::cipher_cbc_decrypt_ctx_free<SM4CbcDecryptor>(ctx) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_cbc_decrypt_get_user_key_len()
 {
-    return SM4CbcDecryptor::USER_KEY_LEN;
+    return c_api::cipher_cbc_decrypt_get_user_key_len<SM4CbcDecryptor>();
 }
 
 size_t gmlib_sm4_cbc_decrypt_get_iv_len()
 {
-    return SM4CbcDecryptor::BLOCK_SIZE;
+    return c_api::cipher_cbc_decrypt_get_iv_len<SM4CbcDecryptor>();
 }
 
 size_t gmlib_sm4_cbc_decrypt_get_block_size()
 {
-    return SM4CbcDecryptor::BLOCK_SIZE;
+    return c_api::cipher_cbc_decrypt_get_block_size<SM4CbcDecryptor>();
 }
 
 int gmlib_sm4_cbc_decrypt_ctx_init(void*          ctx,
@@ -522,48 +288,17 @@ int gmlib_sm4_cbc_decrypt_ctx_init(void*          ctx,
                                    const uint8_t* iv,
                                    size_t         iv_len)
 {
-    if (ctx == nullptr ||                                //
-        user_key == nullptr ||                           //
-        user_key_len != SM4CbcEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                 //
-        iv_len != SM4CbcEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CbcDecryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CbcDecryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_decrypt_ctx_init<SM4CbcDecryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_cbc_decrypt_ctx_reset(void* ctx, const uint8_t* iv, size_t iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != SM4CbcEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CbcDecryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CbcDecryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_decrypt_ctx_reset<SM4CbcDecryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -573,23 +308,9 @@ int gmlib_sm4_cbc_decrypt_ctx_update(void*          ctx,
                                      const uint8_t* in,
                                      size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CbcDecryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CbcDecryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_decrypt_ctx_update<SM4CbcDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -599,87 +320,54 @@ int gmlib_sm4_cbc_decrypt_ctx_final_ex(void*          ctx,
                                        const uint8_t* in,
                                        size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CbcDecryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CbcDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_decrypt_ctx_final_ex<SM4CbcDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_cbc_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CbcDecryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CbcDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cbc_decrypt_ctx_final<SM4CbcDecryptor>(ctx, out,
+                                                                     outl) == 0,
+                { return -1; });
     return 0;
 }
 
 // ******************************************
-// ************** SM4-CFB *******************
+// ***************** SM4-CFB ****************
 // ******************************************
 
 size_t gmlib_sm4_cfb_encrypt_ctx_size()
 {
-    return sizeof(SM4CfbEncryptor);
+    return c_api::cipher_cfb_encrypt_ctx_size<SM4CfbEncryptor>();
 }
 
 void* gmlib_sm4_cfb_encrypt_ctx_alloc()
 {
-    return new (std::nothrow) SM4CfbEncryptor();
+    return c_api::cipher_cfb_encrypt_ctx_alloc<SM4CfbEncryptor>();
 }
 
 int gmlib_sm4_cfb_encrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<SM4CfbEncryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(c_api::cipher_cfb_encrypt_ctx_free<SM4CfbEncryptor>(ctx) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_cfb_encrypt_get_user_key_len()
 {
-    return SM4CfbEncryptor::USER_KEY_LEN;
+    return c_api::cipher_cfb_encrypt_get_user_key_len<SM4CfbEncryptor>();
 }
 
 size_t gmlib_sm4_cfb_encrypt_get_iv_len()
 {
-    return SM4CfbEncryptor::BLOCK_SIZE;
+    return c_api::cipher_cfb_encrypt_get_iv_len<SM4CfbEncryptor>();
 }
 
 size_t gmlib_sm4_cfb_encrypt_get_block_size()
 {
-    return SM4CfbEncryptor::BLOCK_SIZE;
+    return c_api::cipher_cfb_encrypt_get_block_size<SM4CfbEncryptor>();
 }
 
 int gmlib_sm4_cfb_encrypt_ctx_init(void*          ctx,
@@ -688,48 +376,17 @@ int gmlib_sm4_cfb_encrypt_ctx_init(void*          ctx,
                                    const uint8_t* iv,
                                    size_t         iv_len)
 {
-    if (ctx == nullptr ||                                //
-        user_key == nullptr ||                           //
-        user_key_len != SM4CfbEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                 //
-        iv_len != SM4CfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CfbEncryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CfbEncryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_encrypt_ctx_init<SM4CfbEncryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_cfb_encrypt_ctx_reset(void* ctx, const uint8_t* iv, size_t iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != SM4CfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CfbEncryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CfbEncryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_encrypt_ctx_reset<SM4CfbEncryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -739,23 +396,9 @@ int gmlib_sm4_cfb_encrypt_ctx_update(void*          ctx,
                                      const uint8_t* in,
                                      size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CfbEncryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CfbEncryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_encrypt_ctx_update<SM4CfbEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -765,83 +408,50 @@ int gmlib_sm4_cfb_encrypt_ctx_final_ex(void*          ctx,
                                        const uint8_t* in,
                                        size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CfbEncryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CfbEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_encrypt_ctx_final_ex<SM4CfbEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_cfb_encrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CfbEncryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CfbEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_encrypt_ctx_final<SM4CfbEncryptor>(ctx, out,
+                                                                     outl) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_cfb_decrypt_ctx_size()
 {
-    return sizeof(SM4CfbDecryptor);
+    return c_api::cipher_cfb_decrypt_ctx_size<SM4CfbDecryptor>();
 }
 
 void* gmlib_sm4_cfb_decrypt_ctx_alloc()
 {
-    return new (std::nothrow) SM4CfbDecryptor();
+    return c_api::cipher_cfb_decrypt_ctx_alloc<SM4CfbDecryptor>();
 }
 
 int gmlib_sm4_cfb_decrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<SM4CfbDecryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(c_api::cipher_cfb_decrypt_ctx_free<SM4CfbDecryptor>(ctx) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_cfb_decrypt_get_user_key_len()
 {
-    return SM4CfbDecryptor::USER_KEY_LEN;
+    return c_api::cipher_cfb_decrypt_get_user_key_len<SM4CfbDecryptor>();
 }
 
 size_t gmlib_sm4_cfb_decrypt_get_iv_len()
 {
-    return SM4CfbDecryptor::BLOCK_SIZE;
+    return c_api::cipher_cfb_decrypt_get_iv_len<SM4CfbDecryptor>();
 }
 
 size_t gmlib_sm4_cfb_decrypt_get_block_size()
 {
-    return SM4CfbDecryptor::BLOCK_SIZE;
+    return c_api::cipher_cfb_decrypt_get_block_size<SM4CfbDecryptor>();
 }
 
 int gmlib_sm4_cfb_decrypt_ctx_init(void*          ctx,
@@ -850,48 +460,17 @@ int gmlib_sm4_cfb_decrypt_ctx_init(void*          ctx,
                                    const uint8_t* iv,
                                    size_t         iv_len)
 {
-    if (ctx == nullptr ||                                //
-        user_key == nullptr ||                           //
-        user_key_len != SM4CfbEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                 //
-        iv_len != SM4CfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CfbDecryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CfbDecryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_decrypt_ctx_init<SM4CfbDecryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_cfb_decrypt_ctx_reset(void* ctx, const uint8_t* iv, size_t iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != SM4CfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CfbDecryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CfbDecryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_decrypt_ctx_reset<SM4CfbDecryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -901,23 +480,9 @@ int gmlib_sm4_cfb_decrypt_ctx_update(void*          ctx,
                                      const uint8_t* in,
                                      size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CfbDecryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CfbDecryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_decrypt_ctx_update<SM4CfbDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -927,87 +492,54 @@ int gmlib_sm4_cfb_decrypt_ctx_final_ex(void*          ctx,
                                        const uint8_t* in,
                                        size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CfbDecryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CfbDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_decrypt_ctx_final_ex<SM4CfbDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_cfb_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CfbDecryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CfbDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_cfb_decrypt_ctx_final<SM4CfbDecryptor>(ctx, out,
+                                                                     outl) == 0,
+                { return -1; });
     return 0;
 }
 
 // ******************************************
-// ************** SM4-OFB *******************
+// ***************** SM4-OFB ****************
 // ******************************************
 
 size_t gmlib_sm4_ofb_encrypt_ctx_size()
 {
-    return sizeof(SM4OfbEncryptor);
+    return c_api::cipher_ofb_encrypt_ctx_size<SM4OfbEncryptor>();
 }
 
 void* gmlib_sm4_ofb_encrypt_ctx_alloc()
 {
-    return new (std::nothrow) SM4OfbEncryptor();
+    return c_api::cipher_ofb_encrypt_ctx_alloc<SM4OfbEncryptor>();
 }
 
 int gmlib_sm4_ofb_encrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<SM4OfbEncryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(c_api::cipher_ofb_encrypt_ctx_free<SM4OfbEncryptor>(ctx) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_ofb_encrypt_get_user_key_len()
 {
-    return SM4OfbEncryptor::USER_KEY_LEN;
+    return c_api::cipher_ofb_encrypt_get_user_key_len<SM4OfbEncryptor>();
 }
 
 size_t gmlib_sm4_ofb_encrypt_get_iv_len()
 {
-    return SM4OfbEncryptor::BLOCK_SIZE;
+    return c_api::cipher_ofb_encrypt_get_iv_len<SM4OfbEncryptor>();
 }
 
 size_t gmlib_sm4_ofb_encrypt_get_block_size()
 {
-    return SM4OfbEncryptor::BLOCK_SIZE;
+    return c_api::cipher_ofb_encrypt_get_block_size<SM4OfbEncryptor>();
 }
 
 int gmlib_sm4_ofb_encrypt_ctx_init(void*          ctx,
@@ -1016,48 +548,17 @@ int gmlib_sm4_ofb_encrypt_ctx_init(void*          ctx,
                                    const uint8_t* iv,
                                    size_t         iv_len)
 {
-    if (ctx == nullptr ||                                //
-        user_key == nullptr ||                           //
-        user_key_len != SM4OfbEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                 //
-        iv_len != SM4OfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4OfbEncryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4OfbEncryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_encrypt_ctx_init<SM4OfbEncryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_ofb_encrypt_ctx_reset(void* ctx, const uint8_t* iv, size_t iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != SM4OfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4OfbEncryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4OfbEncryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_encrypt_ctx_reset<SM4OfbEncryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1067,23 +568,9 @@ int gmlib_sm4_ofb_encrypt_ctx_update(void*          ctx,
                                      const uint8_t* in,
                                      size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4OfbEncryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4OfbEncryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_encrypt_ctx_update<SM4OfbEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1093,83 +580,50 @@ int gmlib_sm4_ofb_encrypt_ctx_final_ex(void*          ctx,
                                        const uint8_t* in,
                                        size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4OfbEncryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4OfbEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_encrypt_ctx_final_ex<SM4OfbEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_ofb_encrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4OfbEncryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4OfbEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_encrypt_ctx_final<SM4OfbEncryptor>(ctx, out,
+                                                                     outl) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_ofb_decrypt_ctx_size()
 {
-    return sizeof(SM4OfbDecryptor);
+    return c_api::cipher_ofb_decrypt_ctx_size<SM4OfbDecryptor>();
 }
 
 void* gmlib_sm4_ofb_decrypt_ctx_alloc()
 {
-    return new (std::nothrow) SM4OfbDecryptor();
+    return c_api::cipher_ofb_decrypt_ctx_alloc<SM4OfbDecryptor>();
 }
 
 int gmlib_sm4_ofb_decrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<SM4OfbDecryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(c_api::cipher_ofb_decrypt_ctx_free<SM4OfbDecryptor>(ctx) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_ofb_decrypt_get_user_key_len()
 {
-    return SM4OfbDecryptor::USER_KEY_LEN;
+    return c_api::cipher_ofb_decrypt_get_user_key_len<SM4OfbDecryptor>();
 }
 
 size_t gmlib_sm4_ofb_decrypt_get_iv_len()
 {
-    return SM4OfbDecryptor::BLOCK_SIZE;
+    return c_api::cipher_ofb_decrypt_get_iv_len<SM4OfbDecryptor>();
 }
 
 size_t gmlib_sm4_ofb_decrypt_get_block_size()
 {
-    return SM4OfbDecryptor::BLOCK_SIZE;
+    return c_api::cipher_ofb_decrypt_get_block_size<SM4OfbDecryptor>();
 }
 
 int gmlib_sm4_ofb_decrypt_ctx_init(void*          ctx,
@@ -1178,48 +632,17 @@ int gmlib_sm4_ofb_decrypt_ctx_init(void*          ctx,
                                    const uint8_t* iv,
                                    size_t         iv_len)
 {
-    if (ctx == nullptr ||                                //
-        user_key == nullptr ||                           //
-        user_key_len != SM4OfbEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                 //
-        iv_len != SM4OfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4OfbDecryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4OfbDecryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_decrypt_ctx_init<SM4OfbDecryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_ofb_decrypt_ctx_reset(void* ctx, const uint8_t* iv, size_t iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != SM4OfbEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4OfbDecryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4OfbDecryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_decrypt_ctx_reset<SM4OfbDecryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1229,23 +652,9 @@ int gmlib_sm4_ofb_decrypt_ctx_update(void*          ctx,
                                      const uint8_t* in,
                                      size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4OfbDecryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4OfbDecryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_decrypt_ctx_update<SM4OfbDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1255,87 +664,54 @@ int gmlib_sm4_ofb_decrypt_ctx_final_ex(void*          ctx,
                                        const uint8_t* in,
                                        size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4OfbDecryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4OfbDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_decrypt_ctx_final_ex<SM4OfbDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_ofb_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4OfbDecryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4OfbDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ofb_decrypt_ctx_final<SM4OfbDecryptor>(ctx, out,
+                                                                     outl) == 0,
+                { return -1; });
     return 0;
 }
 
 // ******************************************
-// ************** SM4-CTR *******************
+// ***************** SM4-CTR ****************
 // ******************************************
 
 size_t gmlib_sm4_ctr_encrypt_ctx_size()
 {
-    return sizeof(SM4CtrEncryptor);
+    return c_api::cipher_ctr_encrypt_ctx_size<SM4CtrEncryptor>();
 }
 
 void* gmlib_sm4_ctr_encrypt_ctx_alloc()
 {
-    return new (std::nothrow) SM4CtrEncryptor();
+    return c_api::cipher_ctr_encrypt_ctx_alloc<SM4CtrEncryptor>();
 }
 
 int gmlib_sm4_ctr_encrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<SM4CtrEncryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(c_api::cipher_ctr_encrypt_ctx_free<SM4CtrEncryptor>(ctx) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_ctr_encrypt_get_user_key_len()
 {
-    return SM4CtrEncryptor::USER_KEY_LEN;
+    return c_api::cipher_ctr_encrypt_get_user_key_len<SM4CtrEncryptor>();
 }
 
 size_t gmlib_sm4_ctr_encrypt_get_iv_len()
 {
-    return SM4CtrEncryptor::BLOCK_SIZE;
+    return c_api::cipher_ctr_encrypt_get_iv_len<SM4CtrEncryptor>();
 }
 
 size_t gmlib_sm4_ctr_encrypt_get_block_size()
 {
-    return SM4CtrEncryptor::BLOCK_SIZE;
+    return c_api::cipher_ctr_encrypt_get_block_size<SM4CtrEncryptor>();
 }
 
 int gmlib_sm4_ctr_encrypt_ctx_init(void*          ctx,
@@ -1344,48 +720,17 @@ int gmlib_sm4_ctr_encrypt_ctx_init(void*          ctx,
                                    const uint8_t* iv,
                                    size_t         iv_len)
 {
-    if (ctx == nullptr ||                                //
-        user_key == nullptr ||                           //
-        user_key_len != SM4CtrEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                 //
-        iv_len != SM4CtrEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CtrEncryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CtrEncryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_encrypt_ctx_init<SM4CtrEncryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_ctr_encrypt_ctx_reset(void* ctx, const uint8_t* iv, size_t iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != SM4CtrEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CtrEncryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CtrEncryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_encrypt_ctx_reset<SM4CtrEncryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1395,23 +740,9 @@ int gmlib_sm4_ctr_encrypt_ctx_update(void*          ctx,
                                      const uint8_t* in,
                                      size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CtrEncryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CtrEncryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_encrypt_ctx_update<SM4CtrEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1421,83 +752,50 @@ int gmlib_sm4_ctr_encrypt_ctx_final_ex(void*          ctx,
                                        const uint8_t* in,
                                        size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CtrEncryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CtrEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_encrypt_ctx_final_ex<SM4CtrEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_ctr_encrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CtrEncryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CtrEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_encrypt_ctx_final<SM4CtrEncryptor>(ctx, out,
+                                                                     outl) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_ctr_decrypt_ctx_size()
 {
-    return sizeof(SM4CtrDecryptor);
+    return c_api::cipher_ctr_decrypt_ctx_size<SM4CtrDecryptor>();
 }
 
 void* gmlib_sm4_ctr_decrypt_ctx_alloc()
 {
-    return new (std::nothrow) SM4CtrDecryptor();
+    return c_api::cipher_ctr_decrypt_ctx_alloc<SM4CtrDecryptor>();
 }
 
 int gmlib_sm4_ctr_decrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<SM4CtrDecryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(c_api::cipher_ctr_decrypt_ctx_free<SM4CtrDecryptor>(ctx) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_ctr_decrypt_get_user_key_len()
 {
-    return SM4CtrDecryptor::USER_KEY_LEN;
+    return c_api::cipher_ctr_decrypt_get_user_key_len<SM4CtrDecryptor>();
 }
 
 size_t gmlib_sm4_ctr_decrypt_get_iv_len()
 {
-    return SM4CtrDecryptor::BLOCK_SIZE;
+    return c_api::cipher_ctr_decrypt_get_iv_len<SM4CtrDecryptor>();
 }
 
 size_t gmlib_sm4_ctr_decrypt_get_block_size()
 {
-    return SM4CtrDecryptor::BLOCK_SIZE;
+    return c_api::cipher_ctr_decrypt_get_block_size<SM4CtrDecryptor>();
 }
 
 int gmlib_sm4_ctr_decrypt_ctx_init(void*          ctx,
@@ -1506,48 +804,17 @@ int gmlib_sm4_ctr_decrypt_ctx_init(void*          ctx,
                                    const uint8_t* iv,
                                    size_t         iv_len)
 {
-    if (ctx == nullptr ||                                //
-        user_key == nullptr ||                           //
-        user_key_len != SM4CtrEncryptor::USER_KEY_LEN || //
-        iv == nullptr ||                                 //
-        iv_len != SM4CtrEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CtrDecryptor*>(ctx);
-        ptr->init(user_key, iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CtrDecryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_decrypt_ctx_init<SM4CtrDecryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_ctr_decrypt_ctx_reset(void* ctx, const uint8_t* iv, size_t iv_len)
 {
-    if (ctx == nullptr || iv == nullptr ||
-        iv_len != SM4CtrEncryptor::BLOCK_SIZE)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CtrDecryptor*>(ctx);
-        ptr->reset(iv);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CtrDecryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_decrypt_ctx_reset<SM4CtrDecryptor>(
+                    ctx, iv, iv_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1557,23 +824,9 @@ int gmlib_sm4_ctr_decrypt_ctx_update(void*          ctx,
                                      const uint8_t* in,
                                      size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CtrDecryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CtrDecryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_decrypt_ctx_update<SM4CtrDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1583,92 +836,59 @@ int gmlib_sm4_ctr_decrypt_ctx_final_ex(void*          ctx,
                                        const uint8_t* in,
                                        size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CtrDecryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CtrDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_decrypt_ctx_final_ex<SM4CtrDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_ctr_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4CtrDecryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4CtrDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_ctr_decrypt_ctx_final<SM4CtrDecryptor>(ctx, out,
+                                                                     outl) == 0,
+                { return -1; });
     return 0;
 }
 
 // ******************************************
-// ************** SM4-GCM *******************
+// ***************** SM4-GCM ****************
 // ******************************************
 
 size_t gmlib_sm4_gcm_encrypt_ctx_size()
 {
-    return sizeof(SM4GcmEncryptor);
+    return c_api::cipher_gcm_encrypt_ctx_size<SM4GcmEncryptor>();
 }
 
 void* gmlib_sm4_gcm_encrypt_ctx_alloc()
 {
-    return new (std::nothrow) SM4GcmEncryptor();
+    return c_api::cipher_gcm_encrypt_ctx_alloc<SM4GcmEncryptor>();
 }
 
 int gmlib_sm4_gcm_encrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<SM4GcmEncryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_free<SM4GcmEncryptor>(ctx) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_gcm_encrypt_get_user_key_len()
 {
-    return SM4GcmEncryptor::USER_KEY_LEN;
+    return c_api::cipher_gcm_encrypt_get_user_key_len<SM4GcmEncryptor>();
 }
 
 size_t gmlib_sm4_gcm_encrypt_get_default_iv_len()
 {
-    return 12;
+    return c_api::cipher_gcm_encrypt_get_default_iv_len<SM4GcmEncryptor>();
 }
 
 size_t gmlib_sm4_gcm_encrypt_get_block_size()
 {
-    return SM4GcmEncryptor::BLOCK_SIZE;
+    return c_api::cipher_gcm_encrypt_get_block_size<SM4GcmEncryptor>();
 }
 
 size_t gmlib_sm4_gcm_encrypt_get_tag_len()
 {
-    return 16;
+    return c_api::cipher_gcm_encrypt_get_tag_len<SM4GcmEncryptor>();
 }
 
 int gmlib_sm4_gcm_encrypt_ctx_init(void*          ctx,
@@ -1679,26 +899,9 @@ int gmlib_sm4_gcm_encrypt_ctx_init(void*          ctx,
                                    const uint8_t* aad,
                                    size_t         aad_len)
 {
-    if (ctx == nullptr ||                                //
-        user_key == nullptr ||                           //
-        user_key_len != SM4GcmEncryptor::USER_KEY_LEN || //
-        (iv == nullptr && iv_len != 0) ||                //
-        (aad == nullptr && aad_len != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4GcmEncryptor*>(ctx);
-        ptr->init(user_key, iv, iv_len, aad, aad_len);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4GcmEncryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_init<SM4GcmEncryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len, aad, aad_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1708,24 +911,9 @@ int gmlib_sm4_gcm_encrypt_ctx_reset(void*          ctx,
                                     const uint8_t* aad,
                                     size_t         aad_len)
 {
-    if (ctx == nullptr ||                 //
-        (iv == nullptr && iv_len != 0) || //
-        (aad == nullptr && aad_len != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4GcmEncryptor*>(ctx);
-        ptr->reset(iv, iv_len, aad, aad_len);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4GcmEncryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_reset<SM4GcmEncryptor>(
+                    ctx, iv, iv_len, aad, aad_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1735,23 +923,9 @@ int gmlib_sm4_gcm_encrypt_ctx_update(void*          ctx,
                                      const uint8_t* in,
                                      size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4GcmEncryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4GcmEncryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_update<SM4GcmEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1761,109 +935,63 @@ int gmlib_sm4_gcm_encrypt_ctx_final_ex(void*          ctx,
                                        const uint8_t* in,
                                        size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4GcmEncryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4GcmEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_final_ex<SM4GcmEncryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_gcm_encrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4GcmEncryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4GcmEncryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_final<SM4GcmEncryptor>(ctx, out,
+                                                                     outl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_gcm_encrypt_ctx_get_tag(void* ctx, uint8_t* tag)
 {
-    if (ctx == nullptr || tag == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4GcmEncryptor*>(ctx);
-        ptr->get_tag(tag);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4GcmEncryptor::get_tag");
-        return -1;
-    }
+    GMLIB_CHECK(
+        c_api::cipher_gcm_encrypt_ctx_get_tag<SM4GcmEncryptor>(ctx, tag) == 0,
+        { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_gcm_decrypt_ctx_size()
 {
-    return sizeof(SM4GcmDecryptor);
+    return c_api::cipher_gcm_decrypt_ctx_size<SM4GcmDecryptor>();
 }
 
 void* gmlib_sm4_gcm_decrypt_ctx_alloc()
 {
-    return new (std::nothrow) SM4GcmDecryptor();
+    return c_api::cipher_gcm_decrypt_ctx_alloc<SM4GcmDecryptor>();
 }
 
 int gmlib_sm4_gcm_decrypt_ctx_free(void* ctx)
 {
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    auto ptr = static_cast<SM4GcmDecryptor*>(ctx);
-    delete ptr;
+    GMLIB_CHECK(c_api::cipher_gcm_decrypt_ctx_free<SM4GcmDecryptor>(ctx) == 0,
+                { return -1; });
     return 0;
 }
 
 size_t gmlib_sm4_gcm_decrypt_get_user_key_len()
 {
-    return SM4GcmDecryptor::USER_KEY_LEN;
+    return c_api::cipher_gcm_decrypt_get_user_key_len<SM4GcmDecryptor>();
 }
 
 size_t gmlib_sm4_gcm_decrypt_get_default_iv_len()
 {
-    return 12;
+    return c_api::cipher_gcm_decrypt_get_default_iv_len<SM4GcmDecryptor>();
 }
 
 size_t gmlib_sm4_gcm_decrypt_get_block_size()
 {
-    return SM4GcmDecryptor::BLOCK_SIZE;
+    return c_api::cipher_gcm_decrypt_get_block_size<SM4GcmDecryptor>();
 }
 
 size_t gmlib_sm4_gcm_decrypt_get_tag_len()
 {
-    return 16;
+    return c_api::cipher_gcm_decrypt_get_tag_len<SM4GcmDecryptor>();
 }
 
 int gmlib_sm4_gcm_decrypt_ctx_init(void*          ctx,
@@ -1874,26 +1002,9 @@ int gmlib_sm4_gcm_decrypt_ctx_init(void*          ctx,
                                    const uint8_t* aad,
                                    size_t         aad_len)
 {
-    if (ctx == nullptr ||                                //
-        user_key == nullptr ||                           //
-        user_key_len != SM4GcmEncryptor::USER_KEY_LEN || //
-        (iv == nullptr && iv_len != 0) ||                //
-        (aad == nullptr && aad_len != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4GcmDecryptor*>(ctx);
-        ptr->init(user_key, iv, iv_len, aad, aad_len);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4GcmDecryptor::init");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_decrypt_ctx_init<SM4GcmDecryptor>(
+                    ctx, user_key, user_key_len, iv, iv_len, aad, aad_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1903,24 +1014,9 @@ int gmlib_sm4_gcm_decrypt_ctx_reset(void*          ctx,
                                     const uint8_t* aad,
                                     size_t         aad_len)
 {
-    if (ctx == nullptr ||                 //
-        (iv == nullptr && iv_len != 0) || //
-        (aad == nullptr && aad_len != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4GcmDecryptor*>(ctx);
-        ptr->reset(iv, iv_len, aad, aad_len);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4GcmDecryptor::reset");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_decrypt_ctx_reset<SM4GcmDecryptor>(
+                    ctx, iv, iv_len, aad, aad_len) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1930,23 +1026,9 @@ int gmlib_sm4_gcm_decrypt_ctx_update(void*          ctx,
                                      const uint8_t* in,
                                      size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4GcmDecryptor*>(ctx);
-        ptr->update(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4GcmDecryptor::update");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_decrypt_ctx_update<SM4GcmDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
@@ -1956,64 +1038,24 @@ int gmlib_sm4_gcm_decrypt_ctx_final_ex(void*          ctx,
                                        const uint8_t* in,
                                        size_t         inl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr ||
-        (in == nullptr && inl != 0))
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4GcmDecryptor*>(ctx);
-        ptr->do_final(out, outl, in, inl);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4GcmDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_decrypt_ctx_final_ex<SM4GcmDecryptor>(
+                    ctx, out, outl, in, inl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_gcm_decrypt_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 {
-    if (ctx == nullptr || out == nullptr || outl == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4GcmDecryptor*>(ctx);
-        ptr->do_final(out, outl, nullptr, 0);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4GcmDecryptor::do_final");
-        return -1;
-    }
+    GMLIB_CHECK(c_api::cipher_gcm_decrypt_ctx_final<SM4GcmDecryptor>(ctx, out,
+                                                                     outl) == 0,
+                { return -1; });
     return 0;
 }
 
 int gmlib_sm4_gcm_encrypt_ctx_set_tag(void* ctx, const uint8_t* tag)
 {
-    if (ctx == nullptr || tag == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
-    try
-    {
-        auto ptr = static_cast<SM4GcmDecryptor*>(ctx);
-        ptr->set_tag(tag);
-    }
-    catch (...)
-    {
-        GMLIB_ERR_LOG("err happened SM4GcmDecryptor::set_tag");
-        return -1;
-    }
+    GMLIB_CHECK(
+        c_api::cipher_gcm_encrypt_ctx_set_tag<SM4GcmDecryptor>(ctx, tag) == 0,
+        { return -1; });
     return 0;
 }

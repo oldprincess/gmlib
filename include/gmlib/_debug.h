@@ -11,4 +11,11 @@
          "in file " __FILE__ ", "  \
          "in line " CAST_TO_STR(__LINE__) ".")
 
+#define GMLIB_CHECK(exp, if_false_then_do) \
+    if (!(exp))                            \
+    {                                      \
+        GMLIB_ERR_LOG("check false");      \
+        if_false_then_do;                  \
+    }
+
 #endif
