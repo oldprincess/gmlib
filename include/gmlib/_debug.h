@@ -6,10 +6,9 @@
 #define CAST_TO_STR1(R) #R
 #define CAST_TO_STR(R)  CAST_TO_STR1(R)
 
-#define GMLIB_ERR_LOG(msg)         \
-    puts("[gmlib error] " msg ". " \
-         "in file " __FILE__ ", "  \
-         "in line " CAST_TO_STR(__LINE__) ".")
+#define GMLIB_ERR_LOG(msg)           \
+    puts("[gmlib error] " msg ". \t" \
+         "in file " __FILE__ ":" CAST_TO_STR(__LINE__) ".")
 
 #define GMLIB_CHECK(exp, if_false_then_do) \
     if (!(exp))                            \
