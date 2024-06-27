@@ -324,36 +324,18 @@ int hmac_ctx_final(void* ctx, uint8_t* out, size_t* outl) noexcept
 // ******************************************
 
 template <class HashDrbg>
-size_t hash_drbg_ctx_size() noexcept
+void* hash_drbg_ctx_new() noexcept
 {
-    return sizeof(HashDrbg);
-}
-
-template <class HashDrbg>
-void* hash_drbg_ctx_alloc() noexcept
-{
-    return static_cast<void*>(new (std::nothrow) uint8_t[sizeof(HashDrbg)]);
-}
-
-template <class HashDrbg>
-int hash_drbg_ctx_init(void* ctx) noexcept
-{
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
+    void* ctx = nullptr;
     try
     {
-        new (ctx) HashDrbg();
+        ctx = static_cast<void*>(new HashDrbg());
     }
     catch (...)
     {
         GMLIB_ERR_LOG("err happened HashDrbg()");
-        return -1;
     }
-    return 0;
+    return ctx;
 }
 
 template <class HashDrbg>
@@ -397,36 +379,18 @@ int hash_drbg_ctx_gen(void* ctx, void* out, size_t len) noexcept
 // ******************************************
 
 template <class HMacDrbg>
-size_t hmac_drbg_ctx_size() noexcept
+void* hmac_drbg_ctx_new() noexcept
 {
-    return sizeof(HMacDrbg);
-}
-
-template <class HMacDrbg>
-void* hmac_drbg_ctx_alloc() noexcept
-{
-    return static_cast<void*>(new (std::nothrow) uint8_t[sizeof(HMacDrbg)]);
-}
-
-template <class HMacDrbg>
-int hmac_drbg_ctx_init(void* ctx) noexcept
-{
-    if (ctx == nullptr)
-    {
-        GMLIB_ERR_LOG("invalid input");
-        return -1;
-    }
-
+    void* ctx = nullptr;
     try
     {
-        new (ctx) HMacDrbg();
+        ctx = static_cast<void*>(new HMacDrbg());
     }
     catch (...)
     {
         GMLIB_ERR_LOG("err happened HMacDrbg()");
-        return -1;
     }
-    return 0;
+    return ctx;
 }
 
 template <class HMacDrbg>

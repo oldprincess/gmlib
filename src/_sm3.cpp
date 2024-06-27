@@ -157,26 +157,14 @@ GMLIB_API int gmlib_sm3_hmac_ctx_final(void* ctx, uint8_t* out, size_t* outl)
 // *********** SM3-HASH-DRBG ****************
 // ******************************************
 
-GMLIB_API size_t gmlib_sm3_hash_drbg_ctx_size()
+GMLIB_API void* gmlib_sm3_hash_drbg_ctx_new()
 {
-    return c_api::hash_drbg_ctx_size<SM3HashDrbg>();
-}
-
-GMLIB_API void* gmlib_sm3_hash_drbg_ctx_alloc()
-{
-    return c_api::hash_drbg_ctx_alloc<SM3HashDrbg>();
+    return c_api::hash_drbg_ctx_new<SM3HashDrbg>();
 }
 
 GMLIB_API int gmlib_sm3_hash_drbg_ctx_free(void* ctx)
 {
     GMLIB_CHECK(c_api::hash_drbg_ctx_free<SM3HashDrbg>(ctx) == 0,
-                { return -1; });
-    return 0;
-}
-
-GMLIB_API int gmlib_sm3_hash_drbg_ctx_init(void* ctx)
-{
-    GMLIB_CHECK(c_api::hash_drbg_ctx_init<SM3HashDrbg>(ctx) == 0,
                 { return -1; });
     return 0;
 }
@@ -192,26 +180,14 @@ GMLIB_API int gmlib_sm3_hash_drbg_ctx_gen(void* ctx, void* out, size_t len)
 // *********** SM3-HMAC-DRBG ****************
 // ******************************************
 
-GMLIB_API size_t gmlib_sm3_hmac_drbg_ctx_size()
+GMLIB_API void* gmlib_sm3_hmac_drbg_ctx_new()
 {
-    return c_api::hmac_drbg_ctx_size<SM3HMacDrbg>();
-}
-
-GMLIB_API void* gmlib_sm3_hmac_drbg_ctx_alloc()
-{
-    return c_api::hmac_drbg_ctx_alloc<SM3HMacDrbg>();
+    return c_api::hmac_drbg_ctx_new<SM3HMacDrbg>();
 }
 
 GMLIB_API int gmlib_sm3_hmac_drbg_ctx_free(void* ctx)
 {
     GMLIB_CHECK(c_api::hmac_drbg_ctx_free<SM3HMacDrbg>(ctx) == 0,
-                { return -1; });
-    return 0;
-}
-
-GMLIB_API int gmlib_sm3_hmac_drbg_ctx_init(void* ctx)
-{
-    GMLIB_CHECK(c_api::hmac_drbg_ctx_init<SM3HMacDrbg>(ctx) == 0,
                 { return -1; });
     return 0;
 }
