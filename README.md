@@ -2,7 +2,11 @@
 
 本项目使用MIT协议，如果您想要使用本项目，请仔细阅读MIT协议。
 
+如果有任何疑问，请发 email 至 zirui.gong@foxmail.com
+
 This software uses the MIT LICENSE. If you wish to use this software, please carefully read the text of the MIT LICENSE.
+
+If you have any questions, please send an email to zirui.gong@foxmail.com
 
 ## 1 基本介绍
 
