@@ -15,15 +15,30 @@ size_t gmlib_aes128_ecb_encrypt_ctx_size()
     return c_api::cipher_ecb_encrypt_ctx_size<AES128EcbEncryptor>();
 }
 
-void* gmlib_aes128_ecb_encrypt_ctx_alloc()
+void* gmlib_aes128_ecb_encrypt_ctx_new()
 {
-    return c_api::cipher_ecb_encrypt_ctx_alloc<AES128EcbEncryptor>();
+    return c_api::cipher_ecb_encrypt_ctx_new<AES128EcbEncryptor>();
 }
 
-int gmlib_aes128_ecb_encrypt_ctx_free(void* ctx)
+void* gmlib_aes128_ecb_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_ecb_encrypt_ctx_new_inplace<AES128EcbEncryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes128_ecb_encrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_ecb_encrypt_ctx_free<AES128EcbEncryptor>(ctx) == 0,
+        c_api::cipher_ecb_encrypt_ctx_delete<AES128EcbEncryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes128_ecb_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ecb_encrypt_ctx_delete_inplace<AES128EcbEncryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -93,15 +108,30 @@ size_t gmlib_aes128_ecb_decrypt_ctx_size()
     return c_api::cipher_ecb_decrypt_ctx_size<AES128EcbDecryptor>();
 }
 
-void* gmlib_aes128_ecb_decrypt_ctx_alloc()
+void* gmlib_aes128_ecb_decrypt_ctx_new()
 {
-    return c_api::cipher_ecb_decrypt_ctx_alloc<AES128EcbDecryptor>();
+    return c_api::cipher_ecb_decrypt_ctx_new<AES128EcbDecryptor>();
 }
 
-int gmlib_aes128_ecb_decrypt_ctx_free(void* ctx)
+void* gmlib_aes128_ecb_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_ecb_decrypt_ctx_new_inplace<AES128EcbDecryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes128_ecb_decrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_ecb_decrypt_ctx_free<AES128EcbDecryptor>(ctx) == 0,
+        c_api::cipher_ecb_decrypt_ctx_delete<AES128EcbDecryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes128_ecb_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ecb_decrypt_ctx_delete_inplace<AES128EcbDecryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -175,15 +205,30 @@ size_t gmlib_aes128_cbc_encrypt_ctx_size()
     return c_api::cipher_cbc_encrypt_ctx_size<AES128CbcEncryptor>();
 }
 
-void* gmlib_aes128_cbc_encrypt_ctx_alloc()
+void* gmlib_aes128_cbc_encrypt_ctx_new()
 {
-    return c_api::cipher_cbc_encrypt_ctx_alloc<AES128CbcEncryptor>();
+    return c_api::cipher_cbc_encrypt_ctx_new<AES128CbcEncryptor>();
 }
 
-int gmlib_aes128_cbc_encrypt_ctx_free(void* ctx)
+void* gmlib_aes128_cbc_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_cbc_encrypt_ctx_new_inplace<AES128CbcEncryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes128_cbc_encrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_cbc_encrypt_ctx_free<AES128CbcEncryptor>(ctx) == 0,
+        c_api::cipher_cbc_encrypt_ctx_delete<AES128CbcEncryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes128_cbc_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_cbc_encrypt_ctx_delete_inplace<AES128CbcEncryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -262,15 +307,30 @@ size_t gmlib_aes128_cbc_decrypt_ctx_size()
     return c_api::cipher_cbc_decrypt_ctx_size<AES128CbcDecryptor>();
 }
 
-void* gmlib_aes128_cbc_decrypt_ctx_alloc()
+void* gmlib_aes128_cbc_decrypt_ctx_new()
 {
-    return c_api::cipher_cbc_decrypt_ctx_alloc<AES128CbcDecryptor>();
+    return c_api::cipher_cbc_decrypt_ctx_new<AES128CbcDecryptor>();
 }
 
-int gmlib_aes128_cbc_decrypt_ctx_free(void* ctx)
+void* gmlib_aes128_cbc_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_cbc_decrypt_ctx_new_inplace<AES128CbcDecryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes128_cbc_decrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_cbc_decrypt_ctx_free<AES128CbcDecryptor>(ctx) == 0,
+        c_api::cipher_cbc_decrypt_ctx_delete<AES128CbcDecryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes128_cbc_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_cbc_decrypt_ctx_delete_inplace<AES128CbcDecryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -353,15 +413,30 @@ size_t gmlib_aes128_cfb_encrypt_ctx_size()
     return c_api::cipher_cfb_encrypt_ctx_size<AES128CfbEncryptor>();
 }
 
-void* gmlib_aes128_cfb_encrypt_ctx_alloc()
+void* gmlib_aes128_cfb_encrypt_ctx_new()
 {
-    return c_api::cipher_cfb_encrypt_ctx_alloc<AES128CfbEncryptor>();
+    return c_api::cipher_cfb_encrypt_ctx_new<AES128CfbEncryptor>();
 }
 
-int gmlib_aes128_cfb_encrypt_ctx_free(void* ctx)
+void* gmlib_aes128_cfb_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_cfb_encrypt_ctx_new_inplace<AES128CfbEncryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes128_cfb_encrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_cfb_encrypt_ctx_free<AES128CfbEncryptor>(ctx) == 0,
+        c_api::cipher_cfb_encrypt_ctx_delete<AES128CfbEncryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes128_cfb_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_cfb_encrypt_ctx_delete_inplace<AES128CfbEncryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -440,15 +515,30 @@ size_t gmlib_aes128_cfb_decrypt_ctx_size()
     return c_api::cipher_cfb_decrypt_ctx_size<AES128CfbDecryptor>();
 }
 
-void* gmlib_aes128_cfb_decrypt_ctx_alloc()
+void* gmlib_aes128_cfb_decrypt_ctx_new()
 {
-    return c_api::cipher_cfb_decrypt_ctx_alloc<AES128CfbDecryptor>();
+    return c_api::cipher_cfb_decrypt_ctx_new<AES128CfbDecryptor>();
 }
 
-int gmlib_aes128_cfb_decrypt_ctx_free(void* ctx)
+void* gmlib_aes128_cfb_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_cfb_decrypt_ctx_new_inplace<AES128CfbDecryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes128_cfb_decrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_cfb_decrypt_ctx_free<AES128CfbDecryptor>(ctx) == 0,
+        c_api::cipher_cfb_decrypt_ctx_delete<AES128CfbDecryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes128_cfb_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_cfb_decrypt_ctx_delete_inplace<AES128CfbDecryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -531,15 +621,30 @@ size_t gmlib_aes128_ofb_encrypt_ctx_size()
     return c_api::cipher_ofb_encrypt_ctx_size<AES128OfbEncryptor>();
 }
 
-void* gmlib_aes128_ofb_encrypt_ctx_alloc()
+void* gmlib_aes128_ofb_encrypt_ctx_new()
 {
-    return c_api::cipher_ofb_encrypt_ctx_alloc<AES128OfbEncryptor>();
+    return c_api::cipher_ofb_encrypt_ctx_new<AES128OfbEncryptor>();
 }
 
-int gmlib_aes128_ofb_encrypt_ctx_free(void* ctx)
+void* gmlib_aes128_ofb_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_ofb_encrypt_ctx_new_inplace<AES128OfbEncryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes128_ofb_encrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_ofb_encrypt_ctx_free<AES128OfbEncryptor>(ctx) == 0,
+        c_api::cipher_ofb_encrypt_ctx_delete<AES128OfbEncryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes128_ofb_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ofb_encrypt_ctx_delete_inplace<AES128OfbEncryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -618,15 +723,30 @@ size_t gmlib_aes128_ofb_decrypt_ctx_size()
     return c_api::cipher_ofb_decrypt_ctx_size<AES128OfbDecryptor>();
 }
 
-void* gmlib_aes128_ofb_decrypt_ctx_alloc()
+void* gmlib_aes128_ofb_decrypt_ctx_new()
 {
-    return c_api::cipher_ofb_decrypt_ctx_alloc<AES128OfbDecryptor>();
+    return c_api::cipher_ofb_decrypt_ctx_new<AES128OfbDecryptor>();
 }
 
-int gmlib_aes128_ofb_decrypt_ctx_free(void* ctx)
+void* gmlib_aes128_ofb_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_ofb_decrypt_ctx_new_inplace<AES128OfbDecryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes128_ofb_decrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_ofb_decrypt_ctx_free<AES128OfbDecryptor>(ctx) == 0,
+        c_api::cipher_ofb_decrypt_ctx_delete<AES128OfbDecryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes128_ofb_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ofb_decrypt_ctx_delete_inplace<AES128OfbDecryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -709,15 +829,30 @@ size_t gmlib_aes128_ctr_encrypt_ctx_size()
     return c_api::cipher_ctr_encrypt_ctx_size<AES128CtrEncryptor>();
 }
 
-void* gmlib_aes128_ctr_encrypt_ctx_alloc()
+void* gmlib_aes128_ctr_encrypt_ctx_new()
 {
-    return c_api::cipher_ctr_encrypt_ctx_alloc<AES128CtrEncryptor>();
+    return c_api::cipher_ctr_encrypt_ctx_new<AES128CtrEncryptor>();
 }
 
-int gmlib_aes128_ctr_encrypt_ctx_free(void* ctx)
+void* gmlib_aes128_ctr_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_ctr_encrypt_ctx_new_inplace<AES128CtrEncryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes128_ctr_encrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_ctr_encrypt_ctx_free<AES128CtrEncryptor>(ctx) == 0,
+        c_api::cipher_ctr_encrypt_ctx_delete<AES128CtrEncryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes128_ctr_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ctr_encrypt_ctx_delete_inplace<AES128CtrEncryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -796,15 +931,30 @@ size_t gmlib_aes128_ctr_decrypt_ctx_size()
     return c_api::cipher_ctr_decrypt_ctx_size<AES128CtrDecryptor>();
 }
 
-void* gmlib_aes128_ctr_decrypt_ctx_alloc()
+void* gmlib_aes128_ctr_decrypt_ctx_new()
 {
-    return c_api::cipher_ctr_decrypt_ctx_alloc<AES128CtrDecryptor>();
+    return c_api::cipher_ctr_decrypt_ctx_new<AES128CtrDecryptor>();
 }
 
-int gmlib_aes128_ctr_decrypt_ctx_free(void* ctx)
+void* gmlib_aes128_ctr_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_ctr_decrypt_ctx_new_inplace<AES128CtrDecryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes128_ctr_decrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_ctr_decrypt_ctx_free<AES128CtrDecryptor>(ctx) == 0,
+        c_api::cipher_ctr_decrypt_ctx_delete<AES128CtrDecryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes128_ctr_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ctr_decrypt_ctx_delete_inplace<AES128CtrDecryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -887,15 +1037,30 @@ size_t gmlib_aes128_gcm_encrypt_ctx_size()
     return c_api::cipher_gcm_encrypt_ctx_size<AES128GcmEncryptor>();
 }
 
-void* gmlib_aes128_gcm_encrypt_ctx_alloc()
+void* gmlib_aes128_gcm_encrypt_ctx_new()
 {
-    return c_api::cipher_gcm_encrypt_ctx_alloc<AES128GcmEncryptor>();
+    return c_api::cipher_gcm_encrypt_ctx_new<AES128GcmEncryptor>();
 }
 
-int gmlib_aes128_gcm_encrypt_ctx_free(void* ctx)
+void* gmlib_aes128_gcm_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_gcm_encrypt_ctx_new_inplace<AES128GcmEncryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes128_gcm_encrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_gcm_encrypt_ctx_free<AES128GcmEncryptor>(ctx) == 0,
+        c_api::cipher_gcm_encrypt_ctx_delete<AES128GcmEncryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes128_gcm_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_gcm_encrypt_ctx_delete_inplace<AES128GcmEncryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -991,15 +1156,30 @@ size_t gmlib_aes128_gcm_decrypt_ctx_size()
     return c_api::cipher_gcm_decrypt_ctx_size<AES128GcmDecryptor>();
 }
 
-void* gmlib_aes128_gcm_decrypt_ctx_alloc()
+void* gmlib_aes128_gcm_decrypt_ctx_new()
 {
-    return c_api::cipher_gcm_decrypt_ctx_alloc<AES128GcmDecryptor>();
+    return c_api::cipher_gcm_decrypt_ctx_new<AES128GcmDecryptor>();
 }
 
-int gmlib_aes128_gcm_decrypt_ctx_free(void* ctx)
+void* gmlib_aes128_gcm_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_gcm_decrypt_ctx_new_inplace<AES128GcmDecryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes128_gcm_decrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_gcm_decrypt_ctx_free<AES128GcmDecryptor>(ctx) == 0,
+        c_api::cipher_gcm_decrypt_ctx_delete<AES128GcmDecryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes128_gcm_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_gcm_decrypt_ctx_delete_inplace<AES128GcmDecryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }

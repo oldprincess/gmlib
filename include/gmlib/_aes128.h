@@ -10,12 +10,15 @@ extern "C" {
 #endif
 
 // ******************************************
-// ************** AES128-ECB ****************
+// *********** AES128-ECB *******************
 // ******************************************
 
 GMLIB_API size_t gmlib_aes128_ecb_encrypt_ctx_size();
-GMLIB_API void*  gmlib_aes128_ecb_encrypt_ctx_alloc();
-GMLIB_API int    gmlib_aes128_ecb_encrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_aes128_ecb_encrypt_ctx_new();
+GMLIB_API void*  gmlib_aes128_ecb_encrypt_ctx_new_inplace(void*  buf,
+                                                          size_t buf_size);
+GMLIB_API int    gmlib_aes128_ecb_encrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_aes128_ecb_encrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_aes128_ecb_encrypt_get_user_key_len();
 GMLIB_API size_t gmlib_aes128_ecb_encrypt_get_block_size();
 GMLIB_API int    gmlib_aes128_ecb_encrypt_ctx_init(void*          ctx,
@@ -37,8 +40,11 @@ GMLIB_API int    gmlib_aes128_ecb_encrypt_ctx_final(void*    ctx,
                                                     size_t*  outl);
 
 GMLIB_API size_t gmlib_aes128_ecb_decrypt_ctx_size();
-GMLIB_API void*  gmlib_aes128_ecb_decrypt_ctx_alloc();
-GMLIB_API int    gmlib_aes128_ecb_decrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_aes128_ecb_decrypt_ctx_new();
+GMLIB_API void*  gmlib_aes128_ecb_decrypt_ctx_new_inplace(void*  buf,
+                                                          size_t buf_size);
+GMLIB_API int    gmlib_aes128_ecb_decrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_aes128_ecb_decrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_aes128_ecb_decrypt_get_user_key_len();
 GMLIB_API size_t gmlib_aes128_ecb_decrypt_get_block_size();
 GMLIB_API int    gmlib_aes128_ecb_decrypt_ctx_init(void*          ctx,
@@ -60,12 +66,16 @@ GMLIB_API int    gmlib_aes128_ecb_decrypt_ctx_final(void*    ctx,
                                                     size_t*  outl);
 
 // ******************************************
-// ************** AES128-CBC ****************
+// *********** AES128-CBC *******************
 // ******************************************
 
 GMLIB_API size_t gmlib_aes128_cbc_encrypt_ctx_size();
-GMLIB_API void*  gmlib_aes128_cbc_encrypt_ctx_alloc();
-GMLIB_API int    gmlib_aes128_cbc_encrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_aes128_cbc_encrypt_ctx_new();
+GMLIB_API void*  gmlib_aes128_cbc_encrypt_ctx_new_inplace(void*  buf,
+                                                          size_t buf_size);
+GMLIB_API int    gmlib_aes128_cbc_encrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_aes128_cbc_encrypt_ctx_delete_inplace(void* ctx);
+GMLIB_API int    gmlib_aes128_cbc_encrypt_ctx_delete(void* ctx);
 GMLIB_API size_t gmlib_aes128_cbc_encrypt_get_user_key_len();
 GMLIB_API size_t gmlib_aes128_cbc_encrypt_get_iv_len();
 GMLIB_API size_t gmlib_aes128_cbc_encrypt_get_block_size();
@@ -92,8 +102,11 @@ GMLIB_API int    gmlib_aes128_cbc_encrypt_ctx_final(void*    ctx,
                                                     size_t*  outl);
 
 GMLIB_API size_t gmlib_aes128_cbc_decrypt_ctx_size();
-GMLIB_API void*  gmlib_aes128_cbc_decrypt_ctx_alloc();
-GMLIB_API int    gmlib_aes128_cbc_decrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_aes128_cbc_decrypt_ctx_new();
+GMLIB_API void*  gmlib_aes128_cbc_decrypt_ctx_new_inplace(void*  buf,
+                                                          size_t buf_size);
+GMLIB_API int    gmlib_aes128_cbc_decrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_aes128_cbc_decrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_aes128_cbc_decrypt_get_user_key_len();
 GMLIB_API size_t gmlib_aes128_cbc_decrypt_get_iv_len();
 GMLIB_API size_t gmlib_aes128_cbc_decrypt_get_block_size();
@@ -120,12 +133,16 @@ GMLIB_API int    gmlib_aes128_cbc_decrypt_ctx_final(void*    ctx,
                                                     size_t*  outl);
 
 // ******************************************
-// ************** AES128-CFB ****************
+// *********** AES128-CFB *******************
 // ******************************************
 
 GMLIB_API size_t gmlib_aes128_cfb_encrypt_ctx_size();
-GMLIB_API void*  gmlib_aes128_cfb_encrypt_ctx_alloc();
-GMLIB_API int    gmlib_aes128_cfb_encrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_aes128_cfb_encrypt_ctx_new();
+GMLIB_API void*  gmlib_aes128_cfb_encrypt_ctx_new_inplace(void*  buf,
+                                                          size_t buf_size);
+GMLIB_API int    gmlib_aes128_cfb_encrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_aes128_cfb_encrypt_ctx_delete_inplace(void* ctx);
+GMLIB_API int    gmlib_aes128_cfb_encrypt_ctx_delete(void* ctx);
 GMLIB_API size_t gmlib_aes128_cfb_encrypt_get_user_key_len();
 GMLIB_API size_t gmlib_aes128_cfb_encrypt_get_iv_len();
 GMLIB_API size_t gmlib_aes128_cfb_encrypt_get_block_size();
@@ -152,8 +169,11 @@ GMLIB_API int    gmlib_aes128_cfb_encrypt_ctx_final(void*    ctx,
                                                     size_t*  outl);
 
 GMLIB_API size_t gmlib_aes128_cfb_decrypt_ctx_size();
-GMLIB_API void*  gmlib_aes128_cfb_decrypt_ctx_alloc();
-GMLIB_API int    gmlib_aes128_cfb_decrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_aes128_cfb_decrypt_ctx_new();
+GMLIB_API void*  gmlib_aes128_cfb_decrypt_ctx_new_inplace(void*  buf,
+                                                          size_t buf_size);
+GMLIB_API int    gmlib_aes128_cfb_decrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_aes128_cfb_decrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_aes128_cfb_decrypt_get_user_key_len();
 GMLIB_API size_t gmlib_aes128_cfb_decrypt_get_iv_len();
 GMLIB_API size_t gmlib_aes128_cfb_decrypt_get_block_size();
@@ -180,12 +200,15 @@ GMLIB_API int    gmlib_aes128_cfb_decrypt_ctx_final(void*    ctx,
                                                     size_t*  outl);
 
 // ******************************************
-// ************** AES128-OFB ****************
+// *********** AES128-OFB *******************
 // ******************************************
 
 GMLIB_API size_t gmlib_aes128_ofb_encrypt_ctx_size();
-GMLIB_API void*  gmlib_aes128_ofb_encrypt_ctx_alloc();
-GMLIB_API int    gmlib_aes128_ofb_encrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_aes128_ofb_encrypt_ctx_new();
+GMLIB_API void*  gmlib_aes128_ofb_encrypt_ctx_new_inplace(void*  buf,
+                                                          size_t buf_size);
+GMLIB_API int    gmlib_aes128_ofb_encrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_aes128_ofb_encrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_aes128_ofb_encrypt_get_user_key_len();
 GMLIB_API size_t gmlib_aes128_ofb_encrypt_get_iv_len();
 GMLIB_API size_t gmlib_aes128_ofb_encrypt_get_block_size();
@@ -212,8 +235,11 @@ GMLIB_API int    gmlib_aes128_ofb_encrypt_ctx_final(void*    ctx,
                                                     size_t*  outl);
 
 GMLIB_API size_t gmlib_aes128_ofb_decrypt_ctx_size();
-GMLIB_API void*  gmlib_aes128_ofb_decrypt_ctx_alloc();
-GMLIB_API int    gmlib_aes128_ofb_decrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_aes128_ofb_decrypt_ctx_new();
+GMLIB_API void*  gmlib_aes128_ofb_decrypt_ctx_new_inplace(void*  buf,
+                                                          size_t buf_size);
+GMLIB_API int    gmlib_aes128_ofb_decrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_aes128_ofb_decrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_aes128_ofb_decrypt_get_user_key_len();
 GMLIB_API size_t gmlib_aes128_ofb_decrypt_get_iv_len();
 GMLIB_API size_t gmlib_aes128_ofb_decrypt_get_block_size();
@@ -240,12 +266,15 @@ GMLIB_API int    gmlib_aes128_ofb_decrypt_ctx_final(void*    ctx,
                                                     size_t*  outl);
 
 // ******************************************
-// ************** AES128-CTR ****************
+// *********** AES128-CTR *******************
 // ******************************************
 
 GMLIB_API size_t gmlib_aes128_ctr_encrypt_ctx_size();
-GMLIB_API void*  gmlib_aes128_ctr_encrypt_ctx_alloc();
-GMLIB_API int    gmlib_aes128_ctr_encrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_aes128_ctr_encrypt_ctx_new();
+GMLIB_API void*  gmlib_aes128_ctr_encrypt_ctx_new_inplace(void*  buf,
+                                                          size_t buf_size);
+GMLIB_API int    gmlib_aes128_ctr_encrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_aes128_ctr_encrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_aes128_ctr_encrypt_get_user_key_len();
 GMLIB_API size_t gmlib_aes128_ctr_encrypt_get_iv_len();
 GMLIB_API size_t gmlib_aes128_ctr_encrypt_get_block_size();
@@ -272,8 +301,11 @@ GMLIB_API int    gmlib_aes128_ctr_encrypt_ctx_final(void*    ctx,
                                                     size_t*  outl);
 
 GMLIB_API size_t gmlib_aes128_ctr_decrypt_ctx_size();
-GMLIB_API void*  gmlib_aes128_ctr_decrypt_ctx_alloc();
-GMLIB_API int    gmlib_aes128_ctr_decrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_aes128_ctr_decrypt_ctx_new();
+GMLIB_API void*  gmlib_aes128_ctr_decrypt_ctx_new_inplace(void*  buf,
+                                                          size_t buf_size);
+GMLIB_API int    gmlib_aes128_ctr_decrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_aes128_ctr_decrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_aes128_ctr_decrypt_get_user_key_len();
 GMLIB_API size_t gmlib_aes128_ctr_decrypt_get_iv_len();
 GMLIB_API size_t gmlib_aes128_ctr_decrypt_get_block_size();
@@ -300,12 +332,15 @@ GMLIB_API int    gmlib_aes128_ctr_decrypt_ctx_final(void*    ctx,
                                                     size_t*  outl);
 
 // ******************************************
-// ************** AES128-GCM ****************
+// *********** AES128-GCM *******************
 // ******************************************
 
 GMLIB_API size_t gmlib_aes128_gcm_encrypt_ctx_size();
-GMLIB_API void*  gmlib_aes128_gcm_encrypt_ctx_alloc();
-GMLIB_API int    gmlib_aes128_gcm_encrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_aes128_gcm_encrypt_ctx_new();
+GMLIB_API void*  gmlib_aes128_gcm_encrypt_ctx_new_inplace(void*  buf,
+                                                          size_t buf_size);
+GMLIB_API int    gmlib_aes128_gcm_encrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_aes128_gcm_encrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_aes128_gcm_encrypt_get_user_key_len();
 GMLIB_API size_t gmlib_aes128_gcm_encrypt_get_default_iv_len();
 GMLIB_API size_t gmlib_aes128_gcm_encrypt_get_block_size();
@@ -338,8 +373,11 @@ GMLIB_API int    gmlib_aes128_gcm_encrypt_ctx_final(void*    ctx,
 GMLIB_API int    gmlib_aes128_gcm_encrypt_ctx_get_tag(void* ctx, uint8_t* tag);
 
 GMLIB_API size_t gmlib_aes128_gcm_decrypt_ctx_size();
-GMLIB_API void*  gmlib_aes128_gcm_decrypt_ctx_alloc();
-GMLIB_API int    gmlib_aes128_gcm_decrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_aes128_gcm_decrypt_ctx_new();
+GMLIB_API void*  gmlib_aes128_gcm_decrypt_ctx_new_inplace(void*  buf,
+                                                          size_t buf_size);
+GMLIB_API int    gmlib_aes128_gcm_decrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_aes128_gcm_decrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_aes128_gcm_decrypt_get_user_key_len();
 GMLIB_API size_t gmlib_aes128_gcm_decrypt_get_default_iv_len();
 GMLIB_API size_t gmlib_aes128_gcm_decrypt_get_block_size();

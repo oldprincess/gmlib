@@ -14,8 +14,11 @@ extern "C" {
 // ******************************************
 
 GMLIB_API size_t gmlib_sm4_ecb_encrypt_ctx_size();
-GMLIB_API void*  gmlib_sm4_ecb_encrypt_ctx_alloc();
-GMLIB_API int    gmlib_sm4_ecb_encrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_sm4_ecb_encrypt_ctx_new();
+GMLIB_API void*  gmlib_sm4_ecb_encrypt_ctx_new_inplace(void*  buf,
+                                                       size_t buf_size);
+GMLIB_API int    gmlib_sm4_ecb_encrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_sm4_ecb_encrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_sm4_ecb_encrypt_get_user_key_len();
 GMLIB_API size_t gmlib_sm4_ecb_encrypt_get_block_size();
 GMLIB_API int    gmlib_sm4_ecb_encrypt_ctx_init(void*          ctx,
@@ -37,8 +40,11 @@ GMLIB_API int    gmlib_sm4_ecb_encrypt_ctx_final(void*    ctx,
                                                  size_t*  outl);
 
 GMLIB_API size_t gmlib_sm4_ecb_decrypt_ctx_size();
-GMLIB_API void*  gmlib_sm4_ecb_decrypt_ctx_alloc();
-GMLIB_API int    gmlib_sm4_ecb_decrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_sm4_ecb_decrypt_ctx_new();
+GMLIB_API void*  gmlib_sm4_ecb_decrypt_ctx_new_inplace(void*  buf,
+                                                       size_t buf_size);
+GMLIB_API int    gmlib_sm4_ecb_decrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_sm4_ecb_decrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_sm4_ecb_decrypt_get_user_key_len();
 GMLIB_API size_t gmlib_sm4_ecb_decrypt_get_block_size();
 GMLIB_API int    gmlib_sm4_ecb_decrypt_ctx_init(void*          ctx,
@@ -64,8 +70,12 @@ GMLIB_API int    gmlib_sm4_ecb_decrypt_ctx_final(void*    ctx,
 // ******************************************
 
 GMLIB_API size_t gmlib_sm4_cbc_encrypt_ctx_size();
-GMLIB_API void*  gmlib_sm4_cbc_encrypt_ctx_alloc();
-GMLIB_API int    gmlib_sm4_cbc_encrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_sm4_cbc_encrypt_ctx_new();
+GMLIB_API void*  gmlib_sm4_cbc_encrypt_ctx_new_inplace(void*  buf,
+                                                       size_t buf_size);
+GMLIB_API int    gmlib_sm4_cbc_encrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_sm4_cbc_encrypt_ctx_delete_inplace(void* ctx);
+GMLIB_API int    gmlib_sm4_cbc_encrypt_ctx_delete(void* ctx);
 GMLIB_API size_t gmlib_sm4_cbc_encrypt_get_user_key_len();
 GMLIB_API size_t gmlib_sm4_cbc_encrypt_get_iv_len();
 GMLIB_API size_t gmlib_sm4_cbc_encrypt_get_block_size();
@@ -92,8 +102,11 @@ GMLIB_API int    gmlib_sm4_cbc_encrypt_ctx_final(void*    ctx,
                                                  size_t*  outl);
 
 GMLIB_API size_t gmlib_sm4_cbc_decrypt_ctx_size();
-GMLIB_API void*  gmlib_sm4_cbc_decrypt_ctx_alloc();
-GMLIB_API int    gmlib_sm4_cbc_decrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_sm4_cbc_decrypt_ctx_new();
+GMLIB_API void*  gmlib_sm4_cbc_decrypt_ctx_new_inplace(void*  buf,
+                                                       size_t buf_size);
+GMLIB_API int    gmlib_sm4_cbc_decrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_sm4_cbc_decrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_sm4_cbc_decrypt_get_user_key_len();
 GMLIB_API size_t gmlib_sm4_cbc_decrypt_get_iv_len();
 GMLIB_API size_t gmlib_sm4_cbc_decrypt_get_block_size();
@@ -124,8 +137,12 @@ GMLIB_API int    gmlib_sm4_cbc_decrypt_ctx_final(void*    ctx,
 // ******************************************
 
 GMLIB_API size_t gmlib_sm4_cfb_encrypt_ctx_size();
-GMLIB_API void*  gmlib_sm4_cfb_encrypt_ctx_alloc();
-GMLIB_API int    gmlib_sm4_cfb_encrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_sm4_cfb_encrypt_ctx_new();
+GMLIB_API void*  gmlib_sm4_cfb_encrypt_ctx_new_inplace(void*  buf,
+                                                       size_t buf_size);
+GMLIB_API int    gmlib_sm4_cfb_encrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_sm4_cfb_encrypt_ctx_delete_inplace(void* ctx);
+GMLIB_API int    gmlib_sm4_cfb_encrypt_ctx_delete(void* ctx);
 GMLIB_API size_t gmlib_sm4_cfb_encrypt_get_user_key_len();
 GMLIB_API size_t gmlib_sm4_cfb_encrypt_get_iv_len();
 GMLIB_API size_t gmlib_sm4_cfb_encrypt_get_block_size();
@@ -152,8 +169,11 @@ GMLIB_API int    gmlib_sm4_cfb_encrypt_ctx_final(void*    ctx,
                                                  size_t*  outl);
 
 GMLIB_API size_t gmlib_sm4_cfb_decrypt_ctx_size();
-GMLIB_API void*  gmlib_sm4_cfb_decrypt_ctx_alloc();
-GMLIB_API int    gmlib_sm4_cfb_decrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_sm4_cfb_decrypt_ctx_new();
+GMLIB_API void*  gmlib_sm4_cfb_decrypt_ctx_new_inplace(void*  buf,
+                                                       size_t buf_size);
+GMLIB_API int    gmlib_sm4_cfb_decrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_sm4_cfb_decrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_sm4_cfb_decrypt_get_user_key_len();
 GMLIB_API size_t gmlib_sm4_cfb_decrypt_get_iv_len();
 GMLIB_API size_t gmlib_sm4_cfb_decrypt_get_block_size();
@@ -184,8 +204,11 @@ GMLIB_API int    gmlib_sm4_cfb_decrypt_ctx_final(void*    ctx,
 // ******************************************
 
 GMLIB_API size_t gmlib_sm4_ofb_encrypt_ctx_size();
-GMLIB_API void*  gmlib_sm4_ofb_encrypt_ctx_alloc();
-GMLIB_API int    gmlib_sm4_ofb_encrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_sm4_ofb_encrypt_ctx_new();
+GMLIB_API void*  gmlib_sm4_ofb_encrypt_ctx_new_inplace(void*  buf,
+                                                       size_t buf_size);
+GMLIB_API int    gmlib_sm4_ofb_encrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_sm4_ofb_encrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_sm4_ofb_encrypt_get_user_key_len();
 GMLIB_API size_t gmlib_sm4_ofb_encrypt_get_iv_len();
 GMLIB_API size_t gmlib_sm4_ofb_encrypt_get_block_size();
@@ -212,8 +235,11 @@ GMLIB_API int    gmlib_sm4_ofb_encrypt_ctx_final(void*    ctx,
                                                  size_t*  outl);
 
 GMLIB_API size_t gmlib_sm4_ofb_decrypt_ctx_size();
-GMLIB_API void*  gmlib_sm4_ofb_decrypt_ctx_alloc();
-GMLIB_API int    gmlib_sm4_ofb_decrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_sm4_ofb_decrypt_ctx_new();
+GMLIB_API void*  gmlib_sm4_ofb_decrypt_ctx_new_inplace(void*  buf,
+                                                       size_t buf_size);
+GMLIB_API int    gmlib_sm4_ofb_decrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_sm4_ofb_decrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_sm4_ofb_decrypt_get_user_key_len();
 GMLIB_API size_t gmlib_sm4_ofb_decrypt_get_iv_len();
 GMLIB_API size_t gmlib_sm4_ofb_decrypt_get_block_size();
@@ -244,8 +270,11 @@ GMLIB_API int    gmlib_sm4_ofb_decrypt_ctx_final(void*    ctx,
 // ******************************************
 
 GMLIB_API size_t gmlib_sm4_ctr_encrypt_ctx_size();
-GMLIB_API void*  gmlib_sm4_ctr_encrypt_ctx_alloc();
-GMLIB_API int    gmlib_sm4_ctr_encrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_sm4_ctr_encrypt_ctx_new();
+GMLIB_API void*  gmlib_sm4_ctr_encrypt_ctx_new_inplace(void*  buf,
+                                                       size_t buf_size);
+GMLIB_API int    gmlib_sm4_ctr_encrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_sm4_ctr_encrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_sm4_ctr_encrypt_get_user_key_len();
 GMLIB_API size_t gmlib_sm4_ctr_encrypt_get_iv_len();
 GMLIB_API size_t gmlib_sm4_ctr_encrypt_get_block_size();
@@ -272,8 +301,11 @@ GMLIB_API int    gmlib_sm4_ctr_encrypt_ctx_final(void*    ctx,
                                                  size_t*  outl);
 
 GMLIB_API size_t gmlib_sm4_ctr_decrypt_ctx_size();
-GMLIB_API void*  gmlib_sm4_ctr_decrypt_ctx_alloc();
-GMLIB_API int    gmlib_sm4_ctr_decrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_sm4_ctr_decrypt_ctx_new();
+GMLIB_API void*  gmlib_sm4_ctr_decrypt_ctx_new_inplace(void*  buf,
+                                                       size_t buf_size);
+GMLIB_API int    gmlib_sm4_ctr_decrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_sm4_ctr_decrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_sm4_ctr_decrypt_get_user_key_len();
 GMLIB_API size_t gmlib_sm4_ctr_decrypt_get_iv_len();
 GMLIB_API size_t gmlib_sm4_ctr_decrypt_get_block_size();
@@ -304,8 +336,11 @@ GMLIB_API int    gmlib_sm4_ctr_decrypt_ctx_final(void*    ctx,
 // ******************************************
 
 GMLIB_API size_t gmlib_sm4_gcm_encrypt_ctx_size();
-GMLIB_API void*  gmlib_sm4_gcm_encrypt_ctx_alloc();
-GMLIB_API int    gmlib_sm4_gcm_encrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_sm4_gcm_encrypt_ctx_new();
+GMLIB_API void*  gmlib_sm4_gcm_encrypt_ctx_new_inplace(void*  buf,
+                                                       size_t buf_size);
+GMLIB_API int    gmlib_sm4_gcm_encrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_sm4_gcm_encrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_sm4_gcm_encrypt_get_user_key_len();
 GMLIB_API size_t gmlib_sm4_gcm_encrypt_get_default_iv_len();
 GMLIB_API size_t gmlib_sm4_gcm_encrypt_get_block_size();
@@ -338,8 +373,11 @@ GMLIB_API int    gmlib_sm4_gcm_encrypt_ctx_final(void*    ctx,
 GMLIB_API int    gmlib_sm4_gcm_encrypt_ctx_get_tag(void* ctx, uint8_t* tag);
 
 GMLIB_API size_t gmlib_sm4_gcm_decrypt_ctx_size();
-GMLIB_API void*  gmlib_sm4_gcm_decrypt_ctx_alloc();
-GMLIB_API int    gmlib_sm4_gcm_decrypt_ctx_free(void* ctx);
+GMLIB_API void*  gmlib_sm4_gcm_decrypt_ctx_new();
+GMLIB_API void*  gmlib_sm4_gcm_decrypt_ctx_new_inplace(void*  buf,
+                                                       size_t buf_size);
+GMLIB_API int    gmlib_sm4_gcm_decrypt_ctx_delete(void* ctx);
+GMLIB_API int    gmlib_sm4_gcm_decrypt_ctx_delete_inplace(void* ctx);
 GMLIB_API size_t gmlib_sm4_gcm_decrypt_get_user_key_len();
 GMLIB_API size_t gmlib_sm4_gcm_decrypt_get_default_iv_len();
 GMLIB_API size_t gmlib_sm4_gcm_decrypt_get_block_size();

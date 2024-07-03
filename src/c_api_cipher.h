@@ -18,13 +18,43 @@ size_t cipher_ecb_encrypt_ctx_size() noexcept
 }
 
 template <class Cryptor>
-void* cipher_ecb_encrypt_ctx_alloc() noexcept
+void* cipher_ecb_encrypt_ctx_new() noexcept
 {
-    return new (std::nothrow) Cryptor();
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new Cryptor::Cryptor()");
+    }
+    return ptr;
 }
 
 template <class Cryptor>
-int cipher_ecb_encrypt_ctx_free(void* ctx) noexcept
+void* cipher_ecb_encrypt_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(Cryptor))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new (buf) Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened Cryptor::Cryptor()");
+    }
+    return ptr;
+}
+
+template <class Cryptor>
+int cipher_ecb_encrypt_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -34,6 +64,20 @@ int cipher_ecb_encrypt_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<Cryptor*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class Cryptor>
+int cipher_ecb_encrypt_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<Cryptor*>(ctx);
+    ptr->~Cryptor();
     return 0;
 }
 
@@ -179,13 +223,43 @@ size_t cipher_ecb_decrypt_ctx_size() noexcept
 }
 
 template <class Cryptor>
-void* cipher_ecb_decrypt_ctx_alloc() noexcept
+void* cipher_ecb_decrypt_ctx_new() noexcept
 {
-    return new (std::nothrow) Cryptor();
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new Cryptor::Cryptor()");
+    }
+    return ptr;
 }
 
 template <class Cryptor>
-int cipher_ecb_decrypt_ctx_free(void* ctx) noexcept
+void* cipher_ecb_decrypt_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(Cryptor))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new (buf) Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened Cryptor::Cryptor()");
+    }
+    return ptr;
+}
+
+template <class Cryptor>
+int cipher_ecb_decrypt_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -195,6 +269,20 @@ int cipher_ecb_decrypt_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<Cryptor*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class Cryptor>
+int cipher_ecb_decrypt_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<Cryptor*>(ctx);
+    ptr->~Cryptor();
     return 0;
 }
 
@@ -344,13 +432,43 @@ size_t cipher_cbc_encrypt_ctx_size() noexcept
 }
 
 template <class Cryptor>
-void* cipher_cbc_encrypt_ctx_alloc() noexcept
+void* cipher_cbc_encrypt_ctx_new() noexcept
 {
-    return new (std::nothrow) Cryptor();
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new Cryptor::Cryptor()");
+    }
+    return ptr;
 }
 
 template <class Cryptor>
-int cipher_cbc_encrypt_ctx_free(void* ctx) noexcept
+void* cipher_cbc_encrypt_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(Cryptor))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new (buf) Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened Cryptor::Cryptor()");
+    }
+    return ptr;
+}
+
+template <class Cryptor>
+int cipher_cbc_encrypt_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -360,6 +478,20 @@ int cipher_cbc_encrypt_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<Cryptor*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class Cryptor>
+int cipher_cbc_encrypt_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<Cryptor*>(ctx);
+    ptr->~Cryptor();
     return 0;
 }
 
@@ -518,13 +650,43 @@ size_t cipher_cbc_decrypt_ctx_size() noexcept
 }
 
 template <class Cryptor>
-void* cipher_cbc_decrypt_ctx_alloc() noexcept
+void* cipher_cbc_decrypt_ctx_new() noexcept
 {
-    return new (std::nothrow) Cryptor();
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new Cryptor::Cryptor()");
+    }
+    return ptr;
 }
 
 template <class Cryptor>
-int cipher_cbc_decrypt_ctx_free(void* ctx) noexcept
+void* cipher_cbc_decrypt_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(Cryptor))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new (buf) Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened Cryptor::Cryptor()");
+    }
+    return ptr;
+}
+
+template <class Cryptor>
+int cipher_cbc_decrypt_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -534,6 +696,20 @@ int cipher_cbc_decrypt_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<Cryptor*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class Cryptor>
+int cipher_cbc_decrypt_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<Cryptor*>(ctx);
+    ptr->~Cryptor();
     return 0;
 }
 
@@ -696,13 +872,43 @@ size_t cipher_cfb_encrypt_ctx_size() noexcept
 }
 
 template <class Cryptor>
-void* cipher_cfb_encrypt_ctx_alloc() noexcept
+void* cipher_cfb_encrypt_ctx_new() noexcept
 {
-    return new (std::nothrow) Cryptor();
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new Cryptor::Cryptor()");
+    }
+    return ptr;
 }
 
 template <class Cryptor>
-int cipher_cfb_encrypt_ctx_free(void* ctx) noexcept
+void* cipher_cfb_encrypt_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(Cryptor))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new (buf) Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened Cryptor::Cryptor()");
+    }
+    return ptr;
+}
+
+template <class Cryptor>
+int cipher_cfb_encrypt_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -712,6 +918,20 @@ int cipher_cfb_encrypt_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<Cryptor*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class Cryptor>
+int cipher_cfb_encrypt_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<Cryptor*>(ctx);
+    ptr->~Cryptor();
     return 0;
 }
 
@@ -870,13 +1090,43 @@ size_t cipher_cfb_decrypt_ctx_size() noexcept
 }
 
 template <class Cryptor>
-void* cipher_cfb_decrypt_ctx_alloc() noexcept
+void* cipher_cfb_decrypt_ctx_new() noexcept
 {
-    return new (std::nothrow) Cryptor();
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new Cryptor::Cryptor()");
+    }
+    return ptr;
 }
 
 template <class Cryptor>
-int cipher_cfb_decrypt_ctx_free(void* ctx) noexcept
+void* cipher_cfb_decrypt_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(Cryptor))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new (buf) Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened Cryptor::Cryptor()");
+    }
+    return ptr;
+}
+
+template <class Cryptor>
+int cipher_cfb_decrypt_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -886,6 +1136,20 @@ int cipher_cfb_decrypt_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<Cryptor*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class Cryptor>
+int cipher_cfb_decrypt_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<Cryptor*>(ctx);
+    ptr->~Cryptor();
     return 0;
 }
 
@@ -1048,13 +1312,43 @@ size_t cipher_ofb_encrypt_ctx_size() noexcept
 }
 
 template <class Cryptor>
-void* cipher_ofb_encrypt_ctx_alloc() noexcept
+void* cipher_ofb_encrypt_ctx_new() noexcept
 {
-    return new (std::nothrow) Cryptor();
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new Cryptor::Cryptor()");
+    }
+    return ptr;
 }
 
 template <class Cryptor>
-int cipher_ofb_encrypt_ctx_free(void* ctx) noexcept
+void* cipher_ofb_encrypt_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(Cryptor))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new (buf) Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened Cryptor::Cryptor()");
+    }
+    return ptr;
+}
+
+template <class Cryptor>
+int cipher_ofb_encrypt_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -1064,6 +1358,20 @@ int cipher_ofb_encrypt_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<Cryptor*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class Cryptor>
+int cipher_ofb_encrypt_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<Cryptor*>(ctx);
+    ptr->~Cryptor();
     return 0;
 }
 
@@ -1222,13 +1530,43 @@ size_t cipher_ofb_decrypt_ctx_size() noexcept
 }
 
 template <class Cryptor>
-void* cipher_ofb_decrypt_ctx_alloc() noexcept
+void* cipher_ofb_decrypt_ctx_new() noexcept
 {
-    return new (std::nothrow) Cryptor();
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new Cryptor::Cryptor()");
+    }
+    return ptr;
 }
 
 template <class Cryptor>
-int cipher_ofb_decrypt_ctx_free(void* ctx) noexcept
+void* cipher_ofb_decrypt_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(Cryptor))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new (buf) Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened Cryptor::Cryptor()");
+    }
+    return ptr;
+}
+
+template <class Cryptor>
+int cipher_ofb_decrypt_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -1238,6 +1576,20 @@ int cipher_ofb_decrypt_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<Cryptor*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class Cryptor>
+int cipher_ofb_decrypt_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<Cryptor*>(ctx);
+    ptr->~Cryptor();
     return 0;
 }
 
@@ -1400,13 +1752,43 @@ size_t cipher_ctr_encrypt_ctx_size() noexcept
 }
 
 template <class Cryptor>
-void* cipher_ctr_encrypt_ctx_alloc() noexcept
+void* cipher_ctr_encrypt_ctx_new() noexcept
 {
-    return new (std::nothrow) Cryptor();
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new Cryptor::Cryptor()");
+    }
+    return ptr;
 }
 
 template <class Cryptor>
-int cipher_ctr_encrypt_ctx_free(void* ctx) noexcept
+void* cipher_ctr_encrypt_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(Cryptor))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new (buf) Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened Cryptor::Cryptor()");
+    }
+    return ptr;
+}
+
+template <class Cryptor>
+int cipher_ctr_encrypt_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -1416,6 +1798,20 @@ int cipher_ctr_encrypt_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<Cryptor*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class Cryptor>
+int cipher_ctr_encrypt_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<Cryptor*>(ctx);
+    ptr->~Cryptor();
     return 0;
 }
 
@@ -1574,13 +1970,43 @@ size_t cipher_ctr_decrypt_ctx_size() noexcept
 }
 
 template <class Cryptor>
-void* cipher_ctr_decrypt_ctx_alloc() noexcept
+void* cipher_ctr_decrypt_ctx_new() noexcept
 {
-    return new (std::nothrow) Cryptor();
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new Cryptor::Cryptor()");
+    }
+    return ptr;
 }
 
 template <class Cryptor>
-int cipher_ctr_decrypt_ctx_free(void* ctx) noexcept
+void* cipher_ctr_decrypt_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(Cryptor))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new (buf) Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened Cryptor::Cryptor()");
+    }
+    return ptr;
+}
+
+template <class Cryptor>
+int cipher_ctr_decrypt_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -1590,6 +2016,20 @@ int cipher_ctr_decrypt_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<Cryptor*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class Cryptor>
+int cipher_ctr_decrypt_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<Cryptor*>(ctx);
+    ptr->~Cryptor();
     return 0;
 }
 
@@ -1752,13 +2192,43 @@ size_t cipher_gcm_encrypt_ctx_size() noexcept
 }
 
 template <class Cryptor>
-void* cipher_gcm_encrypt_ctx_alloc() noexcept
+void* cipher_gcm_encrypt_ctx_new() noexcept
 {
-    return new (std::nothrow) Cryptor();
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new Cryptor::Cryptor()");
+    }
+    return ptr;
 }
 
 template <class Cryptor>
-int cipher_gcm_encrypt_ctx_free(void* ctx) noexcept
+void* cipher_gcm_encrypt_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(Cryptor))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new (buf) Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened Cryptor::Cryptor()");
+    }
+    return ptr;
+}
+
+template <class Cryptor>
+int cipher_gcm_encrypt_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -1768,6 +2238,20 @@ int cipher_gcm_encrypt_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<Cryptor*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class Cryptor>
+int cipher_gcm_encrypt_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<Cryptor*>(ctx);
+    ptr->~Cryptor();
     return 0;
 }
 
@@ -1960,13 +2444,43 @@ size_t cipher_gcm_decrypt_ctx_size() noexcept
 }
 
 template <class Cryptor>
-void* cipher_gcm_decrypt_ctx_alloc() noexcept
+void* cipher_gcm_decrypt_ctx_new() noexcept
 {
-    return new (std::nothrow) Cryptor();
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new Cryptor::Cryptor()");
+    }
+    return ptr;
 }
 
 template <class Cryptor>
-int cipher_gcm_decrypt_ctx_free(void* ctx) noexcept
+void* cipher_gcm_decrypt_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(Cryptor))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new (buf) Cryptor());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened Cryptor::Cryptor()");
+    }
+    return ptr;
+}
+
+template <class Cryptor>
+int cipher_gcm_decrypt_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -1976,6 +2490,20 @@ int cipher_gcm_decrypt_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<Cryptor*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class Cryptor>
+int cipher_gcm_decrypt_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<Cryptor*>(ctx);
+    ptr->~Cryptor();
     return 0;
 }
 

@@ -15,15 +15,29 @@ size_t gmlib_sm4_ecb_encrypt_ctx_size()
     return c_api::cipher_ecb_encrypt_ctx_size<SM4EcbEncryptor>();
 }
 
-void* gmlib_sm4_ecb_encrypt_ctx_alloc()
+void* gmlib_sm4_ecb_encrypt_ctx_new()
 {
-    return c_api::cipher_ecb_encrypt_ctx_alloc<SM4EcbEncryptor>();
+    return c_api::cipher_ecb_encrypt_ctx_new<SM4EcbEncryptor>();
 }
 
-int gmlib_sm4_ecb_encrypt_ctx_free(void* ctx)
+void* gmlib_sm4_ecb_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
 {
-    GMLIB_CHECK(c_api::cipher_ecb_encrypt_ctx_free<SM4EcbEncryptor>(ctx) == 0,
+    return c_api::cipher_ecb_encrypt_ctx_new_inplace<SM4EcbEncryptor>(buf,
+                                                                      buf_size);
+}
+
+int gmlib_sm4_ecb_encrypt_ctx_delete(void* ctx)
+{
+    GMLIB_CHECK(c_api::cipher_ecb_encrypt_ctx_delete<SM4EcbEncryptor>(ctx) == 0,
                 { return -1; });
+    return 0;
+}
+
+int gmlib_sm4_ecb_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ecb_encrypt_ctx_delete_inplace<SM4EcbEncryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
@@ -91,15 +105,29 @@ size_t gmlib_sm4_ecb_decrypt_ctx_size()
     return c_api::cipher_ecb_decrypt_ctx_size<SM4EcbDecryptor>();
 }
 
-void* gmlib_sm4_ecb_decrypt_ctx_alloc()
+void* gmlib_sm4_ecb_decrypt_ctx_new()
 {
-    return c_api::cipher_ecb_decrypt_ctx_alloc<SM4EcbDecryptor>();
+    return c_api::cipher_ecb_decrypt_ctx_new<SM4EcbDecryptor>();
 }
 
-int gmlib_sm4_ecb_decrypt_ctx_free(void* ctx)
+void* gmlib_sm4_ecb_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
 {
-    GMLIB_CHECK(c_api::cipher_ecb_decrypt_ctx_free<SM4EcbDecryptor>(ctx) == 0,
+    return c_api::cipher_ecb_decrypt_ctx_new_inplace<SM4EcbDecryptor>(buf,
+                                                                      buf_size);
+}
+
+int gmlib_sm4_ecb_decrypt_ctx_delete(void* ctx)
+{
+    GMLIB_CHECK(c_api::cipher_ecb_decrypt_ctx_delete<SM4EcbDecryptor>(ctx) == 0,
                 { return -1; });
+    return 0;
+}
+
+int gmlib_sm4_ecb_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ecb_decrypt_ctx_delete_inplace<SM4EcbDecryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
@@ -171,15 +199,29 @@ size_t gmlib_sm4_cbc_encrypt_ctx_size()
     return c_api::cipher_cbc_encrypt_ctx_size<SM4CbcEncryptor>();
 }
 
-void* gmlib_sm4_cbc_encrypt_ctx_alloc()
+void* gmlib_sm4_cbc_encrypt_ctx_new()
 {
-    return c_api::cipher_cbc_encrypt_ctx_alloc<SM4CbcEncryptor>();
+    return c_api::cipher_cbc_encrypt_ctx_new<SM4CbcEncryptor>();
 }
 
-int gmlib_sm4_cbc_encrypt_ctx_free(void* ctx)
+void* gmlib_sm4_cbc_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
 {
-    GMLIB_CHECK(c_api::cipher_cbc_encrypt_ctx_free<SM4CbcEncryptor>(ctx) == 0,
+    return c_api::cipher_cbc_encrypt_ctx_new_inplace<SM4CbcEncryptor>(buf,
+                                                                      buf_size);
+}
+
+int gmlib_sm4_cbc_encrypt_ctx_delete(void* ctx)
+{
+    GMLIB_CHECK(c_api::cipher_cbc_encrypt_ctx_delete<SM4CbcEncryptor>(ctx) == 0,
                 { return -1; });
+    return 0;
+}
+
+int gmlib_sm4_cbc_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_cbc_encrypt_ctx_delete_inplace<SM4CbcEncryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
@@ -255,15 +297,29 @@ size_t gmlib_sm4_cbc_decrypt_ctx_size()
     return c_api::cipher_cbc_decrypt_ctx_size<SM4CbcDecryptor>();
 }
 
-void* gmlib_sm4_cbc_decrypt_ctx_alloc()
+void* gmlib_sm4_cbc_decrypt_ctx_new()
 {
-    return c_api::cipher_cbc_decrypt_ctx_alloc<SM4CbcDecryptor>();
+    return c_api::cipher_cbc_decrypt_ctx_new<SM4CbcDecryptor>();
 }
 
-int gmlib_sm4_cbc_decrypt_ctx_free(void* ctx)
+void* gmlib_sm4_cbc_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
 {
-    GMLIB_CHECK(c_api::cipher_cbc_decrypt_ctx_free<SM4CbcDecryptor>(ctx) == 0,
+    return c_api::cipher_cbc_decrypt_ctx_new_inplace<SM4CbcDecryptor>(buf,
+                                                                      buf_size);
+}
+
+int gmlib_sm4_cbc_decrypt_ctx_delete(void* ctx)
+{
+    GMLIB_CHECK(c_api::cipher_cbc_decrypt_ctx_delete<SM4CbcDecryptor>(ctx) == 0,
                 { return -1; });
+    return 0;
+}
+
+int gmlib_sm4_cbc_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_cbc_decrypt_ctx_delete_inplace<SM4CbcDecryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
@@ -343,15 +399,29 @@ size_t gmlib_sm4_cfb_encrypt_ctx_size()
     return c_api::cipher_cfb_encrypt_ctx_size<SM4CfbEncryptor>();
 }
 
-void* gmlib_sm4_cfb_encrypt_ctx_alloc()
+void* gmlib_sm4_cfb_encrypt_ctx_new()
 {
-    return c_api::cipher_cfb_encrypt_ctx_alloc<SM4CfbEncryptor>();
+    return c_api::cipher_cfb_encrypt_ctx_new<SM4CfbEncryptor>();
 }
 
-int gmlib_sm4_cfb_encrypt_ctx_free(void* ctx)
+void* gmlib_sm4_cfb_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
 {
-    GMLIB_CHECK(c_api::cipher_cfb_encrypt_ctx_free<SM4CfbEncryptor>(ctx) == 0,
+    return c_api::cipher_cfb_encrypt_ctx_new_inplace<SM4CfbEncryptor>(buf,
+                                                                      buf_size);
+}
+
+int gmlib_sm4_cfb_encrypt_ctx_delete(void* ctx)
+{
+    GMLIB_CHECK(c_api::cipher_cfb_encrypt_ctx_delete<SM4CfbEncryptor>(ctx) == 0,
                 { return -1; });
+    return 0;
+}
+
+int gmlib_sm4_cfb_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_cfb_encrypt_ctx_delete_inplace<SM4CfbEncryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
@@ -427,15 +497,29 @@ size_t gmlib_sm4_cfb_decrypt_ctx_size()
     return c_api::cipher_cfb_decrypt_ctx_size<SM4CfbDecryptor>();
 }
 
-void* gmlib_sm4_cfb_decrypt_ctx_alloc()
+void* gmlib_sm4_cfb_decrypt_ctx_new()
 {
-    return c_api::cipher_cfb_decrypt_ctx_alloc<SM4CfbDecryptor>();
+    return c_api::cipher_cfb_decrypt_ctx_new<SM4CfbDecryptor>();
 }
 
-int gmlib_sm4_cfb_decrypt_ctx_free(void* ctx)
+void* gmlib_sm4_cfb_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
 {
-    GMLIB_CHECK(c_api::cipher_cfb_decrypt_ctx_free<SM4CfbDecryptor>(ctx) == 0,
+    return c_api::cipher_cfb_decrypt_ctx_new_inplace<SM4CfbDecryptor>(buf,
+                                                                      buf_size);
+}
+
+int gmlib_sm4_cfb_decrypt_ctx_delete(void* ctx)
+{
+    GMLIB_CHECK(c_api::cipher_cfb_decrypt_ctx_delete<SM4CfbDecryptor>(ctx) == 0,
                 { return -1; });
+    return 0;
+}
+
+int gmlib_sm4_cfb_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_cfb_decrypt_ctx_delete_inplace<SM4CfbDecryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
@@ -515,15 +599,29 @@ size_t gmlib_sm4_ofb_encrypt_ctx_size()
     return c_api::cipher_ofb_encrypt_ctx_size<SM4OfbEncryptor>();
 }
 
-void* gmlib_sm4_ofb_encrypt_ctx_alloc()
+void* gmlib_sm4_ofb_encrypt_ctx_new()
 {
-    return c_api::cipher_ofb_encrypt_ctx_alloc<SM4OfbEncryptor>();
+    return c_api::cipher_ofb_encrypt_ctx_new<SM4OfbEncryptor>();
 }
 
-int gmlib_sm4_ofb_encrypt_ctx_free(void* ctx)
+void* gmlib_sm4_ofb_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
 {
-    GMLIB_CHECK(c_api::cipher_ofb_encrypt_ctx_free<SM4OfbEncryptor>(ctx) == 0,
+    return c_api::cipher_ofb_encrypt_ctx_new_inplace<SM4OfbEncryptor>(buf,
+                                                                      buf_size);
+}
+
+int gmlib_sm4_ofb_encrypt_ctx_delete(void* ctx)
+{
+    GMLIB_CHECK(c_api::cipher_ofb_encrypt_ctx_delete<SM4OfbEncryptor>(ctx) == 0,
                 { return -1; });
+    return 0;
+}
+
+int gmlib_sm4_ofb_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ofb_encrypt_ctx_delete_inplace<SM4OfbEncryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
@@ -599,15 +697,29 @@ size_t gmlib_sm4_ofb_decrypt_ctx_size()
     return c_api::cipher_ofb_decrypt_ctx_size<SM4OfbDecryptor>();
 }
 
-void* gmlib_sm4_ofb_decrypt_ctx_alloc()
+void* gmlib_sm4_ofb_decrypt_ctx_new()
 {
-    return c_api::cipher_ofb_decrypt_ctx_alloc<SM4OfbDecryptor>();
+    return c_api::cipher_ofb_decrypt_ctx_new<SM4OfbDecryptor>();
 }
 
-int gmlib_sm4_ofb_decrypt_ctx_free(void* ctx)
+void* gmlib_sm4_ofb_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
 {
-    GMLIB_CHECK(c_api::cipher_ofb_decrypt_ctx_free<SM4OfbDecryptor>(ctx) == 0,
+    return c_api::cipher_ofb_decrypt_ctx_new_inplace<SM4OfbDecryptor>(buf,
+                                                                      buf_size);
+}
+
+int gmlib_sm4_ofb_decrypt_ctx_delete(void* ctx)
+{
+    GMLIB_CHECK(c_api::cipher_ofb_decrypt_ctx_delete<SM4OfbDecryptor>(ctx) == 0,
                 { return -1; });
+    return 0;
+}
+
+int gmlib_sm4_ofb_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ofb_decrypt_ctx_delete_inplace<SM4OfbDecryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
@@ -687,15 +799,29 @@ size_t gmlib_sm4_ctr_encrypt_ctx_size()
     return c_api::cipher_ctr_encrypt_ctx_size<SM4CtrEncryptor>();
 }
 
-void* gmlib_sm4_ctr_encrypt_ctx_alloc()
+void* gmlib_sm4_ctr_encrypt_ctx_new()
 {
-    return c_api::cipher_ctr_encrypt_ctx_alloc<SM4CtrEncryptor>();
+    return c_api::cipher_ctr_encrypt_ctx_new<SM4CtrEncryptor>();
 }
 
-int gmlib_sm4_ctr_encrypt_ctx_free(void* ctx)
+void* gmlib_sm4_ctr_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
 {
-    GMLIB_CHECK(c_api::cipher_ctr_encrypt_ctx_free<SM4CtrEncryptor>(ctx) == 0,
+    return c_api::cipher_ctr_encrypt_ctx_new_inplace<SM4CtrEncryptor>(buf,
+                                                                      buf_size);
+}
+
+int gmlib_sm4_ctr_encrypt_ctx_delete(void* ctx)
+{
+    GMLIB_CHECK(c_api::cipher_ctr_encrypt_ctx_delete<SM4CtrEncryptor>(ctx) == 0,
                 { return -1; });
+    return 0;
+}
+
+int gmlib_sm4_ctr_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ctr_encrypt_ctx_delete_inplace<SM4CtrEncryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
@@ -771,15 +897,29 @@ size_t gmlib_sm4_ctr_decrypt_ctx_size()
     return c_api::cipher_ctr_decrypt_ctx_size<SM4CtrDecryptor>();
 }
 
-void* gmlib_sm4_ctr_decrypt_ctx_alloc()
+void* gmlib_sm4_ctr_decrypt_ctx_new()
 {
-    return c_api::cipher_ctr_decrypt_ctx_alloc<SM4CtrDecryptor>();
+    return c_api::cipher_ctr_decrypt_ctx_new<SM4CtrDecryptor>();
 }
 
-int gmlib_sm4_ctr_decrypt_ctx_free(void* ctx)
+void* gmlib_sm4_ctr_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
 {
-    GMLIB_CHECK(c_api::cipher_ctr_decrypt_ctx_free<SM4CtrDecryptor>(ctx) == 0,
+    return c_api::cipher_ctr_decrypt_ctx_new_inplace<SM4CtrDecryptor>(buf,
+                                                                      buf_size);
+}
+
+int gmlib_sm4_ctr_decrypt_ctx_delete(void* ctx)
+{
+    GMLIB_CHECK(c_api::cipher_ctr_decrypt_ctx_delete<SM4CtrDecryptor>(ctx) == 0,
                 { return -1; });
+    return 0;
+}
+
+int gmlib_sm4_ctr_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ctr_decrypt_ctx_delete_inplace<SM4CtrDecryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
@@ -859,15 +999,29 @@ size_t gmlib_sm4_gcm_encrypt_ctx_size()
     return c_api::cipher_gcm_encrypt_ctx_size<SM4GcmEncryptor>();
 }
 
-void* gmlib_sm4_gcm_encrypt_ctx_alloc()
+void* gmlib_sm4_gcm_encrypt_ctx_new()
 {
-    return c_api::cipher_gcm_encrypt_ctx_alloc<SM4GcmEncryptor>();
+    return c_api::cipher_gcm_encrypt_ctx_new<SM4GcmEncryptor>();
 }
 
-int gmlib_sm4_gcm_encrypt_ctx_free(void* ctx)
+void* gmlib_sm4_gcm_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
 {
-    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_free<SM4GcmEncryptor>(ctx) == 0,
+    return c_api::cipher_gcm_encrypt_ctx_new_inplace<SM4GcmEncryptor>(buf,
+                                                                      buf_size);
+}
+
+int gmlib_sm4_gcm_encrypt_ctx_delete(void* ctx)
+{
+    GMLIB_CHECK(c_api::cipher_gcm_encrypt_ctx_delete<SM4GcmEncryptor>(ctx) == 0,
                 { return -1; });
+    return 0;
+}
+
+int gmlib_sm4_gcm_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_gcm_encrypt_ctx_delete_inplace<SM4GcmEncryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 
@@ -962,15 +1116,29 @@ size_t gmlib_sm4_gcm_decrypt_ctx_size()
     return c_api::cipher_gcm_decrypt_ctx_size<SM4GcmDecryptor>();
 }
 
-void* gmlib_sm4_gcm_decrypt_ctx_alloc()
+void* gmlib_sm4_gcm_decrypt_ctx_new()
 {
-    return c_api::cipher_gcm_decrypt_ctx_alloc<SM4GcmDecryptor>();
+    return c_api::cipher_gcm_decrypt_ctx_new<SM4GcmDecryptor>();
 }
 
-int gmlib_sm4_gcm_decrypt_ctx_free(void* ctx)
+void* gmlib_sm4_gcm_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
 {
-    GMLIB_CHECK(c_api::cipher_gcm_decrypt_ctx_free<SM4GcmDecryptor>(ctx) == 0,
+    return c_api::cipher_gcm_decrypt_ctx_new_inplace<SM4GcmDecryptor>(buf,
+                                                                      buf_size);
+}
+
+int gmlib_sm4_gcm_decrypt_ctx_delete(void* ctx)
+{
+    GMLIB_CHECK(c_api::cipher_gcm_decrypt_ctx_delete<SM4GcmDecryptor>(ctx) == 0,
                 { return -1; });
+    return 0;
+}
+
+int gmlib_sm4_gcm_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_gcm_decrypt_ctx_delete_inplace<SM4GcmDecryptor>(ctx) == 0,
+        { return -1; });
     return 0;
 }
 

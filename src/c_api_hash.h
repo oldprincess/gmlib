@@ -14,13 +14,43 @@ size_t hash_ctx_size() noexcept
 }
 
 template <class Hash>
-void* hash_ctx_alloc() noexcept
+void* hash_ctx_new() noexcept
 {
-    return new (std::nothrow) Hash();
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new Hash());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new Hash::Hash()");
+    }
+    return ptr;
 }
 
 template <class Hash>
-int hash_ctx_free(void* ctx) noexcept
+void* hash_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(Hash))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new (buf) Hash());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new Hash::Hash()");
+    }
+    return ptr;
+}
+
+template <class Hash>
+int hash_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -30,6 +60,20 @@ int hash_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<Hash*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class Hash>
+int hash_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<Hash*>(ctx);
+    ptr->~Hash();
     return 0;
 }
 
@@ -173,13 +217,43 @@ size_t hmac_ctx_size() noexcept
 }
 
 template <class HMac>
-void* hmac_ctx_alloc() noexcept
+void* hmac_ctx_new() noexcept
 {
-    return new (std::nothrow) HMac();
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new HMac());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new HMac::HMac()");
+    }
+    return ptr;
 }
 
 template <class HMac>
-int hmac_ctx_free(void* ctx) noexcept
+void* hmac_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(HMac))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ptr = nullptr;
+    try
+    {
+        ptr = static_cast<void*>(new (buf) HMac());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened new HMac::HMac()");
+    }
+    return ptr;
+}
+
+template <class HMac>
+int hmac_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -189,6 +263,20 @@ int hmac_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<HMac*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class HMac>
+int hmac_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<HMac*>(ctx);
+    ptr->~HMac();
     return 0;
 }
 
@@ -324,6 +412,12 @@ int hmac_ctx_final(void* ctx, uint8_t* out, size_t* outl) noexcept
 // ******************************************
 
 template <class HashDrbg>
+size_t hash_drbg_ctx_size() noexcept
+{
+    return sizeof(HashDrbg);
+}
+
+template <class HashDrbg>
 void* hash_drbg_ctx_new() noexcept
 {
     void* ctx = nullptr;
@@ -339,7 +433,28 @@ void* hash_drbg_ctx_new() noexcept
 }
 
 template <class HashDrbg>
-int hash_drbg_ctx_free(void* ctx) noexcept
+void* hash_drbg_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(HashDrbg))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ctx = nullptr;
+    try
+    {
+        ctx = static_cast<void*>(new (buf) HashDrbg());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened HashDrbg()");
+    }
+    return ctx;
+}
+
+template <class HashDrbg>
+int hash_drbg_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -349,6 +464,20 @@ int hash_drbg_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<HashDrbg*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class HashDrbg>
+int hash_drbg_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<HashDrbg*>(ctx);
+    ptr->~HashDrbg();
     return 0;
 }
 
@@ -379,6 +508,12 @@ int hash_drbg_ctx_gen(void* ctx, void* out, size_t len) noexcept
 // ******************************************
 
 template <class HMacDrbg>
+size_t hmac_drbg_ctx_size() noexcept
+{
+    return sizeof(HMacDrbg);
+}
+
+template <class HMacDrbg>
 void* hmac_drbg_ctx_new() noexcept
 {
     void* ctx = nullptr;
@@ -394,7 +529,28 @@ void* hmac_drbg_ctx_new() noexcept
 }
 
 template <class HMacDrbg>
-int hmac_drbg_ctx_free(void* ctx) noexcept
+void* hmac_drbg_ctx_new_inplace(void* buf, size_t buf_size) noexcept
+{
+    if (buf == nullptr || buf_size != sizeof(HMacDrbg))
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return nullptr;
+    }
+
+    void* ctx = nullptr;
+    try
+    {
+        ctx = static_cast<void*>(new (buf) HMacDrbg());
+    }
+    catch (...)
+    {
+        GMLIB_ERR_LOG("err happened HMacDrbg()");
+    }
+    return ctx;
+}
+
+template <class HMacDrbg>
+int hmac_drbg_ctx_delete(void* ctx) noexcept
 {
     if (ctx == nullptr)
     {
@@ -404,6 +560,20 @@ int hmac_drbg_ctx_free(void* ctx) noexcept
 
     auto ptr = static_cast<HMacDrbg*>(ctx);
     delete ptr;
+    return 0;
+}
+
+template <class HMacDrbg>
+int hmac_drbg_ctx_delete_inplace(void* ctx) noexcept
+{
+    if (ctx == nullptr)
+    {
+        GMLIB_ERR_LOG("invalid input");
+        return -1;
+    }
+
+    auto ptr = static_cast<HMacDrbg*>(ctx);
+    ptr->~HMacDrbg();
     return 0;
 }
 

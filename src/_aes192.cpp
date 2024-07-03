@@ -15,15 +15,30 @@ size_t gmlib_aes192_ecb_encrypt_ctx_size()
     return c_api::cipher_ecb_encrypt_ctx_size<AES192EcbEncryptor>();
 }
 
-void* gmlib_aes192_ecb_encrypt_ctx_alloc()
+void* gmlib_aes192_ecb_encrypt_ctx_new()
 {
-    return c_api::cipher_ecb_encrypt_ctx_alloc<AES192EcbEncryptor>();
+    return c_api::cipher_ecb_encrypt_ctx_new<AES192EcbEncryptor>();
 }
 
-int gmlib_aes192_ecb_encrypt_ctx_free(void* ctx)
+void* gmlib_aes192_ecb_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_ecb_encrypt_ctx_new_inplace<AES192EcbEncryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes192_ecb_encrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_ecb_encrypt_ctx_free<AES192EcbEncryptor>(ctx) == 0,
+        c_api::cipher_ecb_encrypt_ctx_delete<AES192EcbEncryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes192_ecb_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ecb_encrypt_ctx_delete_inplace<AES192EcbEncryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -93,15 +108,30 @@ size_t gmlib_aes192_ecb_decrypt_ctx_size()
     return c_api::cipher_ecb_decrypt_ctx_size<AES192EcbDecryptor>();
 }
 
-void* gmlib_aes192_ecb_decrypt_ctx_alloc()
+void* gmlib_aes192_ecb_decrypt_ctx_new()
 {
-    return c_api::cipher_ecb_decrypt_ctx_alloc<AES192EcbDecryptor>();
+    return c_api::cipher_ecb_decrypt_ctx_new<AES192EcbDecryptor>();
 }
 
-int gmlib_aes192_ecb_decrypt_ctx_free(void* ctx)
+void* gmlib_aes192_ecb_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_ecb_decrypt_ctx_new_inplace<AES192EcbDecryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes192_ecb_decrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_ecb_decrypt_ctx_free<AES192EcbDecryptor>(ctx) == 0,
+        c_api::cipher_ecb_decrypt_ctx_delete<AES192EcbDecryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes192_ecb_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ecb_decrypt_ctx_delete_inplace<AES192EcbDecryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -175,15 +205,30 @@ size_t gmlib_aes192_cbc_encrypt_ctx_size()
     return c_api::cipher_cbc_encrypt_ctx_size<AES192CbcEncryptor>();
 }
 
-void* gmlib_aes192_cbc_encrypt_ctx_alloc()
+void* gmlib_aes192_cbc_encrypt_ctx_new()
 {
-    return c_api::cipher_cbc_encrypt_ctx_alloc<AES192CbcEncryptor>();
+    return c_api::cipher_cbc_encrypt_ctx_new<AES192CbcEncryptor>();
 }
 
-int gmlib_aes192_cbc_encrypt_ctx_free(void* ctx)
+void* gmlib_aes192_cbc_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_cbc_encrypt_ctx_new_inplace<AES192CbcEncryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes192_cbc_encrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_cbc_encrypt_ctx_free<AES192CbcEncryptor>(ctx) == 0,
+        c_api::cipher_cbc_encrypt_ctx_delete<AES192CbcEncryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes192_cbc_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_cbc_encrypt_ctx_delete_inplace<AES192CbcEncryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -262,15 +307,30 @@ size_t gmlib_aes192_cbc_decrypt_ctx_size()
     return c_api::cipher_cbc_decrypt_ctx_size<AES192CbcDecryptor>();
 }
 
-void* gmlib_aes192_cbc_decrypt_ctx_alloc()
+void* gmlib_aes192_cbc_decrypt_ctx_new()
 {
-    return c_api::cipher_cbc_decrypt_ctx_alloc<AES192CbcDecryptor>();
+    return c_api::cipher_cbc_decrypt_ctx_new<AES192CbcDecryptor>();
 }
 
-int gmlib_aes192_cbc_decrypt_ctx_free(void* ctx)
+void* gmlib_aes192_cbc_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_cbc_decrypt_ctx_new_inplace<AES192CbcDecryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes192_cbc_decrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_cbc_decrypt_ctx_free<AES192CbcDecryptor>(ctx) == 0,
+        c_api::cipher_cbc_decrypt_ctx_delete<AES192CbcDecryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes192_cbc_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_cbc_decrypt_ctx_delete_inplace<AES192CbcDecryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -353,15 +413,30 @@ size_t gmlib_aes192_cfb_encrypt_ctx_size()
     return c_api::cipher_cfb_encrypt_ctx_size<AES192CfbEncryptor>();
 }
 
-void* gmlib_aes192_cfb_encrypt_ctx_alloc()
+void* gmlib_aes192_cfb_encrypt_ctx_new()
 {
-    return c_api::cipher_cfb_encrypt_ctx_alloc<AES192CfbEncryptor>();
+    return c_api::cipher_cfb_encrypt_ctx_new<AES192CfbEncryptor>();
 }
 
-int gmlib_aes192_cfb_encrypt_ctx_free(void* ctx)
+void* gmlib_aes192_cfb_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_cfb_encrypt_ctx_new_inplace<AES192CfbEncryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes192_cfb_encrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_cfb_encrypt_ctx_free<AES192CfbEncryptor>(ctx) == 0,
+        c_api::cipher_cfb_encrypt_ctx_delete<AES192CfbEncryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes192_cfb_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_cfb_encrypt_ctx_delete_inplace<AES192CfbEncryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -440,15 +515,30 @@ size_t gmlib_aes192_cfb_decrypt_ctx_size()
     return c_api::cipher_cfb_decrypt_ctx_size<AES192CfbDecryptor>();
 }
 
-void* gmlib_aes192_cfb_decrypt_ctx_alloc()
+void* gmlib_aes192_cfb_decrypt_ctx_new()
 {
-    return c_api::cipher_cfb_decrypt_ctx_alloc<AES192CfbDecryptor>();
+    return c_api::cipher_cfb_decrypt_ctx_new<AES192CfbDecryptor>();
 }
 
-int gmlib_aes192_cfb_decrypt_ctx_free(void* ctx)
+void* gmlib_aes192_cfb_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_cfb_decrypt_ctx_new_inplace<AES192CfbDecryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes192_cfb_decrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_cfb_decrypt_ctx_free<AES192CfbDecryptor>(ctx) == 0,
+        c_api::cipher_cfb_decrypt_ctx_delete<AES192CfbDecryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes192_cfb_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_cfb_decrypt_ctx_delete_inplace<AES192CfbDecryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -531,15 +621,30 @@ size_t gmlib_aes192_ofb_encrypt_ctx_size()
     return c_api::cipher_ofb_encrypt_ctx_size<AES192OfbEncryptor>();
 }
 
-void* gmlib_aes192_ofb_encrypt_ctx_alloc()
+void* gmlib_aes192_ofb_encrypt_ctx_new()
 {
-    return c_api::cipher_ofb_encrypt_ctx_alloc<AES192OfbEncryptor>();
+    return c_api::cipher_ofb_encrypt_ctx_new<AES192OfbEncryptor>();
 }
 
-int gmlib_aes192_ofb_encrypt_ctx_free(void* ctx)
+void* gmlib_aes192_ofb_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_ofb_encrypt_ctx_new_inplace<AES192OfbEncryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes192_ofb_encrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_ofb_encrypt_ctx_free<AES192OfbEncryptor>(ctx) == 0,
+        c_api::cipher_ofb_encrypt_ctx_delete<AES192OfbEncryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes192_ofb_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ofb_encrypt_ctx_delete_inplace<AES192OfbEncryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -618,15 +723,30 @@ size_t gmlib_aes192_ofb_decrypt_ctx_size()
     return c_api::cipher_ofb_decrypt_ctx_size<AES192OfbDecryptor>();
 }
 
-void* gmlib_aes192_ofb_decrypt_ctx_alloc()
+void* gmlib_aes192_ofb_decrypt_ctx_new()
 {
-    return c_api::cipher_ofb_decrypt_ctx_alloc<AES192OfbDecryptor>();
+    return c_api::cipher_ofb_decrypt_ctx_new<AES192OfbDecryptor>();
 }
 
-int gmlib_aes192_ofb_decrypt_ctx_free(void* ctx)
+void* gmlib_aes192_ofb_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_ofb_decrypt_ctx_new_inplace<AES192OfbDecryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes192_ofb_decrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_ofb_decrypt_ctx_free<AES192OfbDecryptor>(ctx) == 0,
+        c_api::cipher_ofb_decrypt_ctx_delete<AES192OfbDecryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes192_ofb_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ofb_decrypt_ctx_delete_inplace<AES192OfbDecryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -709,15 +829,30 @@ size_t gmlib_aes192_ctr_encrypt_ctx_size()
     return c_api::cipher_ctr_encrypt_ctx_size<AES192CtrEncryptor>();
 }
 
-void* gmlib_aes192_ctr_encrypt_ctx_alloc()
+void* gmlib_aes192_ctr_encrypt_ctx_new()
 {
-    return c_api::cipher_ctr_encrypt_ctx_alloc<AES192CtrEncryptor>();
+    return c_api::cipher_ctr_encrypt_ctx_new<AES192CtrEncryptor>();
 }
 
-int gmlib_aes192_ctr_encrypt_ctx_free(void* ctx)
+void* gmlib_aes192_ctr_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_ctr_encrypt_ctx_new_inplace<AES192CtrEncryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes192_ctr_encrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_ctr_encrypt_ctx_free<AES192CtrEncryptor>(ctx) == 0,
+        c_api::cipher_ctr_encrypt_ctx_delete<AES192CtrEncryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes192_ctr_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ctr_encrypt_ctx_delete_inplace<AES192CtrEncryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -796,15 +931,30 @@ size_t gmlib_aes192_ctr_decrypt_ctx_size()
     return c_api::cipher_ctr_decrypt_ctx_size<AES192CtrDecryptor>();
 }
 
-void* gmlib_aes192_ctr_decrypt_ctx_alloc()
+void* gmlib_aes192_ctr_decrypt_ctx_new()
 {
-    return c_api::cipher_ctr_decrypt_ctx_alloc<AES192CtrDecryptor>();
+    return c_api::cipher_ctr_decrypt_ctx_new<AES192CtrDecryptor>();
 }
 
-int gmlib_aes192_ctr_decrypt_ctx_free(void* ctx)
+void* gmlib_aes192_ctr_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_ctr_decrypt_ctx_new_inplace<AES192CtrDecryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes192_ctr_decrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_ctr_decrypt_ctx_free<AES192CtrDecryptor>(ctx) == 0,
+        c_api::cipher_ctr_decrypt_ctx_delete<AES192CtrDecryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes192_ctr_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_ctr_decrypt_ctx_delete_inplace<AES192CtrDecryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -887,15 +1037,30 @@ size_t gmlib_aes192_gcm_encrypt_ctx_size()
     return c_api::cipher_gcm_encrypt_ctx_size<AES192GcmEncryptor>();
 }
 
-void* gmlib_aes192_gcm_encrypt_ctx_alloc()
+void* gmlib_aes192_gcm_encrypt_ctx_new()
 {
-    return c_api::cipher_gcm_encrypt_ctx_alloc<AES192GcmEncryptor>();
+    return c_api::cipher_gcm_encrypt_ctx_new<AES192GcmEncryptor>();
 }
 
-int gmlib_aes192_gcm_encrypt_ctx_free(void* ctx)
+void* gmlib_aes192_gcm_encrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_gcm_encrypt_ctx_new_inplace<AES192GcmEncryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes192_gcm_encrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_gcm_encrypt_ctx_free<AES192GcmEncryptor>(ctx) == 0,
+        c_api::cipher_gcm_encrypt_ctx_delete<AES192GcmEncryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes192_gcm_encrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_gcm_encrypt_ctx_delete_inplace<AES192GcmEncryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
@@ -991,15 +1156,30 @@ size_t gmlib_aes192_gcm_decrypt_ctx_size()
     return c_api::cipher_gcm_decrypt_ctx_size<AES192GcmDecryptor>();
 }
 
-void* gmlib_aes192_gcm_decrypt_ctx_alloc()
+void* gmlib_aes192_gcm_decrypt_ctx_new()
 {
-    return c_api::cipher_gcm_decrypt_ctx_alloc<AES192GcmDecryptor>();
+    return c_api::cipher_gcm_decrypt_ctx_new<AES192GcmDecryptor>();
 }
 
-int gmlib_aes192_gcm_decrypt_ctx_free(void* ctx)
+void* gmlib_aes192_gcm_decrypt_ctx_new_inplace(void* buf, size_t buf_size)
+{
+    return c_api::cipher_gcm_decrypt_ctx_new_inplace<AES192GcmDecryptor>(
+        buf, buf_size);
+}
+
+int gmlib_aes192_gcm_decrypt_ctx_delete(void* ctx)
 {
     GMLIB_CHECK(
-        c_api::cipher_gcm_decrypt_ctx_free<AES192GcmDecryptor>(ctx) == 0,
+        c_api::cipher_gcm_decrypt_ctx_delete<AES192GcmDecryptor>(ctx) == 0,
+        { return -1; });
+    return 0;
+}
+
+int gmlib_aes192_gcm_decrypt_ctx_delete_inplace(void* ctx)
+{
+    GMLIB_CHECK(
+        c_api::cipher_gcm_decrypt_ctx_delete_inplace<AES192GcmDecryptor>(ctx) ==
+            0,
         { return -1; });
     return 0;
 }
