@@ -199,10 +199,35 @@ public:
     inline void set_priv(const std::uint8_t priv_key[32]);
 
     /**
+     * @brief                   SM2 Private Key Set
+     * @param[in]   priv_key    private key data (32 bytes, big endian)
+     * @param[in]   pub_x       x coordinate of Public Key (32-bytes, big
+     *                          endian)
+     * @param[in]   pub_y       y coordinate of Public Key (32-bytes, big
+     *                          endian)
+     * @warning                 will not verify the legitimacy of input data
+     */
+    inline void set_priv_and_pub(const std::uint8_t priv_key[32],
+                                 const std::uint8_t pub_x[32],
+                                 const std::uint8_t pub_y[32]) noexcept;
+
+    /**
      * @brief                   SM2 Private Key Get
      * @param[out]  priv_key    private key data (32 bytes, big endian)
      */
     inline void get_priv(std::uint8_t priv_key[32]) const noexcept;
+
+    /**
+     * @brief                   SM2 Private Key Get
+     * @param[out]  priv_key    private key data (32 bytes, big endian)
+     * @param[out]  pub_x       x coordinate of Public Key (32-bytes, big
+     *                          endian)
+     * @param[out]  pub_y       y coordinate of Public Key (32-bytes, big
+     *                          endian)
+     */
+    inline void get_priv_and_pub(std::uint8_t priv_key[32],
+                                 std::uint8_t pub_x[32],
+                                 std::uint8_t pub_y[32]) const noexcept;
 
     /**
      * @brief               SM2 Private Key Generate
@@ -591,10 +616,34 @@ inline void SM2PrivateKey<Hash>::set_priv(const std::uint8_t priv_key[32])
 }
 
 template <class Hash>
+inline void SM2PrivateKey<Hash>::set_priv_and_pub(
+    const std::uint8_t priv_key[32],
+    const std::uint8_t pub_x[32],
+    const std::uint8_t pub_y[32]) noexcept
+{
+    std::memcpy(priv_, priv_key, 32);
+    std::memcpy(pub_.x_, pub_x, 32);
+    std::memcpy(pub_.y_, pub_y, 32);
+    internal::sm2_fp_from_bytes(pub_.P_[0], pub_x);
+    internal::sm2_fp_from_bytes(pub_.P_[1], pub_y);
+}
+
+template <class Hash>
 inline void SM2PrivateKey<Hash>::get_priv(
     std::uint8_t priv_key[32]) const noexcept
 {
     std::memcpy(priv_key, priv_, 32);
+}
+
+template <class Hash>
+inline void SM2PrivateKey<Hash>::get_priv_and_pub(
+    std::uint8_t priv_key[32],
+    std::uint8_t pub_x[32],
+    std::uint8_t pub_y[32]) const noexcept
+{
+    std::memcpy(priv_key, priv_, 32);
+    std::memcpy(pub_x, pub_.x_, 32);
+    std::memcpy(pub_y, pub_.y_, 32);
 }
 
 template <class Hash>
