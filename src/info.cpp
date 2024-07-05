@@ -3,46 +3,162 @@
 #include <cstdint>
 #include <cstdio>
 
-// # add_definitions(-DCPU_FLAG_SSE2)
-// # add_definitions(-DCPU_FLAG_SSSE3)
-// # add_definitions(-DCPU_FLAG_AVX2)
-// # add_definitions(-DCPU_FLAG_AES)
-// # add_definitions(-DCPU_FLAG_MOVBE)
-// # add_definitions(-DCPU_FLAG_BMI2)
-// # add_definitions(-DCPU_FLAG_RDSEED)
-// # add_definitions(-DCPU_FLAG_RDRAND)
-// # add_definitions(-DCPU_FLAG_PCLMUL)
-// # add_definitions(-DSUPPORT_SM3_YANG15)
-// # add_definitions(-DSUPPORT_SM4_LANG18)
-
 static const char* INFO_LIST[] = {
-#ifdef CPU_FLAG_SSE2
-    "CPU_FLAG_SSE2",
+// x86-64 CPU FLAG
+#if defined(CPU_FLAG_3DNOW)
+    "CPU_FLAG_3DNOW",
 #endif
-#ifdef CPU_FLAG_SSSE3
-    "CPU_FLAG_SSSE3",
+#if defined(CPU_FLAG_3DNOWEXT)
+    "CPU_FLAG_3DNOWEXT",
 #endif
-#ifdef CPU_FLAG_AVX2
-    "CPU_FLAG_AVX2",
+#if defined(CPU_FLAG_ABM)
+    "CPU_FLAG_ABM",
 #endif
-#ifdef CPU_FLAG_AES
+#if defined(CPU_FLAG_ADX)
+    "CPU_FLAG_ADX",
+#endif
+#if defined(CPU_FLAG_AES)
     "CPU_FLAG_AES",
 #endif
-#ifdef CPU_FLAG_MOVBE
-    "CPU_FLAG_MOVBE",
+#if defined(CPU_FLAG_AVX)
+    "CPU_FLAG_AVX",
 #endif
-#ifdef CPU_FLAG_BMI2
+#if defined(CPU_FLAG_AVX2)
+    "CPU_FLAG_AVX2",
+#endif
+#if defined(CPU_FLAG_AVX512CD)
+    "CPU_FLAG_AVX512CD",
+#endif
+#if defined(CPU_FLAG_AVX512ER)
+    "CPU_FLAG_AVX512ER",
+#endif
+#if defined(CPU_FLAG_AVX512F)
+    "CPU_FLAG_AVX512F",
+#endif
+#if defined(CPU_FLAG_AVX512PF)
+    "CPU_FLAG_AVX512PF",
+#endif
+#if defined(CPU_FLAG_BMI1)
+    "CPU_FLAG_BMI1",
+#endif
+#if defined(CPU_FLAG_BMI2)
     "CPU_FLAG_BMI2",
 #endif
-#ifdef CPU_FLAG_RDSEED
-    "CPU_FLAG_RDSEED",
+#if defined(CPU_FLAG_CLFSH)
+    "CPU_FLAG_CLFSH",
 #endif
-#ifdef CPU_FLAG_RDRAND
+#if defined(CPU_FLAG_CMPXCHG16B)
+    "CPU_FLAG_CMPXCHG16B",
+#endif
+#if defined(CPU_FLAG_CX8)
+    "CPU_FLAG_CX8",
+#endif
+#if defined(CPU_FLAG_ERMS)
+    "CPU_FLAG_ERMS",
+#endif
+#if defined(CPU_FLAG_F16C)
+    "CPU_FLAG_F16C",
+#endif
+#if defined(CPU_FLAG_FMA)
+    "CPU_FLAG_FMA",
+#endif
+#if defined(CPU_FLAG_FSGSBASE)
+    "CPU_FLAG_FSGSBASE",
+#endif
+#if defined(CPU_FLAG_FXSR)
+    "CPU_FLAG_FXSR",
+#endif
+#if defined(CPU_FLAG_HLE)
+    "CPU_FLAG_HLE",
+#endif
+#if defined(CPU_FLAG_INVPCID)
+    "CPU_FLAG_INVPCID",
+#endif
+#if defined(CPU_FLAG_LAHF)
+    "CPU_FLAG_LAHF",
+#endif
+#if defined(CPU_FLAG_LZCNT)
+    "CPU_FLAG_LZCNT",
+#endif
+#if defined(CPU_FLAG_MMX)
+    "CPU_FLAG_MMX",
+#endif
+#if defined(CPU_FLAG_MMXEXT)
+    "CPU_FLAG_MMXEXT",
+#endif
+#if defined(CPU_FLAG_MONITOR)
+    "CPU_FLAG_MONITOR",
+#endif
+#if defined(CPU_FLAG_MOVBE)
+    "CPU_FLAG_MOVBE",
+#endif
+#if defined(CPU_FLAG_MSR)
+    "CPU_FLAG_MSR",
+#endif
+#if defined(CPU_FLAG_OSXSAVE)
+    "CPU_FLAG_OSXSAVE",
+#endif
+#if defined(CPU_FLAG_PCLMULQDQ)
+    "CPU_FLAG_PCLMULQDQ",
+#endif
+#if defined(CPU_FLAG_POPCNT)
+    "CPU_FLAG_POPCNT",
+#endif
+#if defined(CPU_FLAG_PREFETCHWT1)
+    "CPU_FLAG_PREFETCHWT1",
+#endif
+#if defined(CPU_FLAG_RDRAND)
     "CPU_FLAG_RDRAND",
 #endif
-#ifdef CPU_FLAG_PCLMUL
-    "CPU_FLAG_PCLMUL",
+#if defined(CPU_FLAG_RDSEED)
+    "CPU_FLAG_RDSEED",
 #endif
+#if defined(CPU_FLAG_RDTSCP)
+    "CPU_FLAG_RDTSCP",
+#endif
+#if defined(CPU_FLAG_RTM)
+    "CPU_FLAG_RTM",
+#endif
+#if defined(CPU_FLAG_SEP)
+    "CPU_FLAG_SEP",
+#endif
+#if defined(CPU_FLAG_SHA)
+    "CPU_FLAG_SHA",
+#endif
+#if defined(CPU_FLAG_SSE)
+    "CPU_FLAG_SSE",
+#endif
+#if defined(CPU_FLAG_SSE2)
+    "CPU_FLAG_SSE2",
+#endif
+#if defined(CPU_FLAG_SSE3)
+    "CPU_FLAG_SSE3",
+#endif
+#if defined(CPU_FLAG_SSE4_1)
+    "CPU_FLAG_SSE4_1",
+#endif
+#if defined(CPU_FLAG_SSE4_2)
+    "CPU_FLAG_SSE4_2",
+#endif
+#if defined(CPU_FLAG_SSE4a)
+    "CPU_FLAG_SSE4a",
+#endif
+#if defined(CPU_FLAG_SSSE3)
+    "CPU_FLAG_SSSE3",
+#endif
+#if defined(CPU_FLAG_SYSCALL)
+    "CPU_FLAG_SYSCALL",
+#endif
+#if defined(CPU_FLAG_TBM)
+    "CPU_FLAG_TBM",
+#endif
+#if defined(CPU_FLAG_XOP)
+    "CPU_FLAG_XOP",
+#endif
+#if defined(CPU_FLAG_XSAVE)
+    "CPU_FLAG_XSAVE",
+#endif
+// some optimization
 #ifdef SUPPORT_SM3_YANG15
     "SUPPORT_SM3_YANG15",
 #endif

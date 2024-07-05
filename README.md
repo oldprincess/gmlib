@@ -47,38 +47,31 @@ If you have any questions, please send an email to zirui.gong@foxmail.com
 
 ## 2 快速开始
 
-本项目使用`cmake`构建，使用`python`作为脚本语言
+本项目使用`cmake`构建
 
 #### step1：测试平台支持的优化
 
 如果不想使用针对处理器平台的优化，可以跳过这一步
 
-如果处理器平台是x86_64，可以使用`tools/cpuid.py`脚本测试平台支持的优化，运行下述命令
+如果处理器平台是x86_64，可以使用`tools/cpuid.cpp`脚本测试平台支持的优化，运行下述命令来编译并执行脚本
 
 ```
-python tools/cpuid.py
+g++ tools/cpuid.cpp -o cpuid.exe
+./cpuid.exe
 ```
 
-将得到如下所示的输出
+将得到如下所示的输出（部分输出结果省略）
 
 ```
-add_definitions(-DCPU_FLAG_SSE2)
-add_definitions(-DCPU_FLAG_SSSE3)
-add_definitions(-DCPU_FLAG_AVX2)
+add_definitions(-DCPU_FLAG_ADX)
 add_definitions(-DCPU_FLAG_AES)
-add_definitions(-DCPU_FLAG_MOVBE)
-add_definitions(-DCPU_FLAG_BMI2)
-add_definitions(-DCPU_FLAG_RDSEED)
-add_definitions(-DCPU_FLAG_RDRAND)
-add_definitions(-DCPU_FLAG_PCLMUL)
-add_definitions(-DSUPPORT_SM3_YANG15)
-add_definitions(-DSUPPORT_SM4_LANG18)
-set(PROJECT_COMPILE_OPTIONS -msse2 -mssse3 -mavx2 -maes -mmovbe -mbmi2 -mrdseed -mrdrnd -mpclmul)
+...
+set(PROJECT_COMPILE_OPTIONS -madx ...)
 ```
 
 将上述内容添加至`CMakeLists.txt`文件中，文件中有说明添加的具体位置
 
-* x86_64平台相关宏定义如下
+* x86_64平台相关宏定义如下（部分）
 
 |宏定义|含义|
 |:-:|:-:|
