@@ -9,6 +9,7 @@ set(THIRD_PARTY
     memory_utils
     number
     rng
+    sha1
     sm2
     sm3
     sm4
@@ -23,44 +24,18 @@ add_definitions(-DSUPPORT_SM4_LANG18)
 # ****** set definitions in here ******
 # *************************************
 
-# add_definitions(-DCPU_FLAG_ADX)
 # add_definitions(-DCPU_FLAG_AES)
-# add_definitions(-DCPU_FLAG_AVX)
 # add_definitions(-DCPU_FLAG_AVX2)
-# add_definitions(-DCPU_FLAG_BMI1)
 # add_definitions(-DCPU_FLAG_BMI2)
-# add_definitions(-DCPU_FLAG_CLFSH)
-# add_definitions(-DCPU_FLAG_CMPXCHG16B)
-# add_definitions(-DCPU_FLAG_CX8)
-# add_definitions(-DCPU_FLAG_ERMS)
-# add_definitions(-DCPU_FLAG_F16C)
-# add_definitions(-DCPU_FLAG_FMA)
-# add_definitions(-DCPU_FLAG_FSGSBASE)
-# add_definitions(-DCPU_FLAG_FXSR)
-# add_definitions(-DCPU_FLAG_INVPCID)
-# add_definitions(-DCPU_FLAG_LAHF)
-# add_definitions(-DCPU_FLAG_LZCNT)
-# add_definitions(-DCPU_FLAG_MMX)
-# add_definitions(-DCPU_FLAG_MONITOR)
 # add_definitions(-DCPU_FLAG_MOVBE)
-# add_definitions(-DCPU_FLAG_MSR)
-# add_definitions(-DCPU_FLAG_OSXSAVE)
-# add_definitions(-DCPU_FLAG_PCLMULQDQ)
-# add_definitions(-DCPU_FLAG_POPCNT)
+# add_definitions(-DCPU_FLAG_PCLMUL)
 # add_definitions(-DCPU_FLAG_RDRAND)
 # add_definitions(-DCPU_FLAG_RDSEED)
-# add_definitions(-DCPU_FLAG_RDTSCP)
-# add_definitions(-DCPU_FLAG_SEP)
 # add_definitions(-DCPU_FLAG_SHA)
-# add_definitions(-DCPU_FLAG_SSE)
 # add_definitions(-DCPU_FLAG_SSE2)
-# add_definitions(-DCPU_FLAG_SSE3)
 # add_definitions(-DCPU_FLAG_SSE4_1)
-# add_definitions(-DCPU_FLAG_SSE4_2)
 # add_definitions(-DCPU_FLAG_SSSE3)
-# add_definitions(-DCPU_FLAG_SYSCALL)
-# add_definitions(-DCPU_FLAG_XSAVE)
-# set(PROJECT_COMPILE_OPTIONS -madx -maes -mavx -mavx2 -mbmi1 -mbmi2 -mclfsh -mcmpxchg16b -mcx8 -merms -mf16c -mfma -mfsgsbase -mfxsr -minvpcid -mlahf -mlzcnt -mmmx -mmonitor -mmovbe -mmsr -mosxsave -mpclmulqdq -mpopcnt -mrdrand -mrdseed -mrdtscp -msep -msha -msse -msse2 -msse3 -msse4.1 -msse4.2 -mssse3 -msyscall -mxsave )
+# set(PROJECT_COMPILE_OPTIONS -maes -mavx2 -mbmi2 -mmovbe -mpclmul -mrdrnd -mrdrseed -msha -msse2 -msse4.1 -mssse3)
 
 #######################################################
 ## ================================================= ##
