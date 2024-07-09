@@ -25,7 +25,7 @@ if isa.RDRAND():
     compile_option_list.append("-mrdrnd")
 if isa.RDSEED():
     pre_define_list.append("CPU_FLAG_RDSEED")
-    compile_option_list.append("-mrdrseed")
+    compile_option_list.append("-mrdseed")
 if isa.SHA():
     pre_define_list.append("CPU_FLAG_SHA")
     compile_option_list.append("-msha")
