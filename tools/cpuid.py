@@ -42,3 +42,8 @@ if isa.SSSE3():
 for item in pre_define_list:
     print("add_definitions(-D{})".format(item))
 print("set(PROJECT_COMPILE_OPTIONS {})".format(" ".join(compile_option_list)))
+
+for item in pre_define_list:
+    print(f"""#if defined({item})
+       \"{item}\", 
+#endif""")
