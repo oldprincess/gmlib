@@ -1439,13 +1439,13 @@ void sm9_ec2_a_neg(sm9_ec2_a R, const sm9_ec2_a P) noexcept
 void sm9_ec2_a_to_bytes04(std::uint8_t out[128], const sm9_ec2_a P) noexcept
 {
     sm9_fp2_to_bytes(out + 0, P[0]);
-    sm9_fp2_to_bytes(out + 32, P[1]);
+    sm9_fp2_to_bytes(out + 64, P[1]);
 }
 
 void sm9_ec2_a_from_bytes04(sm9_ec2_a R, const std::uint8_t in[128]) noexcept
 {
     sm9_fp2_from_bytes(R[0], in + 0);
-    sm9_fp2_from_bytes(R[1], in + 32);
+    sm9_fp2_from_bytes(R[1], in + 64);
 }
 
 void sm9_ec2_a_to_bytes_uncompressed(std::uint8_t    out[129],
