@@ -6,6 +6,7 @@ set(THIRD_PARTY
     block_cipher_mode
     ghash
     hash_lib
+    md5
     memory_utils
     number
     rng
