@@ -18,7 +18,7 @@ set(THIRD_PARTY
     ublock
 )
 
-option(PROJECT_BUILD_TEST "" OFF)
+set(PROJECT_BUILD_TEST ON)
 
 add_definitions(-DSUPPORT_SM3_YANG15)
 add_definitions(-DSUPPORT_SM4_LANG18)
