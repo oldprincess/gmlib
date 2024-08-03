@@ -2,7 +2,10 @@
 #define SM9_INTERNAL_SM9_ALG_H
 
 #include <gmlib/memory_utils/endian.h>
+#include <gmlib/memory_utils/memxor.h>
 #include <gmlib/sm9/internal/sm9_field.h>
+
+#include <cstring>
 
 namespace sm9::internal {
 
@@ -41,6 +44,92 @@ void sm9_Hn(std::uint8_t        h[32],
     sm9_bn_add_uint32(h1, h1, 1);
     sm9_bn_to_bytes(h, h1);
 }
+
+template <class Hash>
+class SM9Kdf
+{
+private:
+    Hash          hash_;
+    std::uint32_t ct_;
+    std::uint8_t  buf_[Hash::DIGEST_SIZE];
+    std::size_t   buf_pos_;
+    bool          all_zero_;
+
+public:
+    SM9Kdf() noexcept
+    {
+        ct_       = 0x00000001;
+        buf_pos_  = sizeof(buf_);
+        all_zero_ = true;
+    }
+
+public:
+    void reset()
+    {
+        ct_       = 0x00000001;
+        buf_pos_  = sizeof(buf_);
+        all_zero_ = true;
+        hash_.reset();
+    }
+
+    void update_z(const std::uint8_t* z, std::size_t z_len)
+    {
+        hash_.update(z, z_len);
+    }
+
+    void gen_keystream(std::uint8_t* out, std::size_t len)
+    {
+        static const std::uint8_t ZERO[Hash::DIGEST_SIZE] = {0};
+
+        std::size_t  size, buf_size;
+        std::uint8_t ct_buf[4];
+        while (len)
+        {
+            if (buf_pos_ == sizeof(buf_))
+            {
+                memory_utils::store32_be(ct_buf, ct_);
+                auto hash = hash_;
+                hash.do_final(buf_, ct_buf, 4);
+                buf_pos_ = 0;
+                ct_++;
+            }
+
+            buf_size = sizeof(buf_) - buf_pos_;
+            size     = (len > buf_size) ? buf_size : len;
+            if (std::memcmp(buf_ + buf_pos_, ZERO, size) != 0)
+            {
+                all_zero_ = false; // check if all zero
+            }
+            std::memcpy(out, buf_ + buf_pos_, size);
+            out += size, buf_pos_ += size, len -= size;
+        }
+    }
+
+    void gen_keystream_and_xor(std::uint8_t*       out,
+                               const std::uint8_t* in,
+                               std::size_t         inl)
+    {
+        std::uint8_t buf[Hash::DIGEST_SIZE];
+        while (inl >= Hash::DIGEST_SIZE)
+        {
+            this->gen_keystream(buf, Hash::DIGEST_SIZE);
+            memory_utils::memxor<Hash::DIGEST_SIZE>(out, in, buf);
+            out += Hash::DIGEST_SIZE;
+            in += Hash::DIGEST_SIZE;
+            inl -= Hash::DIGEST_SIZE;
+        }
+        if (inl)
+        {
+            this->gen_keystream(buf, inl);
+            memory_utils::memxor_n(out, in, buf, inl);
+        }
+    }
+
+    bool all_zero_check() const noexcept
+    {
+        return all_zero_;
+    }
+};
 
 } // namespace sm9::internal
 

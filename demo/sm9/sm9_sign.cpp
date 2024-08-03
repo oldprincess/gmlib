@@ -34,7 +34,7 @@ int main()
     memory_utils::memdump(data_master_priv, sizeof(data_master_priv), 32);
 
     log("gen private key");
-    priv_key = master_priv_key.gen_SignPrivateKey(id, sizeof(id), rng);
+    priv_key = master_priv_key.gen_SignPrivateKey(id, sizeof(id));
     priv_key.get_priv(data_priv_x, data_priv_y, data_pub_x, data_pub_y);
 
     log("public key - x");

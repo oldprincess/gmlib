@@ -87,8 +87,9 @@ void test_sm9_sign()
     std::size_t  sig_len;
 
     mpk.set_priv(master_key_data);
-    auto priv = mpk.gen_SignPrivateKey((const std::uint8_t*)ID, std::strlen(ID),
-                                       fix_rng);
+    auto priv = mpk.gen_SignPrivateKey((const std::uint8_t*)ID, //
+                                       std::strlen(ID)          //
+    );
 
     priv.sign(sig, &sig_len, (const std::uint8_t*)msg, std::strlen(msg),
               fix_rng, SM9EcPC::UNCOMPRESSED);
@@ -104,8 +105,7 @@ void test_sm9_sign()
         throw std::runtime_error("err in test sm9 sign");
     }
 
-    priv =
-        mpk.gen_SignPrivateKey((const std::uint8_t*)ID, std::strlen(ID), rng);
+    priv = mpk.gen_SignPrivateKey((const std::uint8_t*)ID, std::strlen(ID));
     auto& pub = priv.fetch_pub();
     for (int i = 0; i < LOOP; i++)
     {

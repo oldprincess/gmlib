@@ -1,4 +1,4 @@
-#include <gmlib/rng/cstd_rng.h>
+#include <gmlib/rng/drbg.h>
 #include <gmlib/sm3/sm3.h>
 #include <gmlib/sm9/sm9.h>
 
@@ -23,18 +23,17 @@ void speed_sm9_sign()
 {
     static const char* ID = "Alice";
 
-    std::uint8_t msg[MSG_SIZE];
-    std::uint8_t sig[SM9SignSK::MAX_SIG_SIZE];
-    std::size_t  sig_len;
-    CstdRng      rng;
-    SM9SignMSK   msk;
-    std::clock_t st, et;
-    double       time_s, opt_s;
+    std::uint8_t  msg[MSG_SIZE];
+    std::uint8_t  sig[SM9SignSK::MAX_SIG_SIZE];
+    std::size_t   sig_len;
+    HashDrbg<SM3> rng;
+    SM9SignMSK    msk;
+    std::clock_t  st, et;
+    double        time_s, opt_s;
 
     msk.gen_priv(rng);
     rng.gen(msg, MSG_SIZE);
-    auto sk =
-        msk.gen_SignPrivateKey((const std::uint8_t*)ID, std::strlen(ID), rng);
+    auto sk = msk.gen_SignPrivateKey((const std::uint8_t*)ID, std::strlen(ID));
 
     std::printf("speed sm9-sm3 sign (%d bytes)... ", MSG_SIZE);
     st = std::clock();
@@ -47,7 +46,7 @@ void speed_sm9_sign()
     opt_s  = LOOP / time_s;
     std::printf("%g opt/s\n", opt_s);
 
-    std::printf("speed sm9-sm3 verify ... ");
+    std::printf("speed sm9-sm3 verify (%d bytes)... ", MSG_SIZE);
     st = std::clock();
     for (int i = 0; i < LOOP; i++)
     {

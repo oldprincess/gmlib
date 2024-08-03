@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
     try
     {
         test_sm9_field();
+        test_sm9_enc();
         test_sm9_sign();
     }
     catch (std::exception& e)
@@ -21,6 +22,7 @@ int main(int argc, char* argv[])
     std::cout << "test sm9 finish!" << std::endl;
     if (argc == 2 && std::strcmp(argv[1], "speed") == 0)
     {
+        speed_sm9_enc();
         speed_sm9_sign();
     }
     return 0;

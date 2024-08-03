@@ -200,6 +200,9 @@ void sm9_ec_j_mul_a(sm9_ec_j           R,
                     const std::uint8_t k[32],
                     const sm9_ec_a     P) noexcept;
 void sm9_ec_j_mul_g(sm9_ec_j R, const std::uint8_t k[32]) noexcept;
+void sm9_ec_j_mul_j(sm9_ec_j           R,
+                    const std::uint8_t k[32],
+                    const sm9_ec_j     P) noexcept;
 void sm9_ec_j_from_a(sm9_ec_j R, const sm9_ec_a P) noexcept;
 void sm9_ec_j_to_a(sm9_ec_a R, const sm9_ec_j P) noexcept;
 void sm9_ec_j_normal(sm9_ec_j R, const sm9_ec_j P) noexcept;
@@ -232,6 +235,9 @@ void sm9_ec2_j_mul_a(sm9_ec2_j          R,
                      const std::uint8_t k[32],
                      const sm9_ec2_a    P) noexcept;
 void sm9_ec2_j_mul_g(sm9_ec2_j R, const std::uint8_t k[32]) noexcept;
+void sm9_ec2_j_mul_j(sm9_ec2_j          R,
+                     const std::uint8_t k[32],
+                     const sm9_ec2_j    P) noexcept;
 void sm9_ec2_j_from_a(sm9_ec2_j R, const sm9_ec2_a P) noexcept;
 void sm9_ec2_j_to_a(sm9_ec2_a R, const sm9_ec2_j P) noexcept;
 void sm9_ec2_j_normal(sm9_ec2_j R, const sm9_ec2_j P) noexcept;

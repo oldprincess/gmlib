@@ -1348,6 +1348,60 @@ void sm9_ec_j_mul_g(sm9_ec_j R, const std::uint8_t k[32]) noexcept
     sm9_ec_j_mul_a(R, k, G);
 }
 
+void sm9_ec_j_mul_j(sm9_ec_j           R,
+                    const std::uint8_t k[32],
+                    const sm9_ec_j     P) noexcept
+{
+    // add-sub method
+    number::uint256_t e, e3;
+    number::uint256_from_bytes(e, k);
+    if (number::uint256_cmp(e, N.v) >= 0)
+    {
+        number::uint256_sub_borrow(e, e, N.v);
+    }
+    if (number::uint256_equal_zero(e))
+    {
+        sm9_ec_j_set_inf(R);
+        return;
+    }
+    sm9_ec_j T;
+    sm9_ec_j P_neg;
+    int      i;
+    int      c = number::uint256_tpl_carry(e3, e);
+    sm9_ec_j_cpy(T, P);
+    sm9_ec_j_neg(P_neg, P);
+    if (c == 1)
+    {
+        i = 255;
+    }
+    else if (c == 2)
+    {
+        i = 255;
+        sm9_ec_j_dbl(T, T);
+    }
+    else // c=0
+    {
+        i = 255;
+        while (!number::uint256_bittest(e3, i)) i--;
+        i--;
+    }
+    for (; i >= 1; i--)
+    {
+        sm9_ec_j_dbl(T, T);
+        int ei  = number::uint256_bittest(e, i) ? 1 : 0;
+        int e3i = number::uint256_bittest(e3, i) ? 1 : 0;
+        if (e3i == 1 && ei == 0)
+        {
+            sm9_ec_j_add(T, T, P);
+        }
+        else if (e3i == 0 && ei == 1)
+        {
+            sm9_ec_j_add(T, T, P_neg);
+        }
+    }
+    sm9_ec_j_cpy(R, T);
+}
+
 void sm9_ec_j_from_a(sm9_ec_j R, const sm9_ec_a P) noexcept
 {
     sm9_fp_cpy(R[0], P[0]);
@@ -1753,6 +1807,60 @@ void sm9_ec2_j_mul_g(sm9_ec2_j R, const std::uint8_t k[32]) noexcept
     sm9_fp2_from_bytes(G[0], SM9_CURVE2_GX);
     sm9_fp2_from_bytes(G[1], SM9_CURVE2_GY);
     sm9_ec2_j_mul_a(R, k, G);
+}
+
+void sm9_ec2_j_mul_j(sm9_ec2_j          R,
+                     const std::uint8_t k[32],
+                     const sm9_ec2_j    P) noexcept
+{
+    // add-sub method
+    number::uint256_t e, e3;
+    number::uint256_from_bytes(e, k);
+    if (number::uint256_cmp(e, N.v) >= 0)
+    {
+        number::uint256_sub_borrow(e, e, N.v);
+    }
+    if (number::uint256_equal_zero(e))
+    {
+        sm9_ec2_j_set_inf(R);
+        return;
+    }
+    sm9_ec2_j T;
+    sm9_ec2_a P_neg;
+    int       i;
+    int       c = number::uint256_tpl_carry(e3, e);
+    sm9_ec2_j_cpy(T, P);
+    sm9_ec2_j_neg(P_neg, P);
+    if (c == 1)
+    {
+        i = 255;
+    }
+    else if (c == 2)
+    {
+        i = 255;
+        sm9_ec2_j_dbl(T, T);
+    }
+    else // c=0
+    {
+        i = 255;
+        while (!number::uint256_bittest(e3, i)) i--;
+        i--;
+    }
+    for (; i >= 1; i--)
+    {
+        sm9_ec2_j_dbl(T, T);
+        int ei  = number::uint256_bittest(e, i) ? 1 : 0;
+        int e3i = number::uint256_bittest(e3, i) ? 1 : 0;
+        if (e3i == 1 && ei == 0)
+        {
+            sm9_ec2_j_add(T, T, P);
+        }
+        else if (e3i == 0 && ei == 1)
+        {
+            sm9_ec2_j_add(T, T, P_neg);
+        }
+    }
+    sm9_ec2_j_cpy(R, T);
 }
 
 void sm9_ec2_j_from_a(sm9_ec2_j R, const sm9_ec2_a P) noexcept

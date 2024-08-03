@@ -15,7 +15,7 @@ If you have any questions, please send an email to zirui.gong@foxmail.com
 目前支持的密码算法为：
 
 * 对称密码：AES、SM4、uBlock
-* 哈希算法：SHA1、SM3、GHASH
+* 哈希算法：MD5、SHA1、SM3、GHASH
 * 公钥密码：SM2、SM9
 
 ### 1.1 开发密码库GMLib的初衷
@@ -44,6 +44,8 @@ If you have any questions, please send an email to zirui.gong@foxmail.com
 |SM4    |6250   Mbps|:-:|SM2-SM3解密[64字节数据]|11876 opt/s|
 |SM3    |2216   Mbps|:-:|SM9-SM3签名[64字节数据]|1116  opt/s|
 |:-:|:-:|:-:|SM9-SM3验签[64字节数据]|444   opt/s|
+|:-:|:-:|:-:|SM9-SM3加密[64字节数据]|1014  opt/s|
+|:-:|:-:|:-:|SM9-SM3解密[64字节数据]|904   opt/s|
 
 #### b. 功能完备且易拓展
 
@@ -76,27 +78,6 @@ set(PROJECT_COMPILE_OPTIONS -maes -mavx2 ...)
 ```
 
 将上述内容添加至`CMakeLists.txt`文件中，文件中有说明添加的具体位置
-
-* x86_64平台相关宏定义如下（部分）
-
-|宏定义|含义|
-|:-:|:-:|
-|CPU_FLAG_SSE2|SSE2指令集|
-|CPU_FLAG_SSSE3|SSSE3指令集|
-|CPU_FLAG_AVX2|AVX2指令集|
-|CPU_FLAG_AES|AES指令集，AES算法加解密|
-|CPU_FLAG_MOVBE|MOVBE指令集，大端读取数据|
-|CPU_FLAG_BMI2|BMI2指令集|
-|CPU_FLAG_RDSEED|RDSEED指令集，随机数生成|
-|CPU_FLAG_RDRAND|RDRAND指令集，随机数生成|
-|CPU_FLAG_PCLMUL|PCLMUL指令集|
-
-* 优化方法相关宏定义如下
-
-|宏定义|含义|
-|:-:|:-:|
-|SUPPORT_SM3_YANG15|支持YANG15的SM3优化|
-|SUPPORT_SM4_LANG18|支持LANG18的SM4优化|
 
 #### step2：编译
 

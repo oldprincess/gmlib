@@ -53,5 +53,9 @@ python make.py sm4\sm4_gcm.cpp  demo.exe
 ## sm9
 
 ```
+python make.py sm9\sm9_enc.cpp  demo.exe
+```
+
+```
 python make.py sm9\sm9_sign.cpp  demo.exe
 ```
