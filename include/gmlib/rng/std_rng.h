@@ -24,7 +24,14 @@ public:
 public:
     void gen(void* out, std::size_t len) override
     {
+        using T = std::random_device::result_type;
+
         std::uint8_t* out_u8 = (std::uint8_t*)out;
+        while (len >= sizeof(T))
+        {
+            *(T*)out_u8 = device_();
+            out_u8 += sizeof(T), len -= sizeof(T);
+        }
         while (len)
         {
             *out_u8 = (std::uint8_t)device_();

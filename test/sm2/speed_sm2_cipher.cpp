@@ -1,4 +1,4 @@
-#include <gmlib/rng/std_rng.h>
+#include <gmlib/rng/drbg.h>
 #include <gmlib/sm2/sm2.h>
 #include <gmlib/sm3/sm3.h>
 
@@ -18,7 +18,7 @@ using SM2withSM3PriKey = SM2PrivateKey<SM3>;
 void speed_sm2_cipher()
 {
     SM2withSM3PriKey key;
-    StdRng           rng;
+    HashDrbg<SM3>    rng;
     std::uint8_t     pt[PT_SIZE], ct[PT_SIZE + 100];
     std::size_t      ct_len, pt_len;
     std::clock_t     st, et;

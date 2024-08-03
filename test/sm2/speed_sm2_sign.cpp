@@ -1,4 +1,4 @@
-#include <gmlib/rng/std_rng.h>
+#include <gmlib/rng/drbg.h>
 #include <gmlib/sm2/sm2.h>
 #include <gmlib/sm3/sm3.h>
 
@@ -19,7 +19,7 @@ void speed_sm2_sign()
 {
     std::uint8_t     msg[MSG_SIZE];
     std::uint8_t     sig_rs[SM2withSM3PriKey::SIG_SIZE];
-    StdRng           rng;
+    HashDrbg<SM3>    rng;
     SM2withSM3PriKey key;
     std::clock_t     st, et;
     double           time_s, opt_s;

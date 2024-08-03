@@ -5,7 +5,7 @@
 
 namespace rng::sp800_90::internal {
 
-void get_entropy(void* entropy, std::size_t entropy_length)
+inline void get_entropy(void* entropy, std::size_t entropy_length)
 {
     using T = std::random_device::result_type;
 
