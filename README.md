@@ -2,11 +2,15 @@
 
 本项目使用MIT协议，如果您想要使用本项目，请仔细阅读MIT协议。
 
-如果有任何疑问，请发 email 至 zirui.gong@foxmail.com
+如果有任何疑问，请发 email 至 zirui.gong@foxmail.com ，或者提交issue。
 
 This software uses the MIT LICENSE. If you wish to use this software, please carefully read the text of the MIT LICENSE.
 
-If you have any questions, please send an email to zirui.gong@foxmail.com
+If you have any questions, please send an email to zirui.gong@foxmail.com, or submit an issue.
+
+本项目的将在 github 平台更新，并随机同步至 gitee 平台。如果您的ip地址位于中国，可以使用 gitee 克隆本项目（ [点击链接跳转](https://gitee.com/oldprincess/gmlib) ），否则更推荐您使用 github 克隆本项目（ [点击链接跳转](https://github.com/oldprincess/gmlib) ）。
+
+This project will be updated on the GitHub platform and randomly synchronized to the Gitee platform. If your IP address is located in China, you can use Gitee to clone this project ( [click link to jump](https://gitee.com/oldprincess/gmlib) ). Otherwise, I recommend that you use GitHub to clone this project ( [click link to jump](https://github.com/oldprincess/gmlib) ).
 
 ## 1 基本介绍
 
@@ -54,6 +58,15 @@ If you have any questions, please send an email to zirui.gong@foxmail.com
 容易拓展到其它密码算法的工作模式（ECB、CBC、...）、消息认证码（HMAC）等，因为使用了C++的模板技术，并且仅依赖C++标准库
 
 ## 2 快速开始
+
+本项目在 Windows 11 和 WSL-Ubuntu 22.04.3 TLS 平台上通过测试。
+
+|平台|处理器|编译器|
+|:-:|:-:|:-:|
+|Windows 11|12th Gen Intel(R) Core(TM) i5-12500H|Microsoft (R) C/C++ 优化编译器 19.40.33811 版|
+|WSL-Ubuntu 22.04.3 TLS|12th Gen Intel(R) Core(TM) i5-12500H|gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0|
+
+### 2.1 快速构建
 
 本项目使用`cmake`构建
 
@@ -115,6 +128,245 @@ Release/sm2_test.exe
 
 ```
 Release/sm2_test.exe speed
+```
+
+### 2.2 使用
+
+很遗憾，目前本项目只能采用静态库的方式进行使用，后续会支持通过动态库的调用。
+
+* Windows平台：按照2.1的流程，将在`Release`文件夹下得到名为`gmlib_static.lib`的静态库文件
+* Linux平台：按照2.1的流程，将在`Release`文件夹下得到名为`libgmlib_static.a`的静态库文件
+
+#### step1：作为教程，创建如下的目录结构
+
+目录包含`include`、`lib`和`src`三个目录：`include`目录中存放gmlib库的头文件，直接从该项目源码中拷贝即可；`lib`目录中存放gmlib库的静态库文件；`src`目录存放教程项目的源代码。
+
+```
++---include
+|   \---gmlib
+|
++---lib
+|       gmlib_static.lib  [in windows]
+|       libgmlib_static.a [in linux]
+|
+\---src
+        main.cpp
+```
+
+#### step2：打印编译时使用的编译器宏
+
+在`src/main.cpp`中写入如下内容。因为gmlib项目使用了大量模板编程，部分模板类需要通过宏定义来确定调用的函数，因而需要先通过`gmlib_print_config_def`函数打印编译时使用的编译器宏。否则，将会产生链接错误。
+
+```c++
+#include <gmlib/info.h>
+
+int main()
+{
+    gmlib_print_config_def();
+    return 0;
+}
+```
+
+之后执行编译命令
+
+* Windows 平台：使用MSVC的 [CL](https://learn.microsoft.com/zh-cn/cpp/build/reference/compiler-command-line-syntax?view=msvc-170) 工具，`/I`表示添加头文件路径，`/Zl`表示省略默认库名，`/std:c++17`表示使用c++17
+
+```
+CL src\main.cpp  lib\gmlib_static.lib /I include /Zl /std:c++17
+```
+
+```
+.\main.exe
+```
+
+* Linux 平台
+
+```
+g++ src/main.cpp lib/libgmlib_static.a -I include -std=c++17 -o main.x
+```
+
+```
+./main.x
+```
+
+将会输出需要提前预定义的宏，下面是一个例子
+
+```
+#define CPU_FLAG_AES
+#define CPU_FLAG_AVX2
+#define CPU_FLAG_BMI2
+#define CPU_FLAG_MOVBE
+#define CPU_FLAG_PCLMUL
+#define CPU_FLAG_RDRAND
+#define CPU_FLAG_RDSEED
+#define CPU_FLAG_SHA
+#define CPU_FLAG_SSE2
+#define CPU_FLAG_SSE4_1
+#define CPU_FLAG_SSSE3
+#define SUPPORT_SM3_YANG15
+#define SUPPORT_SM4_LANG18
+```
+
+为了方便，在`src`中新建一个`gmlib_config.h`文件，将上述步骤输出的内容写成头文件的形式
+
+```c++
+#ifndef GMLIB_CONFIG_H
+#define GMLIB_CONFIG_H
+
+#define CPU_FLAG_AES
+#define CPU_FLAG_AVX2
+#define CPU_FLAG_BMI2
+#define CPU_FLAG_MOVBE
+#define CPU_FLAG_PCLMUL
+#define CPU_FLAG_RDRAND
+#define CPU_FLAG_RDSEED
+#define CPU_FLAG_SHA
+#define CPU_FLAG_SSE2
+#define CPU_FLAG_SSE4_1
+#define CPU_FLAG_SSSE3
+#define SUPPORT_SM3_YANG15
+#define SUPPORT_SM4_LANG18
+
+#endif
+```
+
+#### step3：正式使用gmlib库
+
+接着，修改`src/main.cpp`，在引入gmlib的头文件前添加上述打印的编译器宏，并以`gmlib/demo/sm2/sm2_cipher.cpp`为例。
+
+```c++
+#ifndef GMLIB_CONFIG_H
+#include "gmlib_config.h"
+#endif
+
+#include <gmlib/memory_utils/memdump.h>
+#include <gmlib/rng/std_rng.h>
+#include <gmlib/sm2/sm2.h>
+#include <gmlib/sm3/sm3.h>
+
+#include <iostream>
+#include <memory>
+
+#define log(msg) std::printf("[%d]: %s\n", __LINE__, msg)
+
+constexpr int MSG_SIZE = 64;
+
+int main()
+{
+    log("sm2-sm3 sign demo begin");
+
+    sm2::SM2PrivateKey<sm3::SM3> priv_key;
+    sm2::SM2PublicKey<sm3::SM3>  pub_key;
+    rng::StdRng                  rng;
+
+    std::uint8_t msg[MSG_SIZE];
+    std::uint8_t ct[1024], pt[1024];
+    std::size_t  ct_len, pt_len;
+    std::uint8_t data_pub_x[32], data_pub_y[32], data_priv[32];
+
+    log("generate random private key");
+    priv_key.gen_priv(rng);
+    priv_key.get_priv(data_priv);
+    memory_utils::memdump(data_priv, sizeof(data_priv));
+
+    log("fetch public key");
+    pub_key = priv_key.fetch_pub();
+    pub_key.get_pub(data_pub_x, data_pub_y);
+    log("public key - x");
+    memory_utils::memdump(data_pub_x, sizeof(data_pub_x));
+    log("public key - y");
+    memory_utils::memdump(data_pub_y, sizeof(data_pub_y));
+
+    log("rand msg");
+    rng.gen(msg, MSG_SIZE);
+    memory_utils::memdump(msg, MSG_SIZE);
+
+    // store data_pub_x[32], data_pub_y[32], data_priv[32] to some place
+
+    log("encrypt");
+    pub_key.set_pub(data_pub_x, data_pub_y);
+    if (sizeof(ct) < pub_key.ciphertext_len(msg, sizeof(msg)))
+    {
+        log("err");
+        return -1;
+    }
+    pub_key.encrypt(ct, &ct_len, msg, sizeof(msg), rng);
+    memory_utils::memdump(ct, ct_len);
+
+    log("decrypt");
+    priv_key.set_priv(data_priv);
+    if (sizeof(pt) < priv_key.plaintext_len(ct, ct_len))
+    {
+        log("err");
+        return -1;
+    }
+    priv_key.decrypt(pt, &pt_len, ct, ct_len);
+    memory_utils::memdump(pt, pt_len);
+
+    log("sm2-sm3 sign demo end");
+    return 0;
+}
+```
+
+之后执行编译命令
+
+* Windows 平台
+
+```
+CL src\main.cpp  lib\gmlib_static.lib /I include /Zl /std:c++17
+```
+
+```
+.\main.exe
+```
+
+* Linux 平台：在这次的示例中，仅需要额外添加`-mavx2`的编译参数。具体需要额外添加哪些编译参数，和`CMakeLists.txt`文件中`PROJECT_COMPILE_OPTIONS`的值一致。
+
+```
+g++ src/main.cpp lib/libgmlib_static.a -I include -std=c++17 -o main.x -mavx2
+```
+
+```
+./main.x
+```
+
+将会输出计算结果，下面是一个例子
+
+```
+[19]: sm2-sm3 sign demo begin
+[30]: generate random private key
+82 91 75 1d 3e cf 97 57 27 a0 f8 1b 1b b7 77 11    ..u.>..W'.....w.
+2f 6f 30 91 4b 24 bb cc 75 b7 be 8d 41 7d 92 a1    /o0.K$..u...A}..
+[35]: fetch public key
+[38]: public key - x
+26 f8 fe ab 8b 27 64 38 d4 86 13 fc f0 bd a1 97    &....'d8........
+1c 47 61 a3 8c 14 3b a5 da 0a f4 da 16 21 fb 8a    .Ga...;......!..
+[40]: public key - y
+a2 57 31 df e4 aa c9 56 80 8a 39 d9 c8 14 23 f7    .W1....V..9...#.
+a2 0d b2 ad c8 18 75 9f 5b 7d 82 1f 9b 36 d2 32    ......u.[}...6.2
+[43]: rand msg
+4d 5b 2d 42 b0 4b d1 e4 1a c9 11 28 90 40 c4 d9    M[-B.K.....(.@..
+eb 49 17 5e ac 2d 41 20 17 b8 76 a4 ec 17 10 f3    .I.^.-A ..v.....
+de d3 27 01 c0 7f b4 85 3d 0a 2a 3e f4 31 24 65    ..'.....=.*>.1$e
+8e 8f 5e 71 a9 78 85 bd 78 58 c7 b4 bd 26 32 fc    ..^q.x..xX...&2.
+[49]: encrypt
+04 62 e2 95 9b db 46 25 40 29 3f cb 84 4a 43 f2    .b....F%@)?..JC.
+9b 5d 0f 0e 5a 3a e0 32 bf 01 27 3a 74 30 bb 66    .]..Z:.2..':t0.f
+e6 68 46 e3 19 55 d5 5b 52 6a e1 89 35 99 12 91    .hF..U.[Rj..5...
+00 89 b3 d2 26 43 5d e9 35 f5 de ef 60 96 aa 95    ....&C].5...`...
+5d 3d 64 54 55 87 28 19 d9 68 a7 51 5b 5a c6 da    ]=dTU.(..h.Q[Z..
+e5 ef db a6 26 ed a3 e4 a6 73 7e 36 ac 5b 2a 93    ....&....s~6.[*.
+1e 73 4a 05 75 0e d5 44 81 62 1c c8 c2 7b b7 67    .sJ.u..D.b...{.g
+0c f3 ff 5f df 5b 14 5f f5 50 ef 17 2c 29 62 5b    ..._.[._.P..,)b[
+de ae 57 a5 95 09 87 a0 72 e6 ea 5a 09 a2 c9 f4    ..W.....r..Z....
+6e b6 9c 15 88 f8 d8 81 25 13 d8 29 e1 a0 9b 87    n.......%..)....
+09                                                 .
+[59]: decrypt
+4d 5b 2d 42 b0 4b d1 e4 1a c9 11 28 90 40 c4 d9    M[-B.K.....(.@..
+eb 49 17 5e ac 2d 41 20 17 b8 76 a4 ec 17 10 f3    .I.^.-A ..v.....
+de d3 27 01 c0 7f b4 85 3d 0a 2a 3e f4 31 24 65    ..'.....=.*>.1$e
+8e 8f 5e 71 a9 78 85 bd 78 58 c7 b4 bd 26 32 fc    ..^q.x..xX...&2.
+[69]: sm2-sm3 sign demo end
 ```
 
 ## 3 声明
