@@ -14,7 +14,7 @@ private:
     std::random_device device_;
 
 public:
-    StdRng() noexcept = default;
+    StdRng() = default;
 
     const char* name() const noexcept override
     {
