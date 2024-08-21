@@ -134,8 +134,8 @@ Release/sm2_test.exe speed
 
 很遗憾，目前本项目只能采用静态库的方式进行使用，后续会支持通过动态库的调用。
 
-* Windows平台：按照2.1的流程，将在`Release`文件夹下得到名为`gmlib_static.lib`的静态库文件
-* Linux平台：按照2.1的流程，将在`Release`文件夹下得到名为`libgmlib_static.a`的静态库文件
+* Windows平台：按照2.1的流程，将在`build\Release`文件夹下得到名为`gmlib_static.lib`的静态库文件
+* Linux平台：按照2.1的流程，将在`build`文件夹下得到名为`libgmlib_static.a`的静态库文件
 
 #### step1：作为教程，创建如下的目录结构
 
