@@ -18,7 +18,7 @@ This project will be updated on the GitHub platform and randomly synchronized to
 
 目前支持的密码算法为：
 
-* 对称密码：AES、DES、SM4、uBlock
+* 对称密码：AES、Ballet、DES、SM4、uBlock
 * 哈希算法：MD5、SHA1、SM3、GHASH
 * 公钥密码：SM2、SM9
 
