@@ -1,7 +1,9 @@
+#if !defined(SUPPORT_SM3_YANG15)
 #include <gmlib/sm3/internal/sm3_common.h>
+
+#include <cstdio>
 #include <ctime>
 #include <random>
-#include <cstdio>
 
 static void rand_mem(void* mem, std::size_t size)
 {
@@ -41,3 +43,8 @@ void speed_sm3_common()
     speed_Mbps = LOOP * MSG_SIZE * 8 / time_s / 1024.0 / 1024.0;
     std::printf("%f Mbps\n", speed_Mbps);
 }
+#else
+void speed_sm3_common()
+{
+}
+#endif

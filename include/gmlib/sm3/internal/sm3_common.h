@@ -1,3 +1,4 @@
+#if !defined(SUPPORT_SM3_YANG15)
 #ifndef SM3_INTERNAL_SM3_COMMON_H
 #define SM3_INTERNAL_SM3_COMMON_H
 
@@ -31,4 +32,5 @@ int sm3_final_block(Sm3CTX*             ctx,
 
 } // namespace sm3::internal::common
 
+#endif
 #endif

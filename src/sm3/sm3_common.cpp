@@ -1,3 +1,4 @@
+#if !defined(SUPPORT_SM3_YANG15)
 #include <gmlib/sm3/internal/sm3_common.h>
 
 #include <cstring>
@@ -193,3 +194,4 @@ int sm3_final_block(Sm3CTX*             ctx,
 }
 
 }; // namespace sm3::internal::common
+#endif

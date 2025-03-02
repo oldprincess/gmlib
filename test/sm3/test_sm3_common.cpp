@@ -1,3 +1,4 @@
+#if !defined(SUPPORT_SM3_YANG15)
 #include <gmlib/sm3/internal/sm3_common.h>
 #include <cstring>
 #include <stdexcept>
@@ -1911,3 +1912,8 @@ void test_sm3_common()
         throw std::runtime_error("err in sm3_common");
     }
 }
+#else
+void test_sm3_common()
+{
+}
+#endif
