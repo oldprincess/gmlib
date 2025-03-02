@@ -1,17 +1,21 @@
 #ifndef AES_AES_H
 #define AES_AES_H
 
-#include <gmlib/aes/internal/aes_aesni.h>
-#include <gmlib/aes/internal/aes_lut.h>
 #include <gmlib/block_cipher_mode/block_cipher.h>
 
-namespace aes {
-
 #if defined(CPU_FLAG_AES) && defined(CPU_FLAG_SSE2)
+#include <gmlib/aes/internal/aes_aesni.h>
+namespace aes {
 namespace alg = internal::aesni;
+}
 #else
+#include <gmlib/aes/internal/aes_lut.h>
+namespace aes {
 namespace alg = internal::lut;
+}
 #endif
+
+namespace aes {
 
 class AES128 : public block_cipher_mode::BlockCipherImpl
 {

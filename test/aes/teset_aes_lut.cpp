@@ -1,3 +1,4 @@
+#if !(defined(CPU_FLAG_AES) && defined(CPU_FLAG_SSE2))
 #include <gmlib/aes/internal/aes_lut.h>
 
 #include <cstring>
@@ -130,3 +131,8 @@ void test_aes_lut()
     test_aes192_lut();
     test_aes256_lut();
 }
+#else
+void test_aes_lut()
+{
+}
+#endif

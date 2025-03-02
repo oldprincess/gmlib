@@ -1,3 +1,4 @@
+#if !(defined(CPU_FLAG_AES) && defined(CPU_FLAG_SSE2))
 #include <gmlib/aes/internal/aes_lut.h>
 
 namespace aes::internal::lut {
@@ -911,3 +912,4 @@ void aes256_dec_blocks(const Aes256CTX    *ctx,
 #pragma endregion
 
 }; // namespace aes::internal::lut
+#endif

@@ -1,3 +1,4 @@
+#if !(defined(CPU_FLAG_AES) && defined(CPU_FLAG_SSE2))
 #include <gmlib/aes/internal/aes_lut.h>
 
 #include <cstdio>
@@ -121,3 +122,8 @@ void speed_aes_lut()
     speed_aes192_lut();
     speed_aes256_lut();
 }
+#else
+void speed_aes_lut()
+{
+}
+#endif
