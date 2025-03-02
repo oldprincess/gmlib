@@ -39,6 +39,9 @@ static const char* INFO_LIST[] = {
     "CPU_FLAG_SSSE3",
 #endif
 // some optimization
+#ifdef SUPPORT_BASE64_CHROMIUM
+    "SUPPORT_BASE64_CHROMIUM",
+#endif
 #ifdef SUPPORT_SM3_YANG15
     "SUPPORT_SM3_YANG15",
 #endif

@@ -5,6 +5,7 @@ set(THIRD_PARTY
     aes
     block_cipher_mode
     ballet
+    base64
     des
     ghash
     hash_lib
@@ -22,6 +23,7 @@ set(THIRD_PARTY
 
 set(PROJECT_BUILD_TEST ON)
 
+# add_definitions(-DSUPPORT_BASE64_CHROMIUM)
 add_definitions(-DSUPPORT_SM3_YANG15)
 add_definitions(-DSUPPORT_SM4_LANG18)
 
