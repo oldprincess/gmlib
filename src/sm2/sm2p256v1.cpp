@@ -2,6 +2,8 @@
 #include <gmlib/sm2/internal/sm2p256v1.h>
 
 #include <cstdio>
+
+#include "sm2_p256v1_tb.inc"
 namespace sm2::internal {
 
 const std::uint8_t SM2_DEFAULT_ID[16] = {
@@ -769,10 +771,31 @@ void sm2_ec_j_mul_a(sm2_ec_j           R,
 
 void sm2_ec_j_mul_g(sm2_ec_j R, const std::uint8_t k[32]) noexcept
 {
-    sm2_ec_a G;
-    sm2_fp_from_bytes(G[0], SM2_CURVE_GX);
-    sm2_fp_from_bytes(G[1], SM2_CURVE_GY);
-    sm2_ec_j_mul_a(R, k, G);
+    // sm2_ec_a G;
+    // sm2_fp_from_bytes(G[0], SM2_CURVE_GX);
+    // sm2_fp_from_bytes(G[1], SM2_CURVE_GY);
+    // sm2_ec_j_mul_a(R, k, G);
+
+    // lut optimize
+    int i = 0;
+    while (i < 32 && k[i] == 0) i++;
+    if (i == 32)
+    {
+        sm2_ec_j_set_inf(R);
+        return;
+    }
+    sm2_ec_a T;
+    sm2_ec_a_from_bytes04(T, (unsigned char*)SM2_P256V1_TB[i][k[i]]);
+    sm2_ec_j_from_a(R, T);
+    i++;
+    for (; i < 32; i++)
+    {
+        if (k[i] != 0)
+        {
+            sm2_ec_a_from_bytes04(T, (unsigned char*)SM2_P256V1_TB[i][k[i]]);
+            sm2_ec_j_add_a(R, R, T);
+        }
+    }
 }
 
 void sm2_ec_j_from_a(sm2_ec_j R, const sm2_ec_a P) noexcept

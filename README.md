@@ -42,9 +42,9 @@ This project will be updated on the GitHub platform and randomly synchronized to
 
 |算法|性能|:-:|算法|性能|
 |:-:|:-:|:-:|:-:|:-:|
-|AES-128|104166 Mbps|:-:|SM2-SM3签名[64字节数据]|9140  opt/s|
-|AES-192|87719  Mbps|:-:|SM2-SM3验签[64字节数据]|5668  opt/s|
-|AES-256|73529  Mbps|:-:|SM2-SM3加密[64字节数据]|4878  opt/s|
+|AES-128|104166 Mbps|:-:|SM2-SM3签名[64字节数据]|34722 opt/s|
+|AES-192|87719  Mbps|:-:|SM2-SM3验签[64字节数据]|10548 opt/s|
+|AES-256|73529  Mbps|:-:|SM2-SM3加密[64字节数据]|7987  opt/s|
 |SM4    |6250   Mbps|:-:|SM2-SM3解密[64字节数据]|11876 opt/s|
 |SM3    |2216   Mbps|:-:|SM9-SM3签名[64字节数据]|1116  opt/s|
 |:-:|:-:|:-:|SM9-SM3验签[64字节数据]|444   opt/s|
@@ -76,13 +76,13 @@ This project will be updated on the GitHub platform and randomly synchronized to
 
 如果处理器平台是x86_64，可以使用`tools/cpuid.py`脚本测试平台支持的优化，运行下述命令来编译并执行脚本
 
-```
+```bash
 python cpuid.py
 ```
 
 将得到如下所示的输出（部分输出结果省略）
 
-```
+```text
 add_definitions(-DCPU_FLAG_CPU_FLAG_AES)
 add_definitions(-DCPU_FLAG_CPU_FLAG_AVX2)
 add_definitions(-DCPU_FLAG_CPU_FLAG_BMI2)
@@ -96,7 +96,7 @@ set(PROJECT_COMPILE_OPTIONS -maes -mavx2 ...)
 
 * Windows平台
 
-```
+```bash
 cd gmlib
 mkdir build
 cd build
@@ -104,9 +104,9 @@ cmake ..
 cmake --build . --config=Release
 ```
 
-* Linux平台 
+* Linux平台
 
-```
+```bash
 cd gmlib
 mkdir build
 cd build
@@ -120,13 +120,13 @@ cmake --build .
 
 * 执行下述命令测试SM2算法正确性
 
-```
+```bash
 Release/sm2_test.exe
 ```
 
 * 执行下述命令测试SM2算法正确性和性能
 
-```
+```bash
 Release/sm2_test.exe speed
 ```
 
@@ -141,7 +141,7 @@ Release/sm2_test.exe speed
 
 目录包含`include`、`lib`和`src`三个目录：`include`目录中存放gmlib库的头文件，直接从该项目源码中拷贝即可；`lib`目录中存放gmlib库的静态库文件；`src`目录存放教程项目的源代码。
 
-```
+```text
 +---include
 |   \---gmlib
 |
@@ -171,27 +171,27 @@ int main()
 
 * Windows 平台：使用MSVC的 [CL](https://learn.microsoft.com/zh-cn/cpp/build/reference/compiler-command-line-syntax?view=msvc-170) 工具，`/I`表示添加头文件路径，`/Zl`表示省略默认库名，`/std:c++17`表示使用c++17
 
-```
+```bash
 CL src\main.cpp  lib\gmlib_static.lib /I include /Zl /std:c++17
 ```
 
-```
+```bash
 .\main.exe
 ```
 
 * Linux 平台
 
-```
+```bash
 g++ src/main.cpp lib/libgmlib_static.a -I include -std=c++17 -o main.x
 ```
 
-```
+```bash
 ./main.x
 ```
 
 将会输出需要提前预定义的宏，下面是一个例子
 
-```
+```c++
 #define CPU_FLAG_AES
 #define CPU_FLAG_AVX2
 #define CPU_FLAG_BMI2
@@ -312,27 +312,27 @@ int main()
 
 * Windows 平台
 
-```
+```bash
 CL src\main.cpp  lib\gmlib_static.lib /I include /Zl /std:c++17
 ```
 
-```
+```bash
 .\main.exe
 ```
 
 * Linux 平台：在这次的示例中，仅需要额外添加`-mavx2`的编译参数。具体需要额外添加哪些编译参数，和`CMakeLists.txt`文件中`PROJECT_COMPILE_OPTIONS`的值一致。
 
-```
+```bash
 g++ src/main.cpp lib/libgmlib_static.a -I include -std=c++17 -o main.x -mavx2
 ```
 
-```
+```bash
 ./main.x
 ```
 
 将会输出计算结果，下面是一个例子
 
-```
+```text
 [19]: sm2-sm3 sign demo begin
 [30]: generate random private key
 82 91 75 1d 3e cf 97 57 27 a0 f8 1b 1b b7 77 11    ..u.>..W'.....w.
