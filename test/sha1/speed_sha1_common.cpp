@@ -1,3 +1,4 @@
+#if !(defined(CPU_FLAG_SHA) && defined(CPU_FLAG_SSE4_1))
 #include <gmlib/sha1/internal/sha1_common.h>
 
 #include <cstdio>
@@ -42,3 +43,8 @@ void speed_sha1_common()
     speed_Mbps = LOOP * MSG_SIZE * 8 / time_s / 1024.0 / 1024.0;
     std::printf("%f Mbps\n", speed_Mbps);
 }
+#else
+void speed_sha1_common()
+{
+}
+#endif

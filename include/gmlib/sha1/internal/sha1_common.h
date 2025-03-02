@@ -1,3 +1,4 @@
+#if !(defined(CPU_FLAG_SHA) && defined(CPU_FLAG_SSE4_1))
 #ifndef SHA1_INTERNAL_SHA1_COMMON_H
 #define SHA1_INTERNAL_SHA1_COMMON_H
 
@@ -31,4 +32,5 @@ int sha1_final_block(Sha1CTX*            ctx,
 
 } // namespace sha1::internal::common
 
+#endif
 #endif

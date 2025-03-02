@@ -47,6 +47,7 @@ void test_sha1_sha()
 #endif"""
 
 code_script_common = """\
+#if !(defined(CPU_FLAG_SHA) && defined(CPU_FLAG_SSE4_1))
 #include <gmlib/sha1/internal/sha1_common.h>
 #include <cstring>
 #include <stdexcept>
@@ -62,6 +63,11 @@ void test_sha1_common()
 
 {code}
 }}
+#else
+void test_sha1_common()
+{{
+}}
+#endif
 """
 
 def to_c_array(b: bytes):

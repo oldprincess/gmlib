@@ -1,3 +1,4 @@
+#if !(defined(CPU_FLAG_SHA) && defined(CPU_FLAG_SSE4_1))
 #include <gmlib/sha1/internal/sha1_common.h>
 
 #include <cstring>
@@ -194,3 +195,4 @@ int sha1_final_block(Sha1CTX*            ctx,
 }
 
 } // namespace sha1::internal::common
+#endif
