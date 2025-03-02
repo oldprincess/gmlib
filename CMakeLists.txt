@@ -4,6 +4,7 @@ set(PROJECT_NAME_ gmlib)
 set(THIRD_PARTY 
     aes
     block_cipher_mode
+    des
     ghash
     hash_lib
     md5

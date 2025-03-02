@@ -2,11 +2,11 @@
 
 本项目使用MIT协议，如果您想要使用本项目，请仔细阅读MIT协议。
 
-如果有任何疑问，请发 email 至 zirui.gong@foxmail.com ，或者提交issue。
+如果有任何疑问，请发 email 至 <zirui.gong@foxmail.com> ，或者提交issue。
 
 This software uses the MIT LICENSE. If you wish to use this software, please carefully read the text of the MIT LICENSE.
 
-If you have any questions, please send an email to zirui.gong@foxmail.com, or submit an issue.
+If you have any questions, please send an email to <zirui.gong@foxmail.com>, or submit an issue.
 
 本项目的将在 github 平台更新，并随机同步至 gitee 平台。如果您的ip地址位于中国，可以使用 gitee 克隆本项目（ [点击链接跳转](https://gitee.com/oldprincess/gmlib) ），否则更推荐您使用 github 克隆本项目（ [点击链接跳转](https://github.com/oldprincess/gmlib) ）。
 
@@ -18,7 +18,7 @@ This project will be updated on the GitHub platform and randomly synchronized to
 
 目前支持的密码算法为：
 
-* 对称密码：AES、SM4、uBlock
+* 对称密码：AES、DES、SM4、uBlock
 * 哈希算法：MD5、SHA1、SM3、GHASH
 * 公钥密码：SM2、SM9
 
