@@ -1,3 +1,4 @@
+#if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
 void test_uint256_common_add_carry();
 void test_uint256_common_add_carry();
 void test_uint256_common_bittest();
@@ -42,3 +43,8 @@ void test_uint256_common()
     test_uint256_common_sub_borrow_uint32();
     test_uint256_common_tpl_carry();
 }
+#else
+void test_uint256_common()
+{
+}
+#endif

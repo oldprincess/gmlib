@@ -1,3 +1,4 @@
+#if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
 #ifndef NUMBER_INTERNAL_MPZ_COMMON_H
 #define NUMBER_INTERNAL_MPZ_COMMON_H
 
@@ -69,4 +70,5 @@ void mpz_to_bytes(std::uint8_t*        r,
 
 } // namespace number::internal::common
 
+#endif
 #endif

@@ -1,3 +1,4 @@
+#if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
 void test_mont256_common_add();
 void test_mont256_common_dbl();
 void test_mont256_common_div2();
@@ -24,3 +25,8 @@ void test_mont256_common()
     test_mont256_common_sub();
     test_mont256_common_tpl();
 }
+#else
+void test_mont256_common()
+{
+}
+#endif

@@ -1,3 +1,4 @@
+#if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
 #include <gmlib/number/internal/mpz_common.h>
 #include <stdexcept>
 #include <cstring>
@@ -1309,3 +1310,4 @@ void test_mpz_common_mul()
         throw std::runtime_error("err in common::mpz_mul");
     }
 }
+#endif

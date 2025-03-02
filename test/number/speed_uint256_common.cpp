@@ -1,8 +1,10 @@
+#if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
+#include <cstdio>
+#include <ctime>
+#include <random>
+
 #include "gmlib/number/internal/uint256_common.h"
 #include "speed.h"
-#include <ctime>
-#include <cstdio>
-#include <random>
 
 static void rand_mem(void* mem, std::size_t size)
 {
@@ -59,3 +61,8 @@ void speed_uint256_common()
     speed_opt_s = cnt / time_s;
     std::printf("%e opt/s\n", speed_opt_s);
 }
+#else
+void speed_uint256_common()
+{
+}
+#endif

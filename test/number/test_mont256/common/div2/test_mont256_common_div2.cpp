@@ -1,3 +1,4 @@
+#if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
 #include <gmlib/number/internal/mont256_common.h>
 #include <gmlib/number/internal/uint256_common.h>
 #include <stdexcept>
@@ -1027,3 +1028,4 @@ void test_mont256_common_div2()
         throw std::runtime_error("err in common::mont256_div2");
     }
 }
+#endif

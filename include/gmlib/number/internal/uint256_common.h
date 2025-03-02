@@ -1,3 +1,4 @@
+// #if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
 #ifndef NUMBER_INTERNAL_UINT256_COMMON_H
 #define NUMBER_INTERNAL_UINT256_COMMON_H
 
@@ -109,3 +110,4 @@ bool uint256_bittest(const std::uint32_t num[8], int i) noexcept;
 } // namespace number::internal::common
 
 #endif
+// #endif

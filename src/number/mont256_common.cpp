@@ -1,3 +1,4 @@
+#if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
 #include <gmlib/number/internal/mont256_common.h>
 #include <gmlib/number/internal/uint256_common.h>
 
@@ -351,3 +352,4 @@ void mont256_from_bytes_ex(const Mont256CTX*   ctx,
 }
 
 }; // namespace number::internal::common
+#endif

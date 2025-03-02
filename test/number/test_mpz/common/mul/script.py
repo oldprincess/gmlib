@@ -21,6 +21,7 @@ test_script_template = """\
 
 
 c_code_template = """\
+#if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
 #include <gmlib/number/internal/mpz_common.h>
 #include <stdexcept>
 #include <cstring>
@@ -33,7 +34,8 @@ void test_mpz_common_mul()
     std::uint8_t product_data[64];
 
 {}
-}}"""
+}}
+#endif"""
 
 
 def int_to_c_array(n: int, bits: int):

@@ -18,6 +18,7 @@ test_script_template = """\
 
 
 c_code_template = """\
+#if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
 #include <gmlib/number/internal/mont256_common.h>
 #include <gmlib/number/internal/uint256_common.h>
 #include <stdexcept>
@@ -48,7 +49,8 @@ void test_mont256_common_tpl()
     std::uint8_t product_data[32];
 
 {code}
-}}"""
+}}
+#endif"""
 
 
 def int_to_c_array(n: int):
