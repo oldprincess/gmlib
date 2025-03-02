@@ -11,7 +11,7 @@
 using namespace ublock::internal::standard;
 
 constexpr std::size_t SIZE = 4096 * 32;
-constexpr int         loop = 10000;
+constexpr int         loop = 1000;
 
 static void rand_mem(void* mem, std::size_t size)
 {

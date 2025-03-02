@@ -1,3 +1,4 @@
+#if !defined(CPU_FLAG_SSSE3)
 #include <gmlib/ublock/internal/ublock_common.h>
 
 #include <cstring>
@@ -136,3 +137,8 @@ void test_ublock_common()
         throw runtime_error("err in ublock common");
     }
 }
+#else
+void test_ublock_common()
+{
+}
+#endif

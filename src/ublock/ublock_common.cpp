@@ -1,3 +1,4 @@
+#if !defined(CPU_FLAG_SSSE3)
 #include <gmlib/ublock/internal/ublock_common.h>
 
 namespace ublock::internal::common {
@@ -777,3 +778,4 @@ void ublock256256_dec_blocks(const uBlockCTX    *ctx,
 }
 
 } // namespace ublock::internal::common
+#endif

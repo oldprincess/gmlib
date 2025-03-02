@@ -1,3 +1,4 @@
+#if !defined(CPU_FLAG_SSSE3)
 #include <gmlib/ublock/internal/ublock_common.h>
 
 #include <cstdio>
@@ -10,7 +11,7 @@
 using namespace ublock::internal::common;
 
 constexpr std::size_t SIZE = 4096 * 32;
-constexpr int         loop = 1000;
+constexpr int         loop = 100;
 
 static void rand_mem(void* mem, std::size_t size)
 {
@@ -121,3 +122,8 @@ void speed_ublock_common()
     speed_ublock128256_common();
     speed_ublock256256_common();
 }
+#else
+void speed_ublock_common()
+{
+}
+#endif
