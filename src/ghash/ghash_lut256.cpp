@@ -1,3 +1,4 @@
+#if !(defined(CPU_FLAG_PCLMUL) && defined(CPU_FLAG_SSE2))
 #include <gmlib/ghash/internal/ghash_lut256.h>
 
 namespace ghash::internal::lut256 {
@@ -184,3 +185,4 @@ int ghash_final_block(const GHashCTX*     ctx,
 }
 
 } // namespace ghash::internal::lut256
+#endif

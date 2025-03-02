@@ -1,17 +1,20 @@
 #ifndef GHASH_GHASH_H
 #define GHASH_GHASH_H
 
-#include <gmlib/ghash/internal/ghash_common.h>
-#include <gmlib/ghash/internal/ghash_lut256.h>
-#include <gmlib/ghash/internal/ghash_pclmul.h>
 #include <gmlib/hash_lib/hash.h>
 
 #include <stdexcept>
 
 #if defined(CPU_FLAG_PCLMUL) && defined(CPU_FLAG_SSE2)
-namespace alg = ghash::internal::pclmul;
+#include <gmlib/ghash/internal/ghash_pclmul.h>
+namespace ghash {
+namespace alg = internal::pclmul;
+}
 #else
-namespace alg = ghash::internal::lut256;
+#include <gmlib/ghash/internal/ghash_lut256.h>
+namespace ghash {
+namespace alg = internal::lut256;
+}
 #endif
 
 // namespace alg = ghash::internal::common;

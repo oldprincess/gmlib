@@ -1,3 +1,4 @@
+#if !(defined(CPU_FLAG_PCLMUL) && defined(CPU_FLAG_SSE2))
 #include <gmlib/ghash/internal/ghash_lut256.h>
 
 #include <cstring>
@@ -97,3 +98,8 @@ void test_ghash_lut256()
         throw std::runtime_error("err in ghash lut256");
     }
 }
+#else
+void test_ghash_lut256()
+{
+}
+#endif

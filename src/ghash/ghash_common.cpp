@@ -1,3 +1,4 @@
+#if 0
 #include <gmlib/ghash/internal/ghash_common.h>
 
 namespace ghash::internal::common {
@@ -93,3 +94,4 @@ int ghash_final_block(const GHashCTX*     ctx,
 }
 
 } // namespace ghash::internal::common
+#endif

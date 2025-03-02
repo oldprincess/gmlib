@@ -7,7 +7,7 @@ set(THIRD_PARTY
 
 add_definitions(-DCPU_FLAG_SSE2)
 add_definitions(-DCPU_FLAG_AVX2)
-add_definitions(-DCPU_FLAG_PCLMUL)
+# add_definitions(-DCPU_FLAG_PCLMUL)
 # add_compile_options(-O3 -msse2 -mavx2 -maes)
 
 #######################################################
