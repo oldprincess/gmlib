@@ -2,16 +2,20 @@
 #define SM4_SM4_H
 
 #include <gmlib/block_cipher_mode/block_cipher.h>
-#include <gmlib/sm4/internal/sm4_common.h>
-#include <gmlib/sm4/internal/sm4_lang18.h>
-
-namespace sm4 {
 
 #if defined(SUPPORT_SM4_LANG18)
+#include <gmlib/sm4/internal/sm4_lang18.h>
+namespace sm4 {
 namespace alg = internal::lang18;
+} // namespace sm4
 #else
+#include <gmlib/sm4/internal/sm4_common.h>
+namespace sm4 {
 namespace alg = internal::common;
+} // namespace sm4
 #endif
+
+namespace sm4 {
 
 /**
  * @brief   SM4 Block Cipher

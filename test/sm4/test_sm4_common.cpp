@@ -1,6 +1,8 @@
+#if !defined(SUPPORT_SM4_LANG18)
 #include <gmlib/sm4/internal/sm4_common.h>
-#include <stdexcept>
+
 #include <cstring>
+#include <stdexcept>
 
 static std::uint8_t user_key[16] = {
     0xd1, 0x37, 0xc6, 0xa7, 0xe8, 0x0c, 0x32, 0x31,
@@ -185,7 +187,7 @@ static std::uint8_t ct[1024] = {
 
 using namespace sm4::internal::common;
 
-void test_sm4_internal()
+void test_sm4_common()
 {
     Sm4CTX       ctx;
     std::uint8_t out[1024];
@@ -193,12 +195,17 @@ void test_sm4_internal()
     sm4_enc_blocks(&ctx, out, pt, sizeof(pt) / 16);
     if (std::memcmp(out, ct, 1024) != 0)
     {
-        throw std::runtime_error("err in sm4 internal");
+        throw std::runtime_error("err in sm4 common");
     }
     sm4_dec_key_init(&ctx, user_key);
     sm4_dec_blocks(&ctx, out, ct, sizeof(ct) / 16);
     if (std::memcmp(out, pt, 1024) != 0)
     {
-        throw std::runtime_error("err in sm4 internal");
+        throw std::runtime_error("err in sm4 common");
     }
 }
+#else
+void test_sm4_common()
+{
+}
+#endif

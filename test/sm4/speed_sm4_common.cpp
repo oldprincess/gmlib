@@ -1,9 +1,12 @@
+#if !defined(SUPPORT_SM4_LANG18)
 #include <gmlib/sm4/internal/sm4_common.h>
-#include "speed.h"
-#include <iostream>
-#include <ctime>
-#include <cstdlib>
+
 #include <cstdio>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
+
+#include "speed.h"
 
 static void rand_mem(void* mem, std::size_t size)
 {
@@ -46,3 +49,8 @@ void speed_sm4_common()
     std::printf("%f Mbps\n", speed_Mbps);
     delete[] data;
 }
+#else
+void speed_sm4_common()
+{
+}
+#endif

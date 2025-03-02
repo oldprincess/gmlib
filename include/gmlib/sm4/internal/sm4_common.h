@@ -1,3 +1,4 @@
+#if !defined(SUPPORT_SM4_LANG18)
 #ifndef SM4_INTERNAL_SM4_COMMON_H
 #define SM4_INTERNAL_SM4_COMMON_H
 
@@ -78,4 +79,5 @@ void sm4_dec_blocks(const Sm4CTX       *ctx,
 
 }; // namespace sm4::internal::common
 
+#endif
 #endif

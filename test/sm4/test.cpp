@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
         test_sm4_cfb_mode();
         test_sm4_ofb_mode();
         test_sm4_ctr_mode();
-        test_sm4_internal();
+        test_sm4_common();
         test_sm4_lang18();
     }
     catch (std::exception &e)

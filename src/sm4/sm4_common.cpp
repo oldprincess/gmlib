@@ -1,3 +1,4 @@
+#if !defined(SUPPORT_SM4_LANG18)
 #include <gmlib/sm4/internal/sm4_common.h>
 
 namespace sm4::internal::common {
@@ -222,3 +223,4 @@ void sm4_dec_blocks(const Sm4CTX       *ctx,
 }
 
 }; // namespace sm4::internal::common
+#endif
