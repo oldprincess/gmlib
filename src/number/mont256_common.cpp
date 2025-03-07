@@ -1,6 +1,7 @@
-#if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
 #include <gmlib/number/internal/mont256_common.h>
 #include <gmlib/number/internal/uint256_common.h>
+
+#if defined(NUMBER_IMPL_MONT256_COMMON)
 
 namespace number::internal::common {
 

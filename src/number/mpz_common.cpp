@@ -1,5 +1,6 @@
-#if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
 #include <gmlib/number/internal/mpz_common.h>
+
+#if defined(NUMBER_IMPL_MPZ_COMMON)
 
 #include <cstring>
 

@@ -1,6 +1,9 @@
-#if defined(CPU_FLAG_AES) && defined(CPU_FLAG_SSE2)
 #ifndef AES_INTERNAL_AES_AESNI_H
 #define AES_INTERNAL_AES_AESNI_H
+
+#include <gmlib/aes/config.h>
+
+#if defined(AES_IMPL_AESNI)
 
 #include <cstddef>
 #include <cstdint>
@@ -187,4 +190,5 @@ void aes256_dec_blocks(const Aes256CTX*    ctx,
 }; // namespace aes::internal::aesni
 
 #endif
+
 #endif

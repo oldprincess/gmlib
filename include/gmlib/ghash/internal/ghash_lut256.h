@@ -1,6 +1,9 @@
-#if !(defined(CPU_FLAG_PCLMUL) && defined(CPU_FLAG_SSE2))
 #ifndef GHASH_INTERNAL_GHASH_LUT256_H
 #define GHASH_INTERNAL_GHASH_LUT256_H
+
+#include <gmlib/ghash/config.h>
+
+#if defined(GHASH_IMPL_LUT256)
 
 #include <cstddef>
 #include <cstdint>
@@ -32,4 +35,5 @@ int ghash_final_block(const GHashCTX*     ctx,
 } // namespace ghash::internal::lut256
 
 #endif
+
 #endif

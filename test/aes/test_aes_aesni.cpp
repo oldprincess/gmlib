@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <cstring>
 
-#if !(defined(CPU_FLAG_AES) && defined(CPU_FLAG_SSE2))
+#if !defined(AES_IMPL_AESNI)
 void test_aes_aesni()
 {
 }

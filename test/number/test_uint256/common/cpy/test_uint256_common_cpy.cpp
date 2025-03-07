@@ -1,4 +1,5 @@
 #include <gmlib/number/internal/uint256_common.h>
+#if defined(NUMBER_IMPL_UINT256_COMMON)
 
 #include <cstring>
 #include <random>
@@ -33,3 +34,4 @@ void test_uint256_common_cpy()
         }
     }
 }
+#endif

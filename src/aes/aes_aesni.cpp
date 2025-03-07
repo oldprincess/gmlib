@@ -1,5 +1,7 @@
-#if defined(CPU_FLAG_AES) && defined(CPU_FLAG_SSE2)
 #include <gmlib/aes/internal/aes_aesni.h>
+
+#if defined(AES_IMPL_AESNI)
+
 #include <immintrin.h>
 
 namespace aes::internal::aesni {

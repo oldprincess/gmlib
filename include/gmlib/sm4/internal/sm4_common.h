@@ -1,6 +1,9 @@
-#if !defined(SUPPORT_SM4_LANG18)
 #ifndef SM4_INTERNAL_SM4_COMMON_H
 #define SM4_INTERNAL_SM4_COMMON_H
+
+#include <gmlib/sm4/config.h>
+
+#if defined(SM4_IMPL_COMMON)
 
 #include <cstddef>
 #include <cstdint>

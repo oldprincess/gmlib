@@ -1,5 +1,7 @@
-#if defined(SUPPORT_SM3_YANG15)
 #include <gmlib/sm3/internal/sm3_yang15.h>
+
+#if defined(SM3_IMPL_YANG15)
+
 #include <ctime>
 #include <random>
 #include <cstdio>

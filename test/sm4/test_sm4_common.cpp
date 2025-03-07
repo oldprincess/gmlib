@@ -1,5 +1,6 @@
-#if !defined(SUPPORT_SM4_LANG18)
 #include <gmlib/sm4/internal/sm4_common.h>
+
+#if defined(SM4_IMPL_COMMON)
 
 #include <cstring>
 #include <stdexcept>

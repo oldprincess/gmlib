@@ -1,15 +1,18 @@
-#if !defined(SUPPORT_SM4_LANG18)
+#include <gmlib/sm4/internal/sm4_lang18.h>
+
+#if !defined(SM4_IMPL_LANG18)
+
 void speed_sm4_lang18()
 {
 }
 #else
 
-#include <gmlib/sm4/internal/sm4_lang18.h>
-#include "speed.h"
-#include <iostream>
-#include <ctime>
-#include <cstdlib>
 #include <cstdio>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
+
+#include "speed.h"
 
 static void rand_mem(void* mem, std::size_t size)
 {

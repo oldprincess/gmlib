@@ -1,6 +1,9 @@
-#if defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2)
 #ifndef NUMBER_INTERNAL_UINT256_X64_H
 #define NUMBER_INTERNAL_UINT256_X64_H
+
+#include <gmlib/number/config.h>
+
+#if defined(NUMBER_IMPL_UINT256_X64)
 
 #include <cstddef>
 #include <cstdint>

@@ -19,6 +19,8 @@ test_script_template = """\
 
 c_code_template = """\
 #include <gmlib/number/internal/uint256_common.h>
+#if defined(NUMBER_IMPL_UINT256_COMMON)
+
 #include <stdexcept>
 
 using namespace number::internal::common;
@@ -28,7 +30,8 @@ void test_uint256_common_equal()
     uint256_t a, b;
 
 {}
-}}"""
+}}
+#endif"""
 
 
 def int_to_c_array(n: int):

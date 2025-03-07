@@ -1,3 +1,7 @@
+#include <gmlib/number/config.h>
+
+#if defined(NUMBER_IMPL_MONT256_X64)
+
 void test_mont256_x64_add();
 void test_mont256_x64_dbl();
 void test_mont256_x64_div2();
@@ -24,3 +28,8 @@ void test_mont256_x64()
     test_mont256_x64_sub();
     test_mont256_x64_tpl();
 }
+#else
+void test_mont256_x64()
+{
+}
+#endif

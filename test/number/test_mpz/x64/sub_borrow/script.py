@@ -21,8 +21,8 @@ test_script_template = """\
 
 
 c_code_template = """\
-#if defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2)
 #include <gmlib/number/internal/mpz_x64.h>
+#if defined(NUMBER_IMPL_MPZ_X64)
 #include <stdexcept>
 #include <cstring>
 

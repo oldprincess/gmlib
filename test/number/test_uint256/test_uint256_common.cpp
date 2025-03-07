@@ -1,4 +1,7 @@
-#if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
+#include <gmlib/number/config.h>
+
+#if defined(NUMBER_IMPL_UINT256_COMMON)
+
 void test_uint256_common_add_carry();
 void test_uint256_common_add_carry();
 void test_uint256_common_bittest();

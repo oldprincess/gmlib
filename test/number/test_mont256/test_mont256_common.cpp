@@ -1,4 +1,7 @@
-#if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
+#include <gmlib/number/config.h>
+
+#if defined(NUMBER_IMPL_MONT256_COMMON)
+
 void test_mont256_common_add();
 void test_mont256_common_dbl();
 void test_mont256_common_div2();

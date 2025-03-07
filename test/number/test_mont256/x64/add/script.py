@@ -4,6 +4,7 @@ import os
 
 TEST_VECTOR_NUM = 100
 
+random.seed(7)
 
 test_script_template = """\
     std::uint8_t augend{i}[32] = {augend_val};
@@ -20,9 +21,10 @@ test_script_template = """\
 
 
 c_code_template = """\
-#if defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2)
 #include <gmlib/number/internal/mont256_x64.h>
 #include <gmlib/number/internal/uint256_x64.h>
+#if defined(NUMBER_IMPL_MONT256_X64)
+
 #include <stdexcept>
 #include <cstring>
 

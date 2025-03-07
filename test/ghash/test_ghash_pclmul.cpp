@@ -1,13 +1,9 @@
-#if !(defined(CPU_FLAG_PCLMUL) && defined(CPU_FLAG_SSE2))
-
+#include <gmlib/ghash/internal/ghash_pclmul.h>
+#if !defined(GHASH_IMPL_PCLMUL)
 void test_ghash_pclmul()
 {
 }
-
 #else
-
-#include <gmlib/ghash/internal/ghash_pclmul.h>
-
 #include <cstring>
 #include <stdexcept>
 

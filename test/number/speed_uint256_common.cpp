@@ -1,9 +1,11 @@
-#if !(defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2))
 #include <cstdio>
 #include <ctime>
 #include <random>
 
 #include "gmlib/number/internal/uint256_common.h"
+
+#if defined(NUMBER_IMPL_UINT256_COMMON)
+
 #include "speed.h"
 
 static void rand_mem(void* mem, std::size_t size)

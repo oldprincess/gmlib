@@ -1,6 +1,9 @@
-#if !(defined(CPU_FLAG_SHA) && defined(CPU_FLAG_SSE4_1))
 #ifndef SHA1_INTERNAL_SHA1_COMMON_H
 #define SHA1_INTERNAL_SHA1_COMMON_H
+
+#include <gmlib/sha1/config.h>
+
+#if defined(SHA1_IMPL_COMMON)
 
 #include <cstddef>
 #include <cstdint>

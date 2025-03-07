@@ -8,10 +8,10 @@
  * Based on code from Intel, and by Sean Gulley for
  * the miTLS project.
  */
-#if defined(CPU_FLAG_SHA) && defined(CPU_FLAG_SSE4_1)
-
-
 #include <gmlib/sha1/internal/sha1_sha.h>
+
+#if defined(SHA1_IMPL_SHA)
+
 #include <immintrin.h>
 
 #include <cstring>

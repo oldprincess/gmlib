@@ -1,9 +1,10 @@
 #ifndef AES_AES_H
 #define AES_AES_H
 
+#include <gmlib/aes/config.h>
 #include <gmlib/block_cipher_mode/block_cipher.h>
 
-#if defined(CPU_FLAG_AES) && defined(CPU_FLAG_SSE2)
+#if defined(AES_IMPL_AESNI)
 #include <gmlib/aes/internal/aes_aesni.h>
 namespace aes {
 namespace alg = internal::aesni;

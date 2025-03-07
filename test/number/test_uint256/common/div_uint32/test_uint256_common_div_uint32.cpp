@@ -1,4 +1,6 @@
 #include <gmlib/number/internal/uint256_common.h>
+#if defined(NUMBER_IMPL_UINT256_COMMON)
+
 #include <stdexcept>
 #include <cstring>
 
@@ -1210,3 +1212,4 @@ void test_uint256_common_div_uint32()
         throw std::runtime_error("err in common::uint256_div_uint32");
     }
 }
+#endif

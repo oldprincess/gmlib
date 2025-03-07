@@ -1,5 +1,7 @@
-#if !defined(SUPPORT_SM3_YANG15)
 #include <gmlib/sm3/internal/sm3_common.h>
+
+#if defined(SM3_IMPL_COMMON)
+
 #include <cstring>
 #include <stdexcept>
 

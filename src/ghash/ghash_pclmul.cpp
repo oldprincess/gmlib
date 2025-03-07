@@ -1,5 +1,7 @@
-#if defined(CPU_FLAG_PCLMUL) && defined(CPU_FLAG_SSE2)
 #include <gmlib/ghash/internal/ghash_pclmul.h>
+
+#if defined(GHASH_IMPL_PCLMUL)
+
 #include <immintrin.h>
 
 namespace ghash::internal::pclmul {

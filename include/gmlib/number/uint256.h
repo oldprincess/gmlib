@@ -1,7 +1,10 @@
 #ifndef NUMBER_UINT256_H
 #define NUMBER_UINT256_H
 
-#if defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2)
+#include <gmlib/number/config.h>
+
+#if defined(NUMBER_IMPL_UINT256_X64)
+
 #include <gmlib/number/internal/uint256_x64.h>
 namespace number {
 using namespace number::internal::x64;
@@ -15,7 +18,7 @@ using namespace number::internal::x64;
 #define uint256_cmp_uint32        uint256_cmp_uint64
 #define uint256_set_uint32        uint256_set_uint64
 #define uint256_mul_carry_uint32(x, y, z) \
-    (std::uint32_t) uint256_mul_carry_uint64(x, y, z)
+    (std::uint32_t)uint256_mul_carry_uint64(x, y, z)
 
 } // namespace number
 

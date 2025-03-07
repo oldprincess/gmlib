@@ -1,11 +1,12 @@
 #ifndef GHASH_GHASH_H
 #define GHASH_GHASH_H
 
+#include <gmlib/ghash/config.h>
 #include <gmlib/hash_lib/hash.h>
 
 #include <stdexcept>
 
-#if defined(CPU_FLAG_PCLMUL) && defined(CPU_FLAG_SSE2)
+#if defined(GHASH_IMPL_PCLMUL)
 #include <gmlib/ghash/internal/ghash_pclmul.h>
 namespace ghash {
 namespace alg = internal::pclmul;

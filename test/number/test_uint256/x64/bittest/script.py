@@ -19,8 +19,9 @@ test_script_template = """\
 
 
 c_code_template = """\
-#if defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2)
 #include <gmlib/number/internal/uint256_x64.h>
+#if defined(NUMBER_IMPL_UINT256_X64)
+
 #include <stdexcept>
 
 using namespace number::internal::x64;

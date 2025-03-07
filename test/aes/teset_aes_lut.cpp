@@ -1,6 +1,5 @@
-#if !(defined(CPU_FLAG_AES) && defined(CPU_FLAG_SSE2))
 #include <gmlib/aes/internal/aes_lut.h>
-
+#if defined(AES_IMPL_LUT)
 #include <cstring>
 #include <stdexcept>
 

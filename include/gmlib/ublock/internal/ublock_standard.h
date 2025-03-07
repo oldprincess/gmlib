@@ -1,6 +1,9 @@
-#if defined(CPU_FLAG_SSSE3)
 #ifndef UBLOCK_INTERNAL_UBLOCK_STANDARD_H
 #define UBLOCK_INTERNAL_UBLOCK_STANDARD_H
+
+#include <gmlib/ublock/config.h>
+
+#if defined(UBLOCK_IMPL_STANDARD)
 
 #include <cstddef>
 #include <cstdint>

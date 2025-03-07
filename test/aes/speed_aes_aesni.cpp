@@ -1,12 +1,9 @@
-#if !(defined(CPU_FLAG_AES) && defined(CPU_FLAG_SSE2))
-
+#include <gmlib/aes/internal/aes_aesni.h>
+#if !defined(AES_IMPL_AESNI)
 void speed_aes_aesni()
 {
 }
-
 #else
-#include <gmlib/aes/internal/aes_aesni.h>
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>

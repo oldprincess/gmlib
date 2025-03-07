@@ -1,3 +1,7 @@
+#include <gmlib/number/config.h>
+
+#if defined(NUMBER_IMPL_UINT256_X64)
+
 void test_uint256_x64_add_carry();
 void test_uint256_x64_add_carry();
 void test_uint256_x64_bittest();
@@ -42,3 +46,8 @@ void test_uint256_x64()
     test_uint256_x64_sub_borrow_uint64();
     test_uint256_x64_tpl_carry();
 }
+#else
+void test_uint256_x64()
+{
+}
+#endif

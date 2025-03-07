@@ -1,6 +1,7 @@
-#if 0
 #ifndef GHASH_INTERNAL_GHASH_COMMON_H
 #define GHASH_INTERNAL_GHASH_COMMON_H
+
+#if 0
 
 #include <cstddef>
 #include <cstdint>
@@ -32,4 +33,5 @@ int ghash_final_block(const GHashCTX*     ctx,
 } // namespace ghash::internal::common
 
 #endif
+
 #endif

@@ -21,6 +21,8 @@ test_script_template = """\
 
 c_code_template = """\
 #include <gmlib/number/internal/uint256_common.h>
+#if defined(NUMBER_IMPL_UINT256_COMMON)
+
 #include <stdexcept>
 #include <cstring>
 
@@ -33,7 +35,8 @@ void test_uint256_common_mul_carry_uint32()
     std::uint8_t  product_data[32];
 
 {}
-}}"""
+}}
+#endif"""
 
 
 def int_to_c_array(n: int, bits: int):

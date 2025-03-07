@@ -1,4 +1,6 @@
 #include <gmlib/number/internal/uint256_common.h>
+#if defined(NUMBER_IMPL_UINT256_COMMON)
+
 #include <stdexcept>
 
 using namespace number::internal::common;
@@ -1007,3 +1009,4 @@ void test_uint256_common_equal()
         throw std::runtime_error("err in common::uint256_equal");
     }
 }
+#endif

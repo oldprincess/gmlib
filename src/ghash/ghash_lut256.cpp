@@ -1,5 +1,6 @@
-#if !(defined(CPU_FLAG_PCLMUL) && defined(CPU_FLAG_SSE2))
 #include <gmlib/ghash/internal/ghash_lut256.h>
+
+#if defined(GHASH_IMPL_LUT256)
 
 namespace ghash::internal::lut256 {
 

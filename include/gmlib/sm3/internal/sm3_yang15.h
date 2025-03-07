@@ -1,6 +1,9 @@
-#if defined(SUPPORT_SM3_YANG15)
 #ifndef SM3_INTERNAL_SM3_YANG15_H
 #define SM3_INTERNAL_SM3_YANG15_H
+
+#include <gmlib/sm3/config.h>
+
+#if defined(SM3_IMPL_YANG15)
 
 #include <cstddef>
 #include <cstdint>

@@ -22,6 +22,8 @@ test_script_template = """\
 
 c_code_template = """\
 #include <gmlib/number/internal/uint256_common.h>
+#if defined(NUMBER_IMPL_UINT256_COMMON)
+
 #include <stdexcept>
 #include <cstring>
 
@@ -34,7 +36,8 @@ void test_uint256_common_sub_borrow()
     std::uint8_t differencedata[32];
 
 {}
-}}"""
+}}
+#endif"""
 
 
 def int_to_c_array(n: int):
