@@ -54,26 +54,6 @@ public:
         return USER_KEY_LEN;
     }
 
-public:
-    std::size_t init(const ConstParameter& params) override
-    {
-        const auto& item_user_key = params.find(ParamKey::USER_KEY);
-
-        if (item_user_key == params.end())
-        {
-            throw std::runtime_error("init need user_key");
-        }
-        if (item_user_key->second.second != USER_KEY_LEN)
-        {
-            throw std::runtime_error("invalid user_key len");
-        }
-
-        this->init(
-            static_cast<const std::uint8_t*>(item_user_key->second.first) //
-        );
-        return ParamKey::USER_KEY;
-    }
-
 private:
     Cipher cipher_;
 
@@ -167,26 +147,6 @@ public:
     std::size_t fetch_user_key_len() const noexcept override
     {
         return USER_KEY_LEN;
-    }
-
-public:
-    std::size_t init(const ConstParameter& params) override
-    {
-        const auto& item_user_key = params.find(ParamKey::USER_KEY);
-
-        if (item_user_key == params.end())
-        {
-            throw std::runtime_error("init need user_key");
-        }
-        if (item_user_key->second.second != USER_KEY_LEN)
-        {
-            throw std::runtime_error("invalid user_key len");
-        }
-
-        this->init(
-            static_cast<const std::uint8_t*>(item_user_key->second.first) //
-        );
-        return ParamKey::USER_KEY;
     }
 
 private:

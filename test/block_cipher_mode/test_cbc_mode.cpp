@@ -197,10 +197,8 @@ static std::uint8_t ct[1024] = {
 
 void test_cbc_mode()
 {
-    std::uint8_t   buf[1024];
-    std::size_t    size, n;
-    ConstParameter c_param;
-    Parameter      param;
+    std::uint8_t buf[1024];
+    std::size_t  size, n;
 
     auto e = SM4CbcEncryptor(user_key, iv);
     e.do_final(buf, &size, pt, 1024);
@@ -229,21 +227,6 @@ void test_cbc_mode()
         throw std::runtime_error("err in Cbc_mode");
     }
 
-    c_param.clear();
-    c_param[ParamKey::USER_KEY] = std::make_pair(user_key, sizeof(user_key));
-    c_param[ParamKey::IV]       = std::make_pair(iv, sizeof(iv));
-    e.init(c_param);
-    e.update(buf, &n, pt, 100);
-    size = n;
-    e.update(buf + size, &n, pt + 100, 1024 - 100);
-    size += n;
-    e.do_final(buf + size, &n, nullptr, 0);
-    size += n;
-    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in Cbc_mode");
-    }
-
     auto d = SM4CbcDecryptor(user_key, iv);
     d.do_final(buf, &size, ct, 1024);
     if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
@@ -260,21 +243,6 @@ void test_cbc_mode()
         throw std::runtime_error("err in Cbc_mode");
     }
     d.reset(iv);
-    d.update(buf, &n, ct, 100);
-    size = n;
-    d.update(buf + size, &n, ct + 100, 1024 - 100);
-    size += n;
-    d.do_final(buf + size, &n, nullptr, 0);
-    size += n;
-    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in Cbc_mode");
-    }
-
-    c_param.clear();
-    c_param[ParamKey::USER_KEY] = std::make_pair(user_key, sizeof(user_key));
-    c_param[ParamKey::IV]       = std::make_pair(iv, sizeof(iv));
-    d.init(c_param);
     d.update(buf, &n, ct, 100);
     size = n;
     d.update(buf + size, &n, ct + 100, 1024 - 100);

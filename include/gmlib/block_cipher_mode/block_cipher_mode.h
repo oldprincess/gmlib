@@ -39,12 +39,6 @@ protected:
     inline void reset() noexcept;
 
 public:
-    inline std::size_t init(const ConstParameter& params) override;
-
-    inline std::size_t set(const ConstParameter& params) override;
-
-    inline std::size_t get(const Parameter& params) override;
-
     inline void update(std::uint8_t*       out,
                        std::size_t*        outl,
                        const std::uint8_t* in,
@@ -117,24 +111,6 @@ template <std::size_t BLOCK_SIZE>
 void BlockCipherModeImpl<BLOCK_SIZE>::reset() noexcept
 {
     buf_size_ = 0;
-}
-
-template <std::size_t BLOCK_SIZE>
-std::size_t BlockCipherModeImpl<BLOCK_SIZE>::init(const ConstParameter& params)
-{
-    return 0;
-}
-
-template <std::size_t BLOCK_SIZE>
-std::size_t BlockCipherModeImpl<BLOCK_SIZE>::set(const ConstParameter& params)
-{
-    return 0;
-}
-
-template <std::size_t BLOCK_SIZE>
-std::size_t BlockCipherModeImpl<BLOCK_SIZE>::get(const Parameter& params)
-{
-    return 0;
 }
 
 template <std::size_t BLOCK_SIZE>
