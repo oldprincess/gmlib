@@ -3,7 +3,7 @@
 
 #include <gmlib/number/config.h>
 
-#if defined(NUMBER_MPZ_X64)
+#if defined(NUMBER_IMPL_MPZ_X64)
 #include <gmlib/number/internal/mpz_x64.h>
 namespace number {
 using namespace number::internal::x64;
