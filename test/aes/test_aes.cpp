@@ -129,17 +129,4 @@ void test_aes()
     test_aes128();
     test_aes192();
     test_aes256();
-    
-    if (!block_cipher_mode::type_traits::test_is_valid_cipher<AES128>())
-    {
-        throw std::runtime_error("err in aes impl");
-    }
-    if (!block_cipher_mode::type_traits::test_is_valid_cipher<AES192>())
-    {
-        throw std::runtime_error("err in aes impl");
-    }
-    if (!block_cipher_mode::type_traits::test_is_valid_cipher<AES256>())
-    {
-        throw std::runtime_error("err in aes impl");
-    }
 }

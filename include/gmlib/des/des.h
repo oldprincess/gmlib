@@ -13,12 +13,10 @@ namespace des {
  * @brief   DES Block Cipher
  * @details GB/T 32907-2016
  */
-class DES : public block_cipher_mode::BlockCipherImpl
+class DES : public block_cipher_mode::BlockCipher
 {
 public:
     static constexpr const char* NAME = "DES";
-
-    static constexpr std::size_t NAME_STR_LEN = 3;
 
     /// @brief DES Block Size (in bytes)
     static constexpr std::size_t BLOCK_SIZE = alg::DES_BLOCK_SIZE;
@@ -56,11 +54,6 @@ public:
     const char* fetch_name() const noexcept override
     {
         return NAME;
-    }
-
-    std::size_t fetch_name_str_len() const noexcept override
-    {
-        return NAME_STR_LEN;
     }
 
     std::size_t fetch_block_size() const noexcept override

@@ -249,15 +249,4 @@ void test_sm4_ctr_mode()
     {
         throw std::runtime_error("err in ctr_mode");
     }
-
-    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
-            SM4CtrEncryptor>() == false)
-    {
-        throw std::runtime_error("err in sm4-ctr impl");
-    }
-    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
-            SM4CtrDecryptor>() == false)
-    {
-        throw std::runtime_error("err in sm4-ctr impl");
-    }
 }

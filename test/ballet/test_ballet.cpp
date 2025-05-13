@@ -124,20 +124,4 @@ void test_ballet()
     {
         throw runtime_error("err in ballet");
     }
-
-    if (block_cipher_mode::type_traits::test_is_valid_cipher<Ballet128128>() ==
-        false)
-    {
-        throw std::runtime_error("err in Ballet impl");
-    }
-    if (block_cipher_mode::type_traits::test_is_valid_cipher<Ballet128256>() ==
-        false)
-    {
-        throw std::runtime_error("err in Ballet impl");
-    }
-    if (block_cipher_mode::type_traits::test_is_valid_cipher<Ballet256256>() ==
-        false)
-    {
-        throw std::runtime_error("err in Ballet impl");
-    }
 }

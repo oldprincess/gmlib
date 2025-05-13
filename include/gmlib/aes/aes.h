@@ -18,11 +18,10 @@ namespace alg = internal::lut;
 
 namespace aes {
 
-class AES128 : public block_cipher_mode::BlockCipherImpl
+class AES128 : public block_cipher_mode::BlockCipher
 {
 public:
     static constexpr const char* NAME              = "AES128";
-    static constexpr std::size_t NAME_STR_LEN      = 6;
     static constexpr std::size_t BLOCK_SIZE        = alg::AES128_BLOCK_SIZE;
     static constexpr std::size_t USER_KEY_LEN      = alg::AES128_USER_KEY_LEN;
     static constexpr std::size_t PARALLEL_NUM      = alg::AES128_PARALLEL_NUM;
@@ -43,11 +42,6 @@ public:
     const char* fetch_name() const noexcept override
     {
         return NAME;
-    }
-
-    std::size_t fetch_name_str_len() const noexcept override
-    {
-        return NAME_STR_LEN;
     }
 
     std::size_t fetch_block_size() const noexcept override
@@ -110,11 +104,10 @@ public:
     }
 };
 
-class AES192 : public block_cipher_mode::BlockCipherImpl
+class AES192 : public block_cipher_mode::BlockCipher
 {
 public:
     static constexpr const char* NAME              = "AES192";
-    static constexpr std::size_t NAME_STR_LEN      = 6;
     static constexpr std::size_t BLOCK_SIZE        = alg::AES192_BLOCK_SIZE;
     static constexpr std::size_t USER_KEY_LEN      = alg::AES192_USER_KEY_LEN;
     static constexpr std::size_t PARALLEL_NUM      = alg::AES192_PARALLEL_NUM;
@@ -135,11 +128,6 @@ public:
     const char* fetch_name() const noexcept override
     {
         return NAME;
-    }
-
-    std::size_t fetch_name_str_len() const noexcept override
-    {
-        return NAME_STR_LEN;
     }
 
     std::size_t fetch_block_size() const noexcept override
@@ -202,11 +190,10 @@ public:
     }
 };
 
-class AES256 : public block_cipher_mode::BlockCipherImpl
+class AES256 : public block_cipher_mode::BlockCipher
 {
 public:
     static constexpr const char* NAME              = "AES256";
-    static constexpr std::size_t NAME_STR_LEN      = 6;
     static constexpr std::size_t BLOCK_SIZE        = alg::AES256_BLOCK_SIZE;
     static constexpr std::size_t USER_KEY_LEN      = alg::AES256_USER_KEY_LEN;
     static constexpr std::size_t PARALLEL_NUM      = alg::AES256_PARALLEL_NUM;
@@ -227,11 +214,6 @@ public:
     const char* fetch_name() const noexcept override
     {
         return NAME;
-    }
-
-    std::size_t fetch_name_str_len() const noexcept override
-    {
-        return NAME_STR_LEN;
     }
 
     std::size_t fetch_block_size() const noexcept override

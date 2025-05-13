@@ -245,15 +245,4 @@ void test_sm4_ecb_mode()
     {
         throw std::runtime_error("err in ecb_mode");
     }
-
-    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
-            SM4EcbEncryptor>() == false)
-    {
-        throw std::runtime_error("err in sm4-ecb impl");
-    }
-    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
-            SM4EcbDecryptor>() == false)
-    {
-        throw std::runtime_error("err in sm4-ecb impl");
-    }
 }

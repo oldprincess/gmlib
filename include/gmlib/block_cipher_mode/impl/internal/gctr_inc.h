@@ -1,9 +1,9 @@
-#ifndef BLOCK_CIPHER_MODE_INTERNAL_GCM_ALG_H
-#define BLOCK_CIPHER_MODE_INTERNAL_GCM_ALG_H
+#ifndef BLOCK_CIPHER_MODE_IMPL_INTERNAL_GCM_ALG_H
+#define BLOCK_CIPHER_MODE_IMPL_INTERNAL_GCM_ALG_H
 
 #include <gmlib/memory_utils/endian.h>
 
-namespace block_cipher_mode::internal {
+namespace block_cipher_mode::impl::internal {
 
 static inline void gctr_inc(std::uint8_t       out[16],
                             const std::uint8_t in[16]) noexcept
@@ -15,6 +15,6 @@ static inline void gctr_inc(std::uint8_t       out[16],
     memory_utils::store32_be(out + 12, tmp);
 }
 
-} // namespace block_cipher_mode::internal
+} // namespace block_cipher_mode::impl::internal
 
 #endif

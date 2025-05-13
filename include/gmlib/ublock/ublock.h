@@ -13,12 +13,10 @@ namespace alg = internal::standard;
 namespace alg = internal::common;
 #endif
 
-class uBlock128128 : public block_cipher_mode::BlockCipherImpl
+class uBlock128128 : public block_cipher_mode::BlockCipher
 {
 public:
     static constexpr const char* NAME = "uBlock-128-128";
-
-    static constexpr std::size_t NAME_STR_LEN = 14;
 
     /// @brief uBlock128128 Block Size (in bytes)
     static constexpr std::size_t BLOCK_SIZE = alg::UBLOCK128128_BLOCK_SIZE;
@@ -57,11 +55,6 @@ public:
     const char* fetch_name() const noexcept override
     {
         return NAME;
-    }
-
-    std::size_t fetch_name_str_len() const noexcept override
-    {
-        return NAME_STR_LEN;
     }
 
     std::size_t fetch_block_size() const noexcept override
@@ -152,7 +145,7 @@ public:
     }
 };
 
-class uBlock128256 : public block_cipher_mode::BlockCipherImpl
+class uBlock128256 : public block_cipher_mode::BlockCipher
 {
 public:
     static constexpr const char* NAME = "uBlock-128-256";
@@ -196,11 +189,6 @@ public:
     const char* fetch_name() const noexcept override
     {
         return NAME;
-    }
-
-    std::size_t fetch_name_str_len() const noexcept override
-    {
-        return NAME_STR_LEN;
     }
 
     std::size_t fetch_block_size() const noexcept override
@@ -291,12 +279,10 @@ public:
     }
 };
 
-class uBlock256256 : public block_cipher_mode::BlockCipherImpl
+class uBlock256256 : public block_cipher_mode::BlockCipher
 {
 public:
     static constexpr const char* NAME = "uBlock-256-256";
-
-    static constexpr std::size_t NAME_STR_LEN = 14;
 
     /// @brief uBlock256256 Block Size (in bytes)
     static constexpr std::size_t BLOCK_SIZE = alg::UBLOCK256256_BLOCK_SIZE;
@@ -335,11 +321,6 @@ public:
     const char* fetch_name() const noexcept override
     {
         return NAME;
-    }
-
-    std::size_t fetch_name_str_len() const noexcept override
-    {
-        return NAME_STR_LEN;
     }
 
     std::size_t fetch_block_size() const noexcept override

@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
         cout << e.what() << endl;
         terminate();
     }
-    cout << "test uBlock ok" << endl;
+    cout << "test ballet ok" << endl;
     if (argc == 2 && std::strcmp(argv[1], "speed") == 0)
     {
         speed_ballet_standard();

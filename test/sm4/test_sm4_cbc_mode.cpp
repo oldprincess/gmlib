@@ -249,15 +249,4 @@ void test_sm4_cbc_mode()
     {
         throw std::runtime_error("err in Cbc_mode");
     }
-
-    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
-            SM4CbcEncryptor>() == false)
-    {
-        throw std::runtime_error("err in sm4-cbc impl");
-    }
-    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
-            SM4CbcDecryptor>() == false)
-    {
-        throw std::runtime_error("err in sm4-cbc impl");
-    }
 }

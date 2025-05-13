@@ -249,15 +249,4 @@ void test_sm4_cfb_mode()
     {
         throw std::runtime_error("err in cfb_mode");
     }
-
-    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
-            SM4CfbEncryptor>() == false)
-    {
-        throw std::runtime_error("err in sm4-cfb impl");
-    }
-    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
-            SM4CfbDecryptor>() == false)
-    {
-        throw std::runtime_error("err in sm4-cfb impl");
-    }
 }

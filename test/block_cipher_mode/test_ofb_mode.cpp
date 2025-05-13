@@ -253,15 +253,4 @@ void test_ofb_mode()
     {
         throw std::runtime_error("err in ofb_mode");
     }
-
-    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
-            SM4OfbEncryptor>() == false)
-    {
-        throw std::runtime_error("err in sm4-ofb impl");
-    }
-    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
-            SM4OfbDecryptor>() == false)
-    {
-        throw std::runtime_error("err in sm4-ofb impl");
-    }
 }

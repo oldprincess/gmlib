@@ -137,20 +137,4 @@ void test_ublock()
     {
         throw runtime_error("err in ublock");
     }
-
-    if (block_cipher_mode::type_traits::test_is_valid_cipher<uBlock128128>() ==
-        false)
-    {
-        throw std::runtime_error("err in uBlock impl");
-    }
-    if (block_cipher_mode::type_traits::test_is_valid_cipher<uBlock128256>() ==
-        false)
-    {
-        throw std::runtime_error("err in uBlock impl");
-    }
-    if (block_cipher_mode::type_traits::test_is_valid_cipher<uBlock256256>() ==
-        false)
-    {
-        throw std::runtime_error("err in uBlock impl");
-    }
 }

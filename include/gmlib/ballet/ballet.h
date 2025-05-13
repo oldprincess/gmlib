@@ -9,12 +9,10 @@ namespace alg = internal::standard;
 
 namespace ballet {
 
-class Ballet128128 : public block_cipher_mode::BlockCipherImpl
+class Ballet128128 : public block_cipher_mode::BlockCipher
 {
 public:
     static constexpr const char* NAME = "Ballet-128-128";
-
-    static constexpr std::size_t NAME_STR_LEN = 14;
 
     /// @brief Ballet128128 Block Size (in bytes)
     static constexpr std::size_t BLOCK_SIZE = alg::BALLET128128_BLOCK_SIZE;
@@ -53,11 +51,6 @@ public:
     const char* fetch_name() const noexcept override
     {
         return NAME;
-    }
-
-    std::size_t fetch_name_str_len() const noexcept override
-    {
-        return NAME_STR_LEN;
     }
 
     std::size_t fetch_block_size() const noexcept override
@@ -148,12 +141,10 @@ public:
     }
 };
 
-class Ballet128256 : public block_cipher_mode::BlockCipherImpl
+class Ballet128256 : public block_cipher_mode::BlockCipher
 {
 public:
     static constexpr const char* NAME = "Ballet-128-256";
-
-    static constexpr std::size_t NAME_STR_LEN = 14;
 
     /// @brief Ballet128256 Block Size (in bytes)
     static constexpr std::size_t BLOCK_SIZE = alg::BALLET128256_BLOCK_SIZE;
@@ -192,11 +183,6 @@ public:
     const char* fetch_name() const noexcept override
     {
         return NAME;
-    }
-
-    std::size_t fetch_name_str_len() const noexcept override
-    {
-        return NAME_STR_LEN;
     }
 
     std::size_t fetch_block_size() const noexcept override
@@ -287,12 +273,10 @@ public:
     }
 };
 
-class Ballet256256 : public block_cipher_mode::BlockCipherImpl
+class Ballet256256 : public block_cipher_mode::BlockCipher
 {
 public:
     static constexpr const char* NAME = "Ballet-256-256";
-
-    static constexpr std::size_t NAME_STR_LEN = 14;
 
     /// @brief Ballet256256 Block Size (in bytes)
     static constexpr std::size_t BLOCK_SIZE = alg::BALLET256256_BLOCK_SIZE;
@@ -331,11 +315,6 @@ public:
     const char* fetch_name() const noexcept override
     {
         return NAME;
-    }
-
-    std::size_t fetch_name_str_len() const noexcept override
-    {
-        return NAME_STR_LEN;
     }
 
     std::size_t fetch_block_size() const noexcept override

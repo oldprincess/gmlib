@@ -285,15 +285,4 @@ void test_gcm_mode()
     {
         throw std::runtime_error("err in gcm_mode");
     }
-
-    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
-            SM4GcmEncryptor>() == false)
-    {
-        throw std::runtime_error("err in sm4-gcm impl");
-    }
-    if (block_cipher_mode::type_traits::test_is_valid_cipher_mode<
-            SM4GcmDecryptor>() == false)
-    {
-        throw std::runtime_error("err in sm4-gcm impl");
-    }
 }

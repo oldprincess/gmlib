@@ -1,12 +1,11 @@
-#ifndef BLOCK_CIPHER_MODE_INTERNAL_CTR_INC_H
-#define BLOCK_CIPHER_MODE_INTERNAL_CTR_INC_H
+#ifndef BLOCK_CIPHER_MODE_IMPL_INTERNAL_CTR_INC_H
+#define BLOCK_CIPHER_MODE_IMPL_INTERNAL_CTR_INC_H
 
 #include <gmlib/memory_utils/endian.h>
 
 #include <cstddef>
 
-namespace block_cipher_mode {
-namespace internal {
+namespace block_cipher_mode::impl::internal {
 
 static inline void ctr_inc8(std::uint8_t* out, const std::uint8_t* in) noexcept
 {
@@ -60,7 +59,6 @@ static inline void ctr_inc(std::uint8_t* out, const std::uint8_t* in) noexcept
     ctr_inc_n(out, in, BLOCK_SIZE);
 }
 
-} // namespace internal
-} // namespace block_cipher_mode
+} // namespace block_cipher_mode::impl::internal
 
 #endif
