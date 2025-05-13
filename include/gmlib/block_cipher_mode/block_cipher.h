@@ -18,6 +18,11 @@ public:
 public:
     virtual const char* fetch_name() const noexcept = 0;
 
+    virtual const char* fetch_impl_algo() const noexcept
+    {
+        return nullptr;
+    };
+
     virtual std::size_t fetch_block_size() const noexcept = 0;
 
     virtual std::size_t fetch_user_key_len() const noexcept = 0;

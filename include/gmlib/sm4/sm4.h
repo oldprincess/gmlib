@@ -3,18 +3,6 @@
 
 #include <gmlib/block_cipher_mode/block_cipher.h>
 
-#if defined(SUPPORT_SM4_LANG18)
-#include <gmlib/sm4/internal/sm4_lang18.h>
-namespace sm4 {
-namespace alg = internal::lang18;
-} // namespace sm4
-#else
-#include <gmlib/sm4/internal/sm4_common.h>
-namespace sm4 {
-namespace alg = internal::common;
-} // namespace sm4
-#endif
-
 namespace sm4 {
 
 /**
@@ -27,19 +15,19 @@ public:
     static constexpr const char* NAME = "SM4";
 
     /// @brief SM4 Block Size (in bytes)
-    static constexpr std::size_t BLOCK_SIZE = alg::SM4_BLOCK_SIZE;
+    static constexpr std::size_t BLOCK_SIZE = 16;
 
     /// @brief SM4 User Key Length (in bytes)
-    static constexpr std::size_t USER_KEY_LEN = alg::SM4_USER_KEY_LEN;
+    static constexpr std::size_t USER_KEY_LEN = 16;
 
     /// @brief SM4 Maximum Number of Parallel Encryption and Decryption
-    static constexpr std::size_t PARALLEL_NUM = alg::SM4_PARALLEL_NUM;
+    static constexpr std::size_t PARALLEL_NUM = 16;
 
-    static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
+    static constexpr std::size_t SECURITY_STRENGTH = 16;
 
 private:
-    /// @brief SM4 private Context
-    alg::Sm4CTX ctx_;
+    /// @brief SM4 round key data
+    std::uint8_t rk_data_[128];
 
 public:
     /**
@@ -63,6 +51,8 @@ public:
     {
         return NAME;
     }
+
+    const char* fetch_impl_algo() const noexcept override;
 
     std::size_t fetch_block_size() const noexcept override
     {
@@ -90,17 +80,7 @@ public:
      * @param[in]   user_key    16-bytes secret key
      * @param[in]   enc         SM4::ENCRYPTION or SM4::DECRYPTION
      */
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override
-    {
-        if (enc == SM4::ENCRYPTION)
-        {
-            alg::sm4_enc_key_init(&ctx_, user_key);
-        }
-        else
-        {
-            alg::sm4_dec_key_init(&ctx_, user_key);
-        }
-    }
+    void set_key(const std::uint8_t* user_key, int enc) noexcept override;
 
     /**
      * @brief                   SM4 Encrypt Single Block
@@ -108,10 +88,7 @@ public:
      * @param[in]   plaintext   16-bytes plaintext
      */
     void encrypt_block(std::uint8_t*       ciphertext,
-                       const std::uint8_t* plaintext) const noexcept override
-    {
-        alg::sm4_enc_block(&ctx_, ciphertext, plaintext);
-    }
+                       const std::uint8_t* plaintext) const noexcept override;
 
     /**
      * @brief                   SM4 Decrypt Single Block
@@ -119,10 +96,7 @@ public:
      * @param[in]   ciphertext  16-bytes ciphertext
      */
     void decrypt_block(std::uint8_t*       plaintext,
-                       const std::uint8_t* ciphertext) const noexcept override
-    {
-        alg::sm4_dec_block(&ctx_, plaintext, ciphertext);
-    }
+                       const std::uint8_t* ciphertext) const noexcept override;
 
     /**
      * @brief                   SM4 Encrypt Multiple Blocks
@@ -132,10 +106,7 @@ public:
      */
     void encrypt_blocks(std::uint8_t*       ciphertext,
                         const std::uint8_t* plaintext,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::sm4_enc_blocks(&ctx_, ciphertext, plaintext, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 
     /**
      * @brief                   SM4 Decrypt Multiple Blocks
@@ -145,10 +116,7 @@ public:
      */
     void decrypt_blocks(std::uint8_t*       plaintext,
                         const std::uint8_t* ciphertext,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::sm4_dec_blocks(&ctx_, plaintext, ciphertext, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 };
 
 } // namespace sm4

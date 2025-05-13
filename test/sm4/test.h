@@ -8,7 +8,4 @@ void test_sm4_cfb_mode();
 void test_sm4_ofb_mode();
 void test_sm4_ctr_mode();
 
-void test_sm4_common();
-void test_sm4_lang18();
-
 #endif
