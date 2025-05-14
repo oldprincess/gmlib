@@ -10,8 +10,6 @@ int main(int argc, char* argv[])
 {
     try
     {
-        test_aes_lut();
-        test_aes_aesni();
         test_aes();
         test_aes_mode();
     }
@@ -23,8 +21,7 @@ int main(int argc, char* argv[])
     std::cout << "test aes finish!" << std::endl;
     if (argc == 2 && std::strcmp(argv[1], "speed") == 0)
     {
-        speed_aes_lut();
-        speed_aes_aesni();
+        speed_aes();
     }
     return 0;
 }

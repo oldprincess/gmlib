@@ -1,20 +1,7 @@
 #ifndef AES_AES_H
 #define AES_AES_H
 
-#include <gmlib/aes/config.h>
 #include <gmlib/block_cipher_mode/block_cipher.h>
-
-#if defined(AES_IMPL_AESNI)
-#include <gmlib/aes/internal/aes_aesni.h>
-namespace aes {
-namespace alg = internal::aesni;
-}
-#else
-#include <gmlib/aes/internal/aes_lut.h>
-namespace aes {
-namespace alg = internal::lut;
-}
-#endif
 
 namespace aes {
 
@@ -22,13 +9,13 @@ class AES128 : public block_cipher_mode::BlockCipher
 {
 public:
     static constexpr const char* NAME              = "AES128";
-    static constexpr std::size_t BLOCK_SIZE        = alg::AES128_BLOCK_SIZE;
-    static constexpr std::size_t USER_KEY_LEN      = alg::AES128_USER_KEY_LEN;
-    static constexpr std::size_t PARALLEL_NUM      = alg::AES128_PARALLEL_NUM;
-    static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
+    static constexpr std::size_t BLOCK_SIZE        = 16;
+    static constexpr std::size_t USER_KEY_LEN      = 16;
+    static constexpr std::size_t PARALLEL_NUM      = 1;
+    static constexpr std::size_t SECURITY_STRENGTH = 16;
 
 private:
-    alg::Aes128CTX ctx_;
+    std::uint8_t rk_data_[11 * 16];
 
 public:
     AES128() = default;
@@ -44,6 +31,8 @@ public:
         return NAME;
     }
 
+    const char* fetch_impl_algo() const noexcept;
+
     std::size_t fetch_block_size() const noexcept override
     {
         return BLOCK_SIZE;
@@ -65,56 +54,34 @@ public:
     }
 
 public:
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override
-    {
-        if (enc == AES128::ENCRYPTION)
-        {
-            alg::aes128_enc_key_init(&ctx_, user_key);
-        }
-        else
-        {
-            alg::aes128_dec_key_init(&ctx_, user_key);
-        }
-    }
+    void set_key(const std::uint8_t* user_key, int enc) noexcept override;
 
     void encrypt_block(std::uint8_t*       out,
-                       const std::uint8_t* in) const noexcept override
-    {
-        alg::aes128_enc_block(&ctx_, out, in);
-    }
+                       const std::uint8_t* in) const noexcept override;
 
     void decrypt_block(std::uint8_t*       out,
-                       const std::uint8_t* in) const noexcept override
-    {
-        alg::aes128_dec_block(&ctx_, out, in);
-    }
+                       const std::uint8_t* in) const noexcept override;
 
     void encrypt_blocks(std::uint8_t*       out,
                         const std::uint8_t* in,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::aes128_enc_blocks(&ctx_, out, in, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 
     void decrypt_blocks(std::uint8_t*       out,
                         const std::uint8_t* in,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::aes128_dec_blocks(&ctx_, out, in, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 };
 
 class AES192 : public block_cipher_mode::BlockCipher
 {
 public:
     static constexpr const char* NAME              = "AES192";
-    static constexpr std::size_t BLOCK_SIZE        = alg::AES192_BLOCK_SIZE;
-    static constexpr std::size_t USER_KEY_LEN      = alg::AES192_USER_KEY_LEN;
-    static constexpr std::size_t PARALLEL_NUM      = alg::AES192_PARALLEL_NUM;
-    static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
+    static constexpr std::size_t BLOCK_SIZE        = 16;
+    static constexpr std::size_t USER_KEY_LEN      = 24;
+    static constexpr std::size_t PARALLEL_NUM      = 1;
+    static constexpr std::size_t SECURITY_STRENGTH = 24;
 
 private:
-    alg::Aes192CTX ctx_;
+    std::uint8_t rk_data_[13 * 16];
 
 public:
     AES192() = default;
@@ -130,6 +97,8 @@ public:
         return NAME;
     }
 
+    const char* fetch_impl_algo() const noexcept;
+
     std::size_t fetch_block_size() const noexcept override
     {
         return BLOCK_SIZE;
@@ -151,56 +120,34 @@ public:
     }
 
 public:
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override
-    {
-        if (enc == AES192::ENCRYPTION)
-        {
-            alg::aes192_enc_key_init(&ctx_, user_key);
-        }
-        else
-        {
-            alg::aes192_dec_key_init(&ctx_, user_key);
-        }
-    }
+    void set_key(const std::uint8_t* user_key, int enc) noexcept override;
 
     void encrypt_block(std::uint8_t*       out,
-                       const std::uint8_t* in) const noexcept override
-    {
-        alg::aes192_enc_block(&ctx_, out, in);
-    }
+                       const std::uint8_t* in) const noexcept override;
 
     void decrypt_block(std::uint8_t*       out,
-                       const std::uint8_t* in) const noexcept override
-    {
-        alg::aes192_dec_block(&ctx_, out, in);
-    }
+                       const std::uint8_t* in) const noexcept override;
 
     void encrypt_blocks(std::uint8_t*       out,
                         const std::uint8_t* in,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::aes192_enc_blocks(&ctx_, out, in, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 
     void decrypt_blocks(std::uint8_t*       out,
                         const std::uint8_t* in,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::aes192_dec_blocks(&ctx_, out, in, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 };
 
 class AES256 : public block_cipher_mode::BlockCipher
 {
 public:
     static constexpr const char* NAME              = "AES256";
-    static constexpr std::size_t BLOCK_SIZE        = alg::AES256_BLOCK_SIZE;
-    static constexpr std::size_t USER_KEY_LEN      = alg::AES256_USER_KEY_LEN;
-    static constexpr std::size_t PARALLEL_NUM      = alg::AES256_PARALLEL_NUM;
-    static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
+    static constexpr std::size_t BLOCK_SIZE        = 16;
+    static constexpr std::size_t USER_KEY_LEN      = 32;
+    static constexpr std::size_t PARALLEL_NUM      = 1;
+    static constexpr std::size_t SECURITY_STRENGTH = 32;
 
 private:
-    alg::Aes256CTX ctx_;
+    std::uint8_t rk_data_[15 * 16];
 
 public:
     AES256() = default;
@@ -216,6 +163,8 @@ public:
         return NAME;
     }
 
+    const char* fetch_impl_algo() const noexcept;
+
     std::size_t fetch_block_size() const noexcept override
     {
         return BLOCK_SIZE;
@@ -237,43 +186,20 @@ public:
     }
 
 public:
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override
-    {
-        if (enc == AES256::ENCRYPTION)
-        {
-            alg::aes256_enc_key_init(&ctx_, user_key);
-        }
-        else
-        {
-            alg::aes256_dec_key_init(&ctx_, user_key);
-        }
-    }
+    void set_key(const std::uint8_t* user_key, int enc) noexcept override;
 
     void encrypt_block(std::uint8_t*       out,
-                       const std::uint8_t* in) const noexcept override
-    {
-        alg::aes256_enc_block(&ctx_, out, in);
-    }
+                       const std::uint8_t* in) const noexcept override;
 
     void decrypt_block(std::uint8_t*       out,
-                       const std::uint8_t* in) const noexcept override
-    {
-        alg::aes256_dec_block(&ctx_, out, in);
-    }
-
+                       const std::uint8_t* in) const noexcept override;
     void encrypt_blocks(std::uint8_t*       out,
                         const std::uint8_t* in,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::aes256_enc_blocks(&ctx_, out, in, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 
     void decrypt_blocks(std::uint8_t*       out,
                         const std::uint8_t* in,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::aes256_dec_blocks(&ctx_, out, in, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 };
 
 } // namespace aes

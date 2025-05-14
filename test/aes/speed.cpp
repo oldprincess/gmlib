@@ -1,9 +1,5 @@
-#include <gmlib/aes/internal/aes_aesni.h>
-#if !defined(AES_IMPL_AESNI)
-void speed_aes_aesni()
-{
-}
-#else
+#include <gmlib/aes/aes.h>
+
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -21,15 +17,15 @@ static void rand_mem(void* mem, std::size_t size)
     }
 }
 
-using namespace aes::internal::aesni;
+using namespace aes;
 
 constexpr std::size_t SIZE = 4096 * 32;
 constexpr int         loop = 10000;
 
-static void speed_aes128_aesni()
+static void speed_aes128()
 {
     std::clock_t st, et;
-    Aes128CTX    ctx;
+    AES128       ctx;
 
     double time_s, speed_Mbps;
 
@@ -40,12 +36,12 @@ static void speed_aes128_aesni()
     rand_mem(data, SIZE);
     rand_mem(user_key, 32);
 
-    std::printf("speed aes128 aesni ... ");
-    aes128_enc_key_init(&ctx, user_key);
+    std::printf("speed aes128 %s ... ", ctx.fetch_impl_algo());
+    ctx.set_key(user_key, ctx.ENCRYPTION);
     st = std::clock();
     for (int i = 0; i < loop; i++)
     {
-        aes128_enc_blocks(&ctx, data, data, SIZE / 16);
+        ctx.encrypt_blocks(data, data, SIZE / 16);
     }
     et = std::clock();
 
@@ -56,10 +52,10 @@ static void speed_aes128_aesni()
     delete[] data;
 }
 
-static void speed_aes192_aesni()
+static void speed_aes192()
 {
     std::clock_t st, et;
-    Aes192CTX    ctx;
+    AES192       ctx;
 
     double time_s, speed_Mbps;
 
@@ -70,12 +66,12 @@ static void speed_aes192_aesni()
     rand_mem(data, SIZE);
     rand_mem(user_key, 32);
 
-    std::printf("speed aes192 aesni ... ");
-    aes192_enc_key_init(&ctx, user_key);
+    std::printf("speed aes192 %s ... ", ctx.fetch_impl_algo());
+    ctx.set_key(user_key, ctx.ENCRYPTION);
     st = std::clock();
     for (int i = 0; i < loop; i++)
     {
-        aes192_enc_blocks(&ctx, data, data, SIZE / 16);
+        ctx.encrypt_blocks(data, data, SIZE / 16);
     }
     et = std::clock();
 
@@ -86,10 +82,10 @@ static void speed_aes192_aesni()
     delete[] data;
 }
 
-static void speed_aes256_aesni()
+static void speed_aes256()
 {
     std::clock_t st, et;
-    Aes256CTX    ctx;
+    AES256       ctx;
 
     double time_s, speed_Mbps;
 
@@ -100,12 +96,12 @@ static void speed_aes256_aesni()
     rand_mem(data, SIZE);
     rand_mem(user_key, 32);
 
-    std::printf("speed aes256 aesni ... ");
-    aes256_enc_key_init(&ctx, user_key);
+    std::printf("speed aes256 %s ... ", ctx.fetch_impl_algo());
+    ctx.set_key(user_key, ctx.ENCRYPTION);
     st = std::clock();
     for (int i = 0; i < loop; i++)
     {
-        aes256_enc_blocks(&ctx, data, data, SIZE / 16);
+        ctx.encrypt_blocks(data, data, SIZE / 16);
     }
     et = std::clock();
 
@@ -116,11 +112,9 @@ static void speed_aes256_aesni()
     delete[] data;
 }
 
-void speed_aes_aesni()
+void speed_aes()
 {
-    speed_aes128_aesni();
-    speed_aes192_aesni();
-    speed_aes256_aesni();
+    speed_aes128();
+    speed_aes192();
+    speed_aes256();
 }
-
-#endif

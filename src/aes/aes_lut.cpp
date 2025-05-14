@@ -1,4 +1,4 @@
-#include <gmlib/aes/internal/aes_lut.h>
+#include "aes_lut.h"
 
 #if defined(AES_IMPL_LUT)
 
@@ -533,40 +533,40 @@ static void aes_dec_key_init(std::uint32_t      *round_key,
 // ===========================================
 // ===========================================
 
-void aes128_enc_key_init(Aes128CTX         *ctx,
+void aes128_enc_key_init(std::uint8_t       round_key[11 * 16],
                          const std::uint8_t user_key[16]) noexcept
 {
-    aes_enc_key_init(ctx->round_key, user_key, 128);
+    aes_enc_key_init((std::uint32_t *)round_key, user_key, 128);
 }
 
-void aes192_enc_key_init(Aes192CTX         *ctx,
+void aes192_enc_key_init(std::uint8_t       round_key[13 * 16],
                          const std::uint8_t user_key[24]) noexcept
 {
-    aes_enc_key_init(ctx->round_key, user_key, 192);
+    aes_enc_key_init((std::uint32_t *)round_key, user_key, 192);
 }
 
-void aes256_enc_key_init(Aes256CTX         *ctx,
+void aes256_enc_key_init(std::uint8_t       round_key[15 * 16],
                          const std::uint8_t user_key[32]) noexcept
 {
-    aes_enc_key_init(ctx->round_key, user_key, 256);
+    aes_enc_key_init((std::uint32_t *)round_key, user_key, 256);
 }
 
-void aes128_dec_key_init(Aes128CTX         *ctx,
+void aes128_dec_key_init(std::uint8_t       round_key[11 * 16],
                          const std::uint8_t user_key[16]) noexcept
 {
-    aes_dec_key_init(ctx->round_key, user_key, 128);
+    aes_dec_key_init((std::uint32_t *)round_key, user_key, 128);
 }
 
-void aes192_dec_key_init(Aes192CTX         *ctx,
+void aes192_dec_key_init(std::uint8_t       round_key[13 * 16],
                          const std::uint8_t user_key[24]) noexcept
 {
-    aes_dec_key_init(ctx->round_key, user_key, 192);
+    aes_dec_key_init((std::uint32_t *)round_key, user_key, 192);
 }
 
-void aes256_dec_key_init(Aes256CTX         *ctx,
+void aes256_dec_key_init(std::uint8_t       round_key[15 * 16],
                          const std::uint8_t user_key[32]) noexcept
 {
-    aes_dec_key_init(ctx->round_key, user_key, 256);
+    aes_dec_key_init((std::uint32_t *)round_key, user_key, 256);
 }
 
 // ===========================================
@@ -820,94 +820,100 @@ static void aes_dec_blocks(const std::uint32_t *round_key,
 
 #pragma region "AES CIPHER ALGO"
 
-void aes128_enc_block(const Aes128CTX   *ctx,
+void aes128_enc_block(const std::uint8_t round_key[11 * 16],
                       std::uint8_t       ciphertext[16],
                       const std::uint8_t plaintext[16]) noexcept
 {
-    aes_enc_block(ctx->round_key, ciphertext, plaintext, 128);
+    aes_enc_block((const std::uint32_t *)round_key, ciphertext, plaintext, 128);
 }
 
-void aes192_enc_block(const Aes192CTX   *ctx,
+void aes192_enc_block(const std::uint8_t round_key[13 * 16],
                       std::uint8_t       ciphertext[16],
                       const std::uint8_t plaintext[16]) noexcept
 {
-    aes_enc_block(ctx->round_key, ciphertext, plaintext, 192);
+    aes_enc_block((const std::uint32_t *)round_key, ciphertext, plaintext, 192);
 }
 
-void aes256_enc_block(const Aes256CTX   *ctx,
+void aes256_enc_block(const std::uint8_t round_key[15 * 16],
                       std::uint8_t       ciphertext[16],
                       const std::uint8_t plaintext[16]) noexcept
 {
-    aes_enc_block(ctx->round_key, ciphertext, plaintext, 256);
+    aes_enc_block((const std::uint32_t *)round_key, ciphertext, plaintext, 256);
 }
 
-void aes128_dec_block(const Aes128CTX   *ctx,
+void aes128_dec_block(const std::uint8_t round_key[11 * 16],
                       std::uint8_t       plaintext[16],
                       const std::uint8_t ciphertext[16]) noexcept
 {
-    aes_dec_block(ctx->round_key, plaintext, ciphertext, 128);
+    aes_dec_block((const std::uint32_t *)round_key, plaintext, ciphertext, 128);
 }
 
-void aes192_dec_block(const Aes192CTX   *ctx,
+void aes192_dec_block(const std::uint8_t round_key[13 * 16],
                       std::uint8_t       plaintext[16],
                       const std::uint8_t ciphertext[16]) noexcept
 {
-    aes_dec_block(ctx->round_key, plaintext, ciphertext, 192);
+    aes_dec_block((const std::uint32_t *)round_key, plaintext, ciphertext, 192);
 }
 
-void aes256_dec_block(const Aes256CTX   *ctx,
+void aes256_dec_block(const std::uint8_t round_key[15 * 16],
                       std::uint8_t       plaintext[16],
                       const std::uint8_t ciphertext[16]) noexcept
 {
-    aes_dec_block(ctx->round_key, plaintext, ciphertext, 256);
+    aes_dec_block((const std::uint32_t *)round_key, plaintext, ciphertext, 256);
 }
 
-void aes128_enc_blocks(const Aes128CTX    *ctx,
+void aes128_enc_blocks(const std::uint8_t  round_key[11 * 16],
                        std::uint8_t       *ciphertext,
                        const std::uint8_t *plaintext,
                        std::size_t         block_num) noexcept
 {
-    aes_enc_blocks(ctx->round_key, ciphertext, plaintext, block_num, 128);
+    aes_enc_blocks((const std::uint32_t *)round_key, ciphertext, plaintext,
+                   block_num, 128);
 }
 
-void aes128_dec_blocks(const Aes128CTX    *ctx,
+void aes128_dec_blocks(const std::uint8_t  round_key[11 * 16],
                        std::uint8_t       *plaintext,
                        const std::uint8_t *ciphertext,
                        std::size_t         block_num) noexcept
 {
-    aes_dec_blocks(ctx->round_key, plaintext, ciphertext, block_num, 128);
+    aes_dec_blocks((const std::uint32_t *)round_key, plaintext, ciphertext,
+                   block_num, 128);
 }
 
-void aes192_enc_blocks(const Aes192CTX    *ctx,
+void aes192_enc_blocks(const std::uint8_t  round_key[13 * 16],
                        std::uint8_t       *ciphertext,
                        const std::uint8_t *plaintext,
                        std::size_t         block_num) noexcept
 {
-    aes_enc_blocks(ctx->round_key, ciphertext, plaintext, block_num, 192);
+    aes_enc_blocks((const std::uint32_t *)round_key, ciphertext, plaintext,
+                   block_num, 192);
 }
 
-void aes192_dec_blocks(const Aes192CTX    *ctx,
+void aes192_dec_blocks(const std::uint8_t  round_key[13 * 16],
                        std::uint8_t       *plaintext,
                        const std::uint8_t *ciphertext,
                        std::size_t         block_num) noexcept
 {
-    aes_dec_blocks(ctx->round_key, plaintext, ciphertext, block_num, 192);
+    aes_dec_blocks((const std::uint32_t *)round_key, plaintext, ciphertext,
+                   block_num, 192);
 }
 
-void aes256_enc_blocks(const Aes256CTX    *ctx,
+void aes256_enc_blocks(const std::uint8_t  round_key[15 * 16],
                        std::uint8_t       *ciphertext,
                        const std::uint8_t *plaintext,
                        std::size_t         block_num) noexcept
 {
-    aes_enc_blocks(ctx->round_key, ciphertext, plaintext, block_num, 256);
+    aes_enc_blocks((const std::uint32_t *)round_key, ciphertext, plaintext,
+                   block_num, 256);
 }
 
-void aes256_dec_blocks(const Aes256CTX    *ctx,
+void aes256_dec_blocks(const std::uint8_t  round_key[15 * 16],
                        std::uint8_t       *plaintext,
                        const std::uint8_t *ciphertext,
                        std::size_t         block_num) noexcept
 {
-    aes_dec_blocks(ctx->round_key, plaintext, ciphertext, block_num, 256);
+    aes_dec_blocks((const std::uint32_t *)round_key, plaintext, ciphertext,
+                   block_num, 256);
 }
 
 #pragma endregion

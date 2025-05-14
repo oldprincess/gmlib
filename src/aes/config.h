@@ -6,5 +6,5 @@
 #else
 #define AES_IMPL_LUT
 #endif
-
+#define AES_IMPL_LUT
 #endif
