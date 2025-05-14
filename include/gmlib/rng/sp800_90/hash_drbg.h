@@ -20,9 +20,6 @@ namespace rng::sp800_90 {
 template <class Hash>
 class HashDrbg : public Rng
 {
-    static_assert(hash_lib::type_traits::is_valid_hash<Hash>::value,
-                  "invalid hash class");
-
 public:
     /// @brief Minimum entropy input length (in bytes)
     static constexpr std::size_t MINIMUM_ENTROPY = Hash::SECURITY_STRENGTH;

@@ -1,7 +1,7 @@
 #ifndef SHA1_SHA1_H
 #define SHA1_SHA1_H
 
-#include <gmlib/hash_lib/hash.h>
+#include <gmlib/hash_lib/impl/hash_impl.h>
 
 #include <stdexcept>
 
@@ -19,12 +19,10 @@ namespace alg = sha1::internal::common;
 
 namespace sha1 {
 
-class SHA1 : public hash_lib::HashImpl<alg::SHA1_BLOCK_SIZE>
+class SHA1 : public hash_lib::impl::HashImpl<alg::SHA1_BLOCK_SIZE>
 {
 public:
     static constexpr const char* NAME = "SHA1";
-
-    static constexpr std::size_t NAME_STR_LEN = 4;
 
     /// @brief SHA1 Block Size (in bytes)
     static constexpr std::size_t BLOCK_SIZE = alg::SHA1_BLOCK_SIZE;
@@ -57,11 +55,6 @@ public:
     const char* fetch_name() const noexcept override
     {
         return NAME;
-    }
-
-    std::size_t fetch_name_str_len() const noexcept override
-    {
-        return NAME_STR_LEN;
     }
 
     std::size_t fetch_block_size() const noexcept override

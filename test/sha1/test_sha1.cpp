@@ -49,10 +49,4 @@ void test_sha1()
     {
         throw std::runtime_error("err in sha1");
     }
-
-    // test virtual function
-    if (hash_lib::type_traits::test_is_valid_hash<SHA1>() == false)
-    {
-        throw std::runtime_error("err in sha1 impl");
-    }
 }

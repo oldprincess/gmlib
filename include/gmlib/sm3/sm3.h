@@ -1,7 +1,7 @@
 #ifndef SM3_SM3_H
 #define SM3_SM3_H
 
-#include <gmlib/hash_lib/hash.h>
+#include <gmlib/hash_lib/impl/hash_impl.h>
 
 #include <stdexcept>
 
@@ -23,12 +23,10 @@ namespace sm3 {
  * @brief   SM3 cryptographic hash algorithm
  * @details GB/T 32905-2016
  */
-class SM3 : public hash_lib::HashImpl<alg::SM3_BLOCK_SIZE>
+class SM3 : public hash_lib::impl::HashImpl<alg::SM3_BLOCK_SIZE>
 {
 public:
     static constexpr const char* NAME = "SM3";
-
-    static constexpr std::size_t NAME_STR_LEN = 3;
 
     /// @brief SM3 Block Size (in bytes)
     static constexpr std::size_t BLOCK_SIZE = alg::SM3_BLOCK_SIZE;
@@ -60,11 +58,6 @@ public:
     const char* fetch_name() const noexcept override
     {
         return NAME;
-    }
-
-    std::size_t fetch_name_str_len() const noexcept override
-    {
-        return NAME_STR_LEN;
     }
 
     std::size_t fetch_block_size() const noexcept override

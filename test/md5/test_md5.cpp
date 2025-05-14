@@ -63,10 +63,4 @@ void test_md5()
     {
         throw std::runtime_error("err in md5");
     }
-
-    // test virtual function
-    if (hash_lib::type_traits::test_is_valid_hash<MD5>() == false)
-    {
-        throw std::runtime_error("err in md5 impl");
-    }
 }
