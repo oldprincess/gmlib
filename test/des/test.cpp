@@ -11,7 +11,6 @@ int main(int argc, char *argv[])
     try
     {
         test_des();
-        test_des_common();
     }
     catch (std::exception &e)
     {
@@ -21,7 +20,7 @@ int main(int argc, char *argv[])
     std::cout << "test des finish!" << std::endl;
     if (argc == 2 && std::strcmp(argv[1], "speed") == 0)
     {
-        speed_des_common();
+        speed_des();
     }
     return 0;
 }

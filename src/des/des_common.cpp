@@ -1,4 +1,4 @@
-#include <gmlib/des/internal/des_common.h>
+#include "des_common.h"
 
 namespace des::internal::common {
 
@@ -231,58 +231,60 @@ static uint64_t des_crypt(const uint64_t *key_rounds, uint64_t text)
 // **************************************************
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 
-void des_enc_key_init(DesCTX *ctx, const std::uint8_t user_key[8]) noexcept
+void des_enc_key_init(std::uint8_t       round_key[128],
+                      const std::uint8_t user_key[8]) noexcept
 {
     std::uint64_t key = MEM_LOAD64BE(user_key);
-    key_generate(ctx->round_key, key, 1);
+    key_generate((std::uint64_t *)round_key, key, 1);
 }
 
-void des_dec_key_init(DesCTX *ctx, const std::uint8_t user_key[8]) noexcept
+void des_dec_key_init(std::uint8_t       round_key[128],
+                      const std::uint8_t user_key[8]) noexcept
 {
     std::uint64_t key = MEM_LOAD64BE(user_key);
-    key_generate(ctx->round_key, key, 0);
+    key_generate((std::uint64_t *)round_key, key, 0);
 }
 
-void des_enc_block(const DesCTX      *ctx,
+void des_enc_block(const std::uint8_t round_key[128],
                    std::uint8_t       ciphertext[8],
                    const std::uint8_t plaintext[8]) noexcept
 {
     std::uint64_t pt = MEM_LOAD64BE(plaintext);
-    std::uint64_t ct = des_crypt(ctx->round_key, pt);
+    std::uint64_t ct = des_crypt((const std::uint64_t *)round_key, pt);
     MEM_STORE64BE(ciphertext, ct);
 }
 
-void des_dec_block(const DesCTX      *ctx,
+void des_dec_block(const std::uint8_t round_key[128],
                    std::uint8_t       plaintext[8],
                    const std::uint8_t ciphertext[8]) noexcept
 {
     std::uint64_t ct = MEM_LOAD64BE(ciphertext);
-    std::uint64_t pt = des_crypt(ctx->round_key, ct);
+    std::uint64_t pt = des_crypt((const std::uint64_t *)round_key, ct);
     MEM_STORE64BE(plaintext, pt);
 }
 
-void des_enc_blocks(const DesCTX       *ctx,
+void des_enc_blocks(const std::uint8_t  round_key[128],
                     std::uint8_t       *ciphertext,
                     const std::uint8_t *plaintext,
                     std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        des_enc_block(ctx, ciphertext, plaintext);
+        des_enc_block(round_key, ciphertext, plaintext);
         ciphertext += 8;
         plaintext += 8;
         block_num -= 1;
     }
 }
 
-void des_dec_blocks(const DesCTX       *ctx,
+void des_dec_blocks(const std::uint8_t  round_key[128],
                     std::uint8_t       *plaintext,
                     const std::uint8_t *ciphertext,
                     std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        des_dec_block(ctx, plaintext, ciphertext);
+        des_dec_block(round_key, plaintext, ciphertext);
         plaintext += 8;
         ciphertext += 8;
         block_num -= 1;

@@ -1,11 +1,11 @@
-#include <gmlib/des/internal/des_common.h>
+#include "speed.h"
+
+#include <gmlib/des/des.h>
 
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
-
-#include "speed.h"
 
 static void rand_mem(void* mem, std::size_t size)
 {
@@ -17,12 +17,12 @@ static void rand_mem(void* mem, std::size_t size)
     }
 }
 
-using namespace des::internal::common;
+using namespace des;
 
-void speed_des_common()
+void speed_des()
 {
     std::clock_t st, et;
-    DesCTX       ctx;
+    DES          ctx;
 
     constexpr int         loop = 1000;
     constexpr std::size_t SIZE = 4096;
@@ -34,12 +34,12 @@ void speed_des_common()
     rand_mem(data, SIZE);
     rand_mem(user_key, 8);
 
-    std::printf("speed des common ... ");
-    des_enc_key_init(&ctx, user_key);
+    std::printf("speed des %s ... ", ctx.fetch_impl_algo());
     st = std::clock();
     for (int i = 0; i < loop; i++)
     {
-        des_enc_blocks(&ctx, data, data, SIZE / 8);
+        ctx.set_key(user_key, ctx.ENCRYPTION);
+        ctx.encrypt_blocks(data, data, SIZE / 8);
     }
     et = std::clock();
 

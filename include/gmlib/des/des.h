@@ -2,10 +2,6 @@
 #define DES_DES_H
 
 #include <gmlib/block_cipher_mode/block_cipher.h>
-#include <gmlib/des/internal/des_common.h>
-namespace des {
-namespace alg = internal::common;
-} // namespace des
 
 namespace des {
 
@@ -19,19 +15,19 @@ public:
     static constexpr const char* NAME = "DES";
 
     /// @brief DES Block Size (in bytes)
-    static constexpr std::size_t BLOCK_SIZE = alg::DES_BLOCK_SIZE;
+    static constexpr std::size_t BLOCK_SIZE = 8;
 
     /// @brief DES User Key Length (in bytes)
-    static constexpr std::size_t USER_KEY_LEN = alg::DES_USER_KEY_LEN;
+    static constexpr std::size_t USER_KEY_LEN = 8;
 
     /// @brief DES Maximum Number of Parallel Encryption and Decryption
-    static constexpr std::size_t PARALLEL_NUM = alg::DES_PARALLEL_NUM;
+    static constexpr std::size_t PARALLEL_NUM = 1;
 
     static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
     /// @brief DES private Context
-    alg::DesCTX ctx_;
+    std::uint8_t rk_data_[16 * 8];
 
 public:
     /**
@@ -55,6 +51,8 @@ public:
     {
         return NAME;
     }
+
+    const char* fetch_impl_algo() const noexcept;
 
     std::size_t fetch_block_size() const noexcept override
     {
@@ -82,17 +80,7 @@ public:
      * @param[in]   user_key    8-bytes secret key
      * @param[in]   enc         DES::ENCRYPTION or DES::DECRYPTION
      */
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override
-    {
-        if (enc == DES::ENCRYPTION)
-        {
-            alg::des_enc_key_init(&ctx_, user_key);
-        }
-        else
-        {
-            alg::des_dec_key_init(&ctx_, user_key);
-        }
-    }
+    void set_key(const std::uint8_t* user_key, int enc) noexcept override;
 
     /**
      * @brief                   DES Encrypt Single Block
@@ -100,10 +88,7 @@ public:
      * @param[in]   plaintext   8-bytes plaintext
      */
     void encrypt_block(std::uint8_t*       ciphertext,
-                       const std::uint8_t* plaintext) const noexcept override
-    {
-        alg::des_enc_block(&ctx_, ciphertext, plaintext);
-    }
+                       const std::uint8_t* plaintext) const noexcept override;
 
     /**
      * @brief                   DES Decrypt Single Block
@@ -111,10 +96,7 @@ public:
      * @param[in]   ciphertext  8-bytes ciphertext
      */
     void decrypt_block(std::uint8_t*       plaintext,
-                       const std::uint8_t* ciphertext) const noexcept override
-    {
-        alg::des_dec_block(&ctx_, plaintext, ciphertext);
-    }
+                       const std::uint8_t* ciphertext) const noexcept override;
 
     /**
      * @brief                   DES Encrypt Multiple Blocks
@@ -124,10 +106,7 @@ public:
      */
     void encrypt_blocks(std::uint8_t*       ciphertext,
                         const std::uint8_t* plaintext,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::des_enc_blocks(&ctx_, ciphertext, plaintext, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 
     /**
      * @brief                   DES Decrypt Multiple Blocks
@@ -137,10 +116,7 @@ public:
      */
     void decrypt_blocks(std::uint8_t*       plaintext,
                         const std::uint8_t* ciphertext,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::des_dec_blocks(&ctx_, plaintext, ciphertext, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 };
 
 } // namespace des

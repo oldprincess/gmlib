@@ -3,6 +3,4 @@
 
 void test_des();
 
-void test_des_common();
-
 #endif
