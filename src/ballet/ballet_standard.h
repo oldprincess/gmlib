@@ -20,16 +20,6 @@ constexpr std::size_t BALLET256256_BLOCK_SIZE   = 32;
 constexpr std::size_t BALLET256256_USER_KEY_LEN = 32;
 constexpr std::size_t BALLET256256_PARALLEL_NUM = 1;
 
-typedef struct BalletCTX
-{
-    union SubKey
-    {
-        std::uint8_t sub_key128128[4 * 4 * 46]; // ballet<blk=128><key=128>
-        std::uint8_t sub_key128256[4 * 4 * 48]; // ballet<blk=128><key=256>
-        std::uint8_t sub_key256256[4 * 4 * 74]; // ballet<blk=256><key=256>
-    } m;
-} BalletCTX;
-
 // ****************************************
 // ********** Ballet 128/128 **************
 // ****************************************
@@ -141,7 +131,7 @@ void ballet128256_dec_block(const std::uint8_t sub_key[4 * 4 * 48],
  * @param plaintext     input blocks, length of 16 x block_num bytes
  * @param block_num     block num
  */
-void ballet128256_enc_blocks(const std::uint8_t *sub_key,
+void ballet128256_enc_blocks(const std::uint8_t  sub_key[4 * 4 * 48],
                              std::uint8_t       *ciphertext,
                              const std::uint8_t *plaintext,
                              std::size_t         block_num) noexcept;
@@ -153,7 +143,7 @@ void ballet128256_enc_blocks(const std::uint8_t *sub_key,
  * @param ciphertext    input blocks, length of 16 x block_num bytes
  * @param block_num     block num
  */
-void ballet128256_dec_blocks(const std::uint8_t *sub_key,
+void ballet128256_dec_blocks(const std::uint8_t  sub_key[4 * 4 * 48],
                              std::uint8_t       *plaintext,
                              const std::uint8_t *ciphertext,
                              std::size_t         block_num) noexcept;
@@ -205,7 +195,7 @@ void ballet256256_dec_block(const std::uint8_t sub_key[4 * 4 * 74],
  * @param plaintext     input blocks, length of 32 x block_num bytes
  * @param block_num     block num
  */
-void ballet256256_enc_blocks(const std::uint8_t *sub_key,
+void ballet256256_enc_blocks(const std::uint8_t  sub_key[4 * 4 * 74],
                              std::uint8_t       *ciphertext,
                              const std::uint8_t *plaintext,
                              std::size_t         block_num) noexcept;
@@ -217,7 +207,7 @@ void ballet256256_enc_blocks(const std::uint8_t *sub_key,
  * @param ciphertext    input blocks, length of 32 x block_num bytes
  * @param block_num     block num
  */
-void ballet256256_dec_blocks(const std::uint8_t *sub_key,
+void ballet256256_dec_blocks(const std::uint8_t  sub_key[4 * 4 * 74],
                              std::uint8_t       *plaintext,
                              const std::uint8_t *ciphertext,
                              std::size_t         block_num) noexcept;
