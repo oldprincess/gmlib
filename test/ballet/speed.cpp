@@ -1,13 +1,13 @@
-#include <gmlib/ballet/internal/ballet_standard.h>
+#include "speed.h"
+
+#include <gmlib/ballet/ballet.h>
 
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
 
-#include "speed.h"
-
-using namespace ballet::internal::standard;
+using namespace ballet;
 
 constexpr std::size_t SIZE = 4096 * 32;
 constexpr int         loop = 1000;
@@ -22,10 +22,10 @@ static void rand_mem(void* mem, std::size_t size)
     }
 }
 
-static void speed_ballet128128_standard()
+static void speed_ballet128128()
 {
     std::clock_t st, et;
-    BalletCTX    ctx;
+    Ballet128128 ctx;
 
     double time_s, speed_Mbps;
 
@@ -36,13 +36,13 @@ static void speed_ballet128128_standard()
     rand_mem(data, SIZE);
     rand_mem(user_key, 32);
 
-    std::printf("speed ballet128128 standard ... ");
-    ballet128128_enc_key_init(&ctx, user_key);
+    std::printf("speed ballet128128 %s ... ", ctx.fetch_impl_algo());
+
     st = std::clock();
     for (int i = 0; i < loop; i++)
     {
-        ballet128128_enc_blocks(&ctx, data, data,
-                                SIZE / BALLET128128_BLOCK_SIZE);
+        ctx.set_key(user_key, ctx.ENCRYPTION);
+        ctx.encrypt_blocks(data, data, SIZE / ctx.BLOCK_SIZE);
     }
     et = std::clock();
 
@@ -53,10 +53,10 @@ static void speed_ballet128128_standard()
     delete[] data;
 }
 
-static void speed_ballet128256_standard()
+static void speed_ballet128256()
 {
     std::clock_t st, et;
-    BalletCTX    ctx;
+    Ballet128256 ctx;
 
     double time_s, speed_Mbps;
 
@@ -67,13 +67,12 @@ static void speed_ballet128256_standard()
     rand_mem(data, SIZE);
     rand_mem(user_key, 32);
 
-    std::printf("speed ballet128256 standard ... ");
-    ballet128256_enc_key_init(&ctx, user_key);
+    std::printf("speed ballet128256 %s ... ", ctx.fetch_impl_algo());
     st = std::clock();
     for (int i = 0; i < loop; i++)
     {
-        ballet128256_enc_blocks(&ctx, data, data,
-                                SIZE / BALLET128256_BLOCK_SIZE);
+        ctx.set_key(user_key, ctx.ENCRYPTION);
+        ctx.encrypt_blocks(data, data, SIZE / ctx.BLOCK_SIZE);
     }
     et = std::clock();
 
@@ -84,10 +83,10 @@ static void speed_ballet128256_standard()
     delete[] data;
 }
 
-static void speed_ballet256256_standard()
+static void speed_ballet256256()
 {
     std::clock_t st, et;
-    BalletCTX    ctx;
+    Ballet256256 ctx;
 
     double time_s, speed_Mbps;
 
@@ -98,13 +97,12 @@ static void speed_ballet256256_standard()
     rand_mem(data, SIZE);
     rand_mem(user_key, 32);
 
-    std::printf("speed ballet256256 standard ... ");
-    ballet256256_enc_key_init(&ctx, user_key);
+    std::printf("speed ballet256256 %s ... ", ctx.fetch_impl_algo());
     st = std::clock();
     for (int i = 0; i < loop; i++)
     {
-        ballet256256_enc_blocks(&ctx, data, data,
-                                SIZE / BALLET256256_BLOCK_SIZE);
+        ctx.set_key(user_key, ctx.ENCRYPTION);
+        ctx.encrypt_blocks(data, data, SIZE / ctx.BLOCK_SIZE);
     }
     et = std::clock();
 
@@ -115,9 +113,9 @@ static void speed_ballet256256_standard()
     delete[] data;
 }
 
-void speed_ballet_standard()
+void speed_ballet()
 {
-    speed_ballet128128_standard();
-    speed_ballet128256_standard();
-    speed_ballet256256_standard();
+    speed_ballet128128();
+    speed_ballet128256();
+    speed_ballet256256();
 }

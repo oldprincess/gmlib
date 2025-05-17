@@ -6,8 +6,7 @@
  * software-friendly block cipher [J]. Journal of Cryptologic Research, 2019,
  * 6(6): 704-712.
  */
-#include <gmlib/ballet/internal/ballet_standard.h>
-#include <immintrin.h>
+#include "ballet_standard.h"
 
 namespace ballet::internal::standard {
 
@@ -527,53 +526,52 @@ static void Ballet256256DecDataS(uint8_t       out[32],
 // ****************************************
 // ********** Ballet 128/128 **************
 // ****************************************
-
-void ballet128128_enc_key_init(BalletCTX         *ctx,
+void ballet128128_enc_key_init(std::uint8_t       sub_key[4 * 4 * 46],
                                const std::uint8_t user_key[16]) noexcept
 {
-    BalletGenRK_128_128(ctx->m.sub_key128128, user_key, 1);
+    BalletGenRK_128_128(sub_key, user_key, 1);
 }
 
-void ballet128128_dec_key_init(BalletCTX         *ctx,
+void ballet128128_dec_key_init(std::uint8_t       sub_key[4 * 4 * 46],
                                const std::uint8_t user_key[16]) noexcept
 {
-    BalletGenRK_128_128(ctx->m.sub_key128128, user_key, 0);
+    BalletGenRK_128_128(sub_key, user_key, 0);
 }
 
-void ballet128128_enc_block(const BalletCTX   *ctx,
+void ballet128128_enc_block(const std::uint8_t sub_key[4 * 4 * 46],
                             std::uint8_t       ciphertext[16],
                             const std::uint8_t plaintext[16]) noexcept
 {
-    Ballet128128EncDataS(ciphertext, plaintext, ctx->m.sub_key128128);
+    Ballet128128EncDataS(ciphertext, plaintext, sub_key);
 }
 
-void ballet128128_dec_block(const BalletCTX   *ctx,
+void ballet128128_dec_block(const std::uint8_t sub_key[4 * 4 * 46],
                             std::uint8_t       plaintext[16],
                             const std::uint8_t ciphertext[16]) noexcept
 {
-    Ballet128128DecDataS(plaintext, ciphertext, ctx->m.sub_key128128);
+    Ballet128128DecDataS(plaintext, ciphertext, sub_key);
 }
 
-void ballet128128_enc_blocks(const BalletCTX    *ctx,
+void ballet128128_enc_blocks(const std::uint8_t  sub_key[4 * 4 * 46],
                              std::uint8_t       *ciphertext,
                              const std::uint8_t *plaintext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        Ballet128128EncDataS(ciphertext, plaintext, ctx->m.sub_key128128);
+        Ballet128128EncDataS(ciphertext, plaintext, sub_key);
         ciphertext += 16, plaintext += 16, block_num--;
     }
 }
 
-void ballet128128_dec_blocks(const BalletCTX    *ctx,
+void ballet128128_dec_blocks(const std::uint8_t  sub_key[4 * 4 * 46],
                              std::uint8_t       *plaintext,
                              const std::uint8_t *ciphertext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        Ballet128128DecDataS(plaintext, ciphertext, ctx->m.sub_key128128);
+        Ballet128128DecDataS(plaintext, ciphertext, sub_key);
         plaintext += 16, ciphertext += 16, block_num--;
     }
 }
@@ -582,52 +580,52 @@ void ballet128128_dec_blocks(const BalletCTX    *ctx,
 // ********** Ballet 128/256 **************
 // ****************************************
 
-void ballet128256_enc_key_init(BalletCTX         *ctx,
+void ballet128256_enc_key_init(std::uint8_t       sub_key[4 * 4 * 48],
                                const std::uint8_t user_key[32]) noexcept
 {
-    BalletGenRK_128_256(ctx->m.sub_key128256, user_key, 1);
+    BalletGenRK_128_256(sub_key, user_key, 1);
 }
 
-void ballet128256_dec_key_init(BalletCTX         *ctx,
+void ballet128256_dec_key_init(std::uint8_t       sub_key[4 * 4 * 48],
                                const std::uint8_t user_key[32]) noexcept
 {
-    BalletGenRK_128_256(ctx->m.sub_key128256, user_key, 0);
+    BalletGenRK_128_256(sub_key, user_key, 0);
 }
 
-void ballet128256_enc_block(const BalletCTX   *ctx,
+void ballet128256_enc_block(const std::uint8_t sub_key[4 * 4 * 48],
                             std::uint8_t       ciphertext[16],
                             const std::uint8_t plaintext[16]) noexcept
 {
-    Ballet128256EncDataS(ciphertext, plaintext, ctx->m.sub_key128256);
+    Ballet128256EncDataS(ciphertext, plaintext, sub_key);
 }
 
-void ballet128256_dec_block(const BalletCTX   *ctx,
+void ballet128256_dec_block(const std::uint8_t sub_key[4 * 4 * 48],
                             std::uint8_t       plaintext[16],
                             const std::uint8_t ciphertext[16]) noexcept
 {
-    Ballet128256DecDataS(plaintext, ciphertext, ctx->m.sub_key128256);
+    Ballet128256DecDataS(plaintext, ciphertext, sub_key);
 }
 
-void ballet128256_enc_blocks(const BalletCTX    *ctx,
+void ballet128256_enc_blocks(const std::uint8_t  sub_key[4 * 4 * 48],
                              std::uint8_t       *ciphertext,
                              const std::uint8_t *plaintext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        Ballet128256EncDataS(ciphertext, plaintext, ctx->m.sub_key128256);
+        Ballet128256EncDataS(ciphertext, plaintext, sub_key);
         ciphertext += 16, plaintext += 16, block_num--;
     }
 }
 
-void ballet128256_dec_blocks(const BalletCTX    *ctx,
+void ballet128256_dec_blocks(const std::uint8_t  sub_key[4 * 4 * 48],
                              std::uint8_t       *plaintext,
                              const std::uint8_t *ciphertext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        Ballet128256DecDataS(plaintext, ciphertext, ctx->m.sub_key128256);
+        Ballet128256DecDataS(plaintext, ciphertext, sub_key);
         plaintext += 16, ciphertext += 16, block_num--;
     }
 }
@@ -636,52 +634,52 @@ void ballet128256_dec_blocks(const BalletCTX    *ctx,
 // ********** Ballet 256/256 **************
 // ****************************************
 
-void ballet256256_enc_key_init(BalletCTX         *ctx,
+void ballet256256_enc_key_init(std::uint8_t       sub_key[4 * 4 * 74],
                                const std::uint8_t user_key[32]) noexcept
 {
-    BalletGenRK_256_256(ctx->m.sub_key256256, user_key, 1);
+    BalletGenRK_256_256(sub_key, user_key, 1);
 }
 
-void ballet256256_dec_key_init(BalletCTX         *ctx,
+void ballet256256_dec_key_init(std::uint8_t       sub_key[4 * 4 * 74],
                                const std::uint8_t user_key[32]) noexcept
 {
-    BalletGenRK_256_256(ctx->m.sub_key256256, user_key, 0);
+    BalletGenRK_256_256(sub_key, user_key, 0);
 }
 
-void ballet256256_enc_block(const BalletCTX   *ctx,
+void ballet256256_enc_block(const std::uint8_t sub_key[4 * 4 * 74],
                             std::uint8_t       ciphertext[32],
                             const std::uint8_t plaintext[32]) noexcept
 {
-    Ballet256256EncDataS(ciphertext, plaintext, ctx->m.sub_key256256);
+    Ballet256256EncDataS(ciphertext, plaintext, sub_key);
 }
 
-void ballet256256_dec_block(const BalletCTX   *ctx,
+void ballet256256_dec_block(const std::uint8_t sub_key[4 * 4 * 74],
                             std::uint8_t       plaintext[32],
                             const std::uint8_t ciphertext[32]) noexcept
 {
-    Ballet256256DecDataS(plaintext, ciphertext, ctx->m.sub_key256256);
+    Ballet256256DecDataS(plaintext, ciphertext, sub_key);
 }
 
-void ballet256256_enc_blocks(const BalletCTX    *ctx,
+void ballet256256_enc_blocks(const std::uint8_t  sub_key[4 * 4 * 74],
                              std::uint8_t       *ciphertext,
                              const std::uint8_t *plaintext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        Ballet256256EncDataS(ciphertext, plaintext, ctx->m.sub_key256256);
+        Ballet256256EncDataS(ciphertext, plaintext, sub_key);
         ciphertext += 32, plaintext += 32, block_num--;
     }
 }
 
-void ballet256256_dec_blocks(const BalletCTX    *ctx,
+void ballet256256_dec_blocks(const std::uint8_t  sub_key[4 * 4 * 74],
                              std::uint8_t       *plaintext,
                              const std::uint8_t *ciphertext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        Ballet256256DecDataS(plaintext, ciphertext, ctx->m.sub_key256256);
+        Ballet256256DecDataS(plaintext, ciphertext, sub_key);
         plaintext += 32, ciphertext += 32, block_num--;
     }
 }

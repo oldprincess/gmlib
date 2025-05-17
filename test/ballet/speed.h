@@ -1,6 +1,6 @@
 #ifndef SPEED_H
 #define SPEED_H
 
-void speed_ballet_standard();
+void speed_ballet();
 
 #endif

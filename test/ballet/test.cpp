@@ -12,7 +12,6 @@ int main(int argc, char *argv[])
 {
     try
     {
-        test_ballet_standard();
         test_ballet();
     }
     catch (exception &e)
@@ -23,7 +22,7 @@ int main(int argc, char *argv[])
     cout << "test ballet ok" << endl;
     if (argc == 2 && std::strcmp(argv[1], "speed") == 0)
     {
-        speed_ballet_standard();
+        speed_ballet();
     }
     return 0;
 }
