@@ -1,7 +1,6 @@
 #ifndef SPEED_H
 #define SPEED_H
 
-void speed_sha1_common();
-void speed_sha1_sha();
+void speed_sha1();
 
 #endif

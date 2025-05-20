@@ -6,69 +6,29 @@ import random
 code_template = """\
     std::uint8_t msg{i}[{msg_size}]    = {msg_val};
     std::uint8_t digest{i}[20] = {digest_val};
-    sha1_reset(&ctx);
-    block_num = sizeof(msg{i}) / SHA1_BLOCK_SIZE;
-    process_n = block_num * SHA1_BLOCK_SIZE;
-    if (sha1_update_blocks(&ctx, msg{i}, block_num))
-    {{
-        throw std::runtime_error("err in sha1");
-    }}
-    if (sha1_final_block(&ctx, digest, msg{i} + process_n,
-                        sizeof(msg{i}) - process_n))
-    {{
-        throw std::runtime_error("err in sha1");
-    }}
-    if (std::memcmp(digest{i}, digest, SHA1_DIGEST_SIZE) != 0)
+    ctx.reset();
+    ctx.do_final(digest, msg{i}, sizeof(msg{i}));
+    if (std::memcmp(digest{i}, digest, SHA1::DIGEST_SIZE) != 0)
     {{
         throw std::runtime_error("err in sha1");
     }}"""
 
-code_script_sha = """\
-#if defined(CPU_FLAG_SHA) && defined(CPU_FLAG_SSE4_1)
-#include <gmlib/sha1/internal/sha1_sha.h>
+code_script = """\
+#include <gmlib/sha1/sha1.h>
 #include <cstring>
 #include <stdexcept>
 
-using namespace sha1::internal::sha;
+using namespace sha1;
 
-void test_sha1_sha()
+void test_sha1()
 {{
-    Sha1CTX ctx;
-    sha1_init(&ctx);
-    std::uint8_t  digest[SHA1_DIGEST_SIZE];
-    std::size_t   block_num, process_n;
+    SHA1 ctx;
+    std::uint8_t  digest[SHA1::DIGEST_SIZE];
 
 {code}
 }}
-#else
-void test_sha1_sha()
-{{
-}}
-#endif"""
-
-code_script_common = """\
-#if !(defined(CPU_FLAG_SHA) && defined(CPU_FLAG_SSE4_1))
-#include <gmlib/sha1/internal/sha1_common.h>
-#include <cstring>
-#include <stdexcept>
-
-using namespace sha1::internal::common;
-
-void test_sha1_common()
-{{
-    Sha1CTX ctx;
-    sha1_init(&ctx);
-    std::uint8_t  digest[SHA1_DIGEST_SIZE];
-    std::size_t   block_num, process_n;
-
-{code}
-}}
-#else
-void test_sha1_common()
-{{
-}}
-#endif
 """
+
 
 def to_c_array(b: bytes):
     return "{" + ",".join(map(lambda c: "0x" + hex(c)[2::].zfill(2), b)) + "}"
@@ -89,7 +49,5 @@ for i in range(TEST_VECTOR_NUM):
         )
     )
 
-with open("test_sha1_common.cpp", "w") as fp:
-    fp.write(code_script_common.format(code=os.linesep.join(code)))
-with open("test_sha1_sha.cpp", "w") as fp:
-    fp.write(code_script_sha.format(code=os.linesep.join(code)))
+with open("test_sha1.cpp", "w") as fp:
+    fp.write(code_script.format(code=os.linesep.join(code)))

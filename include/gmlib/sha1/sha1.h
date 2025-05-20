@@ -3,49 +3,32 @@
 
 #include <gmlib/hash_lib/impl/hash_impl.h>
 
-#include <stdexcept>
-
-#if defined(CPU_FLAG_SHA)
-#include <gmlib/sha1/internal/sha1_sha.h>
-namespace sha1 {
-namespace alg = sha1::internal::sha;
-} // namespace sha1
-#else
-#include <gmlib/sha1/internal/sha1_common.h>
-namespace sha1 {
-namespace alg = sha1::internal::common;
-} // namespace sha1
-#endif
-
 namespace sha1 {
 
-class SHA1 : public hash_lib::impl::HashImpl<alg::SHA1_BLOCK_SIZE>
+class SHA1 : public hash_lib::impl::HashImpl<64>
 {
 public:
     static constexpr const char* NAME = "SHA1";
 
     /// @brief SHA1 Block Size (in bytes)
-    static constexpr std::size_t BLOCK_SIZE = alg::SHA1_BLOCK_SIZE;
+    static constexpr std::size_t BLOCK_SIZE = 64;
 
     /// @brief SHA1 Digest Size (in bytes)
-    static constexpr std::size_t DIGEST_SIZE = alg::SHA1_DIGEST_SIZE;
+    static constexpr std::size_t DIGEST_SIZE = 20;
 
     /// @brief SHA1 Security Strength (in bytes)
-    static constexpr std::size_t SECURITY_STRENGTH =
-        alg::SHA1_SECURITY_STRENGTH;
+    static constexpr std::size_t SECURITY_STRENGTH = 10;
 
 private:
     /// @brief SHA1 private Context
-    alg::Sha1CTX ctx_;
+    std::uint32_t state_[5];
+    std::uint64_t data_bits_;
 
 public:
     /**
      * @brief SHA1 Context Init
      */
-    SHA1() noexcept
-    {
-        alg::sha1_init(&ctx_);
-    }
+    SHA1() noexcept;
 
 public:
     /**
@@ -56,6 +39,8 @@ public:
     {
         return NAME;
     }
+
+    const char* fetch_impl_algo() const noexcept override;
 
     std::size_t fetch_block_size() const noexcept override
     {
@@ -76,11 +61,7 @@ public:
     /**
      * @brief SHA1 Context Reset (re-init)
      */
-    void reset() noexcept override
-    {
-        this->HashImpl<alg::SHA1_BLOCK_SIZE>::reset();
-        alg::sha1_reset(&ctx_);
-    }
+    void reset() noexcept override;
 
 private:
     /**
@@ -88,13 +69,7 @@ private:
      * @param[in]   in          BLOCK_SIZE x block_num -bytes input data
      * @param[in]   block_num   input data block number
      */
-    void update_blocks(const std::uint8_t* in, std::size_t block_num) override
-    {
-        if (alg::sha1_update_blocks(&ctx_, in, block_num))
-        {
-            throw std::runtime_error("err in sha1 update blocks");
-        }
-    }
+    void update_blocks(const std::uint8_t* in, std::size_t block_num) override;
 
     /**
      * @brief               SHA1 update final message block and output digest
@@ -104,13 +79,7 @@ private:
      */
     void final_block(std::uint8_t*       digest,
                      const std::uint8_t* in,
-                     std::size_t         inl) override
-    {
-        if (alg::sha1_final_block(&ctx_, digest, in, inl))
-        {
-            throw std::runtime_error("err in sha1 final block");
-        }
-    }
+                     std::size_t         inl) override;
 };
 
 } // namespace sha1

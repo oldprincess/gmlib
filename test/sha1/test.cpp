@@ -10,8 +10,6 @@ int main(int argc, char* argv[])
 {
     try
     {
-        test_sha1_common();
-        test_sha1_sha();
         test_sha1();
     }
     catch (std::exception& e)
@@ -22,8 +20,7 @@ int main(int argc, char* argv[])
     std::cout << "test sha1 finish!" << std::endl;
     if (argc == 2 && std::strcmp(argv[1], "speed") == 0)
     {
-        speed_sha1_common();
-        speed_sha1_sha();
+        speed_sha1();
     }
     return 0;
 }
