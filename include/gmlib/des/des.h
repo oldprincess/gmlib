@@ -52,7 +52,7 @@ public:
         return NAME;
     }
 
-    const char* fetch_impl_algo() const noexcept;
+    const char* fetch_impl_algo() const noexcept override;
 
     std::size_t fetch_block_size() const noexcept override
     {

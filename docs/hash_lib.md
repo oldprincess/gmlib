@@ -15,7 +15,6 @@
 ### 2.1 Hash 接口（gmlib/hash_lib/abc.h）
 
 `Hash` 类型是所有Hash算法的基类，任何派生类都需要实现下述接口函数。
-在 `type_traits` 中定义了 `is_valid_hash` 模板和 `test_is_valid_hash` 函数，用于校验派生类的合法性。
 
 1 算法参数获取，包括：算法名称、算法名称的字符串长度、分组长度、摘要长度、安全强度
 
@@ -23,12 +22,6 @@
 
 ```c++
     virtual const char* fetch_name() const noexcept = 0;
-```
-
-* 获取当前对象对应的哈希算法名称的字符串长度
-
-```c++
-    virtual std::size_t fetch_name_str_len() const noexcept = 0;
 ```
 
 * 获取当前对象对应的哈希算法的分组长度（以字节为单位）
@@ -73,7 +66,7 @@
 
 ### 2.2 HashImpl 接口（gmlib/hash_lib/hash.h）
 
-`HashImpl` 类型是对 `Hash` 类型的初步包装，定义了一个哈希算法所需要具备的基本接口。任何哈希算法都应该继承 `HashImlp` 类型。
+`HashImpl` 类型是对 `Hash` 类型的初步包装，定义了一个哈希算法所需要具备的基本接口。任何哈希算法都应该继承 `HashImpl` 类型。
 
 `HashImpl` 类型实现了 `Hash` 类型中的 `reset`、`update` 和 `do_final` 函数，但需要依赖于下方两个函数，需要通过具体的哈希算法来实例化。
 
