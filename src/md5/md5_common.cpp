@@ -5,7 +5,7 @@
  * Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All rights
  * reserved.
  */
-#include <gmlib/md5/internal/md5_common.h>
+#include "md5_common.h"
 
 #include <cstring>
 
@@ -238,7 +238,7 @@ static void md5_compress_block(std::uint32_t      state[4],
 // **************************************************
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 
-void md5_init(Md5CTX* ctx) noexcept
+void md5_init(std::uint32_t state[4], std::uint64_t* data_bits) noexcept
 {
     static const std::uint32_t MD5_INIT_DIGEST[4] = {
         0x67452301,
@@ -246,57 +246,59 @@ void md5_init(Md5CTX* ctx) noexcept
         0x98badcfe,
         0x10325476,
     };
-    ctx->state[0]  = MD5_INIT_DIGEST[0];
-    ctx->state[1]  = MD5_INIT_DIGEST[1];
-    ctx->state[2]  = MD5_INIT_DIGEST[2];
-    ctx->state[3]  = MD5_INIT_DIGEST[3];
-    ctx->data_bits = 0;
+    state[0]   = MD5_INIT_DIGEST[0];
+    state[1]   = MD5_INIT_DIGEST[1];
+    state[2]   = MD5_INIT_DIGEST[2];
+    state[3]   = MD5_INIT_DIGEST[3];
+    *data_bits = 0;
 }
 
-void md5_reset(Md5CTX* ctx) noexcept
+void md5_reset(std::uint32_t state[4], std::uint64_t* data_bits) noexcept
 {
-    md5_init(ctx);
+    md5_init(state, data_bits);
 }
 
-void md5_update_blocks(Md5CTX*             ctx,
+void md5_update_blocks(std::uint32_t       state[4],
+                       std::uint64_t*      data_bits,
                        const std::uint8_t* in,
                        std::size_t         block_num) noexcept
 {
-    ctx->data_bits += (std::uint64_t)block_num * MD5_BLOCK_SIZE * 8;
+    *data_bits += (std::uint64_t)block_num * MD5_BLOCK_SIZE * 8;
     while (block_num)
     {
-        md5_compress_block(ctx->state, in);
+        md5_compress_block(state, in);
         in += MD5_BLOCK_SIZE, block_num--;
     }
 }
 
-void md5_final_block(Md5CTX*             ctx,
+void md5_final_block(std::uint32_t       state[4],
+                     std::uint64_t*      data_bits,
                      std::uint8_t        digest[16],
                      const std::uint8_t* in,
                      std::size_t         inl) noexcept
 {
-    ctx->data_bits += (std::uint64_t)inl * 8;
+    *data_bits += (std::uint64_t)inl * 8;
     std::size_t  pad_num = (64ULL + 56 - 1 - inl) % 64;
     std::uint8_t buf[64 * 2];
     std::size_t  buf_size = 0;
     std::memcpy(buf, in, inl);
-    buf_size += inl;                               // update
-    buf[buf_size] = 0x80;                          // 10..0
-    buf_size += 1;                                 // update
-    std::memset(buf + buf_size, 0, pad_num);       // pad 0
-    buf_size += pad_num;                           // update
-    MEM_STORE64LE(buf + buf_size, ctx->data_bits); //
-    buf_size += 8;                                 // update
+    buf_size += inl;                           // update
+    buf[buf_size] = 0x80;                      // 10..0
+    buf_size += 1;                             // update
+    std::memset(buf + buf_size, 0, pad_num);   // pad 0
+    buf_size += pad_num;                       // update
+    MEM_STORE64LE(buf + buf_size, *data_bits); //
+    buf_size += 8;                             // update
     // compress
     for (std::size_t i = 0; i < buf_size; i += 64)
     {
-        md5_compress_block(ctx->state, buf + i);
+        md5_compress_block(state, buf + i);
     }
     // output digest
-    MEM_STORE32LE(digest + 4 * 0, ctx->state[0]);
-    MEM_STORE32LE(digest + 4 * 1, ctx->state[1]);
-    MEM_STORE32LE(digest + 4 * 2, ctx->state[2]);
-    MEM_STORE32LE(digest + 4 * 3, ctx->state[3]);
+    MEM_STORE32LE(digest + 4 * 0, state[0]);
+    MEM_STORE32LE(digest + 4 * 1, state[1]);
+    MEM_STORE32LE(digest + 4 * 2, state[2]);
+    MEM_STORE32LE(digest + 4 * 3, state[3]);
 }
 
 }; // namespace md5::internal::common

@@ -2,40 +2,33 @@
 #define MD5_MD5_H
 
 #include <gmlib/hash_lib/impl/hash_impl.h>
-#include <gmlib/md5/internal/md5_common.h>
-
-namespace md5 {
-namespace alg = md5::internal::common;
-} // namespace md5
 
 namespace md5 {
 
-class MD5 : public hash_lib::impl::HashImpl<alg::MD5_BLOCK_SIZE>
+class MD5 : public hash_lib::impl::HashImpl<64>
 {
 public:
     static constexpr const char* NAME = "MD5";
 
     /// @brief MD5 Block Size (in bytes)
-    static constexpr std::size_t BLOCK_SIZE = alg::MD5_BLOCK_SIZE;
+    static constexpr std::size_t BLOCK_SIZE = 64;
 
     /// @brief MD5 Digest Size (in bytes)
-    static constexpr std::size_t DIGEST_SIZE = alg::MD5_DIGEST_SIZE;
+    static constexpr std::size_t DIGEST_SIZE = 16;
 
     /// @brief MD5 Security Strength (in bytes)
-    static constexpr std::size_t SECURITY_STRENGTH = alg::MD5_SECURITY_STRENGTH;
+    static constexpr std::size_t SECURITY_STRENGTH = 8;
 
 private:
     /// @brief MD5 private Context
-    alg::Md5CTX ctx_;
+    std::uint32_t state_[4];
+    std::uint64_t data_bits_;
 
 public:
     /**
      * @brief MD5 Context Init
      */
-    MD5() noexcept
-    {
-        alg::md5_init(&ctx_);
-    }
+    MD5() noexcept;
 
 public:
     /**
@@ -46,6 +39,8 @@ public:
     {
         return NAME;
     }
+
+    const char* fetch_impl_algo() const noexcept override;
 
     std::size_t fetch_block_size() const noexcept override
     {
@@ -66,11 +61,7 @@ public:
     /**
      * @brief MD5 Context Reset (re-init)
      */
-    void reset() noexcept override
-    {
-        this->HashImpl<alg::MD5_BLOCK_SIZE>::reset();
-        alg::md5_reset(&ctx_);
-    }
+    void reset() noexcept override;
 
 private:
     /**
@@ -79,10 +70,7 @@ private:
      * @param[in]   block_num   input data block number
      */
     void update_blocks(const std::uint8_t* in,
-                       std::size_t         block_num) noexcept override
-    {
-        alg::md5_update_blocks(&ctx_, in, block_num);
-    }
+                       std::size_t         block_num) noexcept override;
 
     /**
      * @brief               MD5 update final message block and output digest
@@ -92,10 +80,7 @@ private:
      */
     void final_block(std::uint8_t*       digest,
                      const std::uint8_t* in,
-                     std::size_t         inl) noexcept override
-    {
-        alg::md5_final_block(&ctx_, digest, in, inl);
-    }
+                     std::size_t         inl) noexcept override;
 };
 
 } // namespace md5

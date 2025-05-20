@@ -1,4 +1,4 @@
-#include <gmlib/md5/internal/md5_common.h>
+#include <gmlib/md5/md5.h>
 
 #include <cstdio>
 #include <ctime>
@@ -15,27 +15,24 @@ static void rand_mem(void* mem, std::size_t size)
     }
 }
 
-using namespace md5::internal::common;
-
 constexpr std::size_t MSG_SIZE = 4096;
 constexpr int         LOOP     = 10000;
 
-void speed_md5_common()
+void speed_md5()
 {
-    Md5CTX       ctx;
-    std::uint8_t digest[MD5_DIGEST_SIZE];
+    md5::MD5     ctx;
+    std::uint8_t digest[md5::MD5::DIGEST_SIZE];
     std::uint8_t msg[MSG_SIZE];
     std::clock_t st, et;
     double       time_s, speed_Mbps;
 
     rand_mem(msg, MSG_SIZE);
-    std::printf("speed md5 common ... ");
+    std::printf("speed md5 %s ... ", ctx.fetch_impl_algo());
     st = std::clock();
     for (int i = 0; i < LOOP; i++)
     {
-        md5_init(&ctx);
-        md5_update_blocks(&ctx, msg, MSG_SIZE / MD5_BLOCK_SIZE);
-        md5_final_block(&ctx, digest, nullptr, 0);
+        ctx.reset();
+        ctx.do_final(digest, msg, MSG_SIZE);
     }
     et         = std::clock();
     time_s     = (double)(et - st) / CLOCKS_PER_SEC;
