@@ -12,8 +12,6 @@ int main(int argc, char *argv[])
 {
     try
     {
-        test_ublock_common();
-        test_ublock_standard();
         test_ublock();
     }
     catch (exception &e)
@@ -24,8 +22,7 @@ int main(int argc, char *argv[])
     cout << "test uBlock ok" << endl;
     if (argc == 2 && std::strcmp(argv[1], "speed") == 0)
     {
-        speed_ublock_common();
-        speed_ublock_standard();
+        speed_ublock();
     }
     return 0;
 }

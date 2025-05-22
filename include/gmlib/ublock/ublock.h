@@ -2,16 +2,8 @@
 #define UBLOCK_UBLOCK_H
 
 #include <gmlib/block_cipher_mode/block_cipher.h>
-#include <gmlib/ublock/internal/ublock_common.h>
-#include <gmlib/ublock/internal/ublock_standard.h>
 
 namespace ublock {
-
-#if defined(CPU_FLAG_SSSE3)
-namespace alg = internal::standard;
-#else
-namespace alg = internal::common;
-#endif
 
 class uBlock128128 : public block_cipher_mode::BlockCipher
 {
@@ -19,19 +11,19 @@ public:
     static constexpr const char* NAME = "uBlock-128-128";
 
     /// @brief uBlock128128 Block Size (in bytes)
-    static constexpr std::size_t BLOCK_SIZE = alg::UBLOCK128128_BLOCK_SIZE;
+    static constexpr std::size_t BLOCK_SIZE = 16;
 
     /// @brief uBlock128128 User Key Length (in bytes)
-    static constexpr std::size_t USER_KEY_LEN = alg::UBLOCK128128_USER_KEY_LEN;
+    static constexpr std::size_t USER_KEY_LEN = 16;
 
     /// @brief uBlock128128 Maximum Number of Parallel Encryption and Decryption
-    static constexpr std::size_t PARALLEL_NUM = alg::UBLOCK128128_PARALLEL_NUM;
+    static constexpr std::size_t PARALLEL_NUM = 1;
 
     static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
     /// @brief uBlock128128 private Context
-    alg::uBlockCTX ctx_;
+    std::uint8_t rk_data_[544];
 
 public:
     /**
@@ -56,6 +48,8 @@ public:
     {
         return NAME;
     }
+
+    const char* fetch_impl_algo() const noexcept override;
 
     std::size_t fetch_block_size() const noexcept override
     {
@@ -84,17 +78,7 @@ public:
      * @param[in]   enc         uBlock128128::ENCRYPTION or
      * uBlock128128::DECRYPTION
      */
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override
-    {
-        if (enc == uBlock128128::ENCRYPTION)
-        {
-            alg::ublock128128_enc_key_init(&ctx_, user_key);
-        }
-        else
-        {
-            alg::ublock128128_dec_key_init(&ctx_, user_key);
-        }
-    }
+    void set_key(const std::uint8_t* user_key, int enc) noexcept override;
 
     /**
      * @brief                   uBlock128128 Encrypt Single Block
@@ -102,10 +86,7 @@ public:
      * @param[in]   plaintext   16-bytes plaintext
      */
     void encrypt_block(std::uint8_t*       ciphertext,
-                       const std::uint8_t* plaintext) const noexcept override
-    {
-        alg::ublock128128_enc_block(&ctx_, ciphertext, plaintext);
-    }
+                       const std::uint8_t* plaintext) const noexcept override;
 
     /**
      * @brief                   uBlock128128 Decrypt Single Block
@@ -113,10 +94,7 @@ public:
      * @param[in]   ciphertext  16-bytes ciphertext
      */
     void decrypt_block(std::uint8_t*       plaintext,
-                       const std::uint8_t* ciphertext) const noexcept override
-    {
-        alg::ublock128128_dec_block(&ctx_, plaintext, ciphertext);
-    }
+                       const std::uint8_t* ciphertext) const noexcept override;
 
     /**
      * @brief                   uBlock128128 Encrypt Multiple Blocks
@@ -126,10 +104,7 @@ public:
      */
     void encrypt_blocks(std::uint8_t*       ciphertext,
                         const std::uint8_t* plaintext,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::ublock128128_enc_blocks(&ctx_, ciphertext, plaintext, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 
     /**
      * @brief                   uBlock128128 Decrypt Multiple Blocks
@@ -139,10 +114,7 @@ public:
      */
     void decrypt_blocks(std::uint8_t*       plaintext,
                         const std::uint8_t* ciphertext,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::ublock128128_dec_blocks(&ctx_, plaintext, ciphertext, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 };
 
 class uBlock128256 : public block_cipher_mode::BlockCipher
@@ -150,22 +122,20 @@ class uBlock128256 : public block_cipher_mode::BlockCipher
 public:
     static constexpr const char* NAME = "uBlock-128-256";
 
-    static constexpr std::size_t NAME_STR_LEN = 14;
-
     /// @brief uBlock128256 Block Size (in bytes)
-    static constexpr std::size_t BLOCK_SIZE = alg::UBLOCK128256_BLOCK_SIZE;
+    static constexpr std::size_t BLOCK_SIZE = 16;
 
     /// @brief uBlock128256 User Key Length (in bytes)
-    static constexpr std::size_t USER_KEY_LEN = alg::UBLOCK128256_USER_KEY_LEN;
+    static constexpr std::size_t USER_KEY_LEN = 32;
 
     /// @brief uBlock128256 Maximum Number of Parallel Encryption and Decryption
-    static constexpr std::size_t PARALLEL_NUM = alg::UBLOCK128256_PARALLEL_NUM;
+    static constexpr std::size_t PARALLEL_NUM = 1;
 
     static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
     /// @brief uBlock128256 private Context
-    alg::uBlockCTX ctx_;
+    std::uint8_t rk_data_[800];
 
 public:
     /**
@@ -190,6 +160,8 @@ public:
     {
         return NAME;
     }
+
+    const char* fetch_impl_algo() const noexcept override;
 
     std::size_t fetch_block_size() const noexcept override
     {
@@ -218,17 +190,7 @@ public:
      * @param[in]   enc         uBlock128256::ENCRYPTION or
      * uBlock128256::DECRYPTION
      */
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override
-    {
-        if (enc == uBlock128256::ENCRYPTION)
-        {
-            alg::ublock128256_enc_key_init(&ctx_, user_key);
-        }
-        else
-        {
-            alg::ublock128256_dec_key_init(&ctx_, user_key);
-        }
-    }
+    void set_key(const std::uint8_t* user_key, int enc) noexcept override;
 
     /**
      * @brief                   uBlock128256 Encrypt Single Block
@@ -236,10 +198,7 @@ public:
      * @param[in]   plaintext   16-bytes plaintext
      */
     void encrypt_block(std::uint8_t*       ciphertext,
-                       const std::uint8_t* plaintext) const noexcept override
-    {
-        alg::ublock128256_enc_block(&ctx_, ciphertext, plaintext);
-    }
+                       const std::uint8_t* plaintext) const noexcept override;
 
     /**
      * @brief                   uBlock128256 Decrypt Single Block
@@ -247,10 +206,7 @@ public:
      * @param[in]   ciphertext  16-bytes ciphertext
      */
     void decrypt_block(std::uint8_t*       plaintext,
-                       const std::uint8_t* ciphertext) const noexcept override
-    {
-        alg::ublock128256_dec_block(&ctx_, plaintext, ciphertext);
-    }
+                       const std::uint8_t* ciphertext) const noexcept override;
 
     /**
      * @brief                   uBlock128256 Encrypt Multiple Blocks
@@ -260,10 +216,7 @@ public:
      */
     void encrypt_blocks(std::uint8_t*       ciphertext,
                         const std::uint8_t* plaintext,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::ublock128256_enc_blocks(&ctx_, ciphertext, plaintext, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 
     /**
      * @brief                   uBlock128256 Decrypt Multiple Blocks
@@ -273,10 +226,7 @@ public:
      */
     void decrypt_blocks(std::uint8_t*       plaintext,
                         const std::uint8_t* ciphertext,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::ublock128256_dec_blocks(&ctx_, plaintext, ciphertext, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 };
 
 class uBlock256256 : public block_cipher_mode::BlockCipher
@@ -285,19 +235,19 @@ public:
     static constexpr const char* NAME = "uBlock-256-256";
 
     /// @brief uBlock256256 Block Size (in bytes)
-    static constexpr std::size_t BLOCK_SIZE = alg::UBLOCK256256_BLOCK_SIZE;
+    static constexpr std::size_t BLOCK_SIZE = 32;
 
     /// @brief uBlock256256 User Key Length (in bytes)
-    static constexpr std::size_t USER_KEY_LEN = alg::UBLOCK256256_USER_KEY_LEN;
+    static constexpr std::size_t USER_KEY_LEN = 32;
 
     /// @brief uBlock256256 Maximum Number of Parallel Encryption and Decryption
-    static constexpr std::size_t PARALLEL_NUM = alg::UBLOCK256256_PARALLEL_NUM;
+    static constexpr std::size_t PARALLEL_NUM = 1;
 
     static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
     /// @brief uBlock256256 private Context
-    alg::uBlockCTX ctx_;
+    std::uint8_t rk_data_[1600];
 
 public:
     /**
@@ -322,6 +272,8 @@ public:
     {
         return NAME;
     }
+
+    const char* fetch_impl_algo() const noexcept override;
 
     std::size_t fetch_block_size() const noexcept override
     {
@@ -350,17 +302,7 @@ public:
      * @param[in]   enc         uBlock256256::ENCRYPTION or
      * uBlock256256::DECRYPTION
      */
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override
-    {
-        if (enc == uBlock256256::ENCRYPTION)
-        {
-            alg::ublock256256_enc_key_init(&ctx_, user_key);
-        }
-        else
-        {
-            alg::ublock256256_dec_key_init(&ctx_, user_key);
-        }
-    }
+    void set_key(const std::uint8_t* user_key, int enc) noexcept override;
 
     /**
      * @brief                   uBlock256256 Encrypt Single Block
@@ -368,10 +310,7 @@ public:
      * @param[in]   plaintext   16-bytes plaintext
      */
     void encrypt_block(std::uint8_t*       ciphertext,
-                       const std::uint8_t* plaintext) const noexcept override
-    {
-        alg::ublock256256_enc_block(&ctx_, ciphertext, plaintext);
-    }
+                       const std::uint8_t* plaintext) const noexcept override;
 
     /**
      * @brief                   uBlock256256 Decrypt Single Block
@@ -379,10 +318,7 @@ public:
      * @param[in]   ciphertext  16-bytes ciphertext
      */
     void decrypt_block(std::uint8_t*       plaintext,
-                       const std::uint8_t* ciphertext) const noexcept override
-    {
-        alg::ublock256256_dec_block(&ctx_, plaintext, ciphertext);
-    }
+                       const std::uint8_t* ciphertext) const noexcept override;
 
     /**
      * @brief                   uBlock256256 Encrypt Multiple Blocks
@@ -392,10 +328,7 @@ public:
      */
     void encrypt_blocks(std::uint8_t*       ciphertext,
                         const std::uint8_t* plaintext,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::ublock256256_enc_blocks(&ctx_, ciphertext, plaintext, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 
     /**
      * @brief                   uBlock256256 Decrypt Multiple Blocks
@@ -405,10 +338,7 @@ public:
      */
     void decrypt_blocks(std::uint8_t*       plaintext,
                         const std::uint8_t* ciphertext,
-                        std::size_t         block_num) const noexcept override
-    {
-        alg::ublock256256_dec_blocks(&ctx_, plaintext, ciphertext, block_num);
-    }
+                        std::size_t         block_num) const noexcept override;
 };
 
 } // namespace ublock

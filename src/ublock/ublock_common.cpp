@@ -1,5 +1,5 @@
-#if !defined(CPU_FLAG_SSSE3)
-#include <gmlib/ublock/internal/ublock_common.h>
+#include "ublock_common.h"
+#if defined(UBLOCK_IMPL_COMMON)
 
 namespace ublock::internal::common {
 
@@ -326,8 +326,8 @@ static inline void PR256I_u128(std::uint64_t n[2]) noexcept
 // **************************************************
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 
-static void ublock128128_key_init(std::uint64_t      round_key[17][2],
-                                  const std::uint8_t user_key[16]) noexcept
+static void _ublock128128_key_init(std::uint64_t      round_key[17][2],
+                                   const std::uint8_t user_key[16]) noexcept
 {
     std::uint32_t K[4];
     K[0] = MEM_LOAD32BE(user_key + 0);
@@ -352,8 +352,8 @@ static void ublock128128_key_init(std::uint64_t      round_key[17][2],
     }
 }
 
-static void ublock128256_key_init(std::uint64_t      round_key[25][2],
-                                  const std::uint8_t user_key[32]) noexcept
+static void _ublock128256_key_init(std::uint64_t      round_key[25][2],
+                                   const std::uint8_t user_key[32]) noexcept
 {
     std::uint64_t K[4];
     K[0] = MEM_LOAD64BE(user_key + 0);
@@ -376,8 +376,8 @@ static void ublock128256_key_init(std::uint64_t      round_key[25][2],
     }
 }
 
-static void ublock256256_key_init(std::uint64_t      round_key[25][4],
-                                  const std::uint8_t user_key[32]) noexcept
+static void _ublock256256_key_init(std::uint64_t      round_key[25][4],
+                                   const std::uint8_t user_key[32]) noexcept
 {
     std::uint64_t K[4];
     K[0] = MEM_LOAD64BE(user_key + 0);
@@ -402,9 +402,9 @@ static void ublock256256_key_init(std::uint64_t      round_key[25][4],
     }
 }
 
-static void ublock128128_enc_block(const std::uint64_t round_key[17][2],
-                                   std::uint8_t        out[16],
-                                   const std::uint8_t  in[16]) noexcept
+static void _ublock128128_enc_block(const std::uint64_t round_key[17][2],
+                                    std::uint8_t        out[16],
+                                    const std::uint8_t  in[16]) noexcept
 {
     // X0||X1 <- X
     std::uint64_t X0 = MEM_LOAD64BE(in + 0);
@@ -431,9 +431,9 @@ static void ublock128128_enc_block(const std::uint64_t round_key[17][2],
     MEM_STORE64BE(out + 8, Y1);
 }
 
-static void ublock128128_dec_block(const std::uint64_t round_key[17][2],
-                                   std::uint8_t        out[16],
-                                   const std::uint8_t  in[16]) noexcept
+static void _ublock128128_dec_block(const std::uint64_t round_key[17][2],
+                                    std::uint8_t        out[16],
+                                    const std::uint8_t  in[16]) noexcept
 {
     // Y0||Y1 <- Y
     std::uint64_t Y0 = MEM_LOAD64BE(in + 0);
@@ -462,9 +462,9 @@ static void ublock128128_dec_block(const std::uint64_t round_key[17][2],
     MEM_STORE64BE(out + 8, X1);
 }
 
-static void ublock128256_enc_block(const std::uint64_t round_key[25][2],
-                                   std::uint8_t        out[16],
-                                   const std::uint8_t  in[16]) noexcept
+static void _ublock128256_enc_block(const std::uint64_t round_key[25][2],
+                                    std::uint8_t        out[16],
+                                    const std::uint8_t  in[16]) noexcept
 {
     // X0||X1 <- X
     std::uint64_t X0 = MEM_LOAD64BE(in + 0);
@@ -491,9 +491,9 @@ static void ublock128256_enc_block(const std::uint64_t round_key[25][2],
     MEM_STORE64BE(out + 8, Y1);
 }
 
-static void ublock128256_dec_block(const std::uint64_t round_key[25][2],
-                                   std::uint8_t        out[16],
-                                   const std::uint8_t  in[16]) noexcept
+static void _ublock128256_dec_block(const std::uint64_t round_key[25][2],
+                                    std::uint8_t        out[16],
+                                    const std::uint8_t  in[16]) noexcept
 {
     // Y0||Y1 <- Y
     std::uint64_t Y0 = MEM_LOAD64BE(in + 0);
@@ -522,9 +522,9 @@ static void ublock128256_dec_block(const std::uint64_t round_key[25][2],
     MEM_STORE64BE(out + 8, X1);
 }
 
-static void ublock256256_enc_block(const std::uint64_t round_key[25][4],
-                                   std::uint8_t        out[32],
-                                   const std::uint8_t  in[32]) noexcept
+static void _ublock256256_enc_block(const std::uint64_t round_key[25][4],
+                                    std::uint8_t        out[32],
+                                    const std::uint8_t  in[32]) noexcept
 {
     std::uint64_t X0[2], X1[2];
     X0[0] = MEM_LOAD64BE(in + 0);
@@ -564,9 +564,9 @@ static void ublock256256_enc_block(const std::uint64_t round_key[25][4],
     MEM_STORE64BE(out + 24, Y1[1]);
 }
 
-static void ublock256256_dec_block(const std::uint64_t round_key[25][4],
-                                   std::uint8_t        out[32],
-                                   const std::uint8_t  in[32]) noexcept
+static void _ublock256256_dec_block(const std::uint64_t round_key[25][4],
+                                    std::uint8_t        out[32],
+                                    const std::uint8_t  in[32]) noexcept
 {
     std::uint64_t Y0[2], Y1[2];
     Y0[0] = MEM_LOAD64BE(in + 0);
@@ -619,52 +619,54 @@ static void ublock256256_dec_block(const std::uint64_t round_key[25][4],
 // ********** uBlock 128/128 **************
 // ****************************************
 
-void ublock128128_enc_key_init(uBlockCTX         *ctx,
+void ublock128128_enc_key_init(std::uint8_t       round_key[544],
                                const std::uint8_t user_key[16]) noexcept
 {
-    ublock128128_key_init(ctx->m.sub_key128128, user_key);
+    _ublock128128_key_init((std::uint64_t (*)[2])round_key, user_key);
 }
 
-void ublock128128_dec_key_init(uBlockCTX         *ctx,
+void ublock128128_dec_key_init(std::uint8_t       round_key[544],
                                const std::uint8_t user_key[16]) noexcept
 {
-    ublock128128_key_init(ctx->m.sub_key128128, user_key);
+    _ublock128128_key_init((std::uint64_t (*)[2])round_key, user_key);
 }
 
-void ublock128128_enc_block(const uBlockCTX   *ctx,
+void ublock128128_enc_block(const std::uint8_t round_key[544],
                             std::uint8_t       ciphertext[16],
                             const std::uint8_t plaintext[16]) noexcept
 {
-    ublock128128_enc_block(ctx->m.sub_key128128, ciphertext, plaintext);
+    _ublock128128_enc_block((const std::uint64_t (*)[2])round_key, ciphertext,
+                            plaintext);
 }
 
-void ublock128128_dec_block(const uBlockCTX   *ctx,
+void ublock128128_dec_block(const std::uint8_t round_key[544],
                             std::uint8_t       plaintext[16],
                             const std::uint8_t ciphertext[16]) noexcept
 {
-    ublock128128_dec_block(ctx->m.sub_key128128, plaintext, ciphertext);
+    _ublock128128_dec_block((const std::uint64_t (*)[2])round_key, plaintext,
+                            ciphertext);
 }
 
-void ublock128128_enc_blocks(const uBlockCTX    *ctx,
+void ublock128128_enc_blocks(const std::uint8_t  round_key[544],
                              std::uint8_t       *ciphertext,
                              const std::uint8_t *plaintext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        ublock128128_enc_block(ctx->m.sub_key128128, ciphertext, plaintext);
+        ublock128128_enc_block(round_key, ciphertext, plaintext);
         ciphertext += 16, plaintext += 16, block_num--;
     }
 }
 
-void ublock128128_dec_blocks(const uBlockCTX    *ctx,
+void ublock128128_dec_blocks(const std::uint8_t  round_key[544],
                              std::uint8_t       *plaintext,
                              const std::uint8_t *ciphertext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        ublock128128_dec_block(ctx->m.sub_key128128, plaintext, ciphertext);
+        ublock128128_dec_block(round_key, plaintext, ciphertext);
         plaintext += 16, ciphertext += 16, block_num--;
     }
 }
@@ -673,52 +675,54 @@ void ublock128128_dec_blocks(const uBlockCTX    *ctx,
 // ********** uBlock 128/256 **************
 // ****************************************
 
-void ublock128256_enc_key_init(uBlockCTX         *ctx,
+void ublock128256_enc_key_init(std::uint8_t       round_key[800],
                                const std::uint8_t user_key[32]) noexcept
 {
-    ublock128256_key_init(ctx->m.sub_key128256, user_key);
+    _ublock128256_key_init((std::uint64_t (*)[2])round_key, user_key);
 }
 
-void ublock128256_dec_key_init(uBlockCTX         *ctx,
+void ublock128256_dec_key_init(std::uint8_t       round_key[800],
                                const std::uint8_t user_key[32]) noexcept
 {
-    ublock128256_key_init(ctx->m.sub_key128256, user_key);
+    _ublock128256_key_init((std::uint64_t (*)[2])round_key, user_key);
 }
 
-void ublock128256_enc_block(const uBlockCTX   *ctx,
+void ublock128256_enc_block(const std::uint8_t round_key[800],
                             std::uint8_t       ciphertext[16],
                             const std::uint8_t plaintext[16]) noexcept
 {
-    ublock128256_enc_block(ctx->m.sub_key128256, ciphertext, plaintext);
+    _ublock128256_enc_block((const std::uint64_t (*)[2])round_key, ciphertext,
+                            plaintext);
 }
 
-void ublock128256_dec_block(const uBlockCTX   *ctx,
+void ublock128256_dec_block(const std::uint8_t round_key[800],
                             std::uint8_t       plaintext[16],
                             const std::uint8_t ciphertext[16]) noexcept
 {
-    ublock128256_dec_block(ctx->m.sub_key128256, plaintext, ciphertext);
+    _ublock128256_dec_block((const std::uint64_t (*)[2])round_key, plaintext,
+                            ciphertext);
 }
 
-void ublock128256_enc_blocks(const uBlockCTX    *ctx,
+void ublock128256_enc_blocks(const std::uint8_t  round_key[800],
                              std::uint8_t       *ciphertext,
                              const std::uint8_t *plaintext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        ublock128256_enc_block(ctx->m.sub_key128256, ciphertext, plaintext);
+        ublock128256_enc_block(round_key, ciphertext, plaintext);
         ciphertext += 16, plaintext += 16, block_num--;
     }
 }
 
-void ublock128256_dec_blocks(const uBlockCTX    *ctx,
+void ublock128256_dec_blocks(const std::uint8_t  round_key[800],
                              std::uint8_t       *plaintext,
                              const std::uint8_t *ciphertext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        ublock128256_dec_block(ctx->m.sub_key128256, plaintext, ciphertext);
+        ublock128256_dec_block(round_key, plaintext, ciphertext);
         plaintext += 16, ciphertext += 16, block_num--;
     }
 }
@@ -727,52 +731,54 @@ void ublock128256_dec_blocks(const uBlockCTX    *ctx,
 // ********** uBlock 256/256 **************
 // ****************************************
 
-void ublock256256_enc_key_init(uBlockCTX         *ctx,
+void ublock256256_enc_key_init(std::uint8_t       round_key[1600],
                                const std::uint8_t user_key[32]) noexcept
 {
-    ublock256256_key_init(ctx->m.sub_key256256, user_key);
+    _ublock256256_key_init((std::uint64_t (*)[4])round_key, user_key);
 }
 
-void ublock256256_dec_key_init(uBlockCTX         *ctx,
+void ublock256256_dec_key_init(std::uint8_t       round_key[1600],
                                const std::uint8_t user_key[32]) noexcept
 {
-    ublock256256_key_init(ctx->m.sub_key256256, user_key);
+    _ublock256256_key_init((std::uint64_t (*)[4])round_key, user_key);
 }
 
-void ublock256256_enc_block(const uBlockCTX   *ctx,
+void ublock256256_enc_block(const std::uint8_t round_key[1600],
                             std::uint8_t       ciphertext[32],
                             const std::uint8_t plaintext[32]) noexcept
 {
-    ublock256256_enc_block(ctx->m.sub_key256256, ciphertext, plaintext);
+    _ublock256256_enc_block((const std::uint64_t (*)[4])round_key, ciphertext,
+                            plaintext);
 }
 
-void ublock256256_dec_block(const uBlockCTX   *ctx,
+void ublock256256_dec_block(const std::uint8_t round_key[1600],
                             std::uint8_t       plaintext[32],
                             const std::uint8_t ciphertext[32]) noexcept
 {
-    ublock256256_dec_block(ctx->m.sub_key256256, plaintext, ciphertext);
+    _ublock256256_dec_block((const std::uint64_t (*)[4])round_key, plaintext,
+                            ciphertext);
 }
 
-void ublock256256_enc_blocks(const uBlockCTX    *ctx,
+void ublock256256_enc_blocks(const std::uint8_t  round_key[1600],
                              std::uint8_t       *ciphertext,
                              const std::uint8_t *plaintext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        ublock256256_enc_block(ctx->m.sub_key256256, ciphertext, plaintext);
+        ublock256256_enc_block(round_key, ciphertext, plaintext);
         ciphertext += 32, plaintext += 32, block_num--;
     }
 }
 
-void ublock256256_dec_blocks(const uBlockCTX    *ctx,
+void ublock256256_dec_blocks(const std::uint8_t  round_key[1600],
                              std::uint8_t       *plaintext,
                              const std::uint8_t *ciphertext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        ublock256256_dec_block(ctx->m.sub_key256256, plaintext, ciphertext);
+        ublock256256_dec_block(round_key, plaintext, ciphertext);
         plaintext += 32, ciphertext += 32, block_num--;
     }
 }

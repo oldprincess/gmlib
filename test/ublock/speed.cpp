@@ -1,18 +1,16 @@
-#include <gmlib/ublock/internal/ublock_standard.h>
+#include "speed.h"
 
-#if defined(UBLOCK_IMPL_STANDARD)
+#include <gmlib/ublock/ublock.h>
 
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
 
-#include "speed.h"
-
-using namespace ublock::internal::standard;
+using namespace ublock;
 
 constexpr std::size_t SIZE = 4096 * 32;
-constexpr int         loop = 1000;
+constexpr int         loop = 100;
 
 static void rand_mem(void* mem, std::size_t size)
 {
@@ -24,10 +22,10 @@ static void rand_mem(void* mem, std::size_t size)
     }
 }
 
-static void speed_ublock128128_standard()
+static void speed_ublock128128()
 {
     std::clock_t st, et;
-    uBlockCTX    ctx;
+    uBlock128128 ctx;
 
     double time_s, speed_Mbps;
 
@@ -38,13 +36,13 @@ static void speed_ublock128128_standard()
     rand_mem(data, SIZE);
     rand_mem(user_key, 32);
 
-    std::printf("speed ublock128128 standard ... ");
-    ublock128128_enc_key_init(&ctx, user_key);
+    std::printf("speed ublock128128 %s ... ", ctx.fetch_impl_algo());
+
     st = std::clock();
     for (int i = 0; i < loop; i++)
     {
-        ublock128128_enc_blocks(&ctx, data, data,
-                                SIZE / UBLOCK128128_BLOCK_SIZE);
+        ctx.set_key(user_key, uBlock128128::ENCRYPTION);
+        ctx.encrypt_blocks(data, data, SIZE / uBlock128128::BLOCK_SIZE);
     }
     et = std::clock();
 
@@ -55,10 +53,10 @@ static void speed_ublock128128_standard()
     delete[] data;
 }
 
-static void speed_ublock128256_standard()
+static void speed_ublock128256()
 {
     std::clock_t st, et;
-    uBlockCTX    ctx;
+    uBlock128256 ctx;
 
     double time_s, speed_Mbps;
 
@@ -69,13 +67,12 @@ static void speed_ublock128256_standard()
     rand_mem(data, SIZE);
     rand_mem(user_key, 32);
 
-    std::printf("speed ublock128256 standard ... ");
-    ublock128256_enc_key_init(&ctx, user_key);
+    std::printf("speed ublock128256 %s ... ", ctx.fetch_impl_algo());
     st = std::clock();
     for (int i = 0; i < loop; i++)
     {
-        ublock128256_enc_blocks(&ctx, data, data,
-                                SIZE / UBLOCK128256_BLOCK_SIZE);
+        ctx.set_key(user_key, uBlock128256::ENCRYPTION);
+        ctx.encrypt_blocks(data, data, SIZE / uBlock128256::BLOCK_SIZE);
     }
     et = std::clock();
 
@@ -86,10 +83,10 @@ static void speed_ublock128256_standard()
     delete[] data;
 }
 
-static void speed_ublock256256_standard()
+static void speed_ublock256256()
 {
     std::clock_t st, et;
-    uBlockCTX    ctx;
+    uBlock256256 ctx;
 
     double time_s, speed_Mbps;
 
@@ -100,13 +97,12 @@ static void speed_ublock256256_standard()
     rand_mem(data, SIZE);
     rand_mem(user_key, 32);
 
-    std::printf("speed ublock256256 standard ... ");
-    ublock256256_enc_key_init(&ctx, user_key);
+    std::printf("speed ublock256256 %s ... ", ctx.fetch_impl_algo());
     st = std::clock();
     for (int i = 0; i < loop; i++)
     {
-        ublock256256_enc_blocks(&ctx, data, data,
-                                SIZE / UBLOCK256256_BLOCK_SIZE);
+        ctx.set_key(user_key, uBlock256256::ENCRYPTION);
+        ctx.encrypt_blocks(data, data, SIZE / uBlock256256::BLOCK_SIZE);
     }
     et = std::clock();
 
@@ -117,14 +113,9 @@ static void speed_ublock256256_standard()
     delete[] data;
 }
 
-void speed_ublock_standard()
+void speed_ublock()
 {
-    speed_ublock128128_standard();
-    speed_ublock128256_standard();
-    speed_ublock256256_standard();
+    speed_ublock128128();
+    speed_ublock128256();
+    speed_ublock256256();
 }
-#else
-void speed_ublock_standard()
-{
-}
-#endif
