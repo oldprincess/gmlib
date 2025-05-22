@@ -1,7 +1,7 @@
 #ifndef SM3_INTERNAL_SM3_COMMON_H
 #define SM3_INTERNAL_SM3_COMMON_H
 
-#include <gmlib/sm3/config.h>
+#include "config.h"
 
 #if defined(SM3_IMPL_COMMON)
 
@@ -10,25 +10,23 @@
 
 namespace sm3::internal::common {
 
+constexpr const char* SM3_ALGO_NAME = "common";
+
 constexpr std::size_t SM3_BLOCK_SIZE        = 64;
 constexpr std::size_t SM3_DIGEST_SIZE       = 32;
 constexpr std::size_t SM3_SECURITY_STRENGTH = 16;
 
-typedef struct Sm3CTX
-{
-    std::uint32_t state[8];
-    std::uint64_t data_bits;
-} Sm3CTX;
+void sm3_init(std::uint32_t state[8], std::uint64_t* data_bits) noexcept;
 
-void sm3_init(Sm3CTX* ctx) noexcept;
+void sm3_reset(std::uint32_t state[8], std::uint64_t* data_bits) noexcept;
 
-void sm3_reset(Sm3CTX* ctx) noexcept;
-
-int sm3_update_blocks(Sm3CTX*             ctx,
+int sm3_update_blocks(std::uint32_t       state[8],
+                      std::uint64_t*      data_bits,
                       const std::uint8_t* in,
                       std::size_t         block_num) noexcept;
 
-int sm3_final_block(Sm3CTX*             ctx,
+int sm3_final_block(std::uint32_t       state[8],
+                    std::uint64_t*      data_bits,
                     std::uint8_t        digest[32],
                     const std::uint8_t* in,
                     std::size_t         inl) noexcept;

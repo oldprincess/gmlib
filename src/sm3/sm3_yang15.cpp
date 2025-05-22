@@ -1,5 +1,5 @@
-#if defined(SUPPORT_SM3_YANG15)
-#include <gmlib/sm3/internal/sm3_yang15.h>
+#include "sm3_yang15.h"
+#if defined(SM3_IMPL_YANG15)
 
 #include <cstring>
 
@@ -83,26 +83,26 @@ static const std::uint32_t T[64] = {
     0xa7a879d8U, 0x4f50f3b1U, 0x9ea1e762U, 0x3d43cec5U,
 };
 
-void sm3_init(Sm3CTX* ctx) noexcept
+void sm3_init(std::uint32_t state[8], std::uint64_t* data_bits) noexcept
 {
     static const std::uint32_t SM3_INIT_DIGEST[8] = {
         0x7380166F, 0x4914B2B9, 0x172442D7, 0xDA8A0600,
         0xA96F30BC, 0x163138AA, 0xE38DEE4D, 0xB0FB0E4E,
     };
-    ctx->state[0]  = SM3_INIT_DIGEST[0];
-    ctx->state[1]  = SM3_INIT_DIGEST[1];
-    ctx->state[2]  = SM3_INIT_DIGEST[2];
-    ctx->state[3]  = SM3_INIT_DIGEST[3];
-    ctx->state[4]  = SM3_INIT_DIGEST[4];
-    ctx->state[5]  = SM3_INIT_DIGEST[5];
-    ctx->state[6]  = SM3_INIT_DIGEST[6];
-    ctx->state[7]  = SM3_INIT_DIGEST[7];
-    ctx->data_bits = 0;
+    state[0]   = SM3_INIT_DIGEST[0];
+    state[1]   = SM3_INIT_DIGEST[1];
+    state[2]   = SM3_INIT_DIGEST[2];
+    state[3]   = SM3_INIT_DIGEST[3];
+    state[4]   = SM3_INIT_DIGEST[4];
+    state[5]   = SM3_INIT_DIGEST[5];
+    state[6]   = SM3_INIT_DIGEST[6];
+    state[7]   = SM3_INIT_DIGEST[7];
+    *data_bits = 0;
 }
 
-void sm3_reset(Sm3CTX* ctx) noexcept
+void sm3_reset(std::uint32_t state[8], std::uint64_t* data_bits) noexcept
 {
-    sm3_init(ctx);
+    sm3_init(state, data_bits);
 }
 
 static void sm3_compress_block(std::uint32_t      state[8],
@@ -149,7 +149,8 @@ static void sm3_compress_block(std::uint32_t      state[8],
     state[7] ^= H;
 }
 
-int sm3_update_blocks(Sm3CTX*             ctx,
+int sm3_update_blocks(std::uint32_t       state[8],
+                      std::uint64_t*      data_bits,
                       const std::uint8_t* data,
                       std::size_t         block_num) noexcept
 {
@@ -157,52 +158,53 @@ int sm3_update_blocks(Sm3CTX*             ctx,
     {
         return -1;
     }
-    std::uint64_t nxt_bits = block_num * 512 + ctx->data_bits;
-    if (nxt_bits < ctx->data_bits)
+    std::uint64_t nxt_bits = block_num * 512 + *data_bits;
+    if (nxt_bits < *data_bits)
     {
         return -1;
     }
-    ctx->data_bits = nxt_bits;
+    *data_bits = nxt_bits;
     while (block_num)
     {
-        sm3_compress_block(ctx->state, data);
+        sm3_compress_block(state, data);
         data += 64, block_num -= 1;
     }
     return 0;
 }
 
-int sm3_final_block(Sm3CTX*             ctx,
+int sm3_final_block(std::uint32_t       state[8],
+                    std::uint64_t*      data_bits,
                     std::uint8_t        digest[32],
                     const std::uint8_t* in,
                     std::size_t         inl) noexcept
 {
-    std::uint64_t nxt_bits = inl * 8 + ctx->data_bits;
-    if (nxt_bits < ctx->data_bits)
+    std::uint64_t nxt_bits = inl * 8 + *data_bits;
+    if (nxt_bits < *data_bits)
     {
         return -1;
     }
-    ctx->data_bits = nxt_bits;
+    *data_bits = nxt_bits;
 
     std::size_t  pad_num = (64ULL + 56 - 1 - inl) % 64;
     std::uint8_t buf[64 * 2];
     std::size_t  buf_size = 0;
     std::memcpy(buf, in, inl);
-    buf_size += inl;                               // update
-    buf[buf_size] = 0x80;                          // 10..0
-    buf_size += 1;                                 // update
-    std::memset(buf + buf_size, 0, pad_num);       // pad 0
-    buf_size += pad_num;                           // update
-    MEM_STORE64BE(buf + buf_size, ctx->data_bits); //
-    buf_size += 8;                                 // update
+    buf_size += inl;                           // update
+    buf[buf_size] = 0x80;                      // 10..0
+    buf_size += 1;                             // update
+    std::memset(buf + buf_size, 0, pad_num);   // pad 0
+    buf_size += pad_num;                       // update
+    MEM_STORE64BE(buf + buf_size, *data_bits); //
+    buf_size += 8;                             // update
     // compress
     for (std::size_t i = 0; i < buf_size; i += 64)
     {
-        sm3_compress_block(ctx->state, buf + i);
+        sm3_compress_block(state, buf + i);
     }
     // output digest
     for (int i = 0; i < 8; i++)
     {
-        MEM_STORE32BE(digest + 4 * i, ctx->state[i]);
+        MEM_STORE32BE(digest + 4 * i, state[i]);
     }
     return 0;
 }

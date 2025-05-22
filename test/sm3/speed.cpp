@@ -1,10 +1,8 @@
-#include <gmlib/sm3/internal/sm3_yang15.h>
+#include <gmlib/sm3/sm3.h>
 
-#if defined(SM3_IMPL_YANG15)
-
+#include <cstdio>
 #include <ctime>
 #include <random>
-#include <cstdio>
 
 static void rand_mem(void* mem, std::size_t size)
 {
@@ -17,36 +15,29 @@ static void rand_mem(void* mem, std::size_t size)
     }
 }
 
-using namespace sm3::internal::yang15;
+using namespace sm3;
 
 constexpr std::size_t MSG_SIZE = 4096;
 constexpr int         LOOP     = 10000;
 
-void speed_sm3_yang15()
+void speed_sm3()
 {
-    Sm3CTX       ctx;
-    std::uint8_t digest[SM3_DIGEST_SIZE];
+    SM3          ctx;
+    std::uint8_t digest[SM3::DIGEST_SIZE];
     std::uint8_t msg[MSG_SIZE];
     std::clock_t st, et;
     double       time_s, speed_Mbps;
 
     rand_mem(msg, MSG_SIZE);
-    std::printf("speed sm3 yang15 ... ");
+    std::printf("speed sm3 %s ... ", ctx.fetch_impl_algo());
     st = std::clock();
     for (int i = 0; i < LOOP; i++)
     {
-        sm3_init(&ctx);
-        sm3_update_blocks(&ctx, msg, MSG_SIZE / SM3_BLOCK_SIZE);
-        sm3_final_block(&ctx, digest, nullptr, 0);
+        ctx.reset();
+        ctx.do_final(digest, msg, MSG_SIZE);
     }
     et         = std::clock();
     time_s     = (double)(et - st) / CLOCKS_PER_SEC;
     speed_Mbps = LOOP * MSG_SIZE * 8 / time_s / 1024.0 / 1024.0;
     std::printf("%f Mbps\n", speed_Mbps);
 }
-
-#else
-void speed_sm3_yang15()
-{
-}
-#endif
