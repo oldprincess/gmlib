@@ -11,11 +11,9 @@ int main(int argc, char* argv[])
     try
     {
         test_bn();
-        test_uint256_common();
-        test_mont256_common();
+        test_uint256();
+        test_mont256();
         test_mpz_common();
-        test_uint256_x64();
-        test_mont256_x64();
         test_mpz_x64();
     }
     catch (std::exception& e)
@@ -27,10 +25,8 @@ int main(int argc, char* argv[])
     if (argc == 2 && std::strcmp(argv[1], "speed") == 0)
     {
         speed_bn();
-        speed_uint256_common();
-        speed_mont256_common();
-        speed_uint256_x64();
-        speed_mont256_x64();
+        speed_uint256();
+        speed_uint256();
     }
     return 0;
 }

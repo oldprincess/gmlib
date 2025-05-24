@@ -2,9 +2,7 @@
 #define SPEED_H
 
 void speed_bn();
-void speed_uint256_common();
-void speed_mont256_common();
-void speed_uint256_x64();
-void speed_mont256_x64();
+void speed_uint256();
+void speed_mont256();
 
 #endif

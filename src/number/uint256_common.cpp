@@ -1,5 +1,7 @@
-#include <gmlib/number/internal/uint256_common.h>
+#include "uint256_common.h"
 
+#include <cstdio>
+#include <cstdlib>
 #if defined(NUMBER_IMPL_UINT256_COMMON)
 
 namespace number::internal::common {
@@ -267,6 +269,24 @@ int uint256_add_carry_uint32(std::uint32_t       sum[8],
     return carry;
 }
 
+int uint256_add_carry_uint64(std::uint32_t       sum[8],
+                             const std::uint32_t augend[8],
+                             std::uint64_t       addend) noexcept
+{
+    std::uint32_t addend_lo = (std::uint32_t)addend;
+    std::uint32_t addend_hi = (std::uint32_t)(addend >> 32);
+    int           carry;
+    carry = _add_carry(&sum[0], augend[0], addend_lo, 0);
+    carry = _add_carry(&sum[1], augend[1], addend_hi, carry);
+    carry = _add_carry(&sum[2], augend[2], 0, carry);
+    carry = _add_carry(&sum[3], augend[3], 0, carry);
+    carry = _add_carry(&sum[4], augend[4], 0, carry);
+    carry = _add_carry(&sum[5], augend[5], 0, carry);
+    carry = _add_carry(&sum[6], augend[6], 0, carry);
+    carry = _add_carry(&sum[7], augend[7], 0, carry);
+    return carry;
+}
+
 int uint256_sub_borrow_uint32(std::uint32_t       difference[8],
                               const std::uint32_t minuend[8],
                               std::uint32_t       subtrahend) noexcept
@@ -274,6 +294,24 @@ int uint256_sub_borrow_uint32(std::uint32_t       difference[8],
     int borrow;
     borrow = _sub_borrow(&difference[0], minuend[0], subtrahend, 0);
     borrow = _sub_borrow(&difference[1], minuend[1], 0, borrow);
+    borrow = _sub_borrow(&difference[2], minuend[2], 0, borrow);
+    borrow = _sub_borrow(&difference[3], minuend[3], 0, borrow);
+    borrow = _sub_borrow(&difference[4], minuend[4], 0, borrow);
+    borrow = _sub_borrow(&difference[5], minuend[5], 0, borrow);
+    borrow = _sub_borrow(&difference[6], minuend[6], 0, borrow);
+    borrow = _sub_borrow(&difference[7], minuend[7], 0, borrow);
+    return borrow;
+}
+
+int uint256_sub_borrow_uint64(std::uint32_t       difference[8],
+                              const std::uint32_t minuend[8],
+                              std::uint64_t       subtrahend) noexcept
+{
+    std::uint32_t subtrahend_lo = (std::uint32_t)subtrahend;
+    std::uint32_t subtrahend_hi = (std::uint32_t)(subtrahend >> 32);
+    int           borrow;
+    borrow = _sub_borrow(&difference[0], minuend[0], subtrahend_lo, 0);
+    borrow = _sub_borrow(&difference[1], minuend[1], subtrahend_hi, borrow);
     borrow = _sub_borrow(&difference[2], minuend[2], 0, borrow);
     borrow = _sub_borrow(&difference[3], minuend[3], 0, borrow);
     borrow = _sub_borrow(&difference[4], minuend[4], 0, borrow);
@@ -299,6 +337,14 @@ std::uint32_t uint256_mul_carry_uint32(std::uint32_t       product[8],
     return carry;
 }
 
+std::uint64_t uint256_mul_carry_uint64(std::uint32_t       product[8],
+                                       const std::uint32_t multiplier[8],
+                                       std::uint64_t multiplicand) noexcept
+{
+    std::printf("[NUMBER LOG] not implemented %s:%d\n", __FILE__, __LINE__);
+    std::exit(-1);
+}
+
 std::uint32_t uint256_div_uint32(std::uint32_t       quotient[8],
                                  const std::uint32_t dividend[8],
                                  std::uint32_t       divisor) noexcept
@@ -312,6 +358,14 @@ std::uint32_t uint256_div_uint32(std::uint32_t       quotient[8],
         rem         = rem % divisor;
     }
     return (std::uint32_t)rem;
+}
+
+std::uint64_t uint256_div_uint64(std::uint32_t       quotient[8],
+                                 const std::uint32_t dividend[8],
+                                 std::uint64_t       divisor) noexcept
+{
+    std::printf("[NUMBER LOG] not implemented %s:%d\n", __FILE__, __LINE__);
+    std::exit(-1);
 }
 
 void uint256_mod_add(std::uint32_t       sum[8],
@@ -422,6 +476,18 @@ int uint256_cmp_uint32(const std::uint32_t a[8], std::uint32_t b) noexcept
     return 0;
 }
 
+int uint256_cmp_uint64(const std::uint32_t a[8], std::uint64_t b) noexcept
+{
+    for (int i = 7; i >= 2; i--)
+    {
+        if (a[i] > 0) return 1;
+    }
+    std::uint64_t a10 = ((std::uint64_t)a[1] << 32) | (std::uint64_t)a[0];
+    if (a10 > b) return 1;
+    if (a10 < b) return -1;
+    return 0;
+}
+
 bool uint256_equal(const std::uint32_t a[8], const std::uint32_t b[8]) noexcept
 {
     return ((a[0] ^ b[0]) | (a[1] ^ b[1]) | (a[2] ^ b[2]) | (a[3] ^ b[3]) |
@@ -464,6 +530,13 @@ void uint256_set_uint32(std::uint32_t ret[8], std::uint32_t num) noexcept
 {
     ret[0] = num;
     ret[1] = ret[2] = ret[3] = ret[4] = ret[5] = ret[6] = ret[7] = 0;
+}
+
+void uint256_set_uint64(std::uint32_t ret[8], std::uint64_t num) noexcept
+{
+    ret[0] = (std::uint32_t)num;
+    ret[1] = (std::uint32_t)(num >> 32);
+    ret[2] = ret[3] = ret[4] = ret[5] = ret[6] = ret[7] = 0;
 }
 
 // ****************************************

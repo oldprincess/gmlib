@@ -1,5 +1,6 @@
-#include <gmlib/number/internal/mont256_common.h>
-#include <gmlib/number/internal/uint256_common.h>
+#include "mont256_common.h"
+
+#include "uint256_common.h"
 
 #if defined(NUMBER_IMPL_MONT256_COMMON)
 
@@ -33,7 +34,8 @@ static void mont256_redc(const Mont256CTX* ctx,
                          std::uint32_t     r[8],
                          std::uint32_t     t[16]) noexcept
 {
-    const std::uint32_t N_ = ctx->N_; // N':N'*N=-1 mod B, B=2^32, R=B^8
+    std::uint32_t        N_ = *(const std::uint32_t*)(ctx->N_);
+    const std::uint32_t* P  = (const std::uint32_t*)(ctx->P);
 
     std::uint32_t t16 = 0; // overflow
     for (int i = 0; i < 8; i++)
@@ -41,14 +43,14 @@ static void mont256_redc(const Mont256CTX* ctx,
         std::uint32_t carry = 0;
         std::uint32_t m     = (std::uint32_t)(t[i] * N_);
 
-        carry = _add_mul_carry(&t[i + 0], m, ctx->P[0], 0);
-        carry = _add_mul_carry(&t[i + 1], m, ctx->P[1], carry);
-        carry = _add_mul_carry(&t[i + 2], m, ctx->P[2], carry);
-        carry = _add_mul_carry(&t[i + 3], m, ctx->P[3], carry);
-        carry = _add_mul_carry(&t[i + 4], m, ctx->P[4], carry);
-        carry = _add_mul_carry(&t[i + 5], m, ctx->P[5], carry);
-        carry = _add_mul_carry(&t[i + 6], m, ctx->P[6], carry);
-        carry = _add_mul_carry(&t[i + 7], m, ctx->P[7], carry);
+        carry = _add_mul_carry(&t[i + 0], m, P[0], 0);
+        carry = _add_mul_carry(&t[i + 1], m, P[1], carry);
+        carry = _add_mul_carry(&t[i + 2], m, P[2], carry);
+        carry = _add_mul_carry(&t[i + 3], m, P[3], carry);
+        carry = _add_mul_carry(&t[i + 4], m, P[4], carry);
+        carry = _add_mul_carry(&t[i + 5], m, P[5], carry);
+        carry = _add_mul_carry(&t[i + 6], m, P[6], carry);
+        carry = _add_mul_carry(&t[i + 7], m, P[7], carry);
 
         int c = _add_carry(&t[i + 8], t[i + 8], carry, 0);
         for (int j = 9; j < 8 + 8 - i && c != 0; j++)
@@ -58,9 +60,9 @@ static void mont256_redc(const Mont256CTX* ctx,
         t16 += c;
     }
     uint256_cpy(r, t + 8);
-    if (t16 || uint256_cmp(r, ctx->P) >= 0)
+    if (t16 || uint256_cmp(r, P) >= 0)
     {
-        uint256_sub_borrow(r, r, ctx->P);
+        uint256_sub_borrow(r, r, P);
     }
 }
 
@@ -68,7 +70,7 @@ static void uint256_to_mont(const Mont256CTX*   ctx,
                             std::uint32_t       r[8],
                             const std::uint32_t a[8]) noexcept
 {
-    mont256_mul(ctx, r, a, ctx->R_POW2);
+    mont256_mul(ctx, r, a, (const std::uint32_t*)ctx->R_POW2);
 }
 
 static void uint256_from_mont(const Mont256CTX*   ctx,
@@ -92,11 +94,11 @@ void mont256_add(const Mont256CTX*   ctx,
                  const std::uint32_t addend[8]) noexcept
 {
     // int carry = uint256_add_carry(sum, augend, addend);
-    // if (carry || uint256_cmp(sum, ctx->P) >= 0)
+    // if (carry || uint256_cmp(sum, P) >= 0)
     // {
-    //     uint256_sub_borrow(sum, sum, ctx->P);
+    //     uint256_sub_borrow(sum, sum, P);
     // }
-    uint256_mod_add(sum, augend, addend, ctx->P);
+    uint256_mod_add(sum, augend, addend, (const std::uint32_t*)ctx->P);
 }
 
 void mont256_sub(const Mont256CTX*   ctx,
@@ -105,21 +107,24 @@ void mont256_sub(const Mont256CTX*   ctx,
                  const std::uint32_t subtrahend[8]) noexcept
 {
     // int borrow = uint256_sub_borrow(difference, minuend, subtrahend);
-    // if (borrow || uint256_cmp(difference, ctx->P) >= 0)
+    // if (borrow || uint256_cmp(difference, P) >= 0)
     // {
-    //     uint256_add_carry(difference, difference, ctx->P);
+    //     uint256_add_carry(difference, difference, P);
     // }
-    uint256_mod_sub(difference, minuend, subtrahend, ctx->P);
+    const std::uint32_t* P = (const std::uint32_t*)ctx->P;
+    uint256_mod_sub(difference, minuend, subtrahend, P);
 }
 
 void mont256_dbl(const Mont256CTX*   ctx,
                  std::uint32_t       product[8],
                  const std::uint32_t multiplier[8]) noexcept
 {
+    const std::uint32_t* P = (const std::uint32_t*)ctx->P;
+
     int carry = uint256_dbl_carry(product, multiplier);
-    if (carry || uint256_cmp(product, ctx->P) >= 0)
+    if (carry || uint256_cmp(product, P) >= 0)
     {
-        uint256_sub_borrow(product, product, ctx->P);
+        uint256_sub_borrow(product, product, P);
     }
 }
 
@@ -127,14 +132,16 @@ void mont256_tpl(const Mont256CTX*   ctx,
                  std::uint32_t       product[8],
                  const std::uint32_t multiplier[8]) noexcept
 {
+    const std::uint32_t* P = (const std::uint32_t*)ctx->P;
+
     int carry = uint256_tpl_carry(product, multiplier);
     while (carry)
     {
-        carry += uint256_sub_borrow(product, product, ctx->P);
+        carry += uint256_sub_borrow(product, product, P);
     }
-    if (uint256_cmp(product, ctx->P) >= 0)
+    if (uint256_cmp(product, P) >= 0)
     {
-        uint256_sub_borrow(product, product, ctx->P);
+        uint256_sub_borrow(product, product, P);
     }
 }
 
@@ -146,7 +153,7 @@ void mont256_neg(const Mont256CTX*   ctx,
     {
         uint256_set_zero(ret);
     }
-    uint256_sub_borrow(ret, ctx->P, num);
+    uint256_sub_borrow(ret, (const std::uint32_t*)ctx->P, num);
 }
 
 void mont256_mul(const Mont256CTX*   ctx,
@@ -172,11 +179,12 @@ void mont256_div2(const Mont256CTX*   ctx,
                   std::uint32_t       quotient[8],
                   const std::uint32_t dividend[8]) noexcept
 {
+    const std::uint32_t* P   = (const std::uint32_t*)ctx->P;
     int                  c   = 0;
     const std::uint32_t* ref = dividend;
     if (dividend[0] & 1)
     {
-        c   = uint256_add_carry(quotient, dividend, ctx->P);
+        c   = uint256_add_carry(quotient, dividend, P);
         ref = quotient;
     }
     for (int i = 0; i < 7; i++)
@@ -267,7 +275,7 @@ void mont256_inv(const Mont256CTX*   ctx,
                  std::uint32_t       inverse[8],
                  const std::uint32_t num[8]) noexcept
 {
-    mont256_pow(ctx, inverse, num, ctx->P_SUB2);
+    mont256_pow(ctx, inverse, num, (const std::uint32_t*)ctx->P_SUB2);
 }
 
 // ****************************************
@@ -289,7 +297,7 @@ bool mont256_equal_zero(const Mont256CTX*   ctx,
 
 bool mont256_equal_one(const Mont256CTX* ctx, const std::uint32_t a[8]) noexcept
 {
-    return uint256_equal(a, ctx->R);
+    return uint256_equal(a, (const std::uint32_t*)ctx->R);
 }
 
 // ****************************************
@@ -310,7 +318,7 @@ void mont256_set_zero(const Mont256CTX* ctx, std::uint32_t num[8]) noexcept
 
 void mont256_set_one(const Mont256CTX* ctx, std::uint32_t ret[8]) noexcept
 {
-    uint256_cpy(ret, ctx->R);
+    uint256_cpy(ret, (const std::uint32_t*)ctx->R);
 }
 
 void mont256_set_uint32(const Mont256CTX* ctx,
@@ -318,6 +326,14 @@ void mont256_set_uint32(const Mont256CTX* ctx,
                         std::uint32_t     num) noexcept
 {
     uint256_set_uint32(ret, num);
+    uint256_to_mont(ctx, ret, ret);
+}
+
+void mont256_set_uint64(const Mont256CTX* ctx,
+                        std::uint32_t     ret[8],
+                        std::uint64_t     num) noexcept
+{
+    uint256_set_uint64(ret, num);
     uint256_to_mont(ctx, ret, ret);
 }
 
@@ -348,7 +364,7 @@ void mont256_from_bytes_ex(const Mont256CTX*   ctx,
                            std::size_t         bytes_len) noexcept
 {
     uint32_t t[8];
-    uint256_mod(t, bytes, bytes_len, ctx->P);
+    uint256_mod(t, bytes, bytes_len, (const std::uint32_t*)ctx->P);
     uint256_to_mont(ctx, num, t);
 }
 

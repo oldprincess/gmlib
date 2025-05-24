@@ -65,7 +65,10 @@ const std::uint8_t SM2_CURVE_GY[32] = {
     0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, \
         0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0xff, 0xff, 0xff,   \
         0xff, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03
-constexpr std::uint64_t FP_N_ = 1ULL;
+#define FP_MONT_N_DATA                                                      \
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   \
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
 
 #define N_DATA                                                              \
     0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
@@ -87,23 +90,36 @@ constexpr std::uint64_t FP_N_ = 1ULL;
     0x1e, 0xb5, 0xe4, 0x12, 0xa2, 0x2b, 0x3d, 0x3b, 0x62, 0x0f, 0xc8, 0x4c, \
         0x3a, 0xff, 0xe0, 0xd4, 0x34, 0x64, 0x50, 0x4a, 0xde, 0x6f, 0xa2,   \
         0xfa, 0x90, 0x11, 0x92, 0xaf, 0x7c, 0x11, 0x4f, 0x20
-constexpr std::uint64_t FN_N_ = 0x327f9e8872350975ULL;
+#define FN_MONT_N_DATA                                                      \
+    0x6f, 0x39, 0x13, 0x2f, 0x82, 0xe4, 0xc7, 0xbc, 0x2b, 0x00, 0x68, 0xd3, \
+        0xb0, 0x89, 0x41, 0xd4, 0xdf, 0x1e, 0x8d, 0x34, 0xfc, 0x83, 0x19,   \
+        0xa5, 0x32, 0x7f, 0x9e, 0x88, 0x72, 0x35, 0x09, 0x75
 
-static const auto P         = number::mpz_set_epi8(P_DATA);
-static const auto P_SUB2    = number::mpz_set_epi8(P_SUB2_DATA);
-static const auto FP_R      = number::mpz_set_epi8(FP_R_DATA);
-static const auto FP_R_POW2 = number::mpz_set_epi8(FP_R_POW2_DATA);
-static const auto N         = number::mpz_set_epi8(N_DATA);
-static const auto N_SUB1    = number::mpz_set_epi8(N_SUB1_DATA);
-static const auto N_SUB2    = number::mpz_set_epi8(N_SUB2_DATA);
-static const auto FN_R      = number::mpz_set_epi8(FN_R_DATA);
-static const auto FN_R_POW2 = number::mpz_set_epi8(FN_R_POW2_DATA);
+static const auto P          = number::mpz_set_epi8(P_DATA);
+static const auto P_SUB2     = number::mpz_set_epi8(P_SUB2_DATA);
+static const auto FP_R       = number::mpz_set_epi8(FP_R_DATA);
+static const auto FP_R_POW2  = number::mpz_set_epi8(FP_R_POW2_DATA);
+static const auto FP_MONT_N_ = number::mpz_set_epi8(FP_MONT_N_DATA);
+static const auto N          = number::mpz_set_epi8(N_DATA);
+static const auto N_SUB1     = number::mpz_set_epi8(N_SUB1_DATA);
+static const auto N_SUB2     = number::mpz_set_epi8(N_SUB2_DATA);
+static const auto FN_R       = number::mpz_set_epi8(FN_R_DATA);
+static const auto FN_R_POW2  = number::mpz_set_epi8(FN_R_POW2_DATA);
+static const auto FN_MONT_N_ = number::mpz_set_epi8(FN_MONT_N_DATA);
 
 static const number::Mont256CTX FP_MONT_CTX = {
-    P.v, P_SUB2.v, FP_R.v, FP_R_POW2.v, number::mont_compute_N_(P.v[0]),
+    (const std::uint8_t*)P.v,          //
+    (const std::uint8_t*)P_SUB2.v,     //
+    (const std::uint8_t*)FP_R.v,       //
+    (const std::uint8_t*)FP_R_POW2.v,  //
+    (const std::uint8_t*)FP_MONT_N_.v, //
 };
 static const number::Mont256CTX FN_MONT_CTX = {
-    N.v, N_SUB2.v, FN_R.v, FN_R_POW2.v, number::mont_compute_N_(N.v[0]),
+    (const std::uint8_t*)N.v,          //
+    (const std::uint8_t*)N_SUB2.v,     //
+    (const std::uint8_t*)FN_R.v,       //
+    (const std::uint8_t*)FN_R_POW2.v,  //
+    (const std::uint8_t*)FN_MONT_N_.v, //
 };
 
 int sm2_bn_cmp(const sm2_bn_t a, const sm2_bn_t b) noexcept
@@ -128,17 +144,17 @@ int sm2_bn_add_uint32(sm2_bn_t r, const sm2_bn_t a, std::uint32_t b) noexcept
 
 void sm2_bn_mod_n_sub1(sm2_bn_t a) noexcept
 {
-    if (number::uint256_cmp(a, N_SUB1.v) >= 0)
+    if (number::uint256_cmp(a, (const std::uint8_t*)N_SUB1.v) >= 0)
     {
-        number::uint256_sub_borrow(a, a, N_SUB1.v);
+        number::uint256_sub_borrow(a, a, (const std::uint8_t*)N_SUB1.v);
     }
 }
 
 void sm2_bn_mod_n_sub2(sm2_bn_t a) noexcept
 {
-    if (number::uint256_cmp(a, N_SUB2.v) >= 0)
+    if (number::uint256_cmp(a, (const std::uint8_t*)N_SUB2.v) >= 0)
     {
-        number::uint256_sub_borrow(a, a, N_SUB2.v);
+        number::uint256_sub_borrow(a, a, (const std::uint8_t*)N_SUB2.v);
     }
 }
 
@@ -189,7 +205,8 @@ int sm2_fp_sqrt(sm2_fp_t r, const sm2_fp_t a) noexcept
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0, 0x00, 0x00, 0x00,
         0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
     sm2_fp_t t, t2;
-    number::mont256_pow(&FP_MONT_CTX, t, a, P_SUB3_DIV4_ADD1.v);
+    number::mont256_pow(&FP_MONT_CTX, t, a,
+                        (const std::uint8_t*)P_SUB3_DIV4_ADD1.v);
     number::mont256_sqr(&FP_MONT_CTX, t2, t);
     if (!number::mont256_equal(&FP_MONT_CTX, a, t2))
     {
@@ -722,9 +739,9 @@ void sm2_ec_j_mul_a(sm2_ec_j           R,
     // add-sub method
     number::uint256_t e, e3;
     number::uint256_from_bytes(e, k);
-    if (number::uint256_cmp(e, N.v) >= 0)
+    if (number::uint256_cmp(e, (const std::uint8_t*)N.v) >= 0)
     {
-        number::uint256_sub_borrow(e, e, N.v);
+        number::uint256_sub_borrow(e, e, (const std::uint8_t*)N.v);
     }
     if (number::uint256_equal_zero(e))
     {

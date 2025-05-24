@@ -1,6 +1,5 @@
 #include <gmlib/number/mpz.h>
 #include <gmlib/sm9/internal/sm9_field.h>
-
 namespace sm9::internal {
 // y^2 = x^3 + 5
 // 0xb640000002a3a6f1d603ab4ff58ec74521f2934b1a7aeedbe56f9b27e351457d
@@ -82,11 +81,16 @@ const std::uint8_t SM9_CURVE2_GY[64] = {
         0xd6, 0x70, 0x6e, 0x7b, 0x88, 0xf8, 0x10, 0x5f, 0xae, 0x1a, 0x5d,   \
         0x3f, 0x27, 0xde, 0xa3, 0x12, 0xb4, 0x17, 0xe2, 0xd2
 
-static const auto       P         = number::mpz_set_epi8(P_DATA);
-static const auto       P_SUB2    = number::mpz_set_epi8(P_SUB2_DATA);
-static const auto       FP_R      = number::mpz_set_epi8(FP_R_DATA);
-static const auto       FP_R_POW2 = number::mpz_set_epi8(FP_R_POW2_DATA);
-constexpr std::uint64_t FP_N_     = 0x892bc42c2f2ee42bULL;
+#define FP_MONT_N_DATA                                                      \
+    0xaf, 0xd2, 0xba, 0xc5, 0x55, 0x8a, 0x13, 0xb3, 0x96, 0x6a, 0x4b, 0x29, \
+        0x15, 0x22, 0xb1, 0x37, 0x18, 0x1a, 0xe3, 0x96, 0x13, 0xc8, 0xdb,   \
+        0xaf, 0x89, 0x2b, 0xc4, 0x2c, 0x2f, 0x2e, 0xe4, 0x2b
+
+static const auto P          = number::mpz_set_epi8(P_DATA);
+static const auto P_SUB2     = number::mpz_set_epi8(P_SUB2_DATA);
+static const auto FP_R       = number::mpz_set_epi8(FP_R_DATA);
+static const auto FP_R_POW2  = number::mpz_set_epi8(FP_R_POW2_DATA);
+static const auto FP_MONT_N_ = number::mpz_set_epi8(FP_MONT_N_DATA);
 
 #define N_DATA                                                              \
     0xb6, 0x40, 0x00, 0x00, 0x02, 0xa3, 0xa6, 0xf1, 0xd6, 0x03, 0xab, 0x4f, \
@@ -113,19 +117,32 @@ constexpr std::uint64_t FP_N_     = 0x892bc42c2f2ee42bULL;
         0x7d, 0x78, 0xa1, 0xf9, 0xe4, 0xa0, 0x81, 0x10, 0xbb, 0x6d, 0xae,   \
         0xab, 0x75, 0x98, 0xcd, 0x79, 0xcd, 0x75, 0x0c, 0x35
 
-static const auto       N         = number::mpz_set_epi8(N_DATA);
-static const auto       N_SUB2    = number::mpz_set_epi8(N_SUB2_DATA);
-static const auto       N_SUB3    = number::mpz_set_epi8(N_SUB3_DATA);
-static const auto       FN_R      = number::mpz_set_epi8(FN_R_DATA);
-static const auto       FN_R_POW2 = number::mpz_set_epi8(FN_R_POW2_DATA);
-constexpr std::uint64_t FN_N_     = 0x1d02662351974b53ULL;
+#define FN_MONT_N_DATA                                                      \
+    0xe3, 0x58, 0x2e, 0xd4, 0xca, 0xa6, 0xff, 0x31, 0x20, 0x5f, 0x4c, 0x4b, \
+        0x48, 0x17, 0x50, 0x59, 0xf5, 0x90, 0x74, 0x0d, 0x93, 0x9a, 0x51,   \
+        0x0d, 0x1d, 0x02, 0x66, 0x23, 0x51, 0x97, 0x4b, 0x53
+
+static const auto N          = number::mpz_set_epi8(N_DATA);
+static const auto N_SUB2     = number::mpz_set_epi8(N_SUB2_DATA);
+static const auto N_SUB3     = number::mpz_set_epi8(N_SUB3_DATA);
+static const auto FN_R       = number::mpz_set_epi8(FN_R_DATA);
+static const auto FN_R_POW2  = number::mpz_set_epi8(FN_R_POW2_DATA);
+static const auto FN_MONT_N_ = number::mpz_set_epi8(FN_MONT_N_DATA);
 
 static const number::Mont256CTX FP_MONT_CTX = {
-    P.v, P_SUB2.v, FP_R.v, FP_R_POW2.v, number::mont_compute_N_(P.v[0]),
+    (const std::uint8_t*)P.v,          //
+    (const std::uint8_t*)P_SUB2.v,     //
+    (const std::uint8_t*)FP_R.v,       //
+    (const std::uint8_t*)FP_R_POW2.v,  //
+    (const std::uint8_t*)FP_MONT_N_.v, //
 };
 
 static const number::Mont256CTX FN_MONT_CTX = {
-    N.v, N_SUB2.v, FN_R.v, FN_R_POW2.v, number::mont_compute_N_(N.v[0]),
+    (const std::uint8_t*)N.v,          //
+    (const std::uint8_t*)N_SUB2.v,     //
+    (const std::uint8_t*)FN_R.v,       //
+    (const std::uint8_t*)FN_R_POW2.v,  //
+    (const std::uint8_t*)FN_MONT_N_.v, //
 };
 
 #pragma region "SM9 BN"
@@ -153,7 +170,7 @@ int sm9_bn_add_uint32(sm9_bn_t r, const sm9_bn_t a, std::uint32_t b) noexcept
 void sm9_bn_mod_n_sub1(sm9_bn_t a) noexcept
 {
     number::uint256_t n_sub1;
-    number::uint256_sub_borrow_uint32(n_sub1, N.v, 1);
+    number::uint256_sub_borrow_uint32(n_sub1, (const std::uint8_t*)N.v, 1);
     if (number::uint256_cmp(a, n_sub1) >= 0)
     {
         number::uint256_sub_borrow(a, a, n_sub1);
@@ -165,23 +182,23 @@ void sm9_bn_mod_n_sub1_ex(sm9_bn_t            a,
                           std::size_t         data_len) noexcept
 {
     number::uint256_t n_sub1;
-    number::uint256_sub_borrow_uint32(n_sub1, N.v, 1);
+    number::uint256_sub_borrow_uint32(n_sub1, (const std::uint8_t*)N.v, 1);
     number::uint256_mod(a, data, data_len, n_sub1);
 }
 
 void sm9_bn_mod_n_sub2(sm9_bn_t a) noexcept
 {
-    if (number::uint256_cmp(a, N_SUB2.v) >= 0)
+    if (number::uint256_cmp(a, (const std::uint8_t*)N_SUB2.v) >= 0)
     {
-        number::uint256_sub_borrow(a, a, N_SUB2.v);
+        number::uint256_sub_borrow(a, a, (const std::uint8_t*)N_SUB2.v);
     }
 }
 
 void sm9_bn_mod_n_sub3(sm9_bn_t a) noexcept
 {
-    if (number::uint256_cmp(a, N_SUB3.v) >= 0)
+    if (number::uint256_cmp(a, (const std::uint8_t*)N_SUB3.v) >= 0)
     {
-        number::uint256_sub_borrow(a, a, N_SUB3.v);
+        number::uint256_sub_borrow(a, a, (const std::uint8_t*)N_SUB3.v);
     }
 }
 
@@ -341,7 +358,7 @@ int sm9_fp_sqrt(sm9_fp_t r, const sm9_fp_t a) noexcept
     number::mont256_set_one(&FP_MONT_CTX, neg1);
     number::mont256_neg(&FP_MONT_CTX, neg1, neg1);
     // z = a^(2u+1)
-    number::mont256_pow(&FP_MONT_CTX, z, a, U_MUL2_ADD1.v);
+    number::mont256_pow(&FP_MONT_CTX, z, a, (const std::uint8_t*)U_MUL2_ADD1.v);
     // if z=1:  return g^(u+1)
     // if z=-1: return 2^(2u+1) * g^(u+1)
     // other:   return false
@@ -350,7 +367,7 @@ int sm9_fp_sqrt(sm9_fp_t r, const sm9_fp_t a) noexcept
     {
         return -1;
     }
-    number::mont256_pow(&FP_MONT_CTX, r, a, U_ADD1.v);
+    number::mont256_pow(&FP_MONT_CTX, r, a, (const std::uint8_t*)U_ADD1.v);
     if (number::mont256_equal(&FP_MONT_CTX, z, neg1))
     {
         number::mont256_from_bytes(&FP_MONT_CTX, z, TWO_POW_2U1_DATA);
@@ -1293,9 +1310,9 @@ void sm9_ec_j_mul_a(sm9_ec_j           R,
     // add-sub method
     number::uint256_t e, e3;
     number::uint256_from_bytes(e, k);
-    if (number::uint256_cmp(e, N.v) >= 0)
+    if (number::uint256_cmp(e, (const std::uint8_t*)N.v) >= 0)
     {
-        number::uint256_sub_borrow(e, e, N.v);
+        number::uint256_sub_borrow(e, e, (const std::uint8_t*)N.v);
     }
     if (number::uint256_equal_zero(e))
     {
@@ -1355,9 +1372,9 @@ void sm9_ec_j_mul_j(sm9_ec_j           R,
     // add-sub method
     number::uint256_t e, e3;
     number::uint256_from_bytes(e, k);
-    if (number::uint256_cmp(e, N.v) >= 0)
+    if (number::uint256_cmp(e, (const std::uint8_t*)N.v) >= 0)
     {
-        number::uint256_sub_borrow(e, e, N.v);
+        number::uint256_sub_borrow(e, e, (const std::uint8_t*)N.v);
     }
     if (number::uint256_equal_zero(e))
     {
@@ -1754,9 +1771,9 @@ void sm9_ec2_j_mul_a(sm9_ec2_j          R,
     // add-sub method
     number::uint256_t e, e3;
     number::uint256_from_bytes(e, k);
-    if (number::uint256_cmp(e, N.v) >= 0)
+    if (number::uint256_cmp(e, (const std::uint8_t*)N.v) >= 0)
     {
-        number::uint256_sub_borrow(e, e, N.v);
+        number::uint256_sub_borrow(e, e, (const std::uint8_t*)N.v);
     }
     if (number::uint256_equal_zero(e))
     {
@@ -1816,9 +1833,9 @@ void sm9_ec2_j_mul_j(sm9_ec2_j          R,
     // add-sub method
     number::uint256_t e, e3;
     number::uint256_from_bytes(e, k);
-    if (number::uint256_cmp(e, N.v) >= 0)
+    if (number::uint256_cmp(e, (const std::uint8_t*)N.v) >= 0)
     {
-        number::uint256_sub_borrow(e, e, N.v);
+        number::uint256_sub_borrow(e, e, (const std::uint8_t*)N.v);
     }
     if (number::uint256_equal_zero(e))
     {

@@ -2,11 +2,9 @@
 #define TEST_H
 
 void test_bn();
-void test_uint256_common();
-void test_mont256_common();
+void test_uint256();
+void test_mont256();
 void test_mpz_common();
-void test_uint256_x64();
-void test_mont256_x64();
 void test_mpz_x64();
 
 #endif

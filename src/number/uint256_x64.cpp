@@ -1,4 +1,4 @@
-#include <gmlib/number/internal/uint256_x64.h>
+#include "uint256_x64.h"
 
 #if defined(NUMBER_IMPL_UINT256_X64)
 
@@ -169,6 +169,18 @@ void uint256_sqr(std::uint64_t       product[8],
     uint256_mul(product, multiplier, multiplier);
 }
 
+int uint256_add_carry_uint32(std::uint64_t       sum[4],
+                             const std::uint64_t augend[4],
+                             std::uint32_t       addend) noexcept
+{
+    unsigned char CF;
+    CF = _addcarry_u64(0, augend[0], addend, &sum[0]);
+    CF = _addcarry_u64(CF, augend[1], 0, &sum[1]);
+    CF = _addcarry_u64(CF, augend[2], 0, &sum[2]);
+    CF = _addcarry_u64(CF, augend[3], 0, &sum[3]);
+    return CF;
+}
+
 int uint256_add_carry_uint64(std::uint64_t       sum[4],
                              const std::uint64_t augend[4],
                              std::uint64_t       addend) noexcept
@@ -181,6 +193,18 @@ int uint256_add_carry_uint64(std::uint64_t       sum[4],
     return CF;
 }
 
+int uint256_sub_borrow_uint32(std::uint64_t       difference[4],
+                              const std::uint64_t minuend[4],
+                              std::uint32_t       subtrahend) noexcept
+{
+    unsigned char CF;
+    CF = _subborrow_u64(0, minuend[0], subtrahend, &difference[0]);
+    CF = _subborrow_u64(CF, minuend[1], 0, &difference[1]);
+    CF = _subborrow_u64(CF, minuend[2], 0, &difference[2]);
+    CF = _subborrow_u64(CF, minuend[3], 0, &difference[3]);
+    return -CF;
+}
+
 int uint256_sub_borrow_uint64(std::uint64_t       difference[4],
                               const std::uint64_t minuend[4],
                               std::uint64_t       subtrahend) noexcept
@@ -191,6 +215,14 @@ int uint256_sub_borrow_uint64(std::uint64_t       difference[4],
     CF = _subborrow_u64(CF, minuend[2], 0, &difference[2]);
     CF = _subborrow_u64(CF, minuend[3], 0, &difference[3]);
     return -CF;
+}
+
+std::uint32_t uint256_mul_carry_uint32(std::uint64_t       product[4],
+                                       const std::uint64_t multiplier[4],
+                                       std::uint32_t multiplicand) noexcept
+{
+    return (std::uint32_t)uint256_mul_carry_uint64(product, multiplier,
+                                                   multiplicand);
 }
 
 std::uint64_t uint256_mul_carry_uint64(std::uint64_t       product[4],
@@ -211,6 +243,13 @@ std::uint64_t uint256_mul_carry_uint64(std::uint64_t       product[4],
     CF = _addcarry_u64(CF, product[3], hi[2], &product[3]);
     _addcarry_u64(CF, 0, hi[3], &ret); // drop CF
     return ret;
+}
+
+std::uint32_t uint256_div_uint32(std::uint64_t       quotient[4],
+                                 const std::uint64_t dividend[4],
+                                 std::uint32_t       divisor) noexcept
+{
+    return (std::uint32_t)uint256_div_uint64(quotient, dividend, divisor);
 }
 
 std::uint64_t uint256_div_uint64(std::uint64_t       quotient[4],
@@ -336,6 +375,11 @@ int uint256_cmp(const std::uint64_t a[4], const std::uint64_t b[4]) noexcept
     return 0;
 }
 
+int uint256_cmp_uint32(const std::uint64_t a[4], std::uint32_t b) noexcept
+{
+    return uint256_cmp_uint64(a, b);
+}
+
 int uint256_cmp_uint64(const std::uint64_t a[4], std::uint64_t b) noexcept
 {
     for (int i = 3; i >= 1; i--)
@@ -380,6 +424,11 @@ void uint256_set_one(std::uint64_t num[4]) noexcept
 {
     num[0] = 1;
     num[1] = num[2] = num[3] = 0;
+}
+
+void uint256_set_uint32(std::uint64_t ret[4], std::uint32_t num) noexcept
+{
+    uint256_set_uint64(ret, num);
 }
 
 void uint256_set_uint64(std::uint64_t ret[4], std::uint64_t num) noexcept
