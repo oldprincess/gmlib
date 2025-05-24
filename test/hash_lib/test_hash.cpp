@@ -1,5 +1,5 @@
 #include <gmlib/sm3/sm3.h>
-
+#include <stdexcept>
 #include <cstring>
 
 #include "test.h"
