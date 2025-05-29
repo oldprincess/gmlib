@@ -153,92 +153,11 @@ Release/sm2_test.exe speed
         main.cpp
 ```
 
-#### step2：打印编译时使用的编译器宏
+#### step2：正式使用gmlib库
 
-在`src/main.cpp`中写入如下内容。因为gmlib项目使用了大量模板编程，部分模板类需要通过宏定义来确定调用的函数，因而需要先通过`gmlib_print_config_def`函数打印编译时使用的编译器宏。否则，将会产生链接错误。
-
-```c++
-#include <gmlib/info.h>
-
-int main()
-{
-    gmlib_print_config_def();
-    return 0;
-}
-```
-
-之后执行编译命令
-
-* Windows 平台：使用MSVC的 [CL](https://learn.microsoft.com/zh-cn/cpp/build/reference/compiler-command-line-syntax?view=msvc-170) 工具，`/I`表示添加头文件路径，`/Zl`表示省略默认库名，`/std:c++17`表示使用c++17
-
-```bash
-CL src\main.cpp  lib\gmlib_static.lib /I include /Zl /std:c++17
-```
-
-```bash
-.\main.exe
-```
-
-* Linux 平台
-
-```bash
-g++ src/main.cpp lib/libgmlib_static.a -I include -std=c++17 -o main.x
-```
-
-```bash
-./main.x
-```
-
-将会输出需要提前预定义的宏，下面是一个例子
+接着，修改`src/main.cpp`，以`gmlib/demo/sm2/sm2_cipher.cpp`为例。
 
 ```c++
-#define CPU_FLAG_AES
-#define CPU_FLAG_AVX2
-#define CPU_FLAG_BMI2
-#define CPU_FLAG_MOVBE
-#define CPU_FLAG_PCLMUL
-#define CPU_FLAG_RDRAND
-#define CPU_FLAG_RDSEED
-#define CPU_FLAG_SHA
-#define CPU_FLAG_SSE2
-#define CPU_FLAG_SSE4_1
-#define CPU_FLAG_SSSE3
-#define SUPPORT_SM3_YANG15
-#define SUPPORT_SM4_LANG18
-```
-
-为了方便，在`src`中新建一个`gmlib_config.h`文件，将上述步骤输出的内容写成头文件的形式
-
-```c++
-#ifndef GMLIB_CONFIG_H
-#define GMLIB_CONFIG_H
-
-#define CPU_FLAG_AES
-#define CPU_FLAG_AVX2
-#define CPU_FLAG_BMI2
-#define CPU_FLAG_MOVBE
-#define CPU_FLAG_PCLMUL
-#define CPU_FLAG_RDRAND
-#define CPU_FLAG_RDSEED
-#define CPU_FLAG_SHA
-#define CPU_FLAG_SSE2
-#define CPU_FLAG_SSE4_1
-#define CPU_FLAG_SSSE3
-#define SUPPORT_SM3_YANG15
-#define SUPPORT_SM4_LANG18
-
-#endif
-```
-
-#### step3：正式使用gmlib库
-
-接着，修改`src/main.cpp`，在引入gmlib的头文件前添加上述打印的编译器宏，并以`gmlib/demo/sm2/sm2_cipher.cpp`为例。
-
-```c++
-#ifndef GMLIB_CONFIG_H
-#include "gmlib_config.h"
-#endif
-
 #include <gmlib/memory_utils/memdump.h>
 #include <gmlib/rng/std_rng.h>
 #include <gmlib/sm2/sm2.h>
@@ -312,18 +231,20 @@ int main()
 
 * Windows 平台
 
+使用MSVC的 [CL](https://learn.microsoft.com/zh-cn/cpp/build/reference/compiler-command-line-syntax?view=msvc-170) 工具，`/I`表示添加头文件路径，`/Zl`表示省略默认库名，`/std:c++17`表示使用c++17，`/MD`表示多线程使用Release版本的动态链接库
+
 ```bash
-CL src\main.cpp  lib\gmlib_static.lib /I include /Zl /std:c++17
+CL src\main.cpp  lib\gmlib_static.lib /I include /Zl /std:c++17 /MD
 ```
 
 ```bash
 .\main.exe
 ```
 
-* Linux 平台：在这次的示例中，仅需要额外添加`-mavx2`的编译参数。具体需要额外添加哪些编译参数，和`CMakeLists.txt`文件中`PROJECT_COMPILE_OPTIONS`的值一致。
+* Linux 平台
 
 ```bash
-g++ src/main.cpp lib/libgmlib_static.a -I include -std=c++17 -o main.x -mavx2
+g++ src/main.cpp lib/libgmlib_static.a -I include -std=c++17 -o main.x
 ```
 
 ```bash
