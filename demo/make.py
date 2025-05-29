@@ -8,7 +8,7 @@ try:
 
     source = " ".join(glob.glob("../src/**/*.cpp", recursive=True))
     define = " "
-    option = " "
+    option = " ".join(["-std=c++17"])
 
     code = f"g++ -o {dst} -I ../include {src} {source} {define} {option}"
     print(code)
