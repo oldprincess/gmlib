@@ -7,9 +7,6 @@ int main()
 {
     try
     {
-        test_ghash_common();
-        test_ghash_lut256();
-        test_ghash_pclmul();
         test_ghash();
     }
     catch (std::exception& e)

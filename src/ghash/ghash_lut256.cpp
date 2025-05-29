@@ -1,4 +1,4 @@
-#include <gmlib/ghash/internal/ghash_lut256.h>
+#include "ghash_lut256.h"
 
 #if defined(GHASH_IMPL_LUT256)
 
@@ -129,7 +129,7 @@ void ghash_update_blocks(GHashCTX*           ctx,
                          std::size_t         block_num) noexcept
 {
     std::uint64_t X[2], R[2];
-    const std::uint64_t(*T)[2] = ctx->T;
+    const std::uint64_t (*T)[2] = ctx->T;
     while (block_num)
     {
 #define GMUL128_ROUND(s)                                                      \

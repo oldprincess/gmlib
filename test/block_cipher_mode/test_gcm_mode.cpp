@@ -2,6 +2,7 @@
 #include <gmlib/sm4/sm4.h>
 
 #include <cstring>
+#include <stdexcept>
 
 #include "test.h"
 

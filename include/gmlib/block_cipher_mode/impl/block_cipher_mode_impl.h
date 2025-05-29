@@ -3,6 +3,8 @@
 
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>
 
+#include <cstring>
+
 namespace block_cipher_mode::impl {
 
 template <std::size_t BLOCK_SIZE_>

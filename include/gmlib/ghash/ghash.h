@@ -1,60 +1,43 @@
 #ifndef GHASH_GHASH_H
 #define GHASH_GHASH_H
 
-#include <gmlib/ghash/config.h>
 #include <gmlib/hash_lib/impl/hash_impl.h>
 
-#include <stdexcept>
-
-#if defined(GHASH_IMPL_PCLMUL)
-#include <gmlib/ghash/internal/ghash_pclmul.h>
-namespace ghash {
-namespace alg = internal::pclmul;
-}
-#else
-#include <gmlib/ghash/internal/ghash_lut256.h>
-namespace ghash {
-namespace alg = internal::lut256;
-}
-#endif
-
-// namespace alg = ghash::internal::common;
+#include <memory>
 
 namespace ghash {
 
-class GHash : public hash_lib::impl::HashImpl<alg::GHASH_BLOCK_SIZE>
+class GHash : public hash_lib::impl::HashImpl<16>
 {
 public:
     static constexpr const char* NAME        = "GHash";
-    static constexpr std::size_t BLOCK_SIZE  = alg::GHASH_BLOCK_SIZE;
-    static constexpr std::size_t DIGEST_SIZE = alg::GHASH_DIGEST_SIZE;
+    static constexpr std::size_t BLOCK_SIZE  = 16;
+    static constexpr std::size_t DIGEST_SIZE = 16;
 
 private:
-    alg::GHashCTX ctx_;
+    std::unique_ptr<void, void (*)(void*)> ctx_;
 
 public:
-    GHash() = default;
+    GHash();
 
-    GHash(const std::uint8_t H[16]) noexcept
-    {
-        alg::ghash_init(&ctx_, H);
-    }
+    GHash(const GHash& other);
 
-    void reset() noexcept override
-    {
-        alg::ghash_reset(&ctx_);
-    }
+    GHash(const std::uint8_t H[16]);
 
-    void set_key(const std::uint8_t H[16]) noexcept
-    {
-        alg::ghash_init(&ctx_, H);
-    }
+    void reset() noexcept override;
+
+    void set_key(const std::uint8_t H[16]) noexcept;
+
+public:
+    GHash& operator=(const GHash& other) noexcept;
 
 public:
     const char* fetch_name() const noexcept override
     {
         return NAME;
     }
+
+    const char* fetch_impl_algo() const noexcept override;
 
     std::size_t fetch_block_size() const noexcept override
     {
@@ -66,28 +49,18 @@ public:
         return DIGEST_SIZE;
     }
 
-    std::size_t fetch_security_strength() const noexcept
+    std::size_t fetch_security_strength() const noexcept override
     {
         return 0;
     }
 
 private:
     void update_blocks(const std::uint8_t* in,
-                       std::size_t         block_num) noexcept override
-    {
-        alg::ghash_update_blocks(&ctx_, in, block_num);
-    }
+                       std::size_t         block_num) noexcept override;
 
     void final_block(std::uint8_t*       digest,
                      const std::uint8_t* in,
-                     std::size_t         inl) override
-    {
-        int err = alg::ghash_final_block(&ctx_, digest, in, inl);
-        if (err != 0)
-        {
-            throw std::runtime_error("err in ghash final block");
-        }
-    }
+                     std::size_t         inl) override;
 };
 
 } // namespace ghash

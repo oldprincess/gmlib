@@ -1,7 +1,7 @@
 #ifndef GHASH_INTERNAL_GHASH_PCLMUL_H
 #define GHASH_INTERNAL_GHASH_PCLMUL_H
 
-#include <gmlib/ghash/config.h>
+#include "config.h"
 
 #if defined(GHASH_IMPL_PCLMUL)
 
@@ -9,6 +9,8 @@
 #include <cstdint>
 
 namespace ghash::internal::pclmul {
+
+constexpr const char* GHASH_ALGO_NAME = "pclmul";
 
 constexpr std::size_t GHASH_BLOCK_SIZE  = 16;
 constexpr std::size_t GHASH_DIGEST_SIZE = 16;

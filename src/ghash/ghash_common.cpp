@@ -1,5 +1,6 @@
-#if 0
-#include <gmlib/ghash/internal/ghash_common.h>
+#include "ghash_common.h"
+
+#if defined(GHASH_IMPL_COMMON)
 
 namespace ghash::internal::common {
 

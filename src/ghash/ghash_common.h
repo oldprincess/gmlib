@@ -1,21 +1,23 @@
-#ifndef GHASH_INTERNAL_GHASH_LUT256_H
-#define GHASH_INTERNAL_GHASH_LUT256_H
+#ifndef GHASH_INTERNAL_GHASH_COMMON_H
+#define GHASH_INTERNAL_GHASH_COMMON_H
 
-#include <gmlib/ghash/config.h>
+#include "config.h"
 
-#if defined(GHASH_IMPL_LUT256)
+#if defined(GHASH_IMPL_COMMON)
 
 #include <cstddef>
 #include <cstdint>
 
-namespace ghash::internal::lut256 {
+namespace ghash::internal::common {
+
+constexpr const char* GHASH_ALGO_NAME = "common";
 
 constexpr std::size_t GHASH_BLOCK_SIZE  = 16;
 constexpr std::size_t GHASH_DIGEST_SIZE = 16;
 
 typedef struct GHashCTX
 {
-    std::uint64_t T[256][2];
+    std::uint64_t H[2];
     std::uint64_t state[2];
 } GHashCTX;
 
@@ -32,7 +34,7 @@ int ghash_final_block(const GHashCTX*     ctx,
                       const std::uint8_t* in,
                       std::size_t         inl) noexcept;
 
-} // namespace ghash::internal::lut256
+} // namespace ghash::internal::common
 
 #endif
 

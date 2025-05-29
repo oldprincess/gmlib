@@ -1,4 +1,4 @@
-#include <gmlib/ghash/internal/ghash_pclmul.h>
+#include "ghash_pclmul.h"
 
 #if defined(GHASH_IMPL_PCLMUL)
 
