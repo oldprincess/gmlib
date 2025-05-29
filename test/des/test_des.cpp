@@ -59,7 +59,8 @@ void test_des()
         {
             std::printf("err in des common enc, file: %s, line: %d\n", __FILE__,
                         __LINE__);
-            std::printf("%llx %llx %llx\n", pt[i], ct[i], MEM_LOAD64BE(out));
+            std::printf("%llx %llx %llx\n", pt[i], ct[i],
+                        (unsigned long long)MEM_LOAD64BE(out));
             std::exit(-1);
         }
         ctx.encrypt_blocks(out, in, 1);
@@ -67,7 +68,8 @@ void test_des()
         {
             std::printf("err in des common enc, file: %s, line: %d\n", __FILE__,
                         __LINE__);
-            std::printf("%llx %llx %llx\n", pt[i], ct[i], MEM_LOAD64BE(out));
+            std::printf("%llx %llx %llx\n", pt[i], ct[i],
+                        (unsigned long long)MEM_LOAD64BE(out));
             std::exit(-1);
         }
         MEM_STORE64BE(in, ct[i]);
