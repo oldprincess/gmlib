@@ -14,13 +14,17 @@ This project will be updated on the GitHub platform and randomly synchronized to
 
 ## 1 基本介绍
 
-一句话介绍：GMLib是一个基于C++17的高性能国密算法库，支持国密SM2、SM3、SM4、SM9
+一句话介绍：GMLib是一个基于C++17的支持国密SM2、SM3、SM4、SM9等算法的高性能国密算法库
 
 目前支持的密码算法为：
 
 * 对称密码：AES、Ballet、DES、SM4、uBlock
 * 哈希算法：MD5、SHA1、SM3、GHASH
 * 公钥密码：SM2、SM9
+
+此外：
+
+* 使用OpenSSL的API实现了GMLib的Provider，可以在OpenSSL中调用GMLib的实现，即为OpenSSL添加了国密算法的拓展。详见 [README](extention/openssl-binding/README.md)，目前仅支持对称密码。
 
 ### 1.1 开发密码库GMLib的初衷
 

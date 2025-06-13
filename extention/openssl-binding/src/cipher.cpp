@@ -1,0 +1,34 @@
+#include "cipher.h"
+
+#include <gmlib/ballet/ballet.h>
+#include <gmlib/sm4/sm4.h>
+#include <gmlib/ublock/ublock.h>
+
+#include "cipher_impl.h"
+
+using namespace gmlibprov;
+
+#define GMLIBPROV_CIPHER_DISPATCH_5_MODE(T, NAME)                     \
+    GMLIBPROV_CIPHER_IMPL_DEF_DISPACH(T, NAME, ECB, NAME##_ecb_impl); \
+    GMLIBPROV_CIPHER_IMPL_DEF_DISPACH(T, NAME, CBC, NAME##_cbc_impl); \
+    GMLIBPROV_CIPHER_IMPL_DEF_DISPACH(T, NAME, OFB, NAME##_ofb_impl); \
+    GMLIBPROV_CIPHER_IMPL_DEF_DISPACH(T, NAME, CFB, NAME##_cfb_impl); \
+    GMLIBPROV_CIPHER_IMPL_DEF_DISPACH(T, NAME, CTR, NAME##_ctr_impl)
+
+#define GMLIBPROV_CIPHER_DISPATCH_6_MODE(T, NAME)                     \
+    GMLIBPROV_CIPHER_IMPL_DEF_DISPACH(T, NAME, ECB, NAME##_ecb_impl); \
+    GMLIBPROV_CIPHER_IMPL_DEF_DISPACH(T, NAME, CBC, NAME##_cbc_impl); \
+    GMLIBPROV_CIPHER_IMPL_DEF_DISPACH(T, NAME, OFB, NAME##_ofb_impl); \
+    GMLIBPROV_CIPHER_IMPL_DEF_DISPACH(T, NAME, CFB, NAME##_cfb_impl); \
+    GMLIBPROV_CIPHER_IMPL_DEF_DISPACH(T, NAME, CTR, NAME##_ctr_impl); \
+    GMLIBPROV_CIPHER_IMPL_DEF_DISPACH(T, NAME, GCM, NAME##_gcm_impl)
+
+GMLIBPROV_CIPHER_DISPATCH_6_MODE(sm4::SM4, SM4);
+
+GMLIBPROV_CIPHER_DISPATCH_6_MODE(ublock::uBlock128128, uBlock128128);
+GMLIBPROV_CIPHER_DISPATCH_6_MODE(ublock::uBlock128256, uBlock128256);
+GMLIBPROV_CIPHER_DISPATCH_5_MODE(ublock::uBlock256256, uBlock256256);
+
+GMLIBPROV_CIPHER_DISPATCH_6_MODE(ballet::Ballet128128, Ballet128128);
+GMLIBPROV_CIPHER_DISPATCH_6_MODE(ballet::Ballet128256, Ballet128256);
+GMLIBPROV_CIPHER_DISPATCH_5_MODE(ballet::Ballet256256, Ballet256256);

@@ -7,5 +7,6 @@ build_win/
 *.obj
 *.lib
 *.so
+*.a
 *.dll
 *.cfg
