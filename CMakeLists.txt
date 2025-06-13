@@ -55,10 +55,11 @@ project(${PROJECT_NAME_} CXX)
 set(CMAKE_CXX_STANDARD 17)
 
 if(MSVC)
-
-else()
+    message(STATUS "[GMLIB] Use Compiler MSVC")
+    add_compile_options(/source-charset:utf-8)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    message(STATUS "[GMLIB] Use Compiler GNU")
     add_compile_options(${PROJECT_COMPILE_OPTIONS})
-    add_compile_options(-std=c++17)
     add_compile_options(-fvisibility=hidden)
 endif()
 
@@ -71,6 +72,9 @@ file(GLOB_RECURSE PROJECT_INCLUDE  ${BASE_INCLUDE_DIRECTORY}/*.h)
 file(GLOB_RECURSE PROJECT_LIB_SRC  ${BASE_LIB_SRC_DIRECTORY}/*.cpp)
 
 add_library(${PROJECT_NAME_}_static STATIC ${PROJECT_LIB_SRC} ${PROJECT_INCLUDE})
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(${PROJECT_NAME_}_static PRIVATE -fPIC)
+endif()
 
 if(${PROJECT_BUILD_TEST})
     foreach(THIRD_PARTY_NAME ${THIRD_PARTY})
@@ -91,16 +95,3 @@ if(${PROJECT_BUILD_TEST})
         )
     endforeach()
 endif()
-
-add_library(${PROJECT_NAME_} SHARED ${PROJECT_LIB_SRC} ${PROJECT_INCLUDE})
-target_compile_definitions(${PROJECT_NAME_} PUBLIC GMLIB_BUILD_DLL)
-add_executable(
-    ${PROJECT_NAME_}_test
-    ${PROJECT_INCLUDE}
-    ${BASE_TEST_SRC_DIRECTORY}/test.cpp
-)
-target_link_libraries(
-    ${PROJECT_NAME_}_test
-    PUBLIC
-    ${PROJECT_NAME_}
-)
