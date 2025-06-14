@@ -49,7 +49,7 @@ void speed_uint256()
     speed_opt_s = cnt / time_s;
     std::printf("%e opt/s\n", speed_opt_s);
 
-    std::printf("speed uint256 %s ... ", algo_name);
+    std::printf("speed uint256 %s sqr ... ", algo_name);
     cnt = 0;
     st  = std::clock();
     for (int i = 0; i < LOOP; i++)

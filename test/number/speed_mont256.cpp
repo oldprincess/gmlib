@@ -87,7 +87,7 @@ void speed_mont256()
     st  = std::clock();
     for (int i = 0; i < LOOP; i++)
     {
-        mont256_sqr(&ctx, a, a);
+        mont256_sqr(&ctx, b, a);
         cnt++;
     }
     et          = std::clock();
@@ -100,7 +100,7 @@ void speed_mont256()
     st  = std::clock();
     for (int i = 0; i < LOOP / 100; i++)
     {
-        mont256_inv(&ctx, a, a);
+        mont256_inv(&ctx, b, a);
         cnt++;
     }
     et          = std::clock();

@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
     {
         speed_bn();
         speed_uint256();
-        speed_uint256();
+        speed_mont256();
     }
     return 0;
 }
