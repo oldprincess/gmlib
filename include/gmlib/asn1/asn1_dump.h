@@ -1,6 +1,8 @@
 #ifndef ASN1_ASN1_DUMP_H
 #define ASN1_ASN1_DUMP_H
 
+#include <gmlib/asn1/asn1.h>
+
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
