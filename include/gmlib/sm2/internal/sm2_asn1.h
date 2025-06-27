@@ -17,7 +17,8 @@ namespace sm2::internal {
  */
 typedef struct ASN1_SM2PrivateKey
 {
-    const std::uint8_t* value; // INTEGER 256-bit(32-bytes)
+    const std::uint8_t* value;  // INTEGER less than 256-bit
+    std::size_t         length; // length in bytes
 } ASN1_SM2PrivateKey;
 
 static constexpr std::size_t SM2_PRIVATE_KEY_ASN1_ENCODE_MAX_OUTL()
@@ -77,8 +78,16 @@ int sm2_public_key_asn1_decode(ASN1_SM2PublicKey*  pub,
  */
 typedef struct ASN1_SM2Signature
 {
-    const std::uint8_t* R; // INTEGER 256-bit(32-bytes)
-    const std::uint8_t* S; // INTEGER 256-bit(32-bytes)
+    struct
+    {
+        const std::uint8_t* value;
+        std::size_t         length;
+    } R; // INTEGER 256-bit
+    struct
+    {
+        const std::uint8_t* value;
+        std::size_t         length;
+    } S; // INTEGER 256-bit
 } ASN1_SM2Signature;
 
 static constexpr std::size_t SM2_SIGNATURE_ASN1_ENCODE_MAX_OUTL()
@@ -113,8 +122,16 @@ int sm2_signature_asn1_decode(ASN1_SM2Signature*  sig,
  */
 typedef struct ASN1_SM2Cipher
 {
-    const std::uint8_t* XCoordinate; // INTEGER 256-bit(32-bytes)
-    const std::uint8_t* YCoordinate; // INTEGER 256-bit(32-bytes)
+    struct
+    {
+        const std::uint8_t* value;
+        std::size_t         length;
+    } XCoordinate; // INTEGER 256-bit
+    struct
+    {
+        const std::uint8_t* value;
+        std::size_t         length;
+    } YCoordinate; // INTEGER 256-bit
     struct C3
     {
         const std::uint8_t* value;

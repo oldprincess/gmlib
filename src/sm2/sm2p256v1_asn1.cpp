@@ -81,24 +81,25 @@ int sm2_public_key_asn1_decode(ASN1_SM2PublicKey*  pub,
 std::size_t sm2_signature_asn1_encode_outl(const ASN1_SM2Signature* sig)
 {
     return asn1::asn1_encode_sequence_outl(
-        asn1::asn1_encode_integer_outl(sig->R, 32) +
-        asn1::asn1_encode_integer_outl(sig->S, 32));
+        asn1::asn1_encode_integer_outl(sig->R.value, sig->R.length) +
+        asn1::asn1_encode_integer_outl(sig->S.value, sig->S.length));
 }
 
 void sm2_signature_asn1_encode(std::uint8_t*            out,
                                std::size_t*             outl,
                                const ASN1_SM2Signature* sig)
 {
-    std::size_t seq_v_len = asn1::asn1_encode_integer_outl(sig->R, 32) +
-                            asn1::asn1_encode_integer_outl(sig->S, 32);
+    std::size_t seq_v_len =
+        asn1::asn1_encode_integer_outl(sig->R.value, sig->R.length) +
+        asn1::asn1_encode_integer_outl(sig->S.value, sig->S.length);
 
     std::size_t   n;
     std::uint8_t* out_save = out;
     asn1::asn1_encode_sequence_tl(out, &n, seq_v_len);
     out += n;
-    asn1::asn1_encode_integer_tlv(out, &n, sig->R, 32);
+    asn1::asn1_encode_integer_tlv(out, &n, sig->R.value, sig->R.length);
     out += n;
-    asn1::asn1_encode_integer_tlv(out, &n, sig->S, 32);
+    asn1::asn1_encode_integer_tlv(out, &n, sig->S.value, sig->S.length);
     out += n;
     *outl = (std::size_t)out - (std::size_t)out_save;
 }
@@ -111,7 +112,7 @@ int sm2_signature_asn1_decode(ASN1_SM2Signature*  sig,
     std::size_t inl_save = inl, n;
 
     const std::uint8_t* seq_value;
-    std::size_t         seq_v_len, int_1_v_len, int_2_v_len;
+    std::size_t         seq_v_len;
 
     // decode SEQUENCE
     if (asn1::asn1_decode_sequence_value(&seq_value, &seq_v_len, &n, in, inl))
@@ -120,23 +121,23 @@ int sm2_signature_asn1_decode(ASN1_SM2Signature*  sig,
     }
     in += n, inl -= n;
     // decode INTEGER
-    if (asn1::asn1_decode_integer_value(&sig->R, &int_1_v_len, &n, seq_value,
-                                        seq_v_len))
+    if (asn1::asn1_decode_integer_value(&sig->R.value, &sig->R.length, &n,
+                                        seq_value, seq_v_len))
     {
         return -1;
     }
-    if (int_1_v_len != 32)
+    if (sig->R.length > 32)
     {
         return -1;
     }
     seq_value += n, seq_v_len -= n;
     // decode INTEGER
-    if (asn1::asn1_decode_integer_value(&sig->S, &int_2_v_len, &n, seq_value,
-                                        seq_v_len))
+    if (asn1::asn1_decode_integer_value(&sig->S.value, &sig->S.length, &n,
+                                        seq_value, seq_v_len))
     {
         return -1;
     }
-    if (int_2_v_len != 32)
+    if (sig->S.length > 32)
     {
         return -1;
     }
@@ -161,8 +162,10 @@ std::size_t sm2_cipher_asn1_encode_max_outl(std::size_t C3_length,
 std::size_t sm2_cipher_asn1_encode_outl(const ASN1_SM2Cipher* cipher)
 {
     return asn1::asn1_encode_sequence_outl(
-        asn1::asn1_encode_integer_outl(cipher->XCoordinate, 32) +
-        asn1::asn1_encode_integer_outl(cipher->YCoordinate, 32) +
+        asn1::asn1_encode_integer_outl(cipher->XCoordinate.value,
+                                       cipher->XCoordinate.length) +
+        asn1::asn1_encode_integer_outl(cipher->YCoordinate.value,
+                                       cipher->YCoordinate.length) +
         asn1::asn1_encode_octet_string_outl(cipher->HASH.length) +
         asn1::asn1_encode_octet_string_outl(cipher->CipherText.length));
 }
@@ -172,8 +175,10 @@ void sm2_cipher_asn1_encode(std::uint8_t*         out,
                             const ASN1_SM2Cipher* cipher)
 {
     std::size_t seq_v_len =
-        asn1::asn1_encode_integer_outl(cipher->XCoordinate, 32) +
-        asn1::asn1_encode_integer_outl(cipher->YCoordinate, 32) +
+        asn1::asn1_encode_integer_outl(cipher->XCoordinate.value,
+                                       cipher->XCoordinate.length) +
+        asn1::asn1_encode_integer_outl(cipher->YCoordinate.value,
+                                       cipher->YCoordinate.length) +
         asn1::asn1_encode_octet_string_outl(cipher->HASH.length) +
         asn1::asn1_encode_octet_string_outl(cipher->CipherText.length);
 
@@ -181,9 +186,11 @@ void sm2_cipher_asn1_encode(std::uint8_t*         out,
     std::uint8_t* out_save = out;
     asn1::asn1_encode_sequence_tl(out, &n, seq_v_len);
     out += n;
-    asn1::asn1_encode_integer_tlv(out, &n, cipher->XCoordinate, 32);
+    asn1::asn1_encode_integer_tlv(out, &n, cipher->XCoordinate.value,
+                                  cipher->XCoordinate.length);
     out += n;
-    asn1::asn1_encode_integer_tlv(out, &n, cipher->YCoordinate, 32);
+    asn1::asn1_encode_integer_tlv(out, &n, cipher->YCoordinate.value,
+                                  cipher->YCoordinate.length);
     out += n;
     asn1::asn1_encode_octet_string_tlv(out, &n, cipher->HASH.value,
                                        cipher->HASH.length);
@@ -202,29 +209,31 @@ int sm2_cipher_asn1_decode(ASN1_SM2Cipher*     cipher,
     std::size_t inl_save = inl, n;
 
     const std::uint8_t* seq_value;
-    std::size_t         seq_v_len, int_1_v_len, int_2_v_len;
+    std::size_t         seq_v_len;
 
     if (asn1::asn1_decode_sequence_value(&seq_value, &seq_v_len, &n, in, inl))
     {
         return -1;
     }
     in += n, inl -= n;
-    if (asn1::asn1_decode_integer_value(&cipher->XCoordinate, &int_1_v_len, &n,
+    if (asn1::asn1_decode_integer_value(&cipher->XCoordinate.value,
+                                        &cipher->XCoordinate.length, &n,
                                         seq_value, seq_v_len))
     {
         return -1;
     }
-    if (int_1_v_len != 32)
+    if (cipher->XCoordinate.length > 32)
     {
         return -1;
     }
     seq_value += n, seq_v_len -= n;
-    if (asn1::asn1_decode_integer_value(&cipher->YCoordinate, &int_2_v_len, &n,
+    if (asn1::asn1_decode_integer_value(&cipher->YCoordinate.value,
+                                        &cipher->YCoordinate.length, &n,
                                         seq_value, seq_v_len))
     {
         return -1;
     }
-    if (int_2_v_len != 32)
+    if (cipher->YCoordinate.length > 32)
     {
         return -1;
     }

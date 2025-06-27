@@ -249,6 +249,10 @@ static std::size_t asn1_encode_integer_value_length(
     std::size_t         data_len) noexcept
 {
     std::size_t value_length;
+    while (data_len && (*data == 0))
+    {
+        data += 1, data_len -= 1;
+    }
     if (data_len == 0)
     {
         value_length = 0;
@@ -348,11 +352,16 @@ void asn1_encode_integer_tlv(std::uint8_t*       out,
                    ASN1_TAG_INTEGER,         //
                    asn1_encode_integer_value_length(data, data_len));
     out += n, *outl = n;
+    while (data_len && (*data == 0))
+    {
+        data += 1, data_len -= 1;
+    }
     if (data_len)
     {
         if (data[0] >= 0x80)
         {
-            *out = 0, *outl += 1;
+            *out = 0;
+            out += 1, *outl += 1;
         }
         std::memmove(out, data, data_len);
         *outl += data_len;
