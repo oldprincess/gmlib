@@ -1,4 +1,4 @@
-#if !defined(CPU_FLAG_AVX2) && !defined(SUPPORT_BASE64_CHROMIUM)
+#if !defined(CPU_FLAG_INTEL_AVX2) && !defined(SUPPORT_BASE64_CHROMIUM)
 
 #include "base64_common.h"
 

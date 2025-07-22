@@ -1,4 +1,4 @@
-#if defined(SUPPORT_BASE64_CHROMIUM) && !defined(CPU_FLAG_AVX2)
+#if defined(SUPPORT_BASE64_CHROMIUM) && !defined(CPU_FLAG_INTEL_AVX2)
 /**
  * part of the code is "derived from
  * https://github.com/lemire/fastbase64/blob/master/src/chromiumbase64.c "

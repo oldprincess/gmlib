@@ -22,7 +22,7 @@ int main()
     StdRng std_rng;
     cout << std_rng.name() << ", rand int: " << std_rng.rand<int>() << endl;
 
-#if defined(CPU_FLAG_RDRAND)
+#if defined(CPU_FLAG_INTEL_RDRAND)
     hardware_rng::RdrandRng_32 rdrand_rng32;
     cout << rdrand_rng32.name() << ", rand int: " << rdrand_rng32.rand<int>()
          << endl;
@@ -32,7 +32,7 @@ int main()
          << endl;
 #endif
 
-#if defined(CPU_FLAG_RDSEED)
+#if defined(CPU_FLAG_INTEL_RDSEED)
     hardware_rng::RdseedRng_32 rdseed_rng32;
     cout << rdseed_rng32.name() << ", rand int: " << rdseed_rng32.rand<int>()
          << endl;

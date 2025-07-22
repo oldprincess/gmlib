@@ -6,8 +6,8 @@ set(THIRD_PARTY
     sm3 # for test
 )
 
-add_definitions(-DCPU_FLAG_RDRAND)
-add_definitions(-DCPU_FLAG_RDSEED)
+add_definitions(-DCPU_FLAG_INTEL_RDRAND)
+add_definitions(-DCPU_FLAG_INTEL_RDSEED)
 # add_compile_options(-O3 -msse2 -mavx2 -maes)
 
 #######################################################

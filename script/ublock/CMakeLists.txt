@@ -5,7 +5,7 @@ set(THIRD_PARTY
     block_cipher_mode
 )
 
-add_definitions(-DCPU_FLAG_SSSE3)
+add_definitions(-DCPU_FLAG_INTEL_SSSE3)
 # add_compile_options(-O3 -msse2 -mavx2 -maes)
 
 #######################################################

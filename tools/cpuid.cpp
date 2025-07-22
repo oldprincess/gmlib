@@ -451,7 +451,7 @@ int main()
         std::transform(item.begin(), item.end(), tmp.begin(),
                        [](char c) { return (c == '.') ? '_' : c; });
 
-        std::cout << "add_definitions(-DCPU_FLAG_" << tmp << ")" << std::endl;
+        std::cout << "add_definitions(-DCPU_FLAG_INTEL_" << tmp << ")" << std::endl;
     }
 
     std::cout << "set(PROJECT_COMPILE_OPTIONS ";
@@ -471,7 +471,7 @@ int main()
     //     tmp.resize(item.length() + 1);
     //     std::transform(item.begin(), item.end(), tmp.begin(),
     //                    [](char c) { return (c == '.') ? '_' : c; });
-    //     tmp = std::string("CPU_FLAG_") + tmp;
+    //     tmp = std::string("CPU_FLAG_INTEL_") + tmp;
 
     //     const char* c_ptr = tmp.c_str();
     //     std::printf("#if defined(%s)\n", c_ptr);

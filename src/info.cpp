@@ -5,38 +5,38 @@
 
 static const char* INFO_LIST[] = {
 // x86-64 CPU FLAG
-#if defined(CPU_FLAG_AES)
-    "CPU_FLAG_AES",
+#if defined(CPU_FLAG_INTEL_AES)
+    "CPU_FLAG_INTEL_AES",
 #endif
-#if defined(CPU_FLAG_AVX2)
-    "CPU_FLAG_AVX2",
+#if defined(CPU_FLAG_INTEL_AVX2)
+    "CPU_FLAG_INTEL_AVX2",
 #endif
-#if defined(CPU_FLAG_BMI2)
-    "CPU_FLAG_BMI2",
+#if defined(CPU_FLAG_INTEL_BMI2)
+    "CPU_FLAG_INTEL_BMI2",
 #endif
-#if defined(CPU_FLAG_MOVBE)
-    "CPU_FLAG_MOVBE",
+#if defined(CPU_FLAG_INTEL_MOVBE)
+    "CPU_FLAG_INTEL_MOVBE",
 #endif
-#if defined(CPU_FLAG_PCLMUL)
-    "CPU_FLAG_PCLMUL",
+#if defined(CPU_FLAG_INTEL_PCLMUL)
+    "CPU_FLAG_INTEL_PCLMUL",
 #endif
-#if defined(CPU_FLAG_RDRAND)
-    "CPU_FLAG_RDRAND",
+#if defined(CPU_FLAG_INTEL_RDRAND)
+    "CPU_FLAG_INTEL_RDRAND",
 #endif
-#if defined(CPU_FLAG_RDSEED)
-    "CPU_FLAG_RDSEED",
+#if defined(CPU_FLAG_INTEL_RDSEED)
+    "CPU_FLAG_INTEL_RDSEED",
 #endif
-#if defined(CPU_FLAG_SHA)
-    "CPU_FLAG_SHA",
+#if defined(CPU_FLAG_INTEL_SHA)
+    "CPU_FLAG_INTEL_SHA",
 #endif
-#if defined(CPU_FLAG_SSE2)
-    "CPU_FLAG_SSE2",
+#if defined(CPU_FLAG_INTEL_SSE2)
+    "CPU_FLAG_INTEL_SSE2",
 #endif
-#if defined(CPU_FLAG_SSE4_1)
-    "CPU_FLAG_SSE4_1",
+#if defined(CPU_FLAG_INTEL_SSE4_1)
+    "CPU_FLAG_INTEL_SSE4_1",
 #endif
-#if defined(CPU_FLAG_SSSE3)
-    "CPU_FLAG_SSSE3",
+#if defined(CPU_FLAG_INTEL_SSSE3)
+    "CPU_FLAG_INTEL_SSSE3",
 #endif
 // some optimization
 #ifdef SUPPORT_BASE64_CHROMIUM

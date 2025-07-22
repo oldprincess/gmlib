@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2013-2015, Alfred Klomp All rights reserved.
  */
-#if defined(CPU_FLAG_AVX2)
+#if defined(CPU_FLAG_INTEL_AVX2)
 #include "base64_avx2.h"
 
 #include <ctype.h>

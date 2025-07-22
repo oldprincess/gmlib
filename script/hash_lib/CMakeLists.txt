@@ -5,8 +5,8 @@ set(THIRD_PARTY
     sm3 # for test
 )
 
-add_definitions(-DCPU_FLAG_SSE2)
-add_definitions(-DCPU_FLAG_AVX2)
+add_definitions(-DCPU_FLAG_INTEL_SSE2)
+add_definitions(-DCPU_FLAG_INTEL_AVX2)
 # add_compile_options(-O3 -msse2 -mavx2 -maes)
 
 #######################################################

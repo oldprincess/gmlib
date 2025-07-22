@@ -1,7 +1,7 @@
 #ifndef NUMBER_CONFIG_H
 #define NUMBER_CONFIG_H
 
-#if defined(CPU_FLAG_MOVBE) && defined(CPU_FLAG_BMI2)
+#if defined(CPU_FLAG_INTEL_MOVBE) && defined(CPU_FLAG_INTEL_BMI2)
 #define NUMBER_IMPL_MPZ_X64
 #define NUMBER_IMPL_UINT256_X64
 #define NUMBER_IMPL_MONT256_X64

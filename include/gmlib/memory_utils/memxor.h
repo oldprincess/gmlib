@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 
-#if defined(CPU_FLAG_SSE2) || defined(__SSE2__) || defined(CPU_FLAG_AVX2) || \
+#if defined(CPU_FLAG_INTEL_SSE2) || defined(__SSE2__) || defined(CPU_FLAG_INTEL_AVX2) || \
     defined(__AVX2__)
 
 #include <immintrin.h>
@@ -15,7 +15,7 @@ namespace memory_utils {
 
 namespace internal {
 
-#if defined(CPU_FLAG_AVX2) || defined(__AVX2__)
+#if defined(CPU_FLAG_INTEL_AVX2) || defined(__AVX2__)
 namespace avx2 {
 
 static inline void memxor512(std::uint8_t       out[512],
@@ -175,7 +175,7 @@ static inline void memxor32(std::uint8_t       out[32],
 }; // namespace avx2
 #endif
 
-#if defined(CPU_FLAG_SSE2) || defined(__SSE2__)
+#if defined(CPU_FLAG_INTEL_SSE2) || defined(__SSE2__)
 namespace sse2 {
 
 static inline void memxor128(std::uint8_t       out[128],
@@ -308,7 +308,7 @@ static inline void memxor(void *out, const void *in1, const void *in2) noexcept
     const std::uint8_t *in2_ptr = static_cast<const std::uint8_t *>(in2);
     if constexpr (SIZE >= 512)
     {
-#if defined(CPU_FLAG_AVX2) || defined(__AVX2__)
+#if defined(CPU_FLAG_INTEL_AVX2) || defined(__AVX2__)
         for (std::size_t i = 0; i < SIZE / 512; i++)
         {
             internal::avx2::memxor512(out_ptr, in1_ptr, in2_ptr);
@@ -320,7 +320,7 @@ static inline void memxor(void *out, const void *in1, const void *in2) noexcept
     }
     if constexpr (SIZE >= 256)
     {
-#if defined(CPU_FLAG_AVX2) || defined(__AVX2__)
+#if defined(CPU_FLAG_INTEL_AVX2) || defined(__AVX2__)
         for (std::size_t i = 0; i < SIZE / 256; i++)
         {
             internal::avx2::memxor256(out_ptr, in1_ptr, in2_ptr);
@@ -332,7 +332,7 @@ static inline void memxor(void *out, const void *in1, const void *in2) noexcept
     }
     if constexpr (SIZE >= 128)
     {
-#if defined(CPU_FLAG_AVX2) || defined(__AVX2__)
+#if defined(CPU_FLAG_INTEL_AVX2) || defined(__AVX2__)
         for (std::size_t i = 0; i < SIZE / 128; i++)
         {
             internal::avx2::memxor128(out_ptr, in1_ptr, in2_ptr);
@@ -340,7 +340,7 @@ static inline void memxor(void *out, const void *in1, const void *in2) noexcept
         }
         memxor<SIZE % 128>(out_ptr, in1_ptr, in2_ptr);
         return;
-#elif defined(CPU_FLAG_SSE2) || defined(__SSE2__)
+#elif defined(CPU_FLAG_INTEL_SSE2) || defined(__SSE2__)
         for (std::size_t i = 0; i < SIZE / 128; i++)
         {
             internal::sse2::memxor128(out_ptr, in1_ptr, in2_ptr);
@@ -352,7 +352,7 @@ static inline void memxor(void *out, const void *in1, const void *in2) noexcept
     }
     if constexpr (SIZE >= 64)
     {
-#if defined(CPU_FLAG_AVX2) || defined(__AVX2__)
+#if defined(CPU_FLAG_INTEL_AVX2) || defined(__AVX2__)
         for (std::size_t i = 0; i < SIZE / 64; i++)
         {
             internal::avx2::memxor64(out_ptr, in1_ptr, in2_ptr);
@@ -360,7 +360,7 @@ static inline void memxor(void *out, const void *in1, const void *in2) noexcept
         }
         memxor<SIZE % 64>(out_ptr, in1_ptr, in2_ptr);
         return;
-#elif defined(CPU_FLAG_SSE2) || defined(__SSE2__)
+#elif defined(CPU_FLAG_INTEL_SSE2) || defined(__SSE2__)
         for (std::size_t i = 0; i < SIZE / 64; i++)
         {
             internal::sse2::memxor64(out_ptr, in1_ptr, in2_ptr);
@@ -372,7 +372,7 @@ static inline void memxor(void *out, const void *in1, const void *in2) noexcept
     }
     if constexpr (SIZE >= 32)
     {
-#if defined(CPU_FLAG_AVX2) || defined(__AVX2__)
+#if defined(CPU_FLAG_INTEL_AVX2) || defined(__AVX2__)
         for (std::size_t i = 0; i < SIZE / 32; i++)
         {
             internal::avx2::memxor32(out_ptr, in1_ptr, in2_ptr);
@@ -380,7 +380,7 @@ static inline void memxor(void *out, const void *in1, const void *in2) noexcept
         }
         memxor<SIZE % 32>(out_ptr, in1_ptr, in2_ptr);
         return;
-#elif defined(CPU_FLAG_SSE2) || defined(__SSE2__)
+#elif defined(CPU_FLAG_INTEL_SSE2) || defined(__SSE2__)
         for (std::size_t i = 0; i < SIZE / 32; i++)
         {
             internal::sse2::memxor32(out_ptr, in1_ptr, in2_ptr);
@@ -392,7 +392,7 @@ static inline void memxor(void *out, const void *in1, const void *in2) noexcept
     }
     if constexpr (SIZE >= 16)
     {
-#if defined(CPU_FLAG_SSE2) || defined(__SSE2__)
+#if defined(CPU_FLAG_INTEL_SSE2) || defined(__SSE2__)
         for (std::size_t i = 0; i < SIZE / 16; i++)
         {
             internal::sse2::memxor16(out_ptr, in1_ptr, in2_ptr);
@@ -440,7 +440,7 @@ inline void memxor_n(void       *out,
     std::uint8_t       *out_ptr = static_cast<std::uint8_t *>(out);
     const std::uint8_t *in1_ptr = static_cast<const std::uint8_t *>(in1);
     const std::uint8_t *in2_ptr = static_cast<const std::uint8_t *>(in2);
-#if defined(CPU_FLAG_AVX2) || defined(__AVX2__)
+#if defined(CPU_FLAG_INTEL_AVX2) || defined(__AVX2__)
     while (size >= 512)
     {
         internal::avx2::memxor512(out_ptr, in1_ptr, in2_ptr);
@@ -448,7 +448,7 @@ inline void memxor_n(void       *out,
     }
 #endif
 
-#if defined(CPU_FLAG_AVX2) || defined(__AVX2__)
+#if defined(CPU_FLAG_INTEL_AVX2) || defined(__AVX2__)
     while (size >= 256)
     {
         internal::avx2::memxor256(out_ptr, in1_ptr, in2_ptr);
@@ -456,13 +456,13 @@ inline void memxor_n(void       *out,
     }
 #endif
 
-#if defined(CPU_FLAG_AVX2) || defined(__AVX2__)
+#if defined(CPU_FLAG_INTEL_AVX2) || defined(__AVX2__)
     while (size >= 128)
     {
         internal::avx2::memxor128(out_ptr, in1_ptr, in2_ptr);
         out_ptr += 128, in1_ptr += 128, in2_ptr += 128, size -= 128;
     }
-#elif defined(CPU_FLAG_SSE2) || defined(__SSE2__)
+#elif defined(CPU_FLAG_INTEL_SSE2) || defined(__SSE2__)
     while (size >= 128)
     {
         internal::sse2::memxor128(out_ptr, in1_ptr, in2_ptr);
@@ -470,13 +470,13 @@ inline void memxor_n(void       *out,
     }
 #endif
 
-#if defined(CPU_FLAG_AVX2) || defined(__AVX2__)
+#if defined(CPU_FLAG_INTEL_AVX2) || defined(__AVX2__)
     while (size >= 64)
     {
         internal::avx2::memxor64(out_ptr, in1_ptr, in2_ptr);
         out_ptr += 64, in1_ptr += 64, in2_ptr += 64, size -= 64;
     }
-#elif defined(CPU_FLAG_SSE2) || defined(__SSE2__)
+#elif defined(CPU_FLAG_INTEL_SSE2) || defined(__SSE2__)
     while (size >= 64)
     {
         internal::sse2::memxor64(out_ptr, in1_ptr, in2_ptr);
@@ -484,13 +484,13 @@ inline void memxor_n(void       *out,
     }
 #endif
 
-#if defined(CPU_FLAG_AVX2) || defined(__AVX2__)
+#if defined(CPU_FLAG_INTEL_AVX2) || defined(__AVX2__)
     while (size >= 32)
     {
         internal::avx2::memxor32(out_ptr, in1_ptr, in2_ptr);
         out_ptr += 32, in1_ptr += 32, in2_ptr += 32, size -= 32;
     }
-#elif defined(CPU_FLAG_SSE2)
+#elif defined(CPU_FLAG_INTEL_SSE2)
     while (size >= 32)
     {
         internal::sse2::memxor32(out_ptr, in1_ptr, in2_ptr);
@@ -498,7 +498,7 @@ inline void memxor_n(void       *out,
     }
 #endif
 
-#if defined(CPU_FLAG_SSE2) || defined(__SSE2__)
+#if defined(CPU_FLAG_INTEL_SSE2) || defined(__SSE2__)
     while (size >= 16)
     {
         internal::sse2::memxor16(out_ptr, in1_ptr, in2_ptr);

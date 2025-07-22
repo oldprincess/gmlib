@@ -6,7 +6,7 @@ set(THIRD_PARTY
 )
 
 add_definitions(-DSUPPORT_BASE64_CHROMIUM)
-# add_definitions(-DCPU_FLAG_AVX2)
+# add_definitions(-DCPU_FLAG_INTEL_AVX2)
 # add_compile_options(-O3 -mavx2)
 
 #######################################################

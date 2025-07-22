@@ -87,9 +87,9 @@ python cpuid.py
 将得到如下所示的输出（部分输出结果省略）
 
 ```text
-add_definitions(-DCPU_FLAG_CPU_FLAG_AES)
-add_definitions(-DCPU_FLAG_CPU_FLAG_AVX2)
-add_definitions(-DCPU_FLAG_CPU_FLAG_BMI2)
+add_definitions(-DCPU_FLAG_INTEL_CPU_FLAG_INTEL_AES)
+add_definitions(-DCPU_FLAG_INTEL_CPU_FLAG_INTEL_AVX2)
+add_definitions(-DCPU_FLAG_INTEL_CPU_FLAG_INTEL_BMI2)
 ...
 set(PROJECT_COMPILE_OPTIONS -maes -mavx2 ...)
 ```

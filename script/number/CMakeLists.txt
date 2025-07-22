@@ -5,8 +5,8 @@ set(THIRD_PARTY
 
 )
 
-add_definitions(-DCPU_FLAG_MOVBE)
-add_definitions(-DCPU_FLAG_BMI2)
+add_definitions(-DCPU_FLAG_INTEL_MOVBE)
+add_definitions(-DCPU_FLAG_INTEL_BMI2)
 # add_compile_options(-O3 -msse2 -mavx2 -maes)
 
 #######################################################

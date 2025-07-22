@@ -5,8 +5,8 @@ set(THIRD_PARTY
     hash_lib
 )
 
-add_definitions(-DCPU_FLAG_SHA)
-add_definitions(-DCPU_FLAG_SSE4_1)
+add_definitions(-DCPU_FLAG_INTEL_SHA)
+add_definitions(-DCPU_FLAG_INTEL_SSE4_1)
 set(PROJECT_COMPILE_OPTIONS -O3 -msha -msse4.1)
 
 #######################################################

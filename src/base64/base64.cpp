@@ -1,6 +1,6 @@
 #include <gmlib/base64/base64.h>
 
-#if defined(CPU_FLAG_AVX2)
+#if defined(CPU_FLAG_INTEL_AVX2)
 #include "base64_avx2.h"
 namespace alg = base64::internal::avx2;
 #elif defined(SUPPORT_BASE64_CHROMIUM)

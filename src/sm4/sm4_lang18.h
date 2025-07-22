@@ -13,7 +13,7 @@ namespace sm4::internal::lang18 {
 constexpr std::size_t SM4_BLOCK_SIZE   = 16;
 constexpr std::size_t SM4_USER_KEY_LEN = 16;
 
-#if defined(CPU_FLAG_AVX2)
+#if defined(CPU_FLAG_INTEL_AVX2)
 constexpr std::size_t SM4_PARALLEL_NUM = 16;
 #else
 constexpr std::size_t SM4_PARALLEL_NUM = 4;

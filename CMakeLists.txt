@@ -21,7 +21,7 @@ set(THIRD_PARTY
     ublock
 )
 
-set(PROJECT_BUILD_TEST ON)
+set(PROJECT_BUILD_TEST OFF)
 
 # add_definitions(-DSUPPORT_BASE64_CHROMIUM)
 add_definitions(-DSUPPORT_SM3_YANG15)
@@ -31,17 +31,17 @@ add_definitions(-DSUPPORT_SM4_LANG18)
 # ****** set definitions in here ******
 # *************************************
 
-# add_definitions(-DCPU_FLAG_AES)
-# add_definitions(-DCPU_FLAG_AVX2)
-# add_definitions(-DCPU_FLAG_BMI2)
-# add_definitions(-DCPU_FLAG_MOVBE)
-# add_definitions(-DCPU_FLAG_PCLMUL)
-# add_definitions(-DCPU_FLAG_RDRAND)
-# add_definitions(-DCPU_FLAG_RDSEED)
-# add_definitions(-DCPU_FLAG_SHA)
-# add_definitions(-DCPU_FLAG_SSE2)
-# add_definitions(-DCPU_FLAG_SSE4_1)
-# add_definitions(-DCPU_FLAG_SSSE3)
+add_definitions(-DCPU_FLAG_INTEL_AES)
+add_definitions(-DCPU_FLAG_INTEL_AVX2)
+add_definitions(-DCPU_FLAG_INTEL_BMI2)
+add_definitions(-DCPU_FLAG_INTEL_MOVBE)
+add_definitions(-DCPU_FLAG_INTEL_PCLMUL)
+add_definitions(-DCPU_FLAG_INTEL_RDRAND)
+add_definitions(-DCPU_FLAG_INTEL_RDSEED)
+add_definitions(-DCPU_FLAG_INTEL_SHA)
+add_definitions(-DCPU_FLAG_INTEL_SSE2)
+add_definitions(-DCPU_FLAG_INTEL_SSE4_1)
+add_definitions(-DCPU_FLAG_INTEL_SSSE3)
 # set(PROJECT_COMPILE_OPTIONS -maes -mavx2 -mbmi2 -mmovbe -mpclmul -mrdrnd -mrdseed -msha -msse2 -msse4.1 -mssse3)
 
 #######################################################
