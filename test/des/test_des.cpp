@@ -59,7 +59,8 @@ void test_des()
         {
             std::printf("err in des common enc, file: %s, line: %d\n", __FILE__,
                         __LINE__);
-            std::printf("%llx %llx %llx\n", pt[i], ct[i],
+            std::printf("%llx %llx %llx\n", (unsigned long long)pt[i],
+                        (unsigned long long)ct[i],
                         (unsigned long long)MEM_LOAD64BE(out));
             std::exit(-1);
         }
@@ -68,7 +69,8 @@ void test_des()
         {
             std::printf("err in des common enc, file: %s, line: %d\n", __FILE__,
                         __LINE__);
-            std::printf("%llx %llx %llx\n", pt[i], ct[i],
+            std::printf("%llx %llx %llx\n", (unsigned long long)pt[i],
+                        (unsigned long long)ct[i],
                         (unsigned long long)MEM_LOAD64BE(out));
             std::exit(-1);
         }
