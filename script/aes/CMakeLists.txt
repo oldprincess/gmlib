@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.10)
 
 set(PROJECT_NAME_ aes)
 set(THIRD_PARTY 
     block_cipher_mode
+    cpuinfo
     ghash
     hash_lib
     memory_utils
