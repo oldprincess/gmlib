@@ -75,6 +75,8 @@ void test_ghash()
     std::uint8_t out[GHash::DIGEST_SIZE];
     GHash        hash;
 
+    std::printf("test ghash %s ...\n", hash.fetch_impl_algo());
+
     hash.set_key(H0);
     hash.do_final(out, msg0, sizeof(msg0));
     if (std::memcmp(digest0, out, GHash::DIGEST_SIZE) != 0)

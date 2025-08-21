@@ -2,12 +2,11 @@ cmake_minimum_required(VERSION 3.0)
 
 set(PROJECT_NAME_ ghash)
 set(THIRD_PARTY 
+    cpuinfo
     hash_lib
 )
 
-add_definitions(-DCPU_FLAG_INTEL_SSE2)
-add_definitions(-DCPU_FLAG_INTEL_AVX2)
-# add_definitions(-DCPU_FLAG_INTEL_PCLMUL)
+add_definitions(-D__SSE2__ -D__PCLMUL__)
 # add_compile_options(-O3 -msse2 -mavx2 -maes)
 
 #######################################################
