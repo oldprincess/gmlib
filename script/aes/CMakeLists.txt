@@ -9,9 +9,6 @@ set(THIRD_PARTY
     memory_utils
 )
 
-add_definitions(-DCPU_FLAG_INTEL_SSE2)
-add_definitions(-DCPU_FLAG_INTEL_AVX2)
-add_definitions(-DCPU_FLAG_INTEL_AES)
 # add_compile_options(-O3 -msse2 -mavx2 -maes)
 
 #######################################################

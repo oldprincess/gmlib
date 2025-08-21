@@ -1,11 +1,11 @@
 #ifndef AES_CONFIG_H
 #define AES_CONFIG_H
 
-#if defined(CPU_FLAG_INTEL_AES) && defined(CPU_FLAG_INTEL_SSE2)
+#if defined(__AES__) && defined(__SSE2__)
 #define AES_IMPL_AESNI
 #endif
 
-#if defined(CPU_FLAG_ARM_AES)
+#if defined(__ARM_NEON)
 #define AES_IMPL_ARM_AES
 #endif
 

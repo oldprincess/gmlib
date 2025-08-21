@@ -13,6 +13,8 @@
 // universal
 #include "aes_lut.h"
 
+namespace aes {
+
 struct AESProvider
 {
     bool (*available)();
@@ -222,8 +224,6 @@ static const AESProvider* get_provider(const AESProvider* providers,
 #define AES128_PROVIDER get_provider(aes128_providers)
 #define AES192_PROVIDER get_provider(aes192_providers)
 #define AES256_PROVIDER get_provider(aes256_providers)
-
-namespace aes {
 
 const char* AES128::fetch_impl_algo() const noexcept
 {
