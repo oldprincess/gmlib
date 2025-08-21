@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 set(PROJECT_NAME_ sm3)
 set(THIRD_PARTY 
+    cpuinfo
     hash_lib
 )
 
