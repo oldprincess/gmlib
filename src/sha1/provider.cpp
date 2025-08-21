@@ -31,7 +31,7 @@ struct SHA1Provider
                        std::size_t         inl);
 };
 
-static SHA1Provider ghash_providers[] = {
+static SHA1Provider sha1_providers[] = {
 
 #if defined(SHA1_IMPL_SHA)
     {
@@ -84,7 +84,7 @@ static const SHA1Provider* get_provider(const SHA1Provider* providers,
     std::exit(-1);
 }
 
-#define SHA1_PROVIDER get_provider(ghash_providers)
+#define SHA1_PROVIDER get_provider(sha1_providers)
 
 SHA1::SHA1() noexcept
 {
