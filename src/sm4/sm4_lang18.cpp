@@ -1,7 +1,7 @@
 #include "sm4_lang18.h"
 #if defined(SM4_IMPL_LANG18)
 
-#if defined(CPU_FLAG_INTEL_AVX2)
+#if defined(__AVX2__)
 #include <immintrin.h>
 #endif
 
@@ -655,7 +655,7 @@ static void sm4_compute_blocks_x4(const std::uint32_t round_key[32],
     MEM_STORE32BE(out + 60, x[0 + 12]);
 }
 
-#if defined(CPU_FLAG_INTEL_AVX2)
+#if defined(__AVX2__)
 
 #define MM256_PACK0_EPI32(a, b, c, d)                  \
     _mm256_unpacklo_epi64(_mm256_unpacklo_epi32(a, b), \
@@ -877,7 +877,7 @@ static void sm4_compute_blocks(const std::uint32_t round_key[32],
                                const std::uint8_t *in,
                                std::size_t         block_num) noexcept
 {
-#if defined(CPU_FLAG_INTEL_AVX2)
+#if defined(__AVX2__)
     while (block_num >= 16)
     {
         avx2_sm4_compute_blocks_x16(round_key, out, in);

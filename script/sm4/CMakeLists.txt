@@ -3,14 +3,12 @@ cmake_minimum_required(VERSION 3.0)
 set(PROJECT_NAME_ sm4)
 set(THIRD_PARTY 
     block_cipher_mode
+    cpuinfo
     ghash
     hash_lib
     memory_utils
 )
 
-add_definitions(-DCPU_FLAG_INTEL_SSE2)
-add_definitions(-DCPU_FLAG_INTEL_AVX2)
-add_definitions(-DCPU_FLAG_INTEL_AES)
 add_definitions(-DSUPPORT_SM4_LANG18)
 # add_compile_options(-O3 -msse2 -mavx2 -maes)
 
