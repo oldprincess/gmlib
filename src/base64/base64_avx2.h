@@ -5,7 +5,8 @@
  *
  * Copyright (c) 2013-2015, Alfred Klomp All rights reserved.
  */
-#if defined(CPU_FLAG_INTEL_AVX2)
+#include "config.h"
+#if defined(BASE64_IMPL_AVX2)
 
 #ifndef BASE64_INTERNAL_BASE64_AVX2_H
 #define BASE64_INTERNAL_BASE64_AVX2_H

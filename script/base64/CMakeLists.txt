@@ -2,11 +2,10 @@ cmake_minimum_required(VERSION 3.0)
 
 set(PROJECT_NAME_ base64)
 set(THIRD_PARTY 
-
+    cpuinfo
 )
 
 add_definitions(-DSUPPORT_BASE64_CHROMIUM)
-# add_definitions(-DCPU_FLAG_INTEL_AVX2)
 # add_compile_options(-O3 -mavx2)
 
 #######################################################

@@ -1,6 +1,6 @@
-#if !defined(CPU_FLAG_INTEL_AVX2) && !defined(SUPPORT_BASE64_CHROMIUM)
-
 #include "base64_common.h"
+
+#if defined(BASE64_IMPL_COMMON)
 
 namespace base64::internal::common {
 
