@@ -1,27 +1,19 @@
 cmake_minimum_required(VERSION 3.0)
 
 set(PROJECT_NAME_ sha1)
-set(THIRD_PARTY 
+set(THIRD_PARTY
+    cpuinfo
     hash_lib
 )
 
-add_definitions(-DCPU_FLAG_INTEL_SHA)
-add_definitions(-DCPU_FLAG_INTEL_SSE4_1)
-set(PROJECT_COMPILE_OPTIONS -O3 -msha -msse4.1)
+add_definitions(-D__SHA__ -D__SSE4_1__)
+# add_compile_options(-O3 -msha -msse4.1)
 
 #######################################################
 ## ================================================= ##
 ## ================================================= ##
 ## ================================================= ##
 #######################################################
-
-if(MSVC)
-
-else()
-    add_compile_options(${PROJECT_COMPILE_OPTIONS})
-    add_compile_options(-std=c++17)
-    add_compile_options(-fvisibility=hidden)
-endif()
 
 project(${PROJECT_NAME_} CXX)
 
