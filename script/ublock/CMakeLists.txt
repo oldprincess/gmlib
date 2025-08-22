@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.0)
 set(PROJECT_NAME_ ublock)
 set(THIRD_PARTY 
     block_cipher_mode
+    cpuinfo
 )
 
-add_definitions(-DCPU_FLAG_INTEL_SSSE3)
 # add_compile_options(-O3 -msse2 -mavx2 -maes)
 
 #######################################################
