@@ -1,6 +1,7 @@
-#include <gmlib/number/mpz.h>
 #include <gmlib/sm9/internal/sm9_field.h>
+
 namespace sm9::internal {
+
 // y^2 = x^3 + 5
 // 0xb640000002a3a6f1d603ab4ff58ec74521f2934b1a7aeedbe56f9b27e351457d
 const std::uint8_t SM9_CURVE_P[32] = {
@@ -61,88 +62,104 @@ const std::uint8_t SM9_CURVE2_GY[64] = {
     0x08, 0x11, 0x62, 0x15, 0xbb, 0xa5, 0xc9, 0x99, 0xa7, 0xc7,
 };
 
-#define P_DATA                                                              \
-    0xb6, 0x40, 0x00, 0x00, 0x02, 0xa3, 0xa6, 0xf1, 0xd6, 0x03, 0xab, 0x4f, \
-        0xf5, 0x8e, 0xc7, 0x45, 0x21, 0xf2, 0x93, 0x4b, 0x1a, 0x7a, 0xee,   \
-        0xdb, 0xe5, 0x6f, 0x9b, 0x27, 0xe3, 0x51, 0x45, 0x7d
+class SM9FieldCtxProvider
+{
+public:
+    std::uint8_t P[32], P_SUB2[32], FP_R[32], FP_R_POW2[32], FP_MONT_N[32];
+    std::uint8_t N[32], N_SUB2[32], FN_R[32], FN_R_POW2[32], FN_MONT_N[32];
 
-#define P_SUB2_DATA                                                         \
-    0xb6, 0x40, 0x00, 0x00, 0x02, 0xa3, 0xa6, 0xf1, 0xd6, 0x03, 0xab, 0x4f, \
-        0xf5, 0x8e, 0xc7, 0x45, 0x21, 0xf2, 0x93, 0x4b, 0x1a, 0x7a, 0xee,   \
-        0xdb, 0xe5, 0x6f, 0x9b, 0x27, 0xe3, 0x51, 0x45, 0x7b
+    std::uint8_t       N_SUB1[32], N_SUB3[32];
+    number::Mont256CTX FP_MONT_CTX;
+    number::Mont256CTX FN_MONT_CTX;
 
-#define FP_R_DATA                                                           \
-    0x49, 0xbf, 0xff, 0xff, 0xfd, 0x5c, 0x59, 0x0e, 0x29, 0xfc, 0x54, 0xb0, \
-        0x0a, 0x71, 0x38, 0xba, 0xde, 0x0d, 0x6c, 0xb4, 0xe5, 0x85, 0x11,   \
-        0x24, 0x1a, 0x90, 0x64, 0xd8, 0x1c, 0xae, 0xba, 0x83
+public:
+    static const SM9FieldCtxProvider& instance() noexcept
+    {
+        static SM9FieldCtxProvider m;
+        return m;
+    }
 
-#define FP_R_POW2_DATA                                                      \
-    0x2e, 0xa7, 0x95, 0xa6, 0x56, 0xf6, 0x2f, 0xbd, 0xe4, 0x79, 0xb5, 0x22, \
-        0xd6, 0x70, 0x6e, 0x7b, 0x88, 0xf8, 0x10, 0x5f, 0xae, 0x1a, 0x5d,   \
-        0x3f, 0x27, 0xde, 0xa3, 0x12, 0xb4, 0x17, 0xe2, 0xd2
+public:
+    SM9FieldCtxProvider() noexcept
+    {
+        static const std::uint8_t P_SUB2_DATA[32] = {
+            0xb6, 0x40, 0x00, 0x00, 0x02, 0xa3, 0xa6, 0xf1, 0xd6, 0x03, 0xab,
+            0x4f, 0xf5, 0x8e, 0xc7, 0x45, 0x21, 0xf2, 0x93, 0x4b, 0x1a, 0x7a,
+            0xee, 0xdb, 0xe5, 0x6f, 0x9b, 0x27, 0xe3, 0x51, 0x45, 0x7b,
+        };
+        static const std::uint8_t FP_R_DATA[32] = {
+            0x49, 0xbf, 0xff, 0xff, 0xfd, 0x5c, 0x59, 0x0e, 0x29, 0xfc, 0x54,
+            0xb0, 0x0a, 0x71, 0x38, 0xba, 0xde, 0x0d, 0x6c, 0xb4, 0xe5, 0x85,
+            0x11, 0x24, 0x1a, 0x90, 0x64, 0xd8, 0x1c, 0xae, 0xba, 0x83,
+        };
+        static const std::uint8_t FP_R_POW2_DATA[32] = {
+            0x2e, 0xa7, 0x95, 0xa6, 0x56, 0xf6, 0x2f, 0xbd, 0xe4, 0x79, 0xb5,
+            0x22, 0xd6, 0x70, 0x6e, 0x7b, 0x88, 0xf8, 0x10, 0x5f, 0xae, 0x1a,
+            0x5d, 0x3f, 0x27, 0xde, 0xa3, 0x12, 0xb4, 0x17, 0xe2, 0xd2,
+        };
+        static const std::uint8_t FP_MONT_N_DATA[32] = {
+            0xaf, 0xd2, 0xba, 0xc5, 0x55, 0x8a, 0x13, 0xb3, 0x96, 0x6a, 0x4b,
+            0x29, 0x15, 0x22, 0xb1, 0x37, 0x18, 0x1a, 0xe3, 0x96, 0x13, 0xc8,
+            0xdb, 0xaf, 0x89, 0x2b, 0xc4, 0x2c, 0x2f, 0x2e, 0xe4, 0x2b,
+        };
 
-#define FP_MONT_N_DATA                                                      \
-    0xaf, 0xd2, 0xba, 0xc5, 0x55, 0x8a, 0x13, 0xb3, 0x96, 0x6a, 0x4b, 0x29, \
-        0x15, 0x22, 0xb1, 0x37, 0x18, 0x1a, 0xe3, 0x96, 0x13, 0xc8, 0xdb,   \
-        0xaf, 0x89, 0x2b, 0xc4, 0x2c, 0x2f, 0x2e, 0xe4, 0x2b
+        static const std::uint8_t N_SUB1_DATA[32] = {
+            0xb6, 0x40, 0x00, 0x00, 0x02, 0xa3, 0xa6, 0xf1, 0xd6, 0x03, 0xab,
+            0x4f, 0xf5, 0x8e, 0xc7, 0x44, 0x49, 0xf2, 0x93, 0x4b, 0x18, 0xea,
+            0x8b, 0xee, 0xe5, 0x6e, 0xe1, 0x9c, 0xd6, 0x9e, 0xcf, 0x24,
+        };
+        static const std::uint8_t N_SUB2_DATA[32] = {
+            0xb6, 0x40, 0x00, 0x00, 0x02, 0xa3, 0xa6, 0xf1, 0xd6, 0x03, 0xab,
+            0x4f, 0xf5, 0x8e, 0xc7, 0x44, 0x49, 0xf2, 0x93, 0x4b, 0x18, 0xea,
+            0x8b, 0xee, 0xe5, 0x6e, 0xe1, 0x9c, 0xd6, 0x9e, 0xcf, 0x23,
+        };
+        static const std::uint8_t N_SUB3_DATA[32] = {
+            0xb6, 0x40, 0x00, 0x00, 0x02, 0xa3, 0xa6, 0xf1, 0xd6, 0x03, 0xab,
+            0x4f, 0xf5, 0x8e, 0xc7, 0x44, 0x49, 0xf2, 0x93, 0x4b, 0x18, 0xea,
+            0x8b, 0xee, 0xe5, 0x6e, 0xe1, 0x9c, 0xd6, 0x9e, 0xcf, 0x22,
+        };
+        static const std::uint8_t FN_R_DATA[32] = {
+            0x49, 0xbf, 0xff, 0xff, 0xfd, 0x5c, 0x59, 0x0e, 0x29, 0xfc, 0x54,
+            0xb0, 0x0a, 0x71, 0x38, 0xbb, 0xb6, 0x0d, 0x6c, 0xb4, 0xe7, 0x15,
+            0x74, 0x11, 0x1a, 0x91, 0x1e, 0x63, 0x29, 0x61, 0x30, 0xdb,
+        };
+        static const std::uint8_t FN_R_POW2_DATA[32] = {
+            0x88, 0x94, 0xf5, 0xd1, 0x63, 0x69, 0x5d, 0x0e, 0xbf, 0xee, 0x4b,
+            0xae, 0x7d, 0x78, 0xa1, 0xf9, 0xe4, 0xa0, 0x81, 0x10, 0xbb, 0x6d,
+            0xae, 0xab, 0x75, 0x98, 0xcd, 0x79, 0xcd, 0x75, 0x0c, 0x35,
+        };
+        static const std::uint8_t FN_MONT_N_DATA[32] = {
+            0xe3, 0x58, 0x2e, 0xd4, 0xca, 0xa6, 0xff, 0x31, 0x20, 0x5f, 0x4c,
+            0x4b, 0x48, 0x17, 0x50, 0x59, 0xf5, 0x90, 0x74, 0x0d, 0x93, 0x9a,
+            0x51, 0x0d, 0x1d, 0x02, 0x66, 0x23, 0x51, 0x97, 0x4b, 0x53,
+        };
 
-static const auto P          = number::mpz_set_epi8(P_DATA);
-static const auto P_SUB2     = number::mpz_set_epi8(P_SUB2_DATA);
-static const auto FP_R       = number::mpz_set_epi8(FP_R_DATA);
-static const auto FP_R_POW2  = number::mpz_set_epi8(FP_R_POW2_DATA);
-static const auto FP_MONT_N_ = number::mpz_set_epi8(FP_MONT_N_DATA);
+        number::uint256_from_bytes(P, SM9_CURVE_P);
+        number::uint256_from_bytes(P_SUB2, P_SUB2_DATA);
+        number::uint256_from_bytes(FP_R, FP_R_DATA);
+        number::uint256_from_bytes(FP_R_POW2, FP_R_POW2_DATA);
+        number::uint256_from_bytes(FP_MONT_N, FP_MONT_N_DATA);
 
-#define N_DATA                                                              \
-    0xb6, 0x40, 0x00, 0x00, 0x02, 0xa3, 0xa6, 0xf1, 0xd6, 0x03, 0xab, 0x4f, \
-        0xf5, 0x8e, 0xc7, 0x44, 0x49, 0xf2, 0x93, 0x4b, 0x18, 0xea, 0x8b,   \
-        0xee, 0xe5, 0x6e, 0xe1, 0x9c, 0xd6, 0x9e, 0xcf, 0x25
+        number::uint256_from_bytes(N, SM9_CURVE_N);
+        number::uint256_from_bytes(N_SUB1, N_SUB1_DATA);
+        number::uint256_from_bytes(N_SUB2, N_SUB2_DATA);
+        number::uint256_from_bytes(N_SUB3, N_SUB3_DATA);
+        number::uint256_from_bytes(FN_R, FN_R_DATA);
+        number::uint256_from_bytes(FN_R_POW2, FN_R_POW2_DATA);
+        number::uint256_from_bytes(FN_MONT_N, FN_MONT_N_DATA);
 
-#define N_SUB2_DATA                                                         \
-    0xb6, 0x40, 0x00, 0x00, 0x02, 0xa3, 0xa6, 0xf1, 0xd6, 0x03, 0xab, 0x4f, \
-        0xf5, 0x8e, 0xc7, 0x44, 0x49, 0xf2, 0x93, 0x4b, 0x18, 0xea, 0x8b,   \
-        0xee, 0xe5, 0x6e, 0xe1, 0x9c, 0xd6, 0x9e, 0xcf, 0x23
+        FP_MONT_CTX.P      = P;
+        FP_MONT_CTX.P_SUB2 = P_SUB2;
+        FP_MONT_CTX.R      = FP_R;
+        FP_MONT_CTX.R_POW2 = FP_R_POW2;
+        FP_MONT_CTX.N_     = FP_MONT_N;
 
-#define N_SUB3_DATA                                                         \
-    0xb6, 0x40, 0x00, 0x00, 0x02, 0xa3, 0xa6, 0xf1, 0xd6, 0x03, 0xab, 0x4f, \
-        0xf5, 0x8e, 0xc7, 0x44, 0x49, 0xf2, 0x93, 0x4b, 0x18, 0xea, 0x8b,   \
-        0xee, 0xe5, 0x6e, 0xe1, 0x9c, 0xd6, 0x9e, 0xcf, 0x22
-
-#define FN_R_DATA                                                           \
-    0x49, 0xbf, 0xff, 0xff, 0xfd, 0x5c, 0x59, 0x0e, 0x29, 0xfc, 0x54, 0xb0, \
-        0x0a, 0x71, 0x38, 0xbb, 0xb6, 0x0d, 0x6c, 0xb4, 0xe7, 0x15, 0x74,   \
-        0x11, 0x1a, 0x91, 0x1e, 0x63, 0x29, 0x61, 0x30, 0xdb
-
-#define FN_R_POW2_DATA                                                      \
-    0x88, 0x94, 0xf5, 0xd1, 0x63, 0x69, 0x5d, 0x0e, 0xbf, 0xee, 0x4b, 0xae, \
-        0x7d, 0x78, 0xa1, 0xf9, 0xe4, 0xa0, 0x81, 0x10, 0xbb, 0x6d, 0xae,   \
-        0xab, 0x75, 0x98, 0xcd, 0x79, 0xcd, 0x75, 0x0c, 0x35
-
-#define FN_MONT_N_DATA                                                      \
-    0xe3, 0x58, 0x2e, 0xd4, 0xca, 0xa6, 0xff, 0x31, 0x20, 0x5f, 0x4c, 0x4b, \
-        0x48, 0x17, 0x50, 0x59, 0xf5, 0x90, 0x74, 0x0d, 0x93, 0x9a, 0x51,   \
-        0x0d, 0x1d, 0x02, 0x66, 0x23, 0x51, 0x97, 0x4b, 0x53
-
-static const auto N          = number::mpz_set_epi8(N_DATA);
-static const auto N_SUB2     = number::mpz_set_epi8(N_SUB2_DATA);
-static const auto N_SUB3     = number::mpz_set_epi8(N_SUB3_DATA);
-static const auto FN_R       = number::mpz_set_epi8(FN_R_DATA);
-static const auto FN_R_POW2  = number::mpz_set_epi8(FN_R_POW2_DATA);
-static const auto FN_MONT_N_ = number::mpz_set_epi8(FN_MONT_N_DATA);
-
-static const number::Mont256CTX FP_MONT_CTX = {
-    (const std::uint8_t*)P.v,          //
-    (const std::uint8_t*)P_SUB2.v,     //
-    (const std::uint8_t*)FP_R.v,       //
-    (const std::uint8_t*)FP_R_POW2.v,  //
-    (const std::uint8_t*)FP_MONT_N_.v, //
-};
-
-static const number::Mont256CTX FN_MONT_CTX = {
-    (const std::uint8_t*)N.v,          //
-    (const std::uint8_t*)N_SUB2.v,     //
-    (const std::uint8_t*)FN_R.v,       //
-    (const std::uint8_t*)FN_R_POW2.v,  //
-    (const std::uint8_t*)FN_MONT_N_.v, //
+        FN_MONT_CTX.P      = N;
+        FN_MONT_CTX.P_SUB2 = N_SUB2;
+        FN_MONT_CTX.R      = FN_R;
+        FN_MONT_CTX.R_POW2 = FN_R_POW2;
+        FN_MONT_CTX.N_     = FN_MONT_N;
+    }
 };
 
 #pragma region "SM9 BN"
@@ -169,11 +186,10 @@ int sm9_bn_add_uint32(sm9_bn_t r, const sm9_bn_t a, std::uint32_t b) noexcept
 
 void sm9_bn_mod_n_sub1(sm9_bn_t a) noexcept
 {
-    number::uint256_t n_sub1;
-    number::uint256_sub_borrow_uint32(n_sub1, (const std::uint8_t*)N.v, 1);
-    if (number::uint256_cmp(a, n_sub1) >= 0)
+    const std::uint8_t* N_SUB1 = SM9FieldCtxProvider::instance().N_SUB1;
+    if (number::uint256_cmp(a, N_SUB1) >= 0)
     {
-        number::uint256_sub_borrow(a, a, n_sub1);
+        number::uint256_sub_borrow(a, a, N_SUB1);
     }
 }
 
@@ -181,24 +197,25 @@ void sm9_bn_mod_n_sub1_ex(sm9_bn_t            a,
                           const std::uint8_t* data,
                           std::size_t         data_len) noexcept
 {
-    number::uint256_t n_sub1;
-    number::uint256_sub_borrow_uint32(n_sub1, (const std::uint8_t*)N.v, 1);
-    number::uint256_mod(a, data, data_len, n_sub1);
+    const std::uint8_t* N_SUB1 = SM9FieldCtxProvider::instance().N_SUB1;
+    number::uint256_mod(a, data, data_len, N_SUB1);
 }
 
 void sm9_bn_mod_n_sub2(sm9_bn_t a) noexcept
 {
-    if (number::uint256_cmp(a, (const std::uint8_t*)N_SUB2.v) >= 0)
+    auto N_SUB2 = SM9FieldCtxProvider::instance().N_SUB2;
+    if (number::uint256_cmp(a, N_SUB2) >= 0)
     {
-        number::uint256_sub_borrow(a, a, (const std::uint8_t*)N_SUB2.v);
+        number::uint256_sub_borrow(a, a, N_SUB2);
     }
 }
 
 void sm9_bn_mod_n_sub3(sm9_bn_t a) noexcept
 {
-    if (number::uint256_cmp(a, (const std::uint8_t*)N_SUB3.v) >= 0)
+    auto N_SUB3 = SM9FieldCtxProvider::instance().N_SUB3;
+    if (number::uint256_cmp(a, N_SUB3) >= 0)
     {
-        number::uint256_sub_borrow(a, a, (const std::uint8_t*)N_SUB3.v);
+        number::uint256_sub_borrow(a, a, N_SUB3);
     }
 }
 
@@ -223,74 +240,88 @@ void sm9_bn_to_bytes(std::uint8_t out[32], const sm9_bn_t a) noexcept
 
 void sm9_fn_add(sm9_fn_t r, const sm9_fn_t a, const sm9_fn_t b) noexcept
 {
-    number::mont256_add(&FN_MONT_CTX, r, a, b);
+    auto ctx = &SM9FieldCtxProvider::instance().FN_MONT_CTX;
+    number::mont256_add(ctx, r, a, b);
 }
 
 void sm9_fn_sub(sm9_fn_t r, const sm9_fn_t a, const sm9_fn_t b) noexcept
 {
-    number::mont256_sub(&FN_MONT_CTX, r, a, b);
+    auto ctx = &SM9FieldCtxProvider::instance().FN_MONT_CTX;
+    number::mont256_sub(ctx, r, a, b);
 }
 
 void sm9_fn_mul(sm9_fn_t r, const sm9_fn_t a, const sm9_fn_t b) noexcept
 {
-    number::mont256_mul(&FN_MONT_CTX, r, a, b);
+    auto ctx = &SM9FieldCtxProvider::instance().FN_MONT_CTX;
+    number::mont256_mul(ctx, r, a, b);
 }
 
 void sm9_fn_sqr(sm9_fn_t r, const sm9_fn_t a) noexcept
 {
-    number::mont256_sqr(&FN_MONT_CTX, r, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FN_MONT_CTX;
+    number::mont256_sqr(ctx, r, a);
 }
 
 void sm9_fn_inv(sm9_fn_t r, const sm9_fn_t a) noexcept
 {
-    number::mont256_inv(&FN_MONT_CTX, r, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FN_MONT_CTX;
+    number::mont256_inv(ctx, r, a);
 }
 
 bool sm9_fn_equal(const sm9_fn_t a, const sm9_fn_t b) noexcept
 {
-    return number::mont256_equal(&FN_MONT_CTX, a, b);
+    auto ctx = &SM9FieldCtxProvider::instance().FN_MONT_CTX;
+    return number::mont256_equal(ctx, a, b);
 }
 
 bool sm9_fn_equal_zero(const sm9_fn_t a) noexcept
 {
-    return number::mont256_equal_zero(&FN_MONT_CTX, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FN_MONT_CTX;
+    return number::mont256_equal_zero(ctx, a);
 }
 
 bool sm9_fn_equal_one(const sm9_fn_t a) noexcept
 {
-    return number::mont256_equal_one(&FN_MONT_CTX, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FN_MONT_CTX;
+    return number::mont256_equal_one(ctx, a);
 }
 
 void sm9_fn_cpy(sm9_fn_t r, const sm9_fn_t a) noexcept
 {
-    number::mont256_cpy(&FN_MONT_CTX, r, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FN_MONT_CTX;
+    number::mont256_cpy(ctx, r, a);
 }
 
 void sm9_fn_set_zero(sm9_fn_t r) noexcept
 {
-    return number::mont256_set_zero(&FN_MONT_CTX, r);
+    auto ctx = &SM9FieldCtxProvider::instance().FN_MONT_CTX;
+    return number::mont256_set_zero(ctx, r);
 }
 
 void sm9_fn_set_one(sm9_fn_t r) noexcept
 {
-    return number::mont256_set_one(&FN_MONT_CTX, r);
+    auto ctx = &SM9FieldCtxProvider::instance().FN_MONT_CTX;
+    return number::mont256_set_one(ctx, r);
 }
 
 void sm9_fn_from_bytes(sm9_fn_t r, const std::uint8_t in[32]) noexcept
 {
-    number::mont256_from_bytes(&FN_MONT_CTX, r, in);
+    auto ctx = &SM9FieldCtxProvider::instance().FN_MONT_CTX;
+    number::mont256_from_bytes(ctx, r, in);
 }
 
 void sm9_fn_from_bytes_ex(sm9_fn_t            r,
                           const std::uint8_t* in,
                           std::size_t         inl) noexcept
 {
-    number::mont256_from_bytes_ex(&FN_MONT_CTX, r, in, inl);
+    auto ctx = &SM9FieldCtxProvider::instance().FN_MONT_CTX;
+    number::mont256_from_bytes_ex(ctx, r, in, inl);
 }
 
 void sm9_fn_to_bytes(std::uint8_t out[32], const sm9_fn_t a) noexcept
 {
-    number::mont256_to_bytes(&FN_MONT_CTX, out, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FN_MONT_CTX;
+    number::mont256_to_bytes(ctx, out, a);
 }
 
 #pragma endregion
@@ -304,32 +335,38 @@ void sm9_fn_to_bytes(std::uint8_t out[32], const sm9_fn_t a) noexcept
 
 void sm9_fp_add(sm9_fp_t r, const sm9_fp_t a, const sm9_fp_t b) noexcept
 {
-    number::mont256_add(&FP_MONT_CTX, r, a, b);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    number::mont256_add(ctx, r, a, b);
 }
 
 void sm9_fp_dbl(sm9_fp_t r, const sm9_fp_t a) noexcept
 {
-    number::mont256_dbl(&FP_MONT_CTX, r, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    number::mont256_dbl(ctx, r, a);
 }
 
 void sm9_fp_tpl(sm9_fp_t r, const sm9_fp_t a) noexcept
 {
-    number::mont256_tpl(&FP_MONT_CTX, r, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    number::mont256_tpl(ctx, r, a);
 }
 
 void sm9_fp_sub(sm9_fp_t r, const sm9_fp_t a, const sm9_fp_t b) noexcept
 {
-    number::mont256_sub(&FP_MONT_CTX, r, a, b);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    number::mont256_sub(ctx, r, a, b);
 }
 
 void sm9_fp_mul(sm9_fp_t r, const sm9_fp_t a, const sm9_fp_t b) noexcept
 {
-    number::mont256_mul(&FP_MONT_CTX, r, a, b);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    number::mont256_mul(ctx, r, a, b);
 }
 
 void sm9_fp_sqr(sm9_fp_t r, const sm9_fp_t a) noexcept
 {
-    number::mont256_sqr(&FP_MONT_CTX, r, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    number::mont256_sqr(ctx, r, a);
 }
 
 int sm9_fp_sqrt(sm9_fp_t r, const sm9_fp_t a) noexcept
@@ -340,90 +377,105 @@ int sm9_fp_sqrt(sm9_fp_t r, const sm9_fp_t a) noexcept
     // if z=-1: return 2^(2u+1) * g^(u+1)
     // other:   return false
 
-    static const auto U_ADD1 = number::mpz_set_epi8(
-        0x16, 0xc8, 0x00, 0x00, 0x00, 0x54, 0x74, 0xde, 0x3a, 0xc0, 0x75, 0x69,
-        0xfe, 0xb1, 0xd8, 0xe8, 0xa4, 0x3e, 0x52, 0x69, 0x63, 0x4f, 0x5d, 0xdb,
-        0x7c, 0xad, 0xf3, 0x64, 0xfc, 0x6a, 0x28, 0xb0);
-    static const auto U_MUL2_ADD1 = number::mpz_set_epi8(
-        0x2d, 0x90, 0x00, 0x00, 0x00, 0xa8, 0xe9, 0xbc, 0x75, 0x80, 0xea, 0xd3,
-        0xfd, 0x63, 0xb1, 0xd1, 0x48, 0x7c, 0xa4, 0xd2, 0xc6, 0x9e, 0xbb, 0xb6,
-        0xf9, 0x5b, 0xe6, 0xc9, 0xf8, 0xd4, 0x51, 0x5f);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    static const std::uint8_t U_ADD1_DATA[32] = {
+        0x16, 0xc8, 0x00, 0x00, 0x00, 0x54, 0x74, 0xde, 0x3a, 0xc0, 0x75,
+        0x69, 0xfe, 0xb1, 0xd8, 0xe8, 0xa4, 0x3e, 0x52, 0x69, 0x63, 0x4f,
+        0x5d, 0xdb, 0x7c, 0xad, 0xf3, 0x64, 0xfc, 0x6a, 0x28, 0xb0,
+    };
+    static const std::uint8_t U_MUL2_ADD1_DATA[32] = {
+        0x2d, 0x90, 0x00, 0x00, 0x00, 0xa8, 0xe9, 0xbc, 0x75, 0x80, 0xea,
+        0xd3, 0xfd, 0x63, 0xb1, 0xd1, 0x48, 0x7c, 0xa4, 0xd2, 0xc6, 0x9e,
+        0xbb, 0xb6, 0xf9, 0x5b, 0xe6, 0xc9, 0xf8, 0xd4, 0x51, 0x5f,
+    };
     static const std::uint8_t TWO_POW_2U1_DATA[32] = {
         0x49, 0xdb, 0x72, 0x1a, 0x26, 0x99, 0x67, 0xc4, 0xe0, 0xa8, 0xde,
         0xbc, 0x07, 0x83, 0x18, 0x2f, 0x82, 0x55, 0x52, 0x33, 0x13, 0x9e,
         0x9d, 0x63, 0xef, 0xbd, 0x7b, 0x54, 0x09, 0x2c, 0x75, 0x6c,
     };
-    number::mont256_t z;
-    number::mont256_t neg1;
-    number::mont256_set_one(&FP_MONT_CTX, neg1);
-    number::mont256_neg(&FP_MONT_CTX, neg1, neg1);
+    number::uint256_t t;
+    number::mont256_t z, neg1;
+    number::mont256_set_one(ctx, neg1);
+    number::mont256_neg(ctx, neg1, neg1);
     // z = a^(2u+1)
-    number::mont256_pow(&FP_MONT_CTX, z, a, (const std::uint8_t*)U_MUL2_ADD1.v);
+    number::uint256_from_bytes(t, U_MUL2_ADD1_DATA);
+    number::mont256_pow(ctx, z, a, t);
     // if z=1:  return g^(u+1)
     // if z=-1: return 2^(2u+1) * g^(u+1)
     // other:   return false
-    if (!number::mont256_equal_one(&FP_MONT_CTX, z) &&
-        !number::mont256_equal(&FP_MONT_CTX, z, neg1))
+    if (!number::mont256_equal_one(ctx, z) &&
+        !number::mont256_equal(ctx, z, neg1))
     {
         return -1;
     }
-    number::mont256_pow(&FP_MONT_CTX, r, a, (const std::uint8_t*)U_ADD1.v);
-    if (number::mont256_equal(&FP_MONT_CTX, z, neg1))
+    number::uint256_from_bytes(t, U_ADD1_DATA);
+    number::mont256_pow(ctx, r, a, t);
+    if (number::mont256_equal(ctx, z, neg1))
     {
-        number::mont256_from_bytes(&FP_MONT_CTX, z, TWO_POW_2U1_DATA);
-        number::mont256_mul(&FP_MONT_CTX, r, r, z);
+        number::mont256_from_bytes(ctx, z, TWO_POW_2U1_DATA);
+        number::mont256_mul(ctx, r, r, z);
     }
     return 0;
 }
 
 void sm9_fp_neg(sm9_fp_t r, const sm9_fp_t a) noexcept
 {
-    number::mont256_neg(&FP_MONT_CTX, r, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    number::mont256_neg(ctx, r, a);
 }
 
 void sm9_fp_inv(sm9_fp_t r, const sm9_fp_t a) noexcept
 {
-    number::mont256_inv(&FP_MONT_CTX, r, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    number::mont256_inv(ctx, r, a);
 }
 
 bool sm9_fp_equal(const sm9_fp_t a, const sm9_fp_t b) noexcept
 {
-    return number::mont256_equal(&FP_MONT_CTX, a, b);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    return number::mont256_equal(ctx, a, b);
 }
 
 bool sm9_fp_equal_zero(const sm9_fp_t a) noexcept
 {
-    return number::mont256_equal_zero(&FP_MONT_CTX, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    return number::mont256_equal_zero(ctx, a);
 }
 
 bool sm9_fp_equal_one(const sm9_fp_t a) noexcept
 {
-    return number::mont256_equal_one(&FP_MONT_CTX, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    return number::mont256_equal_one(ctx, a);
 }
 
 void sm9_fp_cpy(sm9_fp_t r, const sm9_fp_t a) noexcept
 {
-    number::mont256_cpy(&FP_MONT_CTX, r, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    number::mont256_cpy(ctx, r, a);
 }
 
 void sm9_fp_set_zero(sm9_fp_t r) noexcept
 {
-    number::mont256_set_zero(&FP_MONT_CTX, r);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    number::mont256_set_zero(ctx, r);
 }
 
 void sm9_fp_set_one(sm9_fp_t r) noexcept
 {
-    number::mont256_set_one(&FP_MONT_CTX, r);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    number::mont256_set_one(ctx, r);
 }
 
 void sm9_fp_from_bytes(sm9_fp_t r, const std::uint8_t in[32]) noexcept
 {
-    number::mont256_from_bytes(&FP_MONT_CTX, r, in);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    number::mont256_from_bytes(ctx, r, in);
 }
 
 void sm9_fp_to_bytes(std::uint8_t out[32], const sm9_fp_t a) noexcept
 {
-    number::mont256_to_bytes(&FP_MONT_CTX, out, a);
+    auto ctx = &SM9FieldCtxProvider::instance().FP_MONT_CTX;
+    number::mont256_to_bytes(ctx, out, a);
 }
 
 #pragma endregion
@@ -1307,12 +1359,13 @@ void sm9_ec_j_mul_a(sm9_ec_j           R,
                     const std::uint8_t k[32],
                     const sm9_ec_a     P) noexcept
 {
+    auto N = SM9FieldCtxProvider::instance().N;
     // add-sub method
     number::uint256_t e, e3;
     number::uint256_from_bytes(e, k);
-    if (number::uint256_cmp(e, (const std::uint8_t*)N.v) >= 0)
+    if (number::uint256_cmp(e, N) >= 0)
     {
-        number::uint256_sub_borrow(e, e, (const std::uint8_t*)N.v);
+        number::uint256_sub_borrow(e, e, N);
     }
     if (number::uint256_equal_zero(e))
     {
@@ -1369,12 +1422,13 @@ void sm9_ec_j_mul_j(sm9_ec_j           R,
                     const std::uint8_t k[32],
                     const sm9_ec_j     P) noexcept
 {
+    auto N = SM9FieldCtxProvider::instance().N;
     // add-sub method
     number::uint256_t e, e3;
     number::uint256_from_bytes(e, k);
-    if (number::uint256_cmp(e, (const std::uint8_t*)N.v) >= 0)
+    if (number::uint256_cmp(e, N) >= 0)
     {
-        number::uint256_sub_borrow(e, e, (const std::uint8_t*)N.v);
+        number::uint256_sub_borrow(e, e, N);
     }
     if (number::uint256_equal_zero(e))
     {
@@ -1768,12 +1822,13 @@ void sm9_ec2_j_mul_a(sm9_ec2_j          R,
                      const std::uint8_t k[32],
                      const sm9_ec2_a    P) noexcept
 {
+    auto N = SM9FieldCtxProvider::instance().N;
     // add-sub method
     number::uint256_t e, e3;
     number::uint256_from_bytes(e, k);
-    if (number::uint256_cmp(e, (const std::uint8_t*)N.v) >= 0)
+    if (number::uint256_cmp(e, N) >= 0)
     {
-        number::uint256_sub_borrow(e, e, (const std::uint8_t*)N.v);
+        number::uint256_sub_borrow(e, e, N);
     }
     if (number::uint256_equal_zero(e))
     {
@@ -1830,12 +1885,13 @@ void sm9_ec2_j_mul_j(sm9_ec2_j          R,
                      const std::uint8_t k[32],
                      const sm9_ec2_j    P) noexcept
 {
+    auto N = SM9FieldCtxProvider::instance().N;
     // add-sub method
     number::uint256_t e, e3;
     number::uint256_from_bytes(e, k);
-    if (number::uint256_cmp(e, (const std::uint8_t*)N.v) >= 0)
+    if (number::uint256_cmp(e, N) >= 0)
     {
-        number::uint256_sub_borrow(e, e, (const std::uint8_t*)N.v);
+        number::uint256_sub_borrow(e, e, N);
     }
     if (number::uint256_equal_zero(e))
     {
