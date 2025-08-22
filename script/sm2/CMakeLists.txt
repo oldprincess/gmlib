@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 set(PROJECT_NAME_ sm2)
 set(THIRD_PARTY
     asn1
+    cpuinfo
     hash_lib
     memory_utils
     number
@@ -10,9 +11,7 @@ set(THIRD_PARTY
     sm3
 )
 
-add_definitions(-DCPU_FLAG_INTEL_MOVBE)
-add_definitions(-DCPU_FLAG_INTEL_BMI2)
-# add_compile_options(-O3 -msse2 -mavx2 -maes)
+# add_compile_options(-O3 -msse2 -mavx2 -maes -mbmi2 -mmovbe)
 
 #######################################################
 ## ================================================= ##

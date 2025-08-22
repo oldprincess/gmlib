@@ -1,9 +1,9 @@
-#include <gmlib/number/mpz.h>
 #include <gmlib/sm2/internal/sm2p256v1.h>
 
 #include <cstdio>
 
 #include "sm2_p256v1_tb.inc"
+
 namespace sm2::internal {
 
 const std::uint8_t SM2_DEFAULT_ID[16] = {
@@ -49,77 +49,136 @@ const std::uint8_t SM2_CURVE_GY[32] = {
     0x47, 0x40, 0x02, 0xdf, 0x32, 0xe5, 0x21, 0x39, 0xf0, 0xa0,
 };
 
-#define P_DATA                                                              \
-    0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00,   \
-        0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-#define P_SUB2_DATA                                                         \
-    0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00,   \
-        0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfd
-#define FP_R_DATA                                                           \
-    0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,   \
-        0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
-#define FP_R_POW2_DATA                                                      \
-    0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, \
-        0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0xff, 0xff, 0xff,   \
-        0xff, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03
-#define FP_MONT_N_DATA                                                      \
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   \
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
+class SM2P256V1CtxProvider
+{
+private:
+    std::uint8_t P_[32], P_SUB2_[32], FP_R_[32], FP_R_POW2_[32], FP_MONT_N_[32];
+    std::uint8_t N_[32], N_SUB2_[32], FN_R_[32], FN_R_POW2_[32], FN_MONT_N_[32];
+    std::uint8_t P_SUB3_DIV4_ADD1_[32];
+    std::uint8_t N_SUB1_[32];
+    number::Mont256CTX FP_MONT_CTX_;
+    number::Mont256CTX FN_MONT_CTX_;
 
-#define N_DATA                                                              \
-    0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
-        0xff, 0xff, 0xff, 0xff, 0x72, 0x03, 0xdf, 0x6b, 0x21, 0xc6, 0x05,   \
-        0x2b, 0x53, 0xbb, 0xf4, 0x09, 0x39, 0xd5, 0x41, 0x23
-#define N_SUB1_DATA                                                         \
-    0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
-        0xff, 0xff, 0xff, 0xff, 0x72, 0x03, 0xdf, 0x6b, 0x21, 0xc6, 0x05,   \
-        0x2b, 0x53, 0xbb, 0xf4, 0x09, 0x39, 0xd5, 0x41, 0x22
-#define N_SUB2_DATA                                                         \
-    0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
-        0xff, 0xff, 0xff, 0xff, 0x72, 0x03, 0xdf, 0x6b, 0x21, 0xc6, 0x05,   \
-        0x2b, 0x53, 0xbb, 0xf4, 0x09, 0x39, 0xd5, 0x41, 0x21
-#define FN_R_DATA                                                           \
-    0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-        0x00, 0x00, 0x00, 0x00, 0x8d, 0xfc, 0x20, 0x94, 0xde, 0x39, 0xfa,   \
-        0xd4, 0xac, 0x44, 0x0b, 0xf6, 0xc6, 0x2a, 0xbe, 0xdd
-#define FN_R_POW2_DATA                                                      \
-    0x1e, 0xb5, 0xe4, 0x12, 0xa2, 0x2b, 0x3d, 0x3b, 0x62, 0x0f, 0xc8, 0x4c, \
-        0x3a, 0xff, 0xe0, 0xd4, 0x34, 0x64, 0x50, 0x4a, 0xde, 0x6f, 0xa2,   \
-        0xfa, 0x90, 0x11, 0x92, 0xaf, 0x7c, 0x11, 0x4f, 0x20
-#define FN_MONT_N_DATA                                                      \
-    0x6f, 0x39, 0x13, 0x2f, 0x82, 0xe4, 0xc7, 0xbc, 0x2b, 0x00, 0x68, 0xd3, \
-        0xb0, 0x89, 0x41, 0xd4, 0xdf, 0x1e, 0x8d, 0x34, 0xfc, 0x83, 0x19,   \
-        0xa5, 0x32, 0x7f, 0x9e, 0x88, 0x72, 0x35, 0x09, 0x75
+public:
+    static const SM2P256V1CtxProvider& instance() noexcept
+    {
+        static SM2P256V1CtxProvider m;
+        return m;
+    }
 
-static const auto P          = number::mpz_set_epi8(P_DATA);
-static const auto P_SUB2     = number::mpz_set_epi8(P_SUB2_DATA);
-static const auto FP_R       = number::mpz_set_epi8(FP_R_DATA);
-static const auto FP_R_POW2  = number::mpz_set_epi8(FP_R_POW2_DATA);
-static const auto FP_MONT_N_ = number::mpz_set_epi8(FP_MONT_N_DATA);
-static const auto N          = number::mpz_set_epi8(N_DATA);
-static const auto N_SUB1     = number::mpz_set_epi8(N_SUB1_DATA);
-static const auto N_SUB2     = number::mpz_set_epi8(N_SUB2_DATA);
-static const auto FN_R       = number::mpz_set_epi8(FN_R_DATA);
-static const auto FN_R_POW2  = number::mpz_set_epi8(FN_R_POW2_DATA);
-static const auto FN_MONT_N_ = number::mpz_set_epi8(FN_MONT_N_DATA);
+public:
+    SM2P256V1CtxProvider() noexcept
+    {
+        static const std::uint8_t P_SUB2_DATA[32] = {
+            0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00,
+            0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfd,
+        };
+        static const std::uint8_t FP_R_DATA[32] = {
+            0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff,
+            0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+        };
+        static const std::uint8_t FP_R_POW2_DATA[32] = {
+            0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+            0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0xff, 0xff,
+            0xff, 0xff, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03,
+        };
+        static const std::uint8_t FP_MONT_N_DATA[32] = {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+        };
 
-static const number::Mont256CTX FP_MONT_CTX = {
-    (const std::uint8_t*)P.v,          //
-    (const std::uint8_t*)P_SUB2.v,     //
-    (const std::uint8_t*)FP_R.v,       //
-    (const std::uint8_t*)FP_R_POW2.v,  //
-    (const std::uint8_t*)FP_MONT_N_.v, //
-};
-static const number::Mont256CTX FN_MONT_CTX = {
-    (const std::uint8_t*)N.v,          //
-    (const std::uint8_t*)N_SUB2.v,     //
-    (const std::uint8_t*)FN_R.v,       //
-    (const std::uint8_t*)FN_R_POW2.v,  //
-    (const std::uint8_t*)FN_MONT_N_.v, //
+        static const std::uint8_t P_SUB3_DIV4_ADD1_DATA[32] = {
+            0x3f, 0xff, 0xff, 0xff, 0xbf, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0, 0x00,
+            0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        };
+
+        static const std::uint8_t N_SUB1_DATA[32] = {
+            0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0x72, 0x03, 0xdf, 0x6b, 0x21, 0xc6,
+            0x05, 0x2b, 0x53, 0xbb, 0xf4, 0x09, 0x39, 0xd5, 0x41, 0x22,
+        };
+        static const std::uint8_t N_SUB2_DATA[32] = {
+            0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0x72, 0x03, 0xdf, 0x6b, 0x21, 0xc6,
+            0x05, 0x2b, 0x53, 0xbb, 0xf4, 0x09, 0x39, 0xd5, 0x41, 0x21,
+        };
+        static const std::uint8_t FN_R_DATA[32] = {
+            0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x8d, 0xfc, 0x20, 0x94, 0xde, 0x39,
+            0xfa, 0xd4, 0xac, 0x44, 0x0b, 0xf6, 0xc6, 0x2a, 0xbe, 0xdd,
+        };
+        static const std::uint8_t FN_R_POW2_DATA[32] = {
+            0x1e, 0xb5, 0xe4, 0x12, 0xa2, 0x2b, 0x3d, 0x3b, 0x62, 0x0f, 0xc8,
+            0x4c, 0x3a, 0xff, 0xe0, 0xd4, 0x34, 0x64, 0x50, 0x4a, 0xde, 0x6f,
+            0xa2, 0xfa, 0x90, 0x11, 0x92, 0xaf, 0x7c, 0x11, 0x4f, 0x20,
+        };
+        static const std::uint8_t FN_MONT_N_DATA[32] = {
+            0x6f, 0x39, 0x13, 0x2f, 0x82, 0xe4, 0xc7, 0xbc, 0x2b, 0x00, 0x68,
+            0xd3, 0xb0, 0x89, 0x41, 0xd4, 0xdf, 0x1e, 0x8d, 0x34, 0xfc, 0x83,
+            0x19, 0xa5, 0x32, 0x7f, 0x9e, 0x88, 0x72, 0x35, 0x09, 0x75,
+        };
+
+        number::uint256_from_bytes(P_, SM2_CURVE_P);
+        number::uint256_from_bytes(P_SUB2_, P_SUB2_DATA);
+        number::uint256_from_bytes(P_SUB3_DIV4_ADD1_, P_SUB3_DIV4_ADD1_DATA);
+        number::uint256_from_bytes(FP_R_, FP_R_DATA);
+        number::uint256_from_bytes(FP_R_POW2_, FP_R_POW2_DATA);
+        number::uint256_from_bytes(FP_MONT_N_, FP_MONT_N_DATA);
+
+        number::uint256_from_bytes(N_, SM2_CURVE_N);
+        number::uint256_from_bytes(N_SUB1_, N_SUB1_DATA);
+        number::uint256_from_bytes(N_SUB2_, N_SUB2_DATA);
+        number::uint256_from_bytes(FN_R_, FN_R_DATA);
+        number::uint256_from_bytes(FN_R_POW2_, FN_R_POW2_DATA);
+        number::uint256_from_bytes(FN_MONT_N_, FN_MONT_N_DATA);
+
+        FP_MONT_CTX_.P      = P_;
+        FP_MONT_CTX_.P_SUB2 = P_SUB2_;
+        FP_MONT_CTX_.R      = FP_R_;
+        FP_MONT_CTX_.R_POW2 = FP_R_POW2_;
+        FP_MONT_CTX_.N_     = FP_MONT_N_;
+
+        FN_MONT_CTX_.P      = N_;
+        FN_MONT_CTX_.P_SUB2 = N_SUB2_;
+        FN_MONT_CTX_.R      = FN_R_;
+        FN_MONT_CTX_.R_POW2 = FN_R_POW2_;
+        FN_MONT_CTX_.N_     = FN_MONT_N_;
+    }
+
+    const number::Mont256CTX* FP_MONT_CTX() const noexcept
+    {
+        return &FP_MONT_CTX_;
+    }
+
+    const number::Mont256CTX* FN_MONT_CTX() const noexcept
+    {
+        return &FN_MONT_CTX_;
+    }
+
+    const std::uint8_t* P() const noexcept
+    {
+        return P_;
+    }
+    const std::uint8_t* P_SUB3_DIV4_ADD1() const noexcept
+    {
+        return P_SUB3_DIV4_ADD1_;
+    }
+    const std::uint8_t* N() const noexcept
+    {
+        return N_;
+    }
+    const std::uint8_t* N_SUB1() const noexcept
+    {
+        return N_SUB1_;
+    }
+    const std::uint8_t* N_SUB2() const noexcept
+    {
+        return N_SUB2_;
+    }
 };
 
 int sm2_bn_cmp(const sm2_bn_t a, const sm2_bn_t b) noexcept
@@ -144,17 +203,19 @@ int sm2_bn_add_uint32(sm2_bn_t r, const sm2_bn_t a, std::uint32_t b) noexcept
 
 void sm2_bn_mod_n_sub1(sm2_bn_t a) noexcept
 {
-    if (number::uint256_cmp(a, (const std::uint8_t*)N_SUB1.v) >= 0)
+    const auto N_SUB1 = SM2P256V1CtxProvider::instance().N_SUB1();
+    if (number::uint256_cmp(a, N_SUB1) >= 0)
     {
-        number::uint256_sub_borrow(a, a, (const std::uint8_t*)N_SUB1.v);
+        number::uint256_sub_borrow(a, a, N_SUB1);
     }
 }
 
 void sm2_bn_mod_n_sub2(sm2_bn_t a) noexcept
 {
-    if (number::uint256_cmp(a, (const std::uint8_t*)N_SUB2.v) >= 0)
+    const auto N_SUB2 = SM2P256V1CtxProvider::instance().N_SUB2();
+    if (number::uint256_cmp(a, N_SUB2) >= 0)
     {
-        number::uint256_sub_borrow(a, a, (const std::uint8_t*)N_SUB2.v);
+        number::uint256_sub_borrow(a, a, N_SUB2);
     }
 }
 
@@ -170,100 +231,113 @@ void sm2_bn_to_bytes(std::uint8_t out[32], const sm2_bn_t a) noexcept
 
 void sm2_fp_add(sm2_fp_t r, const sm2_fp_t a, const sm2_fp_t b) noexcept
 {
-    number::mont256_add(&FP_MONT_CTX, r, a, b);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    number::mont256_add(ctx, r, a, b);
 }
 
 void sm2_fp_dbl(sm2_fp_t r, const sm2_fp_t a) noexcept
 {
-    number::mont256_dbl(&FP_MONT_CTX, r, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    number::mont256_dbl(ctx, r, a);
 }
 
 void sm2_fp_tpl(sm2_fp_t r, const sm2_fp_t a) noexcept
 {
-    number::mont256_tpl(&FP_MONT_CTX, r, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    number::mont256_tpl(ctx, r, a);
 }
 
 void sm2_fp_sub(sm2_fp_t r, const sm2_fp_t a, const sm2_fp_t b) noexcept
 {
-    number::mont256_sub(&FP_MONT_CTX, r, a, b);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    number::mont256_sub(ctx, r, a, b);
 }
 
 void sm2_fp_mul(sm2_fp_t r, const sm2_fp_t a, const sm2_fp_t b) noexcept
 {
-    number::mont256_mul(&FP_MONT_CTX, r, a, b);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    number::mont256_mul(ctx, r, a, b);
 }
 
 void sm2_fp_sqr(sm2_fp_t r, const sm2_fp_t a) noexcept
 {
-    number::mont256_sqr(&FP_MONT_CTX, r, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    number::mont256_sqr(ctx, r, a);
 }
 
 int sm2_fp_sqrt(sm2_fp_t r, const sm2_fp_t a) noexcept
 {
-    static const auto P_SUB3_DIV4_ADD1 = number::mpz_set_epi8(
-        0x3f, 0xff, 0xff, 0xff, 0xbf, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0, 0x00, 0x00, 0x00,
-        0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
+    auto&    instance = SM2P256V1CtxProvider::instance();
+    auto     ctx      = instance.FP_MONT_CTX();
     sm2_fp_t t, t2;
-    number::mont256_pow(&FP_MONT_CTX, t, a,
-                        (const std::uint8_t*)P_SUB3_DIV4_ADD1.v);
-    number::mont256_sqr(&FP_MONT_CTX, t2, t);
-    if (!number::mont256_equal(&FP_MONT_CTX, a, t2))
+    number::mont256_pow(ctx, t, a, instance.P_SUB3_DIV4_ADD1());
+    number::mont256_sqr(ctx, t2, t);
+    if (!number::mont256_equal(ctx, a, t2))
     {
         return -1;
     }
-    number::mont256_cpy(&FP_MONT_CTX, r, t);
+    number::mont256_cpy(ctx, r, t);
     return 0;
 }
 
 void sm2_fp_neg(sm2_fp_t r, const sm2_fp_t a) noexcept
 {
-    number::mont256_neg(&FP_MONT_CTX, r, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    number::mont256_neg(ctx, r, a);
 }
 
 void sm2_fp_inv(sm2_fp_t r, const sm2_fp_t a) noexcept
 {
-    number::mont256_inv(&FP_MONT_CTX, r, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    number::mont256_inv(ctx, r, a);
 }
 
 bool sm2_fp_equal(const sm2_fp_t a, const sm2_fp_t b) noexcept
 {
-    return number::mont256_equal(&FP_MONT_CTX, a, b);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    return number::mont256_equal(ctx, a, b);
 }
 
 bool sm2_fp_equal_zero(const sm2_fp_t a) noexcept
 {
-    return number::mont256_equal_zero(&FP_MONT_CTX, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    return number::mont256_equal_zero(ctx, a);
 }
 
 bool sm2_fp_equal_one(const sm2_fp_t a) noexcept
 {
-    return number::mont256_equal_one(&FP_MONT_CTX, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    return number::mont256_equal_one(ctx, a);
 }
 
 void sm2_fp_cpy(sm2_fp_t r, const sm2_fp_t a) noexcept
 {
-    number::mont256_cpy(&FP_MONT_CTX, r, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    number::mont256_cpy(ctx, r, a);
 }
 
 void sm2_fp_set_zero(sm2_fp_t r) noexcept
 {
-    number::mont256_set_zero(&FP_MONT_CTX, r);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    number::mont256_set_zero(ctx, r);
 }
 
 void sm2_fp_set_one(sm2_fp_t r) noexcept
 {
-    number::mont256_set_one(&FP_MONT_CTX, r);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    number::mont256_set_one(ctx, r);
 }
 
 void sm2_fp_from_bytes(sm2_fp_t r, const std::uint8_t in[32]) noexcept
 {
-    number::mont256_from_bytes(&FP_MONT_CTX, r, in);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    number::mont256_from_bytes(ctx, r, in);
 }
 
 void sm2_fp_to_bytes(std::uint8_t out[32], const sm2_fp_t a) noexcept
 {
-    number::mont256_to_bytes(&FP_MONT_CTX, out, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FP_MONT_CTX();
+    number::mont256_to_bytes(ctx, out, a);
 }
 
 // =============================================================================
@@ -273,74 +347,88 @@ void sm2_fp_to_bytes(std::uint8_t out[32], const sm2_fp_t a) noexcept
 
 void sm2_fn_add(sm2_fn_t r, const sm2_fn_t a, const sm2_fn_t b) noexcept
 {
-    number::mont256_add(&FN_MONT_CTX, r, a, b);
+    auto ctx = SM2P256V1CtxProvider::instance().FN_MONT_CTX();
+    number::mont256_add(ctx, r, a, b);
 }
 
 void sm2_fn_sub(sm2_fn_t r, const sm2_fn_t a, const sm2_fn_t b) noexcept
 {
-    number::mont256_sub(&FN_MONT_CTX, r, a, b);
+    auto ctx = SM2P256V1CtxProvider::instance().FN_MONT_CTX();
+    number::mont256_sub(ctx, r, a, b);
 }
 
 void sm2_fn_mul(sm2_fn_t r, const sm2_fn_t a, const sm2_fn_t b) noexcept
 {
-    number::mont256_mul(&FN_MONT_CTX, r, a, b);
+    auto ctx = SM2P256V1CtxProvider::instance().FN_MONT_CTX();
+    number::mont256_mul(ctx, r, a, b);
 }
 
 void sm2_fn_sqr(sm2_fn_t r, const sm2_fn_t a) noexcept
 {
-    number::mont256_sqr(&FN_MONT_CTX, r, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FN_MONT_CTX();
+    number::mont256_sqr(ctx, r, a);
 }
 
 void sm2_fn_inv(sm2_fn_t r, const sm2_fn_t a) noexcept
 {
-    number::mont256_inv(&FN_MONT_CTX, r, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FN_MONT_CTX();
+    number::mont256_inv(ctx, r, a);
 }
 
 bool sm2_fn_equal(const sm2_fn_t a, const sm2_fn_t b) noexcept
 {
-    return number::mont256_equal(&FN_MONT_CTX, a, b);
+    auto ctx = SM2P256V1CtxProvider::instance().FN_MONT_CTX();
+    return number::mont256_equal(ctx, a, b);
 }
 
 bool sm2_fn_equal_zero(const sm2_fn_t a) noexcept
 {
-    return number::mont256_equal_zero(&FN_MONT_CTX, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FN_MONT_CTX();
+    return number::mont256_equal_zero(ctx, a);
 }
 
 bool sm2_fn_equal_one(const sm2_fn_t a) noexcept
 {
-    return number::mont256_equal_one(&FN_MONT_CTX, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FN_MONT_CTX();
+    return number::mont256_equal_one(ctx, a);
 }
 
 void sm2_fn_cpy(sm2_fn_t r, const sm2_fn_t a) noexcept
 {
-    number::mont256_cpy(&FN_MONT_CTX, r, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FN_MONT_CTX();
+    number::mont256_cpy(ctx, r, a);
 }
 
 void sm2_fn_set_zero(sm2_fn_t r) noexcept
 {
-    number::mont256_set_zero(&FN_MONT_CTX, r);
+    auto ctx = SM2P256V1CtxProvider::instance().FN_MONT_CTX();
+    number::mont256_set_zero(ctx, r);
 }
 
 void sm2_fn_set_one(sm2_fn_t r) noexcept
 {
-    number::mont256_set_one(&FN_MONT_CTX, r);
+    auto ctx = SM2P256V1CtxProvider::instance().FN_MONT_CTX();
+    number::mont256_set_one(ctx, r);
 }
 
 void sm2_fn_from_bytes(sm2_fn_t r, const std::uint8_t in[32]) noexcept
 {
-    number::mont256_from_bytes(&FN_MONT_CTX, r, in);
+    auto ctx = SM2P256V1CtxProvider::instance().FN_MONT_CTX();
+    number::mont256_from_bytes(ctx, r, in);
 }
 
 void sm2_fn_from_bytes_ex(sm2_fn_t            r,
                           const std::uint8_t* in,
                           std::size_t         inl) noexcept
 {
-    number::mont256_from_bytes_ex(&FN_MONT_CTX, r, in, inl);
+    auto ctx = SM2P256V1CtxProvider::instance().FN_MONT_CTX();
+    number::mont256_from_bytes_ex(ctx, r, in, inl);
 }
 
 void sm2_fn_to_bytes(std::uint8_t out[32], const sm2_fn_t a) noexcept
 {
-    number::mont256_to_bytes(&FN_MONT_CTX, out, a);
+    auto ctx = SM2P256V1CtxProvider::instance().FN_MONT_CTX();
+    number::mont256_to_bytes(ctx, out, a);
 }
 
 void sm2_fp_to_bn(sm2_bn_t r, const sm2_fp_t a) noexcept
@@ -737,11 +825,12 @@ void sm2_ec_j_mul_a(sm2_ec_j           R,
     // sm2_ec_j_cpy(R, T);
 
     // add-sub method
-    number::uint256_t e, e3;
+    const std::uint8_t* N = SM2P256V1CtxProvider::instance().N();
+    number::uint256_t   e, e3;
     number::uint256_from_bytes(e, k);
-    if (number::uint256_cmp(e, (const std::uint8_t*)N.v) >= 0)
+    if (number::uint256_cmp(e, N) >= 0)
     {
-        number::uint256_sub_borrow(e, e, (const std::uint8_t*)N.v);
+        number::uint256_sub_borrow(e, e, N);
     }
     if (number::uint256_equal_zero(e))
     {

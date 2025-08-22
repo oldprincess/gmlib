@@ -1,14 +1,14 @@
 #ifndef NUMBER_CONFIG_H
 #define NUMBER_CONFIG_H
 
-#if defined(CPU_FLAG_INTEL_MOVBE) && defined(CPU_FLAG_INTEL_BMI2)
+#if defined(__MOVBE__) && defined(__BMI2__)
 #define NUMBER_IMPL_MPZ_X64
 #define NUMBER_IMPL_UINT256_X64
 #define NUMBER_IMPL_MONT256_X64
-#else
+#endif
+
 #define NUMBER_IMPL_MPZ_COMMON
 #define NUMBER_IMPL_UINT256_COMMON
 #define NUMBER_IMPL_MONT256_COMMON
-#endif
 
 #endif
