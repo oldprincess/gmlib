@@ -9,10 +9,10 @@
 下方是AES的相关文档资料。
 
 > FIPS 197. Advanced Encryption Standard (AES).
-> https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+> <https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf>
 
 > ISO/IEC 18033-3: Block ciphers
-> https://www.iso.org/standard/54531.html
+> <https://www.iso.org/standard/54531.html>
 
 ## 2. 接口说明
 
@@ -111,24 +111,24 @@ void aes128_enc_ecb(const std::uint8_t  user_key[16],
 
 针对AES算法的实现采用了多种优化方案，在本节中进行具体说明。
 
-* aes_lut
+- aes_lut
 
 采用查表优化，出自Rijndael算法设计文档。
 
-> J.Daemen, V.Rijmen. The Design of Rijndael[M]. Berlin: Springer, 2020: 53-63. 
-> https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/aes-development/rijndael-ammended.pdf
+> J.Daemen, V.Rijmen. The Design of Rijndael[M]. Berlin: Springer, 2020: 53-63.
+> <https://csrc.nist.gov/csrc/media/projects/cryptographic-standards-and-guidelines/documents/aes-development/rijndael-ammended.pdf>
 
-* aes_aesni
+- aes_aesni
 
 采用AES-NI指令集加速。针对AES-NI指令集的相关资料可以在网上查到。
 
-> https://www.intel.cn/content/www/cn/zh/developer/articles/tool/intel-advanced-encryption-standard-aes-instructions-set.html
+> <https://www.intel.cn/content/www/cn/zh/developer/articles/tool/intel-advanced-encryption-standard-aes-instructions-set.html>
 
 在实现时，部分代码借用了Jubal Mordecai Velasco的开源代码。下方是其代码链接和开源协议。
 
->  MIT License, Copyright (c) 2023 Jubal Mordecai Velasco, https://github.com/mrdcvlsc/AES/blob/main/AES.hpp
+> MIT License, Copyright (c) 2023 Jubal Mordecai Velasco, <https://github.com/mrdcvlsc/AES/blob/main/AES.hpp>
 
-```
+```text
 MIT License
 
 Copyright (c) 2023 Jubal Mordecai Velasco
