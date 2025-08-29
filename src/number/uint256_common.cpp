@@ -2,7 +2,7 @@
 
 #include <cstdio>
 #include <cstdlib>
-#if defined(NUMBER_IMPL_UINT256_COMMON)
+#if defined(NUMBER_IMPL_COMMON)
 
 namespace number::internal::common {
 

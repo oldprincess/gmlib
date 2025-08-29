@@ -2,13 +2,9 @@
 #define NUMBER_CONFIG_H
 
 #if defined(__MOVBE__) && defined(__BMI2__)
-#define NUMBER_IMPL_MPZ_X64
-#define NUMBER_IMPL_UINT256_X64
-#define NUMBER_IMPL_MONT256_X64
+#define NUMBER_IMPL_X64
 #endif
 
-#define NUMBER_IMPL_MPZ_COMMON
-#define NUMBER_IMPL_UINT256_COMMON
-#define NUMBER_IMPL_MONT256_COMMON
+#define NUMBER_IMPL_COMMON
 
 #endif

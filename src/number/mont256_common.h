@@ -5,7 +5,7 @@
 
 #include "config.h"
 
-#if defined(NUMBER_IMPL_MONT256_COMMON)
+#if defined(NUMBER_IMPL_COMMON)
 
 #include <cstddef>
 #include <cstdint>

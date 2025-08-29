@@ -5,7 +5,7 @@
 
 #include "config.h"
 
-#if defined(NUMBER_IMPL_MONT256_X64)
+#if defined(NUMBER_IMPL_X64)
 
 #include <cstddef>
 #include <cstdint>

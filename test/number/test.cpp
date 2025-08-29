@@ -13,8 +13,7 @@ int main(int argc, char* argv[])
         test_bn();
         test_uint256();
         test_mont256();
-        test_mpz_common();
-        test_mpz_x64();
+        test_mpz();
     }
     catch (std::exception& e)
     {

@@ -1,6 +1,6 @@
 #include "uint256_x64.h"
 
-#if defined(NUMBER_IMPL_UINT256_X64)
+#if defined(NUMBER_IMPL_X64)
 
 #include <immintrin.h>
 

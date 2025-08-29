@@ -3,7 +3,7 @@
 
 #include "config.h"
 
-#if defined(NUMBER_IMPL_UINT256_COMMON)
+#if defined(NUMBER_IMPL_COMMON)
 
 #include <cstddef>
 #include <cstdint>

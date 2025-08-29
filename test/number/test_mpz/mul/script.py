@@ -9,33 +9,30 @@ test_script_template = """\
     static std::uint8_t multiplier{i}[32]   = {multiplier_val};
     static std::uint8_t multiplicand{i}[32] = {multiplicand_val};
     static std::uint8_t product{i}[64]      = {product_val};
-    mpz_from_bytes(multiplier, multiplier{i}, 8);
-    mpz_from_bytes(multiplicand, multiplicand{i}, 8);
-    mpz_mul(product[0], multiplier, multiplicand, 8);
-    mpz_to_bytes(product_data + 32, product[0], 8);
-    mpz_to_bytes(product_data, product[1], 8);
+    mpz_from_bytes(multiplier, multiplier{i}, 256);
+    mpz_from_bytes(multiplicand, multiplicand{i}, 256);
+    mpz_mul(product, multiplier, multiplicand, 256);
+    mpz_to_bytes(product_data, product, 512);
     if (std::memcmp(product{i}, product_data, 64) != 0)
     {{
-        throw std::runtime_error("err in common::mpz_mul");
+        throw std::runtime_error("err in mpz_mul");
     }}"""
 
 
 c_code_template = """\
-#if !(defined(CPU_FLAG_INTEL_MOVBE) && defined(CPU_FLAG_INTEL_BMI2))
-#include <gmlib/number/internal/mpz_common.h>
+#include <gmlib/number/mpz.h>
 #include <stdexcept>
 #include <cstring>
 
-using namespace number::internal::common;
+using namespace number;
 
-void test_mpz_common_mul()
+void test_mpz_mul()
 {{
-    uint32_t    multiplier[8], multiplicand[8], product[2][8];
+    uint8_t      multiplier[32], multiplicand[32], product[64];
     std::uint8_t product_data[64];
-
-{}
+    {}
 }}
-#endif"""
+"""
 
 
 def int_to_c_array(n: int, bits: int):
@@ -45,6 +42,7 @@ def int_to_c_array(n: int, bits: int):
 
 
 c_code = []
+random.seed(7)
 for i in range(TEST_VECTOR_NUM):
     multiplier = random.randint(0, 2**256 - 1)
     multiplicand = random.randint(0, 2**256 - 1)
@@ -57,5 +55,5 @@ for i in range(TEST_VECTOR_NUM):
             product_val=int_to_c_array(product, 512),
         )
     )
-with open("test_mpz_common_mul.cpp", "w") as fp:
+with open("test_mpz_mul.cpp", "w") as fp:
     fp.write(c_code_template.format(os.linesep.join(c_code)))

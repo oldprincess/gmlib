@@ -10,37 +10,32 @@ test_script_template = """\
     static std::uint8_t addend{i}[32] = {addend_val};
     static std::uint8_t sum{i}[32]    = {sum_val};
     static int          carry{i}      = {carry_val};
-    mpz_from_bytes(augend, augend{i}, 4);
-    mpz_from_bytes(addend, addend{i}, 4);
-    carry = mpz_add_carry(sum, augend, addend, 0, 4);
-    mpz_to_bytes(sum_data, sum, 4);
+    mpz_from_bytes(augend, augend{i}, 256);
+    mpz_from_bytes(addend, addend{i}, 256);
+    carry = mpz_add_carry(sum, augend, addend, 0, 256);
+    mpz_to_bytes(sum_data, sum, 256);
     if (std::memcmp(sum{i}, sum_data, 32) != 0 || carry{i} != carry)
     {{
-        throw std::runtime_error("err in x64::mpz_add_carry");
+        throw std::runtime_error("err in mpz_add_carry");
     }}"""
 
 
 c_code_template = """\
-#include <gmlib/number/internal/mpz_x64.h>
-#if defined(NUMBER_IMPL_MPZ_X64)
+#include <gmlib/number/mpz.h>
 #include <stdexcept>
 #include <cstring>
 
-using namespace number::internal::x64;
+using namespace number;
 
-void test_mpz_x64_add_carry()
+void test_mpz_add_carry()
 {{
-    uint64_t    augend[4], addend[4], sum[4];
+    uint8_t      augend[32], addend[32], sum[32];
     int          carry;
     std::uint8_t sum_data[32];
 
 {}
 }}
-#else
-void test_mpz_x64_add_carry()
-{{
-}}
-#endif"""
+"""
 
 
 def int_to_c_array(n: int):
@@ -50,6 +45,7 @@ def int_to_c_array(n: int):
 
 
 c_code = []
+random.seed(7)
 for i in range(TEST_VECTOR_NUM):
     augend = random.randint(0, 2**256 - 1)
     addend = random.randint(0, 2**256 - 1)
@@ -63,5 +59,5 @@ for i in range(TEST_VECTOR_NUM):
             carry_val=carry,
         )
     )
-with open("test_mpz_x64_add_carry.cpp", "w") as fp:
+with open("test_mpz_add_carry.cpp", "w") as fp:
     fp.write(c_code_template.format(os.linesep.join(c_code)))

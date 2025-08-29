@@ -1,6 +1,6 @@
-#include <gmlib/number/internal/mpz_common.h>
+#include "mpz_common.h"
 
-#if defined(NUMBER_IMPL_MPZ_COMMON)
+#if defined(NUMBER_IMPL_COMMON)
 
 #include <cstring>
 
@@ -97,11 +97,9 @@ int mpz_add_carry(std::uint32_t*       r,
                   const std::uint32_t* a,
                   const std::uint32_t* b,
                   int                  carry,
-                  std::size_t          limb_size) noexcept
+                  std::size_t          bits) noexcept
 {
-    if (limb_size == 0) return carry;
-
-    for (std::size_t i = 0; i < limb_size; i++)
+    for (std::size_t i = 0; i < bits / 32; i++)
     {
         carry = _add_carry(&r[i], a[i], b[i], carry);
     }
@@ -112,11 +110,9 @@ int mpz_sub_borrow(std::uint32_t*       r,
                    const std::uint32_t* a,
                    const std::uint32_t* b,
                    int                  borrow,
-                   std::size_t          limb_size) noexcept
+                   std::size_t          bits) noexcept
 {
-    if (limb_size == 0) return borrow;
-
-    for (std::size_t i = 0; i < limb_size; i++)
+    for (std::size_t i = 0; i < bits / 32; i++)
     {
         borrow = _sub_borrow(&r[i], a[i], b[i], borrow);
     }
@@ -126,37 +122,34 @@ int mpz_sub_borrow(std::uint32_t*       r,
 void mpz_mul(std::uint32_t*       r,
              const std::uint32_t* a,
              const std::uint32_t* b,
-             std::size_t          limb_size) noexcept
+             std::size_t          bits) noexcept
 {
-    if (limb_size == 0) return;
-
     {
         std::uint32_t carry = 0;
-        for (std::size_t ia = 0; ia < limb_size; ia++)
+        for (std::size_t ia = 0; ia < bits / 32; ia++)
         {
             carry = _mul_carry(&r[0 + ia], a[ia], b[0], carry);
         }
-        r[0 + limb_size] = carry;
+        r[0 + bits / 32] = carry;
     }
-    for (std::size_t ib = 1; ib < limb_size; ib++)
+    for (std::size_t ib = 1; ib < bits / 32; ib++)
     {
         std::uint32_t carry = 0;
-        for (std::size_t ia = 0; ia < limb_size; ia++)
+        for (std::size_t ia = 0; ia < bits / 32; ia++)
         {
             carry = _add_mul_carry(&r[ib + ia], a[ia], b[ib], carry);
         }
-        r[ib + limb_size] = carry;
+        r[ib + bits / 32] = carry;
     }
 }
 
 int mpz_cmp(const std::uint32_t* a,
             const std::uint32_t* b,
-            std::size_t          limb_size) noexcept
+            std::size_t          bits) noexcept
 {
-    if (limb_size == 0) return 0;
-    for (std::size_t i = 0; i < limb_size; i++)
+    for (std::size_t i = 0; i < bits / 32; i++)
     {
-        std::size_t pos = limb_size - 1 - i;
+        std::size_t pos = bits / 32 - 1 - i;
         if (a[pos] > b[pos]) return 1;
         if (a[pos] < b[pos]) return -1;
     }
@@ -165,30 +158,28 @@ int mpz_cmp(const std::uint32_t* a,
 
 void mpz_cpy(std::uint32_t*       r,
              const std::uint32_t* a,
-             std::size_t          limb_size) noexcept
+             std::size_t          bits) noexcept
 {
-    std::memmove(r, a, limb_size * sizeof(std::uint32_t));
+    std::memmove(r, a, bits / 32 * sizeof(std::uint32_t));
 }
 
 void mpz_from_bytes(std::uint32_t*      r,
                     const std::uint8_t* src,
-                    std::size_t         limb_size) noexcept
+                    std::size_t         bits) noexcept
 {
-    if (limb_size == 0) return;
-    for (std::size_t i = 0; i < limb_size; i++)
+    for (std::size_t i = 0; i < bits / 32; i++)
     {
-        r[limb_size - 1 - i] = MEM_LOAD32BE(src + 4 * i);
+        r[bits / 32 - 1 - i] = MEM_LOAD32BE(src + 4 * i);
     }
 }
 
 void mpz_to_bytes(std::uint8_t*        r,
                   const std::uint32_t* src,
-                  std::size_t          limb_size) noexcept
+                  std::size_t          bits) noexcept
 {
-    if (limb_size == 0) return;
-    for (std::size_t i = 0; i < limb_size; i++)
+    for (std::size_t i = 0; i < bits / 32; i++)
     {
-        MEM_STORE32BE(r + 4 * i, src[limb_size - 1 - i]);
+        MEM_STORE32BE(r + 4 * i, src[bits / 32 - 1 - i]);
     }
 }
 

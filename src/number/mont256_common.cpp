@@ -2,7 +2,7 @@
 
 #include "uint256_common.h"
 
-#if defined(NUMBER_IMPL_MONT256_COMMON)
+#if defined(NUMBER_IMPL_COMMON)
 
 namespace number::internal::common {
 
