@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#if defined(CPU_FLAG_INTEL_MOVBE)
+#if defined(__MOVBE__)
 
 #include <immintrin.h>
 
@@ -31,7 +31,7 @@ static inline std::uint8_t load8_le(const void *src) noexcept
 
 static inline std::uint16_t load16_le(const void *src) noexcept
 {
-#if defined(CPU_FLAG_INTEL_MOVBE)
+#if defined(__MOVBE__)
     return *static_cast<const std::uint16_t *>(src);
 #else
     const std::uint8_t *src_ptr = static_cast<const uint8_t *>(src);
@@ -41,7 +41,7 @@ static inline std::uint16_t load16_le(const void *src) noexcept
 
 static inline std::uint32_t load32_le(const void *src) noexcept
 {
-#if defined(CPU_FLAG_INTEL_MOVBE)
+#if defined(__MOVBE__)
     return *static_cast<const std::uint32_t *>(src);
 #else
     const std::uint8_t *src_ptr = static_cast<const uint8_t *>(src);
@@ -53,7 +53,7 @@ static inline std::uint32_t load32_le(const void *src) noexcept
 
 static inline std::uint64_t load64_le(const void *src) noexcept
 {
-#if defined(CPU_FLAG_INTEL_MOVBE)
+#if defined(__MOVBE__)
     return *static_cast<const std::uint64_t *>(src);
 #else
     const std::uint8_t *src_ptr = static_cast<const uint8_t *>(src);
@@ -74,7 +74,7 @@ static inline std::uint8_t load8_be(const void *src) noexcept
 
 static inline std::uint16_t load16_be(const void *src) noexcept
 {
-#if defined(CPU_FLAG_INTEL_MOVBE)
+#if defined(__MOVBE__)
     return (std::uint16_t)_loadbe_i16(src);
 #else
     const std::uint8_t *src_ptr = static_cast<const uint8_t *>(src);
@@ -84,7 +84,7 @@ static inline std::uint16_t load16_be(const void *src) noexcept
 
 static inline std::uint32_t load32_be(const void *src) noexcept
 {
-#if defined(CPU_FLAG_INTEL_MOVBE)
+#if defined(__MOVBE__)
     return (std::uint32_t)_loadbe_i32(src);
 #else
     const std::uint8_t *src_ptr = static_cast<const uint8_t *>(src);
@@ -96,7 +96,7 @@ static inline std::uint32_t load32_be(const void *src) noexcept
 
 static inline std::uint64_t load64_be(const void *src) noexcept
 {
-#if defined(CPU_FLAG_INTEL_MOVBE)
+#if defined(__MOVBE__)
     return (std::uint64_t)_loadbe_i64(src);
 #else
     const std::uint8_t *src_ptr = static_cast<const uint8_t *>(src);
@@ -117,7 +117,7 @@ static inline void store8_le(void *dst, std::uint8_t n) noexcept
 
 static inline void store16_le(void *dst, std::uint16_t n) noexcept
 {
-#if defined(CPU_FLAG_INTEL_MOVBE)
+#if defined(__MOVBE__)
     *static_cast<std::uint16_t *>(dst) = n;
 #else
     std::uint8_t *dst_ptr = static_cast<std::uint8_t *>(dst);
@@ -128,7 +128,7 @@ static inline void store16_le(void *dst, std::uint16_t n) noexcept
 
 static inline void store32_le(void *dst, std::uint32_t n) noexcept
 {
-#if defined(CPU_FLAG_INTEL_MOVBE)
+#if defined(__MOVBE__)
     *static_cast<std::uint32_t *>(dst) = n;
 #else
     std::uint8_t *dst_ptr = static_cast<std::uint8_t *>(dst);
@@ -141,7 +141,7 @@ static inline void store32_le(void *dst, std::uint32_t n) noexcept
 
 static inline void store64_le(void *dst, std::uint64_t n) noexcept
 {
-#if defined(CPU_FLAG_INTEL_MOVBE)
+#if defined(__MOVBE__)
     *static_cast<std::uint64_t *>(dst) = n;
 #else
     std::uint8_t *dst_ptr = static_cast<std::uint8_t *>(dst);
@@ -163,7 +163,7 @@ static inline void store8_be(void *dst, std::uint8_t n) noexcept
 
 static inline void store16_be(void *dst, std::uint16_t n) noexcept
 {
-#if defined(CPU_FLAG_INTEL_MOVBE)
+#if defined(__MOVBE__)
     _storebe_i16(dst, n);
 #else
     std::uint8_t *dst_ptr = static_cast<std::uint8_t *>(dst);
@@ -174,7 +174,7 @@ static inline void store16_be(void *dst, std::uint16_t n) noexcept
 
 static inline void store32_be(void *dst, std::uint32_t n) noexcept
 {
-#if defined(CPU_FLAG_INTEL_MOVBE)
+#if defined(__MOVBE__)
     _storebe_i32(dst, n);
 #else
     std::uint8_t *dst_ptr = static_cast<std::uint8_t *>(dst);
@@ -187,7 +187,7 @@ static inline void store32_be(void *dst, std::uint32_t n) noexcept
 
 static inline void store64_be(void *dst, std::uint64_t n) noexcept
 {
-#if defined(CPU_FLAG_INTEL_MOVBE)
+#if defined(__MOVBE__)
     _storebe_i64(dst, n);
 #else
     std::uint8_t *dst_ptr = static_cast<std::uint8_t *>(dst);
