@@ -2,11 +2,9 @@ cmake_minimum_required(VERSION 3.0)
 
 set(PROJECT_NAME_ memory_utils)
 set(THIRD_PARTY 
-
+    cpuinfo
 )
 
-add_definitions(-DCPU_FLAG_INTEL_SSE2)
-add_definitions(-DCPU_FLAG_INTEL_AVX2)
 # add_compile_options(-O3 -msse2 -mavx2 -maes)
 
 #######################################################
