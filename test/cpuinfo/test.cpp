@@ -13,8 +13,12 @@ int main()
     TEST(cpuinfo::x86_64::cpu_supports_aes);
     TEST(cpuinfo::x86_64::cpu_supports_avx);
     TEST(cpuinfo::x86_64::cpu_supports_avx2);
+    TEST(cpuinfo::x86_64::cpu_supports_avx512bw);
+    TEST(cpuinfo::x86_64::cpu_supports_avx512f);
+    TEST(cpuinfo::x86_64::cpu_supports_avx512vl);
     TEST(cpuinfo::x86_64::cpu_supports_bmi1);
     TEST(cpuinfo::x86_64::cpu_supports_bmi2);
+    TEST(cpuinfo::x86_64::cpu_supports_gfni);
     TEST(cpuinfo::x86_64::cpu_supports_movbe);
     TEST(cpuinfo::x86_64::cpu_supports_pclmulqdq);
     TEST(cpuinfo::x86_64::cpu_supports_rdrand);

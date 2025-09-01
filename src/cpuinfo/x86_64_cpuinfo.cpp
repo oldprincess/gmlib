@@ -61,6 +61,18 @@ public:
     {
         return f_7_ebx_[5];
     }
+    bool cpu_supports_avx512bw() const noexcept
+    {
+        return f_7_ebx_[30];
+    }
+    bool cpu_supports_avx512f() const noexcept
+    {
+        return f_7_ebx_[16];
+    }
+    bool cpu_supports_avx512vl() const noexcept
+    {
+        return f_7_ebx_[31];
+    }
     bool cpu_supports_bmi1() const noexcept
     {
         return f_7_ebx_[3];
@@ -68,6 +80,10 @@ public:
     bool cpu_supports_bmi2() const noexcept
     {
         return f_7_ebx_[8];
+    }
+    bool cpu_supports_gfni() const noexcept
+    {
+        return f_7_ecx_[8];
     }
     bool cpu_supports_movbe() const noexcept
     {
@@ -199,8 +215,12 @@ DEFINE_FN(adx);
 DEFINE_FN(aes);
 DEFINE_FN(avx);
 DEFINE_FN(avx2);
+DEFINE_FN(avx512bw);
+DEFINE_FN(avx512f);
+DEFINE_FN(avx512vl);
 DEFINE_FN(bmi1);
 DEFINE_FN(bmi2);
+DEFINE_FN(gfni);
 DEFINE_FN(movbe);
 DEFINE_FN(pclmulqdq);
 DEFINE_FN(rdrand);
