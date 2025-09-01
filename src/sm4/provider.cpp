@@ -7,6 +7,7 @@
 
 #include "config.h"
 #include "sm4_common.h"
+#include "sm4_gong23.h"
 #include "sm4_lang18.h"
 
 namespace sm4 {
@@ -41,6 +42,25 @@ struct SM4Provider
 };
 
 static SM4Provider sm4_providers[] = {
+
+#if defined(SM4_IMPL_GONG23)
+    {
+        []() {
+            static bool available = cpuinfo::x86_64::cpu_supports_avx512bw() &&
+                                    cpuinfo::x86_64::cpu_supports_avx512f() &&
+                                    cpuinfo::x86_64::cpu_supports_avx512vl() &&
+                                    cpuinfo::x86_64::cpu_supports_gfni();
+            return available;
+        },
+        sm4::internal::gong23::SM4_ALGO_NAME,
+        sm4::internal::gong23::sm4_enc_key_init,
+        sm4::internal::gong23::sm4_dec_key_init,
+        sm4::internal::gong23::sm4_enc_block,
+        sm4::internal::gong23::sm4_dec_block,
+        sm4::internal::gong23::sm4_enc_blocks,
+        sm4::internal::gong23::sm4_dec_blocks,
+    },
+#endif
 
 #if defined(SM4_IMPL_LANG18)
     {

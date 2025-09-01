@@ -21,7 +21,7 @@ public:
     static constexpr std::size_t USER_KEY_LEN = 16;
 
     /// @brief SM4 Maximum Number of Parallel Encryption and Decryption
-    static constexpr std::size_t PARALLEL_NUM = 16;
+    static constexpr std::size_t PARALLEL_NUM = 64;
 
     static constexpr std::size_t SECURITY_STRENGTH = 16;
 

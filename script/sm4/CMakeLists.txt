@@ -10,6 +10,8 @@ set(THIRD_PARTY
 )
 
 add_definitions(-DSUPPORT_SM4_LANG18)
+# add_definitions(-DSUPPORT_SM4_GONG23)
+# add_compile_options(-O3 -msse2 -mavx2 -maes -mgfni -mavx512f -mavx512vl -msse3 -mavx512bw)
 # add_compile_options(-O3 -msse2 -mavx2 -maes)
 
 #######################################################
