@@ -121,6 +121,36 @@ static uint8_t Reshape_epi8[64] = {
     0, 4, 8,  12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, //
 };
 
+static uint8_t Shuffle_ROTL24[64] = {
+    1,  2,  3,  0,                                            //
+    5,  6,  7,  4,                                            //
+    9,  10, 11, 8,                                            //
+    13, 14, 15, 12,                                           //
+    1,  2,  3,  0,  5, 6, 7, 4, 9, 10, 11, 8, 13, 14, 15, 12, //
+    1,  2,  3,  0,  5, 6, 7, 4, 9, 10, 11, 8, 13, 14, 15, 12, //
+    1,  2,  3,  0,  5, 6, 7, 4, 9, 10, 11, 8, 13, 14, 15, 12, //
+};
+
+static uint8_t Shuffle_ROTL16[64] = {
+    2,  3,  0,  1,                                            //
+    6,  7,  4,  5,                                            //
+    10, 11, 8,  9,                                            //
+    14, 15, 12, 13,                                           //
+    2,  3,  0,  1,  6, 7, 4, 5, 10, 11, 8, 9, 14, 15, 12, 13, //
+    2,  3,  0,  1,  6, 7, 4, 5, 10, 11, 8, 9, 14, 15, 12, 13, //
+    2,  3,  0,  1,  6, 7, 4, 5, 10, 11, 8, 9, 14, 15, 12, 13, //
+};
+
+static uint8_t Shuffle_ROTL8[64] = {
+    3,  0,  1,  2,                                            //
+    7,  4,  5,  6,                                            //
+    11, 8,  9,  10,                                           //
+    15, 12, 13, 14,                                           //
+    3,  0,  1,  2,  7, 4, 5, 6, 11, 8, 9, 10, 15, 12, 13, 14, //
+    3,  0,  1,  2,  7, 4, 5, 6, 11, 8, 9, 10, 15, 12, 13, 14, //
+    3,  0,  1,  2,  7, 4, 5, 6, 11, 8, 9, 10, 15, 12, 13, 14, //
+};
+
 #define vector __m512i
 
 #define VECTOR_LOAD(P)     _mm512_loadu_si512((const vector *)(P))
@@ -131,8 +161,9 @@ static uint8_t Reshape_epi8[64] = {
 #define PACK_HI_EPI64 _mm512_unpackhi_epi64
 #define PACK_LO_EPI64 _mm512_unpacklo_epi64
 
-#define XOR_EPI32           _mm512_xor_si512
-#define XOR3_EPI32(a, b, c) _mm512_ternarylogic_epi32(a, b, c, 150)
+#define XOR_EPI32              _mm512_xor_si512
+#define XOR3_EPI32(a, b, c)    _mm512_ternarylogic_epi32(a, b, c, 150)
+#define XOR4_EPI32(a, b, c, d) XOR3_EPI32(a, b, XOR_EPI32(c, d))
 
 // #define XOR3_EPI32(a, b, c) XOR_EPI32(XOR_EPI32(a, b), c)
 
@@ -142,7 +173,7 @@ static uint8_t Reshape_epi8[64] = {
 #define VECTOR_SET1_EPI8    _mm512_set1_epi8
 #define VECTOR_SET1_EPI32   _mm512_set1_epi32
 #define VECTOR_SHUFFLE_EPI8 _mm512_shuffle_epi8
-
+#define ROTL_EPI32          _mm512_rol_epi32
 // out = A1 * rk + C1
 static inline void sm4_gfni_v2_trans_key(std::uint32_t       *out,
                                          const std::uint32_t *rk)
@@ -154,6 +185,125 @@ static inline void sm4_gfni_v2_trans_key(std::uint32_t       *out,
         t        = GF2_AFFINE(t, A1, (Matrix_C1));
         VECTOR_STORE((uint8_t *)out + i, t);
     }
+}
+
+#define PACK_0_EPI32(x0, x1, x2, x3) \
+    PACK_HI_EPI64(PACK_HI_EPI32(x3, x2), PACK_HI_EPI32(x1, x0))
+#define PACK_1_EPI32(x0, x1, x2, x3) \
+    PACK_LO_EPI64(PACK_HI_EPI32(x3, x2), PACK_HI_EPI32(x1, x0))
+#define PACK_2_EPI32(x0, x1, x2, x3) \
+    PACK_HI_EPI64(PACK_LO_EPI32(x3, x2), PACK_LO_EPI32(x1, x0))
+#define PACK_3_EPI32(x0, x1, x2, x3) \
+    PACK_LO_EPI64(PACK_LO_EPI32(x3, x2), PACK_LO_EPI32(x1, x0))
+
+static void sm4_gfni_avx512_crypt(const std::uint32_t *rk,
+                                  std::uint8_t        *out,
+                                  const std::uint8_t  *in)
+{
+    // trans key: compare to sm4-round-func, this cost very small
+    uint32_t trk[32];
+    sm4_gfni_v2_trans_key(trk, rk);
+
+    vector x[4];
+    vector t[4]; // tmp
+    vector t1, t2, t3, t4, t5;
+    // load and pack 32bit patch
+    t1 = VECTOR_LOAD(Shuffle_Endian); // shuffle vindex
+
+    // load vector
+    t[0] = VECTOR_LOAD((vector *)in + 0);
+    t[1] = VECTOR_LOAD((vector *)in + 1);
+    t[2] = VECTOR_LOAD((vector *)in + 2);
+    t[3] = VECTOR_LOAD((vector *)in + 3);
+    // shuffle endian
+    t[0] = VECTOR_SHUFFLE_EPI8(t[0], t1);
+    t[1] = VECTOR_SHUFFLE_EPI8(t[1], t1);
+    t[2] = VECTOR_SHUFFLE_EPI8(t[2], t1);
+    t[3] = VECTOR_SHUFFLE_EPI8(t[3], t1);
+    // pack 32bit data
+    x[0] = PACK_0_EPI32(t[0], t[1], t[2], t[3]);
+    x[1] = PACK_1_EPI32(t[0], t[1], t[2], t[3]);
+    x[2] = PACK_2_EPI32(t[0], t[1], t[2], t[3]);
+    x[3] = PACK_3_EPI32(t[0], t[1], t[2], t[3]);
+    // init(A1 * x)
+    t2   = VECTOR_LOAD(Matrix_A1);
+    x[0] = GF2_AFFINE(x[0], t2, 0);
+    x[1] = GF2_AFFINE(x[1], t2, 0);
+    x[2] = GF2_AFFINE(x[2], t2, 0);
+    x[3] = GF2_AFFINE(x[3], t2, 0);
+
+    // 32 round
+    t1 = VECTOR_LOAD(Matrix_LA);
+    t2 = VECTOR_LOAD(Matrix_LB);
+
+    t3 = VECTOR_LOAD(Shuffle_ROTL8);
+    t4 = VECTOR_LOAD(Shuffle_ROTL16);
+    t5 = VECTOR_LOAD(Shuffle_ROTL24);
+    for (int i = 0; i < 32; i += 4)
+    {
+        t[0] = VECTOR_SET1_EPI32(trk[i]);
+        t[0] = XOR4_EPI32(x[1], x[2], x[3], t[0]);
+        t[1] = GF2_AFFINE_INV(t[0], t1, Matrix_L_C2);
+        t[2] = GF2_AFFINE_INV(t[0], t2, Matrix_L_C2);
+        x[0] = XOR_EPI32(x[0], XOR4_EPI32(               //
+                                   t[1],                 //
+                                   ROTL_EPI32(t[2], 8),  //
+                                   ROTL_EPI32(t[2], 16), //
+                                   ROTL_EPI32(XOR_EPI32(t[1], t[2]), 24)));
+
+        t[0] = VECTOR_SET1_EPI32(trk[i + 1]);
+        t[0] = XOR4_EPI32(x[2], x[3], x[0], t[0]);
+        t[1] = GF2_AFFINE_INV(t[0], t1, Matrix_L_C2);
+        t[2] = GF2_AFFINE_INV(t[0], t2, Matrix_L_C2);
+        x[1] = XOR_EPI32(x[1], XOR4_EPI32(               //
+                                   t[1],                 //
+                                   ROTL_EPI32(t[2], 8),  //
+                                   ROTL_EPI32(t[2], 16), //
+                                   ROTL_EPI32(XOR_EPI32(t[1], t[2]), 24)));
+
+        t[0] = VECTOR_SET1_EPI32(trk[i + 2]);
+        t[0] = XOR4_EPI32(x[3], x[0], x[1], t[0]);
+        t[1] = GF2_AFFINE_INV(t[0], t1, Matrix_L_C2);
+        t[2] = GF2_AFFINE_INV(t[0], t2, Matrix_L_C2);
+        x[2] = XOR_EPI32(x[2], XOR4_EPI32(               //
+                                   t[1],                 //
+                                   ROTL_EPI32(t[2], 8),  //
+                                   ROTL_EPI32(t[2], 16), //
+                                   ROTL_EPI32(XOR_EPI32(t[1], t[2]), 24)));
+
+        t[0] = VECTOR_SET1_EPI32(trk[i + 3]);
+        t[0] = XOR4_EPI32(x[0], x[1], x[2], t[0]);
+        t[1] = GF2_AFFINE_INV(t[0], t1, Matrix_L_C2);
+        t[2] = GF2_AFFINE_INV(t[0], t2, Matrix_L_C2);
+        x[3] = XOR_EPI32(x[3], XOR4_EPI32(               //
+                                   t[1],                 //
+                                   ROTL_EPI32(t[2], 8),  //
+                                   ROTL_EPI32(t[2], 16), //
+                                   ROTL_EPI32(XOR_EPI32(t[1], t[2]), 24)));
+    }
+    // unpack 8bit and invert(A1^-1 * x)
+    t2   = VECTOR_LOAD(Matrix_A1_inv);
+    x[0] = GF2_AFFINE(x[0], t2, 0);
+    x[1] = GF2_AFFINE(x[1], t2, 0);
+    x[2] = GF2_AFFINE(x[2], t2, 0);
+    x[3] = GF2_AFFINE(x[3], t2, 0);
+
+    // unpack 32bit patch and store
+    t1   = VECTOR_LOAD(Shuffle_Endian); // shuffle vindex
+    t[0] = PACK_0_EPI32(x[3], x[2], x[1], x[0]);
+    t[1] = PACK_1_EPI32(x[3], x[2], x[1], x[0]);
+    t[2] = PACK_2_EPI32(x[3], x[2], x[1], x[0]);
+    t[3] = PACK_3_EPI32(x[3], x[2], x[1], x[0]);
+    // shuffle endian
+    t[0] = VECTOR_SHUFFLE_EPI8(t[0], t1);
+    t[1] = VECTOR_SHUFFLE_EPI8(t[1], t1);
+    t[2] = VECTOR_SHUFFLE_EPI8(t[2], t1);
+    t[3] = VECTOR_SHUFFLE_EPI8(t[3], t1);
+    // store data
+    VECTOR_STORE((vector *)out + 0, t[0]);
+    VECTOR_STORE((vector *)out + 1, t[1]);
+    VECTOR_STORE((vector *)out + 2, t[2]);
+    VECTOR_STORE((vector *)out + 3, t[3]);
 }
 
 static void sm4_gfni_v2_avx512_crypt(const std::uint32_t *trk,
@@ -1066,6 +1216,12 @@ void sm4_enc_blocks(const std::uint8_t  round_key[128],
                                        ciphertext, plaintext);
         ciphertext += 64 * 16, plaintext += 64 * 16, block_num -= 64;
     }
+    while (block_num >= 16)
+    {
+        gfni::sm4_gfni_avx512_crypt((const std::uint32_t *)round_key,
+                                    ciphertext, plaintext);
+        ciphertext += 16 * 16, plaintext += 16 * 16, block_num -= 16;
+    }
     while (block_num)
     {
         sm4_compute_block((const std::uint32_t *)round_key, ciphertext,
@@ -1084,6 +1240,12 @@ void sm4_dec_blocks(const std::uint8_t  round_key[128],
         gfni::sm4_gfni_v2_avx512_crypt((const std::uint32_t *)round_key,
                                        plaintext, ciphertext);
         ciphertext += 64 * 16, plaintext += 64 * 16, block_num -= 64;
+    }
+    while (block_num >= 16)
+    {
+        gfni::sm4_gfni_avx512_crypt((const std::uint32_t *)round_key, plaintext,
+                                    ciphertext);
+        ciphertext += 16 * 16, plaintext += 16 * 16, block_num -= 16;
     }
     while (block_num)
     {
