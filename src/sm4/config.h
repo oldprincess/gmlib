@@ -1,7 +1,9 @@
 #ifndef SM4_CONFIG_H
 
 #if defined(SUPPORT_SM4_LANG18)
+#if defined(__AVX2__)
 #define SM4_IMPL_LANG18
+#endif
 #endif
 
 #if defined(SUPPORT_SM4_GONG23)

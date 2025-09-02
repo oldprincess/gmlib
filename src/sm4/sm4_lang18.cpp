@@ -1,9 +1,7 @@
 #include "sm4_lang18.h"
 #if defined(SM4_IMPL_LANG18)
 
-#if defined(__AVX2__)
 #include <immintrin.h>
-#endif
 
 namespace sm4::internal::lang18 {
 
@@ -655,8 +653,6 @@ static void sm4_compute_blocks_x4(const std::uint32_t round_key[32],
     MEM_STORE32BE(out + 60, x[0 + 12]);
 }
 
-#if defined(__AVX2__)
-
 #define MM256_PACK0_EPI32(a, b, c, d)                  \
     _mm256_unpacklo_epi64(_mm256_unpacklo_epi32(a, b), \
                           _mm256_unpacklo_epi32(c, d))
@@ -863,8 +859,6 @@ static void avx2_sm4_compute_blocks_x16(const std::uint32_t round_key[32],
     _mm256_storeu_si256((__m256i *)out + 7, tmp[7]);
 }
 
-#endif
-
 /**
  * @brief               SM4 block encryption/decryption
  * @param round_key     32-dword encryption/decryption round key
@@ -877,7 +871,6 @@ static void sm4_compute_blocks(const std::uint32_t round_key[32],
                                const std::uint8_t *in,
                                std::size_t         block_num) noexcept
 {
-#if defined(__AVX2__)
     while (block_num >= 16)
     {
         avx2_sm4_compute_blocks_x16(round_key, out, in);
@@ -888,7 +881,6 @@ static void sm4_compute_blocks(const std::uint32_t round_key[32],
         avx2_sm4_compute_blocks_x8(round_key, out, in);
         out += 16 * 8, in += 16 * 8, block_num -= 8;
     }
-#endif
     while (block_num >= 4)
     {
         sm4_compute_blocks_x4(round_key, out, in);

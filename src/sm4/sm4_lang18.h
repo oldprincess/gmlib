@@ -12,12 +12,7 @@ namespace sm4::internal::lang18 {
 
 constexpr std::size_t SM4_BLOCK_SIZE   = 16;
 constexpr std::size_t SM4_USER_KEY_LEN = 16;
-
-#if defined(__AVX2__)
 constexpr std::size_t SM4_PARALLEL_NUM = 16;
-#else
-constexpr std::size_t SM4_PARALLEL_NUM = 4;
-#endif
 
 constexpr const char *SM4_ALGO_NAME = "lang18";
 
