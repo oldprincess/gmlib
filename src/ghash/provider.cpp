@@ -39,7 +39,8 @@ static GHashProvider ghash_providers[] = {
     {
         []() {
             return cpuinfo::x86_64::cpu_supports_pclmulqdq() &&
-                   cpuinfo::x86_64::cpu_supports_sse2();
+                   cpuinfo::x86_64::cpu_supports_sse2() &&
+                   cpuinfo::x86_64::cpu_supports_ssse3();
         },
         ghash::internal::pclmul::GHASH_ALGO_NAME,
         sizeof(ghash::internal::pclmul::GHashCTX),
