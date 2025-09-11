@@ -99,10 +99,8 @@ static AESProvider aes192_providers[] = {
 #if defined(AES_IMPL_AESNI)
     {
         []() {
-            return (cpuinfo::arm::cpu_supports_aes() &&
-                    cpuinfo::arm::cpu_supports_neon()) ||
-                   (cpuinfo::aarch64::cpu_supports_aes() &&
-                    cpuinfo::aarch64::cpu_supports_asimd());
+            return cpuinfo::x86_64::cpu_supports_aes() &&
+                   cpuinfo::x86_64::cpu_supports_sse2();
         },
         aes::internal::aesni::AES_ALGO_NAME,
         aes::internal::aesni::aes192_enc_key_init,
