@@ -93,8 +93,8 @@ static const Base64Provider* get_provider(const Base64Provider* providers,
         }
         idx += 1;
     }
-    std::printf("[BASE64 PROVIDER] Provider %s is not available. %s:%d\n", name,
-                __FILE__, __LINE__);
+    std::printf("[BASE64 PROVIDER] Provider %s is not available. %s:%d\n",
+                name ? name : "", __FILE__, __LINE__);
     std::exit(-1);
 }
 

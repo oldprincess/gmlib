@@ -110,8 +110,8 @@ static const SM4Provider* get_provider(const SM4Provider* providers,
         }
         idx += 1;
     }
-    std::printf("[SM4 PROVIDER] Provider %s is not available. %s:%d\n", name,
-                __FILE__, __LINE__);
+    std::printf("[SM4 PROVIDER] Provider %s is not available. %s:%d\n",
+                name ? name : "", __FILE__, __LINE__);
     std::exit(-1);
 }
 

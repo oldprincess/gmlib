@@ -208,7 +208,7 @@ static const SHA2Provider* get_provider(const SHA2Provider* providers,
         idx += 1;
     }
     std::printf("[SHA2 PROVIDER] Provider %s is not available. %s:%d\n",
-                (name) ? name : "", __FILE__, __LINE__);
+                name ? name : "", __FILE__, __LINE__);
     std::exit(-1);
 }
 

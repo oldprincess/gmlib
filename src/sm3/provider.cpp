@@ -75,8 +75,8 @@ static const SM3Provider* get_provider(const SM3Provider* providers,
         }
         idx += 1;
     }
-    std::printf("[SM3 PROVIDER] Provider %s is not available. %s:%d\n", name,
-                __FILE__, __LINE__);
+    std::printf("[SM3 PROVIDER] Provider %s is not available. %s:%d\n",
+                name ? name : "", __FILE__, __LINE__);
     std::exit(-1);
 }
 

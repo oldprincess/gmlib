@@ -141,8 +141,8 @@ static const GHashProvider* get_provider(const GHashProvider* providers,
         }
         idx += 1;
     }
-    std::printf("[GHASH PROVIDER] Provider %s is not available. %s:%d\n", name,
-                __FILE__, __LINE__);
+    std::printf("[GHASH PROVIDER] Provider %s is not available. %s:%d\n",
+                name ? name : "", __FILE__, __LINE__);
     std::exit(-1);
 }
 

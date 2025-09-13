@@ -79,8 +79,8 @@ static const SHA1Provider* get_provider(const SHA1Provider* providers,
         }
         idx += 1;
     }
-    std::printf("[SHA1 PROVIDER] Provider %s is not available. %s:%d\n", name,
-                __FILE__, __LINE__);
+    std::printf("[SHA1 PROVIDER] Provider %s is not available. %s:%d\n",
+                name ? name : "", __FILE__, __LINE__);
     std::exit(-1);
 }
 

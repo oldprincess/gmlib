@@ -214,8 +214,8 @@ static const AESProvider* get_provider(const AESProvider* providers,
         }
         idx += 1;
     }
-    std::printf("[AES PROVIDER] Provider %s is not available. %s:%d\n", name,
-                __FILE__, __LINE__);
+    std::printf("[AES PROVIDER] Provider %s is not available. %s:%d\n",
+                name ? name : "", __FILE__, __LINE__);
     std::exit(-1);
 }
 

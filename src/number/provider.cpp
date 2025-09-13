@@ -246,8 +246,8 @@ static const NumberProvider* get_provider(const NumberProvider* providers,
         }
         idx += 1;
     }
-    std::printf("[uBlock PROVIDER] Provider %s is not available. %s:%d\n", name,
-                __FILE__, __LINE__);
+    std::printf("[uBlock PROVIDER] Provider %s is not available. %s:%d\n",
+                name ? name : "", __FILE__, __LINE__);
     std::exit(-1);
 }
 
