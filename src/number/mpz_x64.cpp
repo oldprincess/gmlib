@@ -90,7 +90,6 @@ int mpz_cmp(const std::uint64_t* a,
 {
     for (std::size_t i = 0; i < bits / 64; i++)
     {
-        std::size_t pos = bits / 64 - 1 - i;
         if (a[i] > b[i]) return 1;
         if (a[i] < b[i]) return -1;
     }

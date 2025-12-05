@@ -275,23 +275,6 @@ static int add_carry_u64(std::uint64_t* self, std::uint64_t other)
     return c;
 }
 
-static int add_carry_u128(std::uint64_t* self_h,
-                          std::uint64_t* self_l,
-                          std::uint64_t  other)
-{
-    int           c  = 0;
-    std::uint64_t tl = *self_l;
-    std::uint64_t th = *self_h;
-    *self_l += other;
-    if (*self_l < tl)
-    {
-        th = *self_h;
-        *self_h++;
-        c += (int)(*self_h < th);
-    }
-    return c;
-}
-
 static int sha224_256_update_blocks(std::uint8_t        state[32],
                                     std::uint64_t*      data_bits,
                                     const std::uint8_t* in,
