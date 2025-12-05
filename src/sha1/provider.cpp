@@ -1,6 +1,7 @@
 #include <gmlib/cpuinfo/cpuinfo.h>
 #include <gmlib/sha1/sha1.h>
 
+#include <cstdio>
 #include <stdexcept>
 
 #include "config.h"

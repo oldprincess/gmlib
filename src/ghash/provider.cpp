@@ -1,6 +1,7 @@
 #include <gmlib/cpuinfo/cpuinfo.h>
 #include <gmlib/ghash/ghash.h>
 
+#include <cstdio>
 #include <cstring>
 #include <stdexcept>
 

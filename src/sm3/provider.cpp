@@ -1,5 +1,6 @@
 #include <gmlib/sm3/sm3.h>
 
+#include <cstdio>
 #include <stdexcept>
 
 #include "config.h"
