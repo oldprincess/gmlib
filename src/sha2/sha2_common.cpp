@@ -288,7 +288,7 @@ static int add_carry_u128(std::uint64_t* self_h,
     if (*self_l < tl)
     {
         th = *self_h;
-        *self_h++;
+        // *self_h++;
         c += (int)(*self_h < th);
     }
     return c;
