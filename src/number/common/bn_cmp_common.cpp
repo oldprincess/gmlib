@@ -38,8 +38,8 @@ int bn_cmp_zero(const BigNum_st* a) noexcept
 
 int bn_cmp_u32(const BigNum_st* a, uint32_t b) noexcept
 {
-    int bSign    = (b == 0) ? 0 : 1;
-    int bDataLen = (b == 0) ? 0 : 1;
+    int         bSign    = (b == 0) ? 0 : 1;
+    std::size_t bDataLen = (b == 0) ? 0 : 1;
 
     if (a->sign > bSign)
     {

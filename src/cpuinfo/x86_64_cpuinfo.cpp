@@ -170,13 +170,13 @@ private:
         __cpuid(cpu_info, 0x80000000);
         n_ex_ids = cpu_info[0];
 
-        if (n_ex_ids >= 0x80000001)
+        if ((unsigned int)n_ex_ids >= 0x80000001)
         {
             __cpuidex(cpu_info, 0x80000001, 0);
             f_81_ecx_ = cpu_info[2];
             f_81_edx_ = cpu_info[3];
         }
-        if (n_ex_ids >= 0x80000004)
+        if ((unsigned int)n_ex_ids >= 0x80000004)
         {
             __cpuidex(cpu_info, 0x80000002, 0);
             std::memcpy(brand_, cpu_info, 16);

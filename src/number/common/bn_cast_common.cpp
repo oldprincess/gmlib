@@ -193,7 +193,7 @@ int bn_from_bytes(BigNum_st          *r,
     {
         r->data[data_len - 1] = 0;
         std::uint8_t *nptr    = (std::uint8_t *)(r->data);
-        for (int i = 0; i < bytes_len; i++)
+        for (std::size_t i = 0; i < bytes_len; i++)
         {
             nptr[bytes_len - i - 1] = bytes[i];
         }
@@ -233,7 +233,7 @@ int bn_to_bytes(std::uint8_t    *bytes,
     if (is_big_endian == 1)
     {
         std::uint8_t *nptr = (std::uint8_t *)(a->data);
-        for (int i = 0; i < bytes_len; i++)
+        for (std::size_t i = 0; i < bytes_len; i++)
         {
             bytes[bytes_len - i - 1] = nptr[i];
         }

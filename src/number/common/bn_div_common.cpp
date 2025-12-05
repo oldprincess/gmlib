@@ -17,7 +17,7 @@ namespace number::internal::common {
         }                      \
     } while (0)
 
-#define u_ge_zero(i) ((i) < (size_t)(-1))
+#define u_ge_zero(i) ((size_t)(i) < (size_t)(-1))
 
 static inline std::uint32_t divmod(std::uint32_t *q,
                                    std::uint64_t  a,
@@ -71,7 +71,6 @@ static int bn_umod32(std::uint32_t   *r,
         return -1;
     }
     std::uint64_t rem = 0, tmp;
-    std::uint32_t t   = 0;
     for (int64_t i = a->data_len - 1; u_ge_zero(i); i--)
     {
         tmp = (rem << 32) | a->data[i];
