@@ -18,28 +18,28 @@ static inline int _add_carry(std::uint32_t* r,
     return tmp >> 32;
 }
 
-/// @brief  r = 2a + carry
-/// @return (1/0)
-static inline int _dbl_carry(std::uint32_t* r,
-                             std::uint32_t  a,
-                             int            carry) noexcept
-{
-    std::uint64_t tmp = (std::uint64_t)a + (std::uint64_t)a + carry;
-    *r                = tmp & UINT32_MAX;
-    return tmp >> 32;
-}
+// /// @brief  r = 2a + carry
+// /// @return (1/0)
+// static inline int _dbl_carry(std::uint32_t* r,
+//                              std::uint32_t  a,
+//                              int            carry) noexcept
+// {
+//     std::uint64_t tmp = (std::uint64_t)a + (std::uint64_t)a + carry;
+//     *r                = tmp & UINT32_MAX;
+//     return tmp >> 32;
+// }
 
-/// @brief r = 3a + carry
-/// @return (2/1/0)
-static inline int _tpl_carry(std::uint32_t* r,
-                             std::uint32_t  a,
-                             int            carry) noexcept
-{
-    std::uint64_t tmp =
-        (std::uint64_t)a + (std::uint64_t)a + (std::uint64_t)a + carry;
-    *r = tmp & UINT32_MAX;
-    return tmp >> 32;
-}
+// /// @brief r = 3a + carry
+// /// @return (2/1/0)
+// static inline int _tpl_carry(std::uint32_t* r,
+//                              std::uint32_t  a,
+//                              int            carry) noexcept
+// {
+//     std::uint64_t tmp =
+//         (std::uint64_t)a + (std::uint64_t)a + (std::uint64_t)a + carry;
+//     *r = tmp & UINT32_MAX;
+//     return tmp >> 32;
+// }
 
 /// @brief r = a - b + borrow
 /// @return (-1/0)
