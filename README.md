@@ -74,34 +74,12 @@ This project will be updated on the GitHub platform and randomly synchronized to
 
 本项目使用`cmake`构建
 
-#### step1：测试平台支持的优化
-
-如果不想使用针对处理器平台的优化，可以跳过这一步
-
-如果处理器平台是x86_64，可以使用`tools/cpuid.py`脚本测试平台支持的优化，运行下述命令来编译并执行脚本
-
-```bash
-python cpuid.py
-```
-
-将得到如下所示的输出（部分输出结果省略）
-
-```text
-add_definitions(-DCPU_FLAG_INTEL_CPU_FLAG_INTEL_AES)
-add_definitions(-DCPU_FLAG_INTEL_CPU_FLAG_INTEL_AVX2)
-add_definitions(-DCPU_FLAG_INTEL_CPU_FLAG_INTEL_BMI2)
-...
-set(PROJECT_COMPILE_OPTIONS -maes -mavx2 ...)
-```
-
-将上述内容添加至`CMakeLists.txt`文件中，文件中有说明添加的具体位置
-
-#### step2：编译
+#### step1：编译
 
 * Windows平台
 
 ```bash
-cd gmlib
+cd gmlib/make
 mkdir build
 cd build
 cmake ..
@@ -111,14 +89,14 @@ cmake --build . --config=Release
 * Linux平台
 
 ```bash
-cd gmlib
+cd gmlib/make
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build .
 ```
 
-#### step3：测试
+#### step2：测试
 
 以Windows平台为例，将在Release文件夹生成`sm2_test.exe`、`sm3_test.exe`、`sm4_test.exe`等多个测试文件
 
