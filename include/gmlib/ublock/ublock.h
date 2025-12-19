@@ -23,7 +23,7 @@ public:
 
 private:
     /// @brief uBlock128128 private Context
-    std::uint8_t rk_data_[544];
+    std::uint8_t rk_data_[272];
 
 public:
     /**
@@ -135,7 +135,7 @@ public:
 
 private:
     /// @brief uBlock128256 private Context
-    std::uint8_t rk_data_[800];
+    std::uint8_t rk_data_[400];
 
 public:
     /**
@@ -247,7 +247,7 @@ public:
 
 private:
     /// @brief uBlock256256 private Context
-    std::uint8_t rk_data_[1600];
+    std::uint8_t rk_data_[800];
 
 public:
     /**

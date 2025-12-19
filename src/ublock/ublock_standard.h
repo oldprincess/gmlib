@@ -33,7 +33,7 @@ constexpr std::size_t UBLOCK256256_PARALLEL_NUM = 1;
  * @param round_key uBlock128/128 standard round key
  * @param user_key  16-byte secret key
  */
-void ublock128128_enc_key_init(std::uint8_t       round_key[544],
+void ublock128128_enc_key_init(std::uint8_t       round_key[272],
                                const std::uint8_t user_key[16]) noexcept;
 
 /**
@@ -41,7 +41,7 @@ void ublock128128_enc_key_init(std::uint8_t       round_key[544],
  * @param round_key uBlock128/128 standard round key
  * @param user_key  16-byte secret key
  */
-void ublock128128_dec_key_init(std::uint8_t       round_key[544],
+void ublock128128_dec_key_init(std::uint8_t       round_key[272],
                                const std::uint8_t user_key[16]) noexcept;
 
 /**
@@ -50,7 +50,7 @@ void ublock128128_dec_key_init(std::uint8_t       round_key[544],
  * @param ciphertext    16-byte output block
  * @param plaintext     16-byte input block
  */
-void ublock128128_enc_block(const std::uint8_t round_key[544],
+void ublock128128_enc_block(const std::uint8_t round_key[272],
                             std::uint8_t       ciphertext[16],
                             const std::uint8_t plaintext[16]) noexcept;
 
@@ -60,7 +60,7 @@ void ublock128128_enc_block(const std::uint8_t round_key[544],
  * @param plaintext     16-byte output block
  * @param ciphertext    16-byte input block
  */
-void ublock128128_dec_block(const std::uint8_t round_key[544],
+void ublock128128_dec_block(const std::uint8_t round_key[272],
                             std::uint8_t       plaintext[16],
                             const std::uint8_t ciphertext[16]) noexcept;
 
@@ -71,7 +71,7 @@ void ublock128128_dec_block(const std::uint8_t round_key[544],
  * @param plaintext     input blocks, length of 16 x block_num bytes
  * @param block_num     block num
  */
-void ublock128128_enc_blocks(const std::uint8_t  round_key[544],
+void ublock128128_enc_blocks(const std::uint8_t  round_key[272],
                              std::uint8_t       *ciphertext,
                              const std::uint8_t *plaintext,
                              std::size_t         block_num) noexcept;
@@ -83,7 +83,7 @@ void ublock128128_enc_blocks(const std::uint8_t  round_key[544],
  * @param ciphertext    input blocks, length of 16 x block_num bytes
  * @param block_num     block num
  */
-void ublock128128_dec_blocks(const std::uint8_t  round_key[544],
+void ublock128128_dec_blocks(const std::uint8_t  round_key[272],
                              std::uint8_t       *plaintext,
                              const std::uint8_t *ciphertext,
                              std::size_t         block_num) noexcept;
@@ -97,7 +97,7 @@ void ublock128128_dec_blocks(const std::uint8_t  round_key[544],
  * @param round_key uBlock128/256 standard round key
  * @param user_key  32-byte secret key
  */
-void ublock128256_enc_key_init(std::uint8_t       round_key[800],
+void ublock128256_enc_key_init(std::uint8_t       round_key[400],
                                const std::uint8_t user_key[32]) noexcept;
 
 /**
@@ -105,7 +105,7 @@ void ublock128256_enc_key_init(std::uint8_t       round_key[800],
  * @param round_key uBlock128/256 standard round key
  * @param user_key  32-byte secret key
  */
-void ublock128256_dec_key_init(std::uint8_t       round_key[800],
+void ublock128256_dec_key_init(std::uint8_t       round_key[400],
                                const std::uint8_t user_key[32]) noexcept;
 
 /**
@@ -114,7 +114,7 @@ void ublock128256_dec_key_init(std::uint8_t       round_key[800],
  * @param ciphertext    16-byte output block
  * @param plaintext     16-byte input block
  */
-void ublock128256_enc_block(const std::uint8_t round_key[800],
+void ublock128256_enc_block(const std::uint8_t round_key[400],
                             std::uint8_t       ciphertext[16],
                             const std::uint8_t plaintext[16]) noexcept;
 
@@ -124,7 +124,7 @@ void ublock128256_enc_block(const std::uint8_t round_key[800],
  * @param plaintext     16-byte output block
  * @param ciphertext    16-byte input block
  */
-void ublock128256_dec_block(const std::uint8_t round_key[800],
+void ublock128256_dec_block(const std::uint8_t round_key[400],
                             std::uint8_t       plaintext[16],
                             const std::uint8_t ciphertext[16]) noexcept;
 
@@ -135,7 +135,7 @@ void ublock128256_dec_block(const std::uint8_t round_key[800],
  * @param plaintext     input blocks, length of 16 x block_num bytes
  * @param block_num     block num
  */
-void ublock128256_enc_blocks(const std::uint8_t  round_key[800],
+void ublock128256_enc_blocks(const std::uint8_t  round_key[400],
                              std::uint8_t       *ciphertext,
                              const std::uint8_t *plaintext,
                              std::size_t         block_num) noexcept;
@@ -147,7 +147,7 @@ void ublock128256_enc_blocks(const std::uint8_t  round_key[800],
  * @param ciphertext    input blocks, length of 16 x block_num bytes
  * @param block_num     block num
  */
-void ublock128256_dec_blocks(const std::uint8_t  round_key[800],
+void ublock128256_dec_blocks(const std::uint8_t  round_key[400],
                              std::uint8_t       *plaintext,
                              const std::uint8_t *ciphertext,
                              std::size_t         block_num) noexcept;
@@ -161,7 +161,7 @@ void ublock128256_dec_blocks(const std::uint8_t  round_key[800],
  * @param round_key uBlock256/256 standard round key
  * @param user_key  32-byte secret key
  */
-void ublock256256_enc_key_init(std::uint8_t       round_key[1600],
+void ublock256256_enc_key_init(std::uint8_t       round_key[800],
                                const std::uint8_t user_key[32]) noexcept;
 
 /**
@@ -169,7 +169,7 @@ void ublock256256_enc_key_init(std::uint8_t       round_key[1600],
  * @param round_key uBlock256/256 standard round key
  * @param user_key  32-byte secret key
  */
-void ublock256256_dec_key_init(std::uint8_t       round_key[1600],
+void ublock256256_dec_key_init(std::uint8_t       round_key[800],
                                const std::uint8_t user_key[32]) noexcept;
 
 /**
@@ -178,7 +178,7 @@ void ublock256256_dec_key_init(std::uint8_t       round_key[1600],
  * @param ciphertext    32-byte output block
  * @param plaintext     32-byte input block
  */
-void ublock256256_enc_block(const std::uint8_t round_key[1600],
+void ublock256256_enc_block(const std::uint8_t round_key[800],
                             std::uint8_t       ciphertext[32],
                             const std::uint8_t plaintext[32]) noexcept;
 
@@ -188,7 +188,7 @@ void ublock256256_enc_block(const std::uint8_t round_key[1600],
  * @param plaintext     32-byte output block
  * @param ciphertext    32-byte input block
  */
-void ublock256256_dec_block(const std::uint8_t round_key[1600],
+void ublock256256_dec_block(const std::uint8_t round_key[800],
                             std::uint8_t       plaintext[32],
                             const std::uint8_t ciphertext[32]) noexcept;
 
@@ -199,7 +199,7 @@ void ublock256256_dec_block(const std::uint8_t round_key[1600],
  * @param plaintext     input blocks, length of 32 x block_num bytes
  * @param block_num     block num
  */
-void ublock256256_enc_blocks(const std::uint8_t  round_key[1600],
+void ublock256256_enc_blocks(const std::uint8_t  round_key[800],
                              std::uint8_t       *ciphertext,
                              const std::uint8_t *plaintext,
                              std::size_t         block_num) noexcept;
@@ -211,7 +211,7 @@ void ublock256256_enc_blocks(const std::uint8_t  round_key[1600],
  * @param ciphertext    input blocks, length of 32 x block_num bytes
  * @param block_num     block num
  */
-void ublock256256_dec_blocks(const std::uint8_t  round_key[1600],
+void ublock256256_dec_blocks(const std::uint8_t  round_key[800],
                              std::uint8_t       *plaintext,
                              const std::uint8_t *ciphertext,
                              std::size_t         block_num) noexcept;

@@ -106,7 +106,7 @@ static const std::uint8_t DATA_c4[16] = {
 // ********** uBlock 128/128 **************
 // ****************************************
 
-static void uBlock_128128_KeySchedule(std::uint8_t       sub_key[17][32],
+static void uBlock_128128_KeySchedule(std::uint8_t       sub_key[17][16],
                                       const std::uint8_t user_key[16]) noexcept
 {
     static const std::uint8_t DATA_c5[16] = {
@@ -150,8 +150,8 @@ static void uBlock_128128_KeySchedule(std::uint8_t       sub_key[17][32],
     state1 = _mm_xor_si128(t1, t2);
     state2 = _mm_xor_si128(t3, t4);
 
-    _mm_storeu_si128((__m128i *)sub_key[0], state1);
-    _mm_storeu_si128((__m128i *)(sub_key[0] + 16), state2);
+    t1 = _mm_xor_si128(_mm_slli_epi32(state2, 4), state1);
+    _mm_storeu_si128((__m128i *)sub_key[0], t1);
 
     for (int i = 1; i <= 16; i++)
     {
@@ -169,12 +169,12 @@ static void uBlock_128128_KeySchedule(std::uint8_t       sub_key[17][32],
         state2 = _mm_shuffle_epi8(state1, c7);
         state1 = k;
 
-        _mm_storeu_si128((__m128i *)sub_key[i], state1);
-        _mm_storeu_si128((__m128i *)(sub_key[i] + 16), state2);
+        t1 = _mm_xor_si128(_mm_slli_epi32(state2, 4), state1);
+        _mm_storeu_si128((__m128i *)sub_key[i], t1);
     }
 }
 
-static void uBlock_128128_Encrypt(const std::uint8_t sub_key[17][32],
+static void uBlock_128128_Encrypt(const std::uint8_t sub_key[17][16],
                                   std::uint8_t       ciphertext[16],
                                   const std::uint8_t plaintext[16]) noexcept
 {
@@ -234,9 +234,9 @@ static void uBlock_128128_Encrypt(const std::uint8_t sub_key[17][32],
     for (int i = 0; i < 16; i++)
     {
         k      = _mm_loadu_si128((__m128i *)sub_key[i]);
-        state1 = _mm_xor_si128(state1, k);
-        k      = _mm_loadu_si128((__m128i *)(sub_key[i] + 16));
-        state2 = _mm_xor_si128(state2, k);
+        state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
+        k      = _mm_srli_epi32(k, 4);
+        state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
 
         state1 = _mm_shuffle_epi8(S, state1);
         state2 = _mm_shuffle_epi8(S, state2);
@@ -257,9 +257,9 @@ static void uBlock_128128_Encrypt(const std::uint8_t sub_key[17][32],
     }
 
     k      = _mm_loadu_si128((__m128i *)sub_key[16]);
-    state1 = _mm_xor_si128(state1, k);
-    k      = _mm_loadu_si128((__m128i *)(sub_key[16] + 16));
-    state2 = _mm_xor_si128(state2, k);
+    state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
+    k      = _mm_srli_epi32(k, 4);
+    state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
 
     t1 = _mm_shuffle_epi8(state1, c5);
     t2 = _mm_shuffle_epi8(state2, c6);
@@ -275,7 +275,7 @@ static void uBlock_128128_Encrypt(const std::uint8_t sub_key[17][32],
     _mm_storeu_si128((__m128i *)ciphertext, state1);
 }
 
-static void uBlock_128128_Decrypt(const std::uint8_t sub_key[17][32],
+static void uBlock_128128_Decrypt(const std::uint8_t sub_key[17][16],
                                   std::uint8_t       plaintext[16],
                                   const std::uint8_t ciphertext[16]) noexcept
 {
@@ -335,9 +335,9 @@ static void uBlock_128128_Decrypt(const std::uint8_t sub_key[17][32],
     for (int i = 16; i > 0; i--)
     {
         k      = _mm_loadu_si128((__m128i *)sub_key[i]);
-        state1 = _mm_xor_si128(state1, k);
-        k      = _mm_loadu_si128((__m128i *)(sub_key[i] + 16));
-        state2 = _mm_xor_si128(state2, k);
+        state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
+        k      = _mm_srli_epi32(k, 4);
+        state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
 
         state1 = _mm_shuffle_epi8(state1, L1);
         state2 = _mm_shuffle_epi8(state2, L2);
@@ -358,9 +358,9 @@ static void uBlock_128128_Decrypt(const std::uint8_t sub_key[17][32],
     }
 
     k      = _mm_loadu_si128((__m128i *)sub_key[0]);
-    state1 = _mm_xor_si128(state1, k);
-    k      = _mm_loadu_si128((__m128i *)(sub_key[0] + 16));
-    state2 = _mm_xor_si128(state2, k);
+    state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
+    k      = _mm_srli_epi32(k, 4);
+    state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
 
     t1 = _mm_shuffle_epi8(state1, c5);
     t2 = _mm_shuffle_epi8(state2, c6);
@@ -380,7 +380,7 @@ static void uBlock_128128_Decrypt(const std::uint8_t sub_key[17][32],
 // ********** uBlock 128/256 **************
 // ****************************************
 
-static void uBlock_128256_KeySchedule(std::uint8_t       sub_key[25][32],
+static void uBlock_128256_KeySchedule(std::uint8_t       sub_key[25][16],
                                       const std::uint8_t user_key[32]) noexcept
 {
     __m128i con = _mm_loadu_si128((const __m128i *)DATA_con);
@@ -421,8 +421,8 @@ static void uBlock_128256_KeySchedule(std::uint8_t       sub_key[25][32],
     state3 = _mm_xor_si128(t1, t2);
     state4 = _mm_xor_si128(t3, t4);
 
-    _mm_storeu_si128((__m128i *)sub_key[0], state1);
-    _mm_storeu_si128((__m128i *)(sub_key[0] + 16), state2);
+    t1 = _mm_xor_si128(_mm_slli_epi32(state2, 4), state1);
+    _mm_storeu_si128((__m128i *)sub_key[0], t1);
 
     for (int i = 1; i <= 24; i++)
     {
@@ -441,14 +441,14 @@ static void uBlock_128256_KeySchedule(std::uint8_t       sub_key[25][32],
         state3 = state2;
         state2 = k;
 
-        _mm_storeu_si128((__m128i *)sub_key[i], state1);
-        _mm_storeu_si128((__m128i *)(sub_key[i] + 16), state2);
+        t1 = _mm_xor_si128(_mm_slli_epi32(state2, 4), state1);
+        _mm_storeu_si128((__m128i *)sub_key[i], t1);
     }
 
     return;
 }
 
-static void uBlock_128256_Encrypt(const std::uint8_t sub_key[25][32],
+static void uBlock_128256_Encrypt(const std::uint8_t sub_key[25][16],
                                   std::uint8_t       ciphertext[16],
                                   const std::uint8_t plaintext[16]) noexcept
 {
@@ -508,10 +508,10 @@ static void uBlock_128256_Encrypt(const std::uint8_t sub_key[25][32],
 
     for (int i = 0; i < 24; i++)
     {
-        k      = _mm_loadu_si128((const __m128i *)sub_key[i]);
-        state1 = _mm_xor_si128(state1, k);
-        k      = _mm_loadu_si128((const __m128i *)(sub_key[i] + 16));
-        state2 = _mm_xor_si128(state2, k);
+        k      = _mm_loadu_si128((__m128i *)sub_key[i]);
+        state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
+        k      = _mm_srli_epi32(k, 4);
+        state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
 
         state1 = _mm_shuffle_epi8(S, state1);
         state2 = _mm_shuffle_epi8(S, state2);
@@ -531,10 +531,10 @@ static void uBlock_128256_Encrypt(const std::uint8_t sub_key[25][32],
         state2 = _mm_shuffle_epi8(state2, L2);
     }
 
-    k      = _mm_loadu_si128((const __m128i *)sub_key[24]);
-    state1 = _mm_xor_si128(state1, k);
-    k      = _mm_loadu_si128((const __m128i *)(sub_key[24] + 16));
-    state2 = _mm_xor_si128(state2, k);
+    k      = _mm_loadu_si128((__m128i *)sub_key[24]);
+    state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
+    k      = _mm_srli_epi32(k, 4);
+    state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
 
     t1 = _mm_shuffle_epi8(state1, c5);
     t2 = _mm_shuffle_epi8(state2, c6);
@@ -552,7 +552,7 @@ static void uBlock_128256_Encrypt(const std::uint8_t sub_key[25][32],
     return;
 }
 
-static void uBlock_128256_Decrypt(const std::uint8_t sub_key[25][32],
+static void uBlock_128256_Decrypt(const std::uint8_t sub_key[25][16],
                                   std::uint8_t       plaintext[16],
                                   const std::uint8_t ciphertext[16]) noexcept
 {
@@ -611,10 +611,10 @@ static void uBlock_128256_Decrypt(const std::uint8_t sub_key[25][32],
 
     for (int i = 24; i > 0; i--)
     {
-        k      = _mm_loadu_si128((const __m128i *)sub_key[i]);
-        state1 = _mm_xor_si128(state1, k);
-        k      = _mm_loadu_si128((const __m128i *)(sub_key[i] + 16));
-        state2 = _mm_xor_si128(state2, k);
+        k      = _mm_loadu_si128((__m128i *)sub_key[i]);
+        state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
+        k      = _mm_srli_epi32(k, 4);
+        state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
 
         state1 = _mm_shuffle_epi8(state1, L1);
         state2 = _mm_shuffle_epi8(state2, L2);
@@ -634,10 +634,10 @@ static void uBlock_128256_Decrypt(const std::uint8_t sub_key[25][32],
         state2 = _mm_shuffle_epi8(S_Inv, state2);
     }
 
-    k      = _mm_loadu_si128((const __m128i *)sub_key[0]);
-    state1 = _mm_xor_si128(state1, k);
-    k      = _mm_loadu_si128((const __m128i *)(sub_key[0] + 16));
-    state2 = _mm_xor_si128(state2, k);
+    k      = _mm_loadu_si128((__m128i *)sub_key[0]);
+    state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
+    k      = _mm_srli_epi32(k, 4);
+    state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
 
     t1 = _mm_shuffle_epi8(state1, c5);
     t2 = _mm_shuffle_epi8(state2, c6);
@@ -657,7 +657,7 @@ static void uBlock_128256_Decrypt(const std::uint8_t sub_key[25][32],
 // ********** uBlock 256/256 **************
 // ****************************************
 
-static void uBlock_256256_KeySchedule(std::uint8_t       sub_key[25][64],
+static void uBlock_256256_KeySchedule(std::uint8_t       sub_key[25][32],
                                       const std::uint8_t user_key[32]) noexcept
 {
     __m128i con = _mm_loadu_si128((const __m128i *)DATA_con);
@@ -697,10 +697,10 @@ static void uBlock_256256_KeySchedule(std::uint8_t       sub_key[25][64],
     state3 = _mm_xor_si128(t1, t2);
     state4 = _mm_xor_si128(t3, t4);
 
-    _mm_storeu_si128((__m128i *)sub_key[0], state1);
-    _mm_storeu_si128((__m128i *)(sub_key[0] + 16), state2);
-    _mm_storeu_si128((__m128i *)(sub_key[0] + 32), state3);
-    _mm_storeu_si128((__m128i *)(sub_key[0] + 48), state4);
+    t1 = _mm_xor_si128(_mm_slli_epi32(state2, 4), state1);
+    t2 = _mm_xor_si128(_mm_slli_epi32(state4, 4), state3);
+    _mm_storeu_si128((__m128i *)sub_key[0], t1);
+    _mm_storeu_si128((__m128i *)(sub_key[0] + 16), t2);
 
     for (int i = 1; i <= 24; i++)
     {
@@ -719,16 +719,16 @@ static void uBlock_256256_KeySchedule(std::uint8_t       sub_key[25][64],
         state3 = state2;
         state2 = k;
 
-        _mm_storeu_si128((__m128i *)sub_key[i], state1);
-        _mm_storeu_si128((__m128i *)(sub_key[i] + 16), state2);
-        _mm_storeu_si128((__m128i *)(sub_key[i] + 32), state3);
-        _mm_storeu_si128((__m128i *)(sub_key[i] + 48), state4);
+        t1 = _mm_xor_si128(_mm_slli_epi32(state2, 4), state1);
+        t2 = _mm_xor_si128(_mm_slli_epi32(state4, 4), state3);
+        _mm_storeu_si128((__m128i *)sub_key[i], t1);
+        _mm_storeu_si128((__m128i *)(sub_key[i] + 16), t2);
     }
 
     return;
 }
 
-static void uBlock_256256_Encrypt(const std::uint8_t  sub_key[25][64],
+static void uBlock_256256_Encrypt(const std::uint8_t  sub_key[25][32],
                                   std::uint8_t       *ciphertext,
                                   const std::uint8_t *plaintext) noexcept
 {
@@ -801,13 +801,13 @@ static void uBlock_256256_Encrypt(const std::uint8_t  sub_key[25][64],
     for (i = 0; i < 24; i++)
     {
         k      = _mm_loadu_si128((const __m128i *)sub_key[i]);
-        state1 = _mm_xor_si128(state1, k);
+        state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
+        k      = _mm_srli_epi32(k, 4);
+        state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
         k      = _mm_loadu_si128((const __m128i *)(sub_key[i] + 16));
-        state2 = _mm_xor_si128(state2, k);
-        k      = _mm_loadu_si128((const __m128i *)(sub_key[i] + 32));
-        state3 = _mm_xor_si128(state3, k);
-        k      = _mm_loadu_si128((const __m128i *)(sub_key[i] + 48));
-        state4 = _mm_xor_si128(state4, k);
+        state3 = _mm_xor_si128(state3, _mm_and_si128(k, con));
+        k      = _mm_srli_epi32(k, 4);
+        state4 = _mm_xor_si128(state4, _mm_and_si128(k, con));
 
         state1 = _mm_shuffle_epi8(S, state1);
         state2 = _mm_shuffle_epi8(S, state2);
@@ -856,13 +856,13 @@ static void uBlock_256256_Encrypt(const std::uint8_t  sub_key[25][64],
     }
 
     k      = _mm_loadu_si128((const __m128i *)sub_key[24]);
-    state1 = _mm_xor_si128(state1, k);
+    state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
+    k      = _mm_srli_epi32(k, 4);
+    state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
     k      = _mm_loadu_si128((const __m128i *)(sub_key[24] + 16));
-    state2 = _mm_xor_si128(state2, k);
-    k      = _mm_loadu_si128((const __m128i *)(sub_key[24] + 32));
-    state3 = _mm_xor_si128(state3, k);
-    k      = _mm_loadu_si128((const __m128i *)(sub_key[24] + 48));
-    state4 = _mm_xor_si128(state4, k);
+    state3 = _mm_xor_si128(state3, _mm_and_si128(k, con));
+    k      = _mm_srli_epi32(k, 4);
+    state4 = _mm_xor_si128(state4, _mm_and_si128(k, con));
 
     t1     = _mm_shuffle_epi8(state1, c5);
     t2     = _mm_shuffle_epi8(state2, c6);
@@ -888,7 +888,7 @@ static void uBlock_256256_Encrypt(const std::uint8_t  sub_key[25][64],
     return;
 }
 
-static void uBlock_256256_Decrypt(const std::uint8_t  sub_key[25][64],
+static void uBlock_256256_Decrypt(const std::uint8_t  sub_key[25][32],
                                   std::uint8_t       *plaintext,
                                   const std::uint8_t *ciphertext) noexcept
 {
@@ -961,13 +961,13 @@ static void uBlock_256256_Decrypt(const std::uint8_t  sub_key[25][64],
     for (i = 24; i > 0; i--)
     {
         k      = _mm_loadu_si128((const __m128i *)sub_key[i]);
-        state1 = _mm_xor_si128(state1, k);
+        state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
+        k      = _mm_srli_epi32(k, 4);
+        state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
         k      = _mm_loadu_si128((const __m128i *)(sub_key[i] + 16));
-        state2 = _mm_xor_si128(state2, k);
-        k      = _mm_loadu_si128((const __m128i *)(sub_key[i] + 32));
-        state3 = _mm_xor_si128(state3, k);
-        k      = _mm_loadu_si128((const __m128i *)(sub_key[i] + 48));
-        state4 = _mm_xor_si128(state4, k);
+        state3 = _mm_xor_si128(state3, _mm_and_si128(k, con));
+        k      = _mm_srli_epi32(k, 4);
+        state4 = _mm_xor_si128(state4, _mm_and_si128(k, con));
 
         t1     = _mm_shuffle_epi8(state1, L1);
         t2     = _mm_shuffle_epi8(state2, L2);
@@ -1016,13 +1016,13 @@ static void uBlock_256256_Decrypt(const std::uint8_t  sub_key[25][64],
     }
 
     k      = _mm_loadu_si128((const __m128i *)sub_key[0]);
-    state1 = _mm_xor_si128(state1, k);
+    state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
+    k      = _mm_srli_epi32(k, 4);
+    state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
     k      = _mm_loadu_si128((const __m128i *)(sub_key[0] + 16));
-    state2 = _mm_xor_si128(state2, k);
-    k      = _mm_loadu_si128((const __m128i *)(sub_key[0] + 32));
-    state3 = _mm_xor_si128(state3, k);
-    k      = _mm_loadu_si128((const __m128i *)(sub_key[0] + 48));
-    state4 = _mm_xor_si128(state4, k);
+    state3 = _mm_xor_si128(state3, _mm_and_si128(k, con));
+    k      = _mm_srli_epi32(k, 4);
+    state4 = _mm_xor_si128(state4, _mm_and_si128(k, con));
 
     t1     = _mm_shuffle_epi8(state1, c5);
     t2     = _mm_shuffle_epi8(state2, c6);
@@ -1068,55 +1068,55 @@ static void uBlock_256256_Decrypt(const std::uint8_t  sub_key[25][64],
 // ********** uBlock 128/128 **************
 // ****************************************
 
-void ublock128128_enc_key_init(std::uint8_t       round_key[544],
+void ublock128128_enc_key_init(std::uint8_t       round_key[272],
                                const std::uint8_t user_key[16]) noexcept
 {
-    uBlock_128128_KeySchedule((std::uint8_t (*)[32])round_key, user_key);
+    uBlock_128128_KeySchedule((std::uint8_t(*)[16])round_key, user_key);
 }
 
-void ublock128128_dec_key_init(std::uint8_t       round_key[544],
+void ublock128128_dec_key_init(std::uint8_t       round_key[272],
                                const std::uint8_t user_key[16]) noexcept
 {
-    uBlock_128128_KeySchedule((std::uint8_t (*)[32])round_key, user_key);
+    uBlock_128128_KeySchedule((std::uint8_t(*)[16])round_key, user_key);
 }
 
-void ublock128128_enc_block(const std::uint8_t round_key[544],
+void ublock128128_enc_block(const std::uint8_t round_key[272],
                             std::uint8_t       ciphertext[16],
                             const std::uint8_t plaintext[16]) noexcept
 {
-    uBlock_128128_Encrypt((const std::uint8_t (*)[32])round_key, ciphertext,
+    uBlock_128128_Encrypt((const std::uint8_t(*)[16])round_key, ciphertext,
                           plaintext);
 }
 
-void ublock128128_dec_block(const std::uint8_t round_key[544],
+void ublock128128_dec_block(const std::uint8_t round_key[272],
                             std::uint8_t       plaintext[16],
                             const std::uint8_t ciphertext[16]) noexcept
 {
-    uBlock_128128_Decrypt((const std::uint8_t (*)[32])round_key, plaintext,
+    uBlock_128128_Decrypt((const std::uint8_t(*)[16])round_key, plaintext,
                           ciphertext);
 }
 
-void ublock128128_enc_blocks(const std::uint8_t  round_key[544],
+void ublock128128_enc_blocks(const std::uint8_t  round_key[272],
                              std::uint8_t       *ciphertext,
                              const std::uint8_t *plaintext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        uBlock_128128_Encrypt((const std::uint8_t (*)[32])round_key, ciphertext,
+        uBlock_128128_Encrypt((const std::uint8_t(*)[16])round_key, ciphertext,
                               plaintext);
         ciphertext += 16, plaintext += 16, block_num--;
     }
 }
 
-void ublock128128_dec_blocks(const std::uint8_t  round_key[544],
+void ublock128128_dec_blocks(const std::uint8_t  round_key[272],
                              std::uint8_t       *plaintext,
                              const std::uint8_t *ciphertext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        uBlock_128128_Decrypt((const std::uint8_t (*)[32])round_key, plaintext,
+        uBlock_128128_Decrypt((const std::uint8_t(*)[16])round_key, plaintext,
                               ciphertext);
         plaintext += 16, ciphertext += 16, block_num--;
     }
@@ -1126,55 +1126,55 @@ void ublock128128_dec_blocks(const std::uint8_t  round_key[544],
 // ********** uBlock 128/256 **************
 // ****************************************
 
-void ublock128256_enc_key_init(std::uint8_t       round_key[800],
+void ublock128256_enc_key_init(std::uint8_t       round_key[400],
                                const std::uint8_t user_key[32]) noexcept
 {
-    uBlock_128256_KeySchedule((std::uint8_t (*)[32])round_key, user_key);
+    uBlock_128256_KeySchedule((std::uint8_t(*)[16])round_key, user_key);
 }
 
-void ublock128256_dec_key_init(std::uint8_t       round_key[800],
+void ublock128256_dec_key_init(std::uint8_t       round_key[400],
                                const std::uint8_t user_key[32]) noexcept
 {
-    uBlock_128256_KeySchedule((std::uint8_t (*)[32])round_key, user_key);
+    uBlock_128256_KeySchedule((std::uint8_t(*)[16])round_key, user_key);
 }
 
-void ublock128256_enc_block(const std::uint8_t round_key[800],
+void ublock128256_enc_block(const std::uint8_t round_key[400],
                             std::uint8_t       ciphertext[16],
                             const std::uint8_t plaintext[16]) noexcept
 {
-    uBlock_128256_Encrypt((const std::uint8_t (*)[32])round_key, ciphertext,
+    uBlock_128256_Encrypt((const std::uint8_t(*)[16])round_key, ciphertext,
                           plaintext);
 }
 
-void ublock128256_dec_block(const std::uint8_t round_key[800],
+void ublock128256_dec_block(const std::uint8_t round_key[400],
                             std::uint8_t       plaintext[16],
                             const std::uint8_t ciphertext[16]) noexcept
 {
-    uBlock_128256_Decrypt((const std::uint8_t (*)[32])round_key, plaintext,
+    uBlock_128256_Decrypt((const std::uint8_t(*)[16])round_key, plaintext,
                           ciphertext);
 }
 
-void ublock128256_enc_blocks(const std::uint8_t  round_key[800],
+void ublock128256_enc_blocks(const std::uint8_t  round_key[400],
                              std::uint8_t       *ciphertext,
                              const std::uint8_t *plaintext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        uBlock_128256_Encrypt((const std::uint8_t (*)[32])round_key, ciphertext,
+        uBlock_128256_Encrypt((const std::uint8_t(*)[16])round_key, ciphertext,
                               plaintext);
         ciphertext += 16, plaintext += 16, block_num--;
     }
 }
 
-void ublock128256_dec_blocks(const std::uint8_t  round_key[800],
+void ublock128256_dec_blocks(const std::uint8_t  round_key[400],
                              std::uint8_t       *plaintext,
                              const std::uint8_t *ciphertext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        uBlock_128256_Decrypt((const std::uint8_t (*)[32])round_key, plaintext,
+        uBlock_128256_Decrypt((const std::uint8_t(*)[16])round_key, plaintext,
                               ciphertext);
         plaintext += 16, ciphertext += 16, block_num--;
     }
@@ -1184,55 +1184,55 @@ void ublock128256_dec_blocks(const std::uint8_t  round_key[800],
 // ********** uBlock 256/256 **************
 // ****************************************
 
-void ublock256256_enc_key_init(std::uint8_t       round_key[1600],
+void ublock256256_enc_key_init(std::uint8_t       round_key[800],
                                const std::uint8_t user_key[32]) noexcept
 {
-    uBlock_256256_KeySchedule((std::uint8_t (*)[64])round_key, user_key);
+    uBlock_256256_KeySchedule((std::uint8_t(*)[32])round_key, user_key);
 }
 
-void ublock256256_dec_key_init(std::uint8_t       round_key[1600],
+void ublock256256_dec_key_init(std::uint8_t       round_key[800],
                                const std::uint8_t user_key[32]) noexcept
 {
-    uBlock_256256_KeySchedule((std::uint8_t (*)[64])round_key, user_key);
+    uBlock_256256_KeySchedule((std::uint8_t(*)[32])round_key, user_key);
 }
 
-void ublock256256_enc_block(const std::uint8_t round_key[1600],
+void ublock256256_enc_block(const std::uint8_t round_key[800],
                             std::uint8_t       ciphertext[32],
                             const std::uint8_t plaintext[32]) noexcept
 {
-    uBlock_256256_Encrypt((const std::uint8_t (*)[64])round_key, ciphertext,
+    uBlock_256256_Encrypt((const std::uint8_t(*)[32])round_key, ciphertext,
                           plaintext);
 }
 
-void ublock256256_dec_block(const std::uint8_t round_key[1600],
+void ublock256256_dec_block(const std::uint8_t round_key[800],
                             std::uint8_t       plaintext[32],
                             const std::uint8_t ciphertext[32]) noexcept
 {
-    uBlock_256256_Decrypt((const std::uint8_t (*)[64])round_key, plaintext,
+    uBlock_256256_Decrypt((const std::uint8_t(*)[32])round_key, plaintext,
                           ciphertext);
 }
 
-void ublock256256_enc_blocks(const std::uint8_t  round_key[1600],
+void ublock256256_enc_blocks(const std::uint8_t  round_key[800],
                              std::uint8_t       *ciphertext,
                              const std::uint8_t *plaintext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        uBlock_256256_Encrypt((const std::uint8_t (*)[64])round_key, ciphertext,
+        uBlock_256256_Encrypt((const std::uint8_t(*)[32])round_key, ciphertext,
                               plaintext);
         ciphertext += 32, plaintext += 32, block_num--;
     }
 }
 
-void ublock256256_dec_blocks(const std::uint8_t  round_key[1600],
+void ublock256256_dec_blocks(const std::uint8_t  round_key[800],
                              std::uint8_t       *plaintext,
                              const std::uint8_t *ciphertext,
                              std::size_t         block_num) noexcept
 {
     while (block_num)
     {
-        uBlock_256256_Decrypt((const std::uint8_t (*)[64])round_key, plaintext,
+        uBlock_256256_Decrypt((const std::uint8_t(*)[32])round_key, plaintext,
                               ciphertext);
         plaintext += 32, ciphertext += 32, block_num--;
     }
