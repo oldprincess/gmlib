@@ -7,13 +7,15 @@
 #include <cstdint>
 
 namespace memory_utils {
+namespace sse2 {
 
-void sse2_memxor_n(void       *out,
-                   const void *in1,
-                   const void *in2,
-                   std::size_t size) noexcept;
+void memxor_n(void       *out,
+              const void *in1,
+              const void *in2,
+              std::size_t size) noexcept;
 
 }
+} // namespace memory_utils
 
 #endif
 

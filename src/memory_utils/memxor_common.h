@@ -1,22 +1,18 @@
-#if defined(__AVX2__)
-
-#ifndef MEMXOR_AVX2_H
-#define MEMXOR_AVX2_H
+#ifndef MEMXOR_COMMON_H
+#define MEMXOR_COMMON_H
 
 #include <cstddef>
 #include <cstdint>
 
 namespace memory_utils {
-namespace avx2 {
+namespace common {
 
 void memxor_n(void       *out,
               const void *in1,
               const void *in2,
               std::size_t size) noexcept;
 
-} // namespace avx2
+} // namespace common
 } // namespace memory_utils
-
-#endif
 
 #endif

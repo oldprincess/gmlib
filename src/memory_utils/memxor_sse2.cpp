@@ -4,12 +4,6 @@
 
 #include <immintrin.h>
 
-namespace memory_utils {
-
-namespace internal {
-
-namespace sse2 {
-
 static inline void memxor128(std::uint8_t       out[128],
                              const std::uint8_t in1[128],
                              const std::uint8_t in2[128]) noexcept
@@ -90,8 +84,6 @@ static inline void memxor16(std::uint8_t       out[16],
     _mm_storeu_si128((__m128i *)(out + 0), c0);
 }
 
-}; // namespace sse2
-
 static inline void memxor8(std::uint8_t       out[8],
                            const std::uint8_t in1[8],
                            const std::uint8_t in2[8]) noexcept
@@ -129,16 +121,13 @@ static inline void memxor1(std::uint8_t       out[1],
     out[0] = in1[0] ^ in2[0];
 }
 
-} // namespace internal
-
-} // namespace memory_utils
-
 namespace memory_utils {
+namespace sse2 {
 
-void sse2_memxor_n(void       *out,
-                   const void *in1,
-                   const void *in2,
-                   std::size_t size) noexcept
+void memxor_n(void       *out,
+              const void *in1,
+              const void *in2,
+              std::size_t size) noexcept
 {
     std::uint8_t       *out_ptr = static_cast<std::uint8_t *>(out);
     const std::uint8_t *in1_ptr = static_cast<const std::uint8_t *>(in1);
@@ -146,53 +135,54 @@ void sse2_memxor_n(void       *out,
 
     while (size >= 128)
     {
-        internal::sse2::memxor128(out_ptr, in1_ptr, in2_ptr);
+        memxor128(out_ptr, in1_ptr, in2_ptr);
         out_ptr += 128, in1_ptr += 128, in2_ptr += 128, size -= 128;
     }
 
     while (size >= 64)
     {
-        internal::sse2::memxor64(out_ptr, in1_ptr, in2_ptr);
+        memxor64(out_ptr, in1_ptr, in2_ptr);
         out_ptr += 64, in1_ptr += 64, in2_ptr += 64, size -= 64;
     }
 
     while (size >= 32)
     {
-        internal::sse2::memxor32(out_ptr, in1_ptr, in2_ptr);
+        memxor32(out_ptr, in1_ptr, in2_ptr);
         out_ptr += 32, in1_ptr += 32, in2_ptr += 32, size -= 32;
     }
 
     while (size >= 16)
     {
-        internal::sse2::memxor16(out_ptr, in1_ptr, in2_ptr);
+        memxor16(out_ptr, in1_ptr, in2_ptr);
         out_ptr += 16, in1_ptr += 16, in2_ptr += 16, size -= 16;
     }
 
     while (size >= 8)
     {
-        internal::memxor8(out_ptr, in1_ptr, in2_ptr);
+        memxor8(out_ptr, in1_ptr, in2_ptr);
         out_ptr += 8, in1_ptr += 8, in2_ptr += 8, size -= 8;
     }
 
     while (size >= 4)
     {
-        internal::memxor4(out_ptr, in1_ptr, in2_ptr);
+        memxor4(out_ptr, in1_ptr, in2_ptr);
         out_ptr += 4, in1_ptr += 4, in2_ptr += 4, size -= 4;
     }
 
     while (size >= 2)
     {
-        internal::memxor2(out_ptr, in1_ptr, in2_ptr);
+        memxor2(out_ptr, in1_ptr, in2_ptr);
         out_ptr += 2, in1_ptr += 2, in2_ptr += 2, size -= 2;
     }
 
     while (size >= 1)
     {
-        internal::memxor1(out_ptr, in1_ptr, in2_ptr);
+        memxor1(out_ptr, in1_ptr, in2_ptr);
         out_ptr += 1, in1_ptr += 1, in2_ptr += 1, size -= 1;
     }
 }
 
+} // namespace sse2
 } // namespace memory_utils
 
 #endif
