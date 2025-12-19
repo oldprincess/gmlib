@@ -24,8 +24,9 @@ static memxor_n_t fetch_impl()
     {
         return avx2::memxor_n;
     }
+    else
 #elif defined(__SSE2__)
-    else if (cpuinfo::x86_64::cpu_supports_sse2())
+    if (cpuinfo::x86_64::cpu_supports_sse2())
     {
         return sse2::memxor_n;
     }

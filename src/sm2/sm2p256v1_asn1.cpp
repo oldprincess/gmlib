@@ -46,7 +46,7 @@ int sm2_private_key_asn1_decode(ASN1_SM2PrivateKey* priv,
 
 std::size_t sm2_public_key_asn1_encode_outl(const ASN1_SM2PublicKey* pub)
 {
-    (pub); // avoid warning C4100 in MSVC
+    (void)(pub); // avoid warning C4100 in MSVC
     return asn1::asn1_encode_bit_string_outl(65 * 8);
 }
 

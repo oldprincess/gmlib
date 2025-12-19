@@ -85,7 +85,7 @@ int ghash_final_block(const GHashCTX*     ctx,
                       const std::uint8_t* in,
                       std::size_t         inl) noexcept
 {
-    (in); // avoid warning C4100 in MSVC
+    (void)(in); // avoid warning C4100 in MSVC
     if (inl != 0)
     {
         return -1;
