@@ -341,6 +341,7 @@ std::uint64_t uint256_mul_carry_uint64(std::uint32_t       product[8],
                                        const std::uint32_t multiplier[8],
                                        std::uint64_t multiplicand) noexcept
 {
+    (product, multiplier, multiplicand); // avoid warning C4100 in MSVC
     std::printf("[NUMBER LOG] not implemented %s:%d\n", __FILE__, __LINE__);
     std::exit(-1);
 }
@@ -364,6 +365,7 @@ std::uint64_t uint256_div_uint64(std::uint32_t       quotient[8],
                                  const std::uint32_t dividend[8],
                                  std::uint64_t       divisor) noexcept
 {
+    (quotient, dividend, divisor); // avoid warning C4100 in MSVC
     std::printf("[NUMBER LOG] not implemented %s:%d\n", __FILE__, __LINE__);
     std::exit(-1);
 }

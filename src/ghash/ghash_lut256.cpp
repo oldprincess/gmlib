@@ -129,7 +129,7 @@ void ghash_update_blocks(GHashCTX*           ctx,
                          std::size_t         block_num) noexcept
 {
     std::uint64_t X[2], R[2];
-    const std::uint64_t (*T)[2] = ctx->T;
+    const std::uint64_t(*T)[2] = ctx->T;
     while (block_num)
     {
 #define GMUL128_ROUND(s)                                                      \
@@ -176,6 +176,7 @@ int ghash_final_block(const GHashCTX*     ctx,
                       const std::uint8_t* in,
                       std::size_t         inl) noexcept
 {
+    (in); // avoid warning C4100 in MSVC
     if (inl != 0)
     {
         return -1;

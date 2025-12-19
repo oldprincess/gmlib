@@ -35,7 +35,7 @@ int bn_udivmod32(BigNum_st       *q,
 {
     int           err_code = 0;
     std::uint64_t rem      = 0, tmp;
-    
+
     if (b == 0)
     {
         return -1;
@@ -237,14 +237,14 @@ static int bn_div_knuth(BigNum_st       *q,
         // D6
         if (borrow != 0)
         {
-            int carry = 0; //
+            int carry_ = 0; //
             for (size_t iv = 0; iv < divLen; iv++)
             {
-                carry = _add_carry(&u[j + iv], u[j + iv], v[iv], carry);
+                carry_ = _add_carry(&u[j + iv], u[j + iv], v[iv], carry_);
             }
-            if (carry != 0)
+            if (carry_ != 0)
             {
-                _add_carry(&u[j + divLen], u[j + divLen], 0, carry);
+                _add_carry(&u[j + divLen], u[j + divLen], 0, carry_);
                 // drop carry
             }
         }

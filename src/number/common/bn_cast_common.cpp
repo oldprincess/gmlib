@@ -79,7 +79,7 @@ int bn_to_str(char                      *s,
     {
         std::uint32_t r = 0;
         _bn_udivmod32(t, &r, t, radix);
-        *cur_str = (0 <= r && r <= 9) ? ('0' + r) : ('A' + r - 10);
+        *cur_str = (char)((0 <= r && r <= 9) ? ('0' + r) : ('A' + r - 10));
         cur_str += 1;
     }
     *cur_str = '\0';

@@ -13,7 +13,7 @@ static void asn1_encode_identifier_octets(std::uint8_t  out[1],
                                           Asn1TagPC     tag_pc,
                                           Asn1TagNumber tag_number) noexcept
 {
-    out[0] = tag_class | tag_pc | tag_number;
+    out[0] = (std::uint8_t)(tag_class | tag_pc | tag_number);
 }
 
 static void asn1_encode_length_octets(std::uint8_t* out,

@@ -363,12 +363,14 @@ bool mont256_equal(const Mont256CTX*   ctx,
                    const std::uint64_t a[4],
                    const std::uint64_t b[4]) noexcept
 {
+    (ctx); // avoid warning C4100 in MSVC
     return uint256_equal(a, b);
 }
 
 bool mont256_equal_zero(const Mont256CTX*   ctx,
                         const std::uint64_t a[4]) noexcept
 {
+    (ctx); // avoid warning C4100 in MSVC
     return uint256_equal_zero(a);
 }
 
@@ -385,11 +387,13 @@ void mont256_cpy(const Mont256CTX*   ctx,
                  std::uint64_t       ret[4],
                  const std::uint64_t num[4]) noexcept
 {
+    (ctx); // avoid warning C4100 in MSVC
     uint256_cpy(ret, num);
 }
 
 void mont256_set_zero(const Mont256CTX* ctx, std::uint64_t num[4]) noexcept
 {
+    (ctx); // avoid warning C4100 in MSVC
     uint256_set_zero(num);
 }
 

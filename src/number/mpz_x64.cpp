@@ -43,7 +43,7 @@ int mpz_sub_borrow(std::uint64_t*       r,
                    int                  borrow,
                    std::size_t          bits) noexcept
 {
-    unsigned char CF = -borrow;
+    unsigned char CF = (unsigned char)(-borrow);
     for (std::size_t i = 0; i < bits / 64; i++)
     {
         CF = _subborrow_u64(CF, a[i], b[i], &r[i]);
