@@ -619,38 +619,38 @@ static void _ublock256256_dec_block(const std::uint64_t round_key[25][4],
 // ********** uBlock 128/128 **************
 // ****************************************
 
-void ublock128128_enc_key_init(std::uint8_t       round_key[272],
-                               const std::uint8_t user_key[16]) noexcept
+void ublock128128_enc_key_init(UBlock128128RoundKey *round_key,
+                               const std::uint8_t    user_key[16]) noexcept
 {
-    _ublock128128_key_init((std::uint64_t(*)[2])round_key, user_key);
+    _ublock128128_key_init((std::uint64_t(*)[2])round_key->round_key, user_key);
 }
 
-void ublock128128_dec_key_init(std::uint8_t       round_key[272],
-                               const std::uint8_t user_key[16]) noexcept
+void ublock128128_dec_key_init(UBlock128128RoundKey *round_key,
+                               const std::uint8_t    user_key[16]) noexcept
 {
-    _ublock128128_key_init((std::uint64_t(*)[2])round_key, user_key);
+    _ublock128128_key_init((std::uint64_t(*)[2])round_key->round_key, user_key);
 }
 
-void ublock128128_enc_block(const std::uint8_t round_key[272],
-                            std::uint8_t       ciphertext[16],
-                            const std::uint8_t plaintext[16]) noexcept
+void ublock128128_enc_block(const UBlock128128RoundKey *round_key,
+                            std::uint8_t                ciphertext[16],
+                            const std::uint8_t          plaintext[16]) noexcept
 {
-    _ublock128128_enc_block((const std::uint64_t(*)[2])round_key, ciphertext,
-                            plaintext);
+    _ublock128128_enc_block((const std::uint64_t(*)[2])round_key->round_key,
+                            ciphertext, plaintext);
 }
 
-void ublock128128_dec_block(const std::uint8_t round_key[272],
-                            std::uint8_t       plaintext[16],
-                            const std::uint8_t ciphertext[16]) noexcept
+void ublock128128_dec_block(const UBlock128128RoundKey *round_key,
+                            std::uint8_t                plaintext[16],
+                            const std::uint8_t          ciphertext[16]) noexcept
 {
-    _ublock128128_dec_block((const std::uint64_t(*)[2])round_key, plaintext,
-                            ciphertext);
+    _ublock128128_dec_block((const std::uint64_t(*)[2])round_key->round_key,
+                            plaintext, ciphertext);
 }
 
-void ublock128128_enc_blocks(const std::uint8_t  round_key[272],
-                             std::uint8_t       *ciphertext,
-                             const std::uint8_t *plaintext,
-                             std::size_t         block_num) noexcept
+void ublock128128_enc_blocks(const UBlock128128RoundKey *round_key,
+                             std::uint8_t               *ciphertext,
+                             const std::uint8_t         *plaintext,
+                             std::size_t                 block_num) noexcept
 {
     while (block_num)
     {
@@ -659,10 +659,10 @@ void ublock128128_enc_blocks(const std::uint8_t  round_key[272],
     }
 }
 
-void ublock128128_dec_blocks(const std::uint8_t  round_key[272],
-                             std::uint8_t       *plaintext,
-                             const std::uint8_t *ciphertext,
-                             std::size_t         block_num) noexcept
+void ublock128128_dec_blocks(const UBlock128128RoundKey *round_key,
+                             std::uint8_t               *plaintext,
+                             const std::uint8_t         *ciphertext,
+                             std::size_t                 block_num) noexcept
 {
     while (block_num)
     {
@@ -675,38 +675,38 @@ void ublock128128_dec_blocks(const std::uint8_t  round_key[272],
 // ********** uBlock 128/256 **************
 // ****************************************
 
-void ublock128256_enc_key_init(std::uint8_t       round_key[400],
-                               const std::uint8_t user_key[32]) noexcept
+void ublock128256_enc_key_init(UBlock128256RoundKey *round_key,
+                               const std::uint8_t    user_key[32]) noexcept
 {
-    _ublock128256_key_init((std::uint64_t(*)[2])round_key, user_key);
+    _ublock128256_key_init((std::uint64_t(*)[2])round_key->round_key, user_key);
 }
 
-void ublock128256_dec_key_init(std::uint8_t       round_key[400],
-                               const std::uint8_t user_key[32]) noexcept
+void ublock128256_dec_key_init(UBlock128256RoundKey *round_key,
+                               const std::uint8_t    user_key[32]) noexcept
 {
-    _ublock128256_key_init((std::uint64_t(*)[2])round_key, user_key);
+    _ublock128256_key_init((std::uint64_t(*)[2])round_key->round_key, user_key);
 }
 
-void ublock128256_enc_block(const std::uint8_t round_key[400],
-                            std::uint8_t       ciphertext[16],
-                            const std::uint8_t plaintext[16]) noexcept
+void ublock128256_enc_block(const UBlock128256RoundKey *round_key,
+                            std::uint8_t                ciphertext[16],
+                            const std::uint8_t          plaintext[16]) noexcept
 {
-    _ublock128256_enc_block((const std::uint64_t(*)[2])round_key, ciphertext,
-                            plaintext);
+    _ublock128256_enc_block((const std::uint64_t(*)[2])round_key->round_key,
+                            ciphertext, plaintext);
 }
 
-void ublock128256_dec_block(const std::uint8_t round_key[400],
-                            std::uint8_t       plaintext[16],
-                            const std::uint8_t ciphertext[16]) noexcept
+void ublock128256_dec_block(const UBlock128256RoundKey *round_key,
+                            std::uint8_t                plaintext[16],
+                            const std::uint8_t          ciphertext[16]) noexcept
 {
-    _ublock128256_dec_block((const std::uint64_t(*)[2])round_key, plaintext,
-                            ciphertext);
+    _ublock128256_dec_block((const std::uint64_t(*)[2])round_key->round_key,
+                            plaintext, ciphertext);
 }
 
-void ublock128256_enc_blocks(const std::uint8_t  round_key[400],
-                             std::uint8_t       *ciphertext,
-                             const std::uint8_t *plaintext,
-                             std::size_t         block_num) noexcept
+void ublock128256_enc_blocks(const UBlock128256RoundKey *round_key,
+                             std::uint8_t               *ciphertext,
+                             const std::uint8_t         *plaintext,
+                             std::size_t                 block_num) noexcept
 {
     while (block_num)
     {
@@ -715,10 +715,10 @@ void ublock128256_enc_blocks(const std::uint8_t  round_key[400],
     }
 }
 
-void ublock128256_dec_blocks(const std::uint8_t  round_key[400],
-                             std::uint8_t       *plaintext,
-                             const std::uint8_t *ciphertext,
-                             std::size_t         block_num) noexcept
+void ublock128256_dec_blocks(const UBlock128256RoundKey *round_key,
+                             std::uint8_t               *plaintext,
+                             const std::uint8_t         *ciphertext,
+                             std::size_t                 block_num) noexcept
 {
     while (block_num)
     {
@@ -731,38 +731,38 @@ void ublock128256_dec_blocks(const std::uint8_t  round_key[400],
 // ********** uBlock 256/256 **************
 // ****************************************
 
-void ublock256256_enc_key_init(std::uint8_t       round_key[800],
-                               const std::uint8_t user_key[32]) noexcept
+void ublock256256_enc_key_init(UBlock256256RoundKey *round_key,
+                               const std::uint8_t    user_key[32]) noexcept
 {
-    _ublock256256_key_init((std::uint64_t(*)[4])round_key, user_key);
+    _ublock256256_key_init((std::uint64_t(*)[4])round_key->round_key, user_key);
 }
 
-void ublock256256_dec_key_init(std::uint8_t       round_key[800],
-                               const std::uint8_t user_key[32]) noexcept
+void ublock256256_dec_key_init(UBlock256256RoundKey *round_key,
+                               const std::uint8_t    user_key[32]) noexcept
 {
-    _ublock256256_key_init((std::uint64_t(*)[4])round_key, user_key);
+    _ublock256256_key_init((std::uint64_t(*)[4])round_key->round_key, user_key);
 }
 
-void ublock256256_enc_block(const std::uint8_t round_key[800],
-                            std::uint8_t       ciphertext[32],
-                            const std::uint8_t plaintext[32]) noexcept
+void ublock256256_enc_block(const UBlock256256RoundKey *round_key,
+                            std::uint8_t                ciphertext[32],
+                            const std::uint8_t          plaintext[32]) noexcept
 {
-    _ublock256256_enc_block((const std::uint64_t(*)[4])round_key, ciphertext,
-                            plaintext);
+    _ublock256256_enc_block((const std::uint64_t(*)[4])round_key->round_key,
+                            ciphertext, plaintext);
 }
 
-void ublock256256_dec_block(const std::uint8_t round_key[800],
-                            std::uint8_t       plaintext[32],
-                            const std::uint8_t ciphertext[32]) noexcept
+void ublock256256_dec_block(const UBlock256256RoundKey *round_key,
+                            std::uint8_t                plaintext[32],
+                            const std::uint8_t          ciphertext[32]) noexcept
 {
-    _ublock256256_dec_block((const std::uint64_t(*)[4])round_key, plaintext,
-                            ciphertext);
+    _ublock256256_dec_block((const std::uint64_t(*)[4])round_key->round_key,
+                            plaintext, ciphertext);
 }
 
-void ublock256256_enc_blocks(const std::uint8_t  round_key[800],
-                             std::uint8_t       *ciphertext,
-                             const std::uint8_t *plaintext,
-                             std::size_t         block_num) noexcept
+void ublock256256_enc_blocks(const UBlock256256RoundKey *round_key,
+                             std::uint8_t               *ciphertext,
+                             const std::uint8_t         *plaintext,
+                             std::size_t                 block_num) noexcept
 {
     while (block_num)
     {
@@ -771,10 +771,10 @@ void ublock256256_enc_blocks(const std::uint8_t  round_key[800],
     }
 }
 
-void ublock256256_dec_blocks(const std::uint8_t  round_key[800],
-                             std::uint8_t       *plaintext,
-                             const std::uint8_t *ciphertext,
-                             std::size_t         block_num) noexcept
+void ublock256256_dec_blocks(const UBlock256256RoundKey *round_key,
+                             std::uint8_t               *plaintext,
+                             const std::uint8_t         *ciphertext,
+                             std::size_t                 block_num) noexcept
 {
     while (block_num)
     {

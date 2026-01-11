@@ -3,6 +3,8 @@
 
 #include <gmlib/block_cipher_mode/block_cipher.h>
 
+#include <memory>
+
 namespace ublock {
 
 class uBlock128128 : public block_cipher_mode::BlockCipher
@@ -23,25 +25,42 @@ public:
 
 private:
     /// @brief uBlock128128 private Context
-    std::uint8_t rk_data_[272];
+    std::unique_ptr<std::uint8_t[]> rk_data_;
 
 public:
     /**
      * @brief   uBlock128128 Context Init
      * @note    need to call the "set_key" function to Key Schedule
      */
-    uBlock128128() noexcept = default;
+    uBlock128128();
 
     /**
      * @brief                   uBlock128128 Context Init and Key Schedule
      * @param[in]   user_key    16-bytes secret key
      * @param[in]   enc         uBlock128128::ENCRYPTION or
-     * uBlock128128::DECRYPTION
+     *                          uBlock128128::DECRYPTION
      */
-    uBlock128128(const std::uint8_t* user_key, int enc) noexcept
-    {
-        this->set_key(user_key, enc);
-    }
+    uBlock128128(const std::uint8_t* user_key, int enc);
+
+    /**
+     * @brief Copy constructor
+     */
+    uBlock128128(const uBlock128128& other);
+
+    /**
+     * @brief Move constructor
+     */
+    uBlock128128(uBlock128128&& other);
+
+    /**
+     * @brief Copy assignment operator
+     */
+    uBlock128128& operator=(const uBlock128128& other);
+
+    /**
+     * @brief Move assignment operator
+     */
+    uBlock128128& operator=(uBlock128128&& other);
 
 public:
     const char* fetch_name() const noexcept override
@@ -76,7 +95,7 @@ public:
      * @brief                   uBlock128128 Key Schedule
      * @param[in]   user_key    16-bytes secret key
      * @param[in]   enc         uBlock128128::ENCRYPTION or
-     * uBlock128128::DECRYPTION
+     *                          uBlock128128::DECRYPTION
      */
     void set_key(const std::uint8_t* user_key, int enc) noexcept override;
 
@@ -135,25 +154,42 @@ public:
 
 private:
     /// @brief uBlock128256 private Context
-    std::uint8_t rk_data_[400];
+    std::unique_ptr<std::uint8_t[]> rk_data_;
 
 public:
     /**
      * @brief   uBlock128256 Context Init
      * @note    need to call the "set_key" function to Key Schedule
      */
-    uBlock128256() noexcept = default;
+    uBlock128256();
 
     /**
      * @brief                   uBlock128256 Context Init and Key Schedule
      * @param[in]   user_key    16-bytes secret key
      * @param[in]   enc         uBlock128256::ENCRYPTION or
-     * uBlock128256::DECRYPTION
+     *                          uBlock128256::DECRYPTION
      */
-    uBlock128256(const std::uint8_t* user_key, int enc) noexcept
-    {
-        this->set_key(user_key, enc);
-    }
+    uBlock128256(const std::uint8_t* user_key, int enc);
+
+    /**
+     * @brief Copy constructor
+     */
+    uBlock128256(const uBlock128256& other);
+
+    /**
+     * @brief Move constructor
+     */
+    uBlock128256(uBlock128256&& other);
+
+    /**
+     * @brief Copy assignment operator
+     */
+    uBlock128256& operator=(const uBlock128256& other);
+
+    /**
+     * @brief Move assignment operator
+     */
+    uBlock128256& operator=(uBlock128256&& other);
 
 public:
     const char* fetch_name() const noexcept override
@@ -188,7 +224,7 @@ public:
      * @brief                   uBlock128256 Key Schedule
      * @param[in]   user_key    16-bytes secret key
      * @param[in]   enc         uBlock128256::ENCRYPTION or
-     * uBlock128256::DECRYPTION
+     *                          uBlock128256::DECRYPTION
      */
     void set_key(const std::uint8_t* user_key, int enc) noexcept override;
 
@@ -247,25 +283,42 @@ public:
 
 private:
     /// @brief uBlock256256 private Context
-    std::uint8_t rk_data_[800];
+    std::unique_ptr<std::uint8_t[]> rk_data_;
 
 public:
     /**
      * @brief   uBlock256256 Context Init
      * @note    need to call the "set_key" function to Key Schedule
      */
-    uBlock256256() noexcept = default;
+    uBlock256256();
 
     /**
      * @brief                   uBlock256256 Context Init and Key Schedule
      * @param[in]   user_key    16-bytes secret key
      * @param[in]   enc         uBlock256256::ENCRYPTION or
-     * uBlock256256::DECRYPTION
+     *                          uBlock256256::DECRYPTION
      */
-    uBlock256256(const std::uint8_t* user_key, int enc) noexcept
-    {
-        this->set_key(user_key, enc);
-    }
+    uBlock256256(const std::uint8_t* user_key, int enc);
+
+    /**
+     * @brief Copy constructor
+     */
+    uBlock256256(const uBlock256256& other);
+
+    /**
+     * @brief Move constructor
+     */
+    uBlock256256(uBlock256256&& other);
+
+    /**
+     * @brief Copy assignment operator
+     */
+    uBlock256256& operator=(const uBlock256256& other);
+
+    /**
+     * @brief Move assignment operator
+     */
+    uBlock256256& operator=(uBlock256256&& other);
 
 public:
     const char* fetch_name() const noexcept override
@@ -300,7 +353,7 @@ public:
      * @brief                   uBlock256256 Key Schedule
      * @param[in]   user_key    16-bytes secret key
      * @param[in]   enc         uBlock256256::ENCRYPTION or
-     * uBlock256256::DECRYPTION
+     *                          uBlock256256::DECRYPTION
      */
     void set_key(const std::uint8_t* user_key, int enc) noexcept override;
 

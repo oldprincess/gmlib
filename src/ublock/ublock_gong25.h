@@ -1,42 +1,47 @@
-#ifndef UBLOCK_INTERNAL_UBLOCK_STANDARD_H
-#define UBLOCK_INTERNAL_UBLOCK_STANDARD_H
+#ifndef UBLOCK_INTERNAL_UBLOCK_GONG25_H
+#define UBLOCK_INTERNAL_UBLOCK_GONG25_H
 
 #include "config.h"
 
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(UBLOCK_IMPL_GONG25)
 
 #include <cstddef>
 #include <cstdint>
 
-namespace ublock::internal::standard {
+namespace ublock {
+namespace internal {
+namespace gong25 {
 
-constexpr const char* UBLOCK_ALGO_NAME = "standard";
+constexpr const char* UBLOCK_ALGO_NAME = "gong25";
 
 constexpr std::size_t UBLOCK128128_BLOCK_SIZE   = 16;
 constexpr std::size_t UBLOCK128128_USER_KEY_LEN = 16;
-constexpr std::size_t UBLOCK128128_PARALLEL_NUM = 1;
+constexpr std::size_t UBLOCK128128_PARALLEL_NUM = 16;
 
 constexpr std::size_t UBLOCK128256_BLOCK_SIZE   = 16;
 constexpr std::size_t UBLOCK128256_USER_KEY_LEN = 32;
-constexpr std::size_t UBLOCK128256_PARALLEL_NUM = 1;
+constexpr std::size_t UBLOCK128256_PARALLEL_NUM = 16;
 
 constexpr std::size_t UBLOCK256256_BLOCK_SIZE   = 32;
 constexpr std::size_t UBLOCK256256_USER_KEY_LEN = 32;
-constexpr std::size_t UBLOCK256256_PARALLEL_NUM = 1;
+constexpr std::size_t UBLOCK256256_PARALLEL_NUM = 8;
 
 typedef struct UBlock128128RoundKey
 {
     std::uint8_t round_key[17][16];
+    std::uint8_t bs_round_key[17][8][32];
 } UBlock128128RoundKey;
 
 typedef struct UBlock128256RoundKey
 {
     std::uint8_t round_key[25][16];
+    std::uint8_t bs_round_key[25][8][32];
 } UBlock128256RoundKey;
 
 typedef struct UBlock256256RoundKey
 {
     std::uint8_t round_key[25][32];
+    std::uint8_t bs_round_key[25][8][32];
 } UBlock256256RoundKey;
 
 // ****************************************
@@ -45,7 +50,7 @@ typedef struct UBlock256256RoundKey
 
 /**
  * @brief           uBlock128/128 key schedule (encryption)
- * @param round_key uBlock128/128 standard round key
+ * @param round_key uBlock128/128 round key
  * @param user_key  16-byte secret key
  */
 void ublock128128_enc_key_init(UBlock128128RoundKey* round_key,
@@ -53,7 +58,7 @@ void ublock128128_enc_key_init(UBlock128128RoundKey* round_key,
 
 /**
  * @brief           uBlock128/128 key schedule (decryption)
- * @param round_key uBlock128/128 standard round key
+ * @param round_key uBlock128/128 round key
  * @param user_key  16-byte secret key
  */
 void ublock128128_dec_key_init(UBlock128128RoundKey* round_key,
@@ -61,7 +66,7 @@ void ublock128128_dec_key_init(UBlock128128RoundKey* round_key,
 
 /**
  * @brief               uBlock128/128 block encryption
- * @param round_key     uBlock128/128 standard round key
+ * @param round_key     uBlock128/128 round key
  * @param ciphertext    16-byte output block
  * @param plaintext     16-byte input block
  */
@@ -71,7 +76,7 @@ void ublock128128_enc_block(const UBlock128128RoundKey* round_key,
 
 /**
  * @brief               uBlock128/128 block decryption
- * @param round_key     uBlock128/128 standard round key
+ * @param round_key     uBlock128/128 round key
  * @param plaintext     16-byte output block
  * @param ciphertext    16-byte input block
  */
@@ -81,7 +86,7 @@ void ublock128128_dec_block(const UBlock128128RoundKey* round_key,
 
 /**
  * @brief               uBlock128/128 block encryption, crypt in ECB mode
- * @param round_key     uBlock128/128 standard round key
+ * @param round_key     uBlock128/128 round key
  * @param ciphertext    output blocks, length of 16 x block_num bytes
  * @param plaintext     input blocks, length of 16 x block_num bytes
  * @param block_num     block num
@@ -93,7 +98,7 @@ void ublock128128_enc_blocks(const UBlock128128RoundKey* round_key,
 
 /**
  * @brief               uBlock128/128 block decryption, crypt in ECB mode
- * @param round_key     uBlock128/128 standard round key
+ * @param round_key     uBlock128/128 round key
  * @param plaintext     output blocks, length of 16 x block_num bytes
  * @param ciphertext    input blocks, length of 16 x block_num bytes
  * @param block_num     block num
@@ -109,7 +114,7 @@ void ublock128128_dec_blocks(const UBlock128128RoundKey* round_key,
 
 /**
  * @brief           uBlock128/256 key schedule (encryption)
- * @param round_key uBlock128/256 standard round key
+ * @param round_key uBlock128/256 round key
  * @param user_key  32-byte secret key
  */
 void ublock128256_enc_key_init(UBlock128256RoundKey* round_key,
@@ -117,7 +122,7 @@ void ublock128256_enc_key_init(UBlock128256RoundKey* round_key,
 
 /**
  * @brief           uBlock128/256 key schedule (decryption)
- * @param round_key uBlock128/256 standard round key
+ * @param round_key uBlock128/256 round key
  * @param user_key  32-byte secret key
  */
 void ublock128256_dec_key_init(UBlock128256RoundKey* round_key,
@@ -125,7 +130,7 @@ void ublock128256_dec_key_init(UBlock128256RoundKey* round_key,
 
 /**
  * @brief               uBlock128/256 block encryption
- * @param round_key     uBlock128/256 standard round key
+ * @param round_key     uBlock128/256 round key
  * @param ciphertext    16-byte output block
  * @param plaintext     16-byte input block
  */
@@ -135,7 +140,7 @@ void ublock128256_enc_block(const UBlock128256RoundKey* round_key,
 
 /**
  * @brief               uBlock128/256 block decryption
- * @param round_key     uBlock128/256 standard round key
+ * @param round_key     uBlock128/256 round key
  * @param plaintext     16-byte output block
  * @param ciphertext    16-byte input block
  */
@@ -145,7 +150,7 @@ void ublock128256_dec_block(const UBlock128256RoundKey* round_key,
 
 /**
  * @brief               uBlock128/256 block encryption, crypt in ECB mode
- * @param round_key     uBlock128/256 standard round key
+ * @param round_key     uBlock128/256 round key
  * @param ciphertext    output blocks, length of 16 x block_num bytes
  * @param plaintext     input blocks, length of 16 x block_num bytes
  * @param block_num     block num
@@ -157,7 +162,7 @@ void ublock128256_enc_blocks(const UBlock128256RoundKey* round_key,
 
 /**
  * @brief               uBlock128/256 block decryption, crypt in ECB mode
- * @param round_key     uBlock128/256 standard round key
+ * @param round_key     uBlock128/256 round key
  * @param plaintext     output blocks, length of 16 x block_num bytes
  * @param ciphertext    input blocks, length of 16 x block_num bytes
  * @param block_num     block num
@@ -173,7 +178,7 @@ void ublock128256_dec_blocks(const UBlock128256RoundKey* round_key,
 
 /**
  * @brief           uBlock256/256 key schedule (encryption)
- * @param round_key uBlock256/256 standard round key
+ * @param round_key uBlock256/256 round key
  * @param user_key  32-byte secret key
  */
 void ublock256256_enc_key_init(UBlock256256RoundKey* round_key,
@@ -181,7 +186,7 @@ void ublock256256_enc_key_init(UBlock256256RoundKey* round_key,
 
 /**
  * @brief           uBlock256/256 key schedule (decryption)
- * @param round_key uBlock256/256 standard round key
+ * @param round_key uBlock256/256 round key
  * @param user_key  32-byte secret key
  */
 void ublock256256_dec_key_init(UBlock256256RoundKey* round_key,
@@ -189,7 +194,7 @@ void ublock256256_dec_key_init(UBlock256256RoundKey* round_key,
 
 /**
  * @brief               uBlock256/256 block encryption
- * @param round_key     uBlock256/256 standard round key
+ * @param round_key     uBlock256/256 round key
  * @param ciphertext    32-byte output block
  * @param plaintext     32-byte input block
  */
@@ -199,7 +204,7 @@ void ublock256256_enc_block(const UBlock256256RoundKey* round_key,
 
 /**
  * @brief               uBlock256/256 block decryption
- * @param round_key     uBlock256/256 standard round key
+ * @param round_key     uBlock256/256 round key
  * @param plaintext     32-byte output block
  * @param ciphertext    32-byte input block
  */
@@ -209,7 +214,7 @@ void ublock256256_dec_block(const UBlock256256RoundKey* round_key,
 
 /**
  * @brief               uBlock256/256 block encryption, crypt in ECB mode
- * @param round_key     uBlock256/256 standard round key
+ * @param round_key     uBlock256/256 round key
  * @param ciphertext    output blocks, length of 32 x block_num bytes
  * @param plaintext     input blocks, length of 32 x block_num bytes
  * @param block_num     block num
@@ -221,7 +226,7 @@ void ublock256256_enc_blocks(const UBlock256256RoundKey* round_key,
 
 /**
  * @brief               uBlock256/256 block decryption, crypt in ECB mode
- * @param round_key     uBlock256/256 standard round key
+ * @param round_key     uBlock256/256 round key
  * @param plaintext     output blocks, length of 32 x block_num bytes
  * @param ciphertext    input blocks, length of 32 x block_num bytes
  * @param block_num     block num
@@ -231,7 +236,9 @@ void ublock256256_dec_blocks(const UBlock256256RoundKey* round_key,
                              const std::uint8_t*         ciphertext,
                              std::size_t                 block_num) noexcept;
 
-}; // namespace ublock::internal::standard
+}; // namespace gong25
+}; // namespace internal
+}; // namespace ublock
 
 #endif
 #endif

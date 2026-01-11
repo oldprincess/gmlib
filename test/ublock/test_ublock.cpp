@@ -1,3 +1,4 @@
+#include <gmlib/memory_utils/memdump.h>
 #include <gmlib/ublock/ublock.h>
 
 #include <cstring>
@@ -67,17 +68,50 @@ static uint8_t ct256256_1000000[32] = {
 
 void test_ublock()
 {
-    uBlock128128 ctx128128;
-    uBlock128256 ctx128256;
-    uBlock256256 ctx256256;
-    uint8_t      out[32];
+    static uint8_t tmp1[32 * 1024 * 1024 + 32];
+    uBlock128128   ctx128128;
+    uBlock128256   ctx128256;
+    uBlock256256   ctx256256;
+    uint8_t        out[32];
     // ====================== 128128
     ctx128128.set_key(key128128, uBlock128128::ENCRYPTION);
     ctx128128.encrypt_block(out, pt128128);
     if (memcmp(out, ct128128, uBlock128128::BLOCK_SIZE) != 0)
     {
-        throw runtime_error("err in ublock");
+        throw runtime_error("err in ublock128128");
     }
+    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128128::BLOCK_SIZE)
+    {
+        memcpy(tmp1 + i, pt128128, uBlock128128::BLOCK_SIZE);
+    }
+    ctx128128.encrypt_blocks(tmp1, tmp1, sizeof(tmp1) / 16);
+    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128128::BLOCK_SIZE)
+    {
+        if (memcmp(tmp1 + i, ct128128, uBlock128128::BLOCK_SIZE) != 0)
+        {
+            throw runtime_error("err in ublock128128");
+        }
+    }
+
+    ctx128128.set_key(key128128, uBlock128128::DECRYPTION);
+    ctx128128.decrypt_block(out, ct128128);
+    if (memcmp(out, pt128128, uBlock128128::BLOCK_SIZE) != 0)
+    {
+        throw runtime_error("err in ublock128128");
+    }
+    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128128::BLOCK_SIZE)
+    {
+        memcpy(tmp1 + i, ct128128, uBlock128128::BLOCK_SIZE);
+    }
+    ctx128128.decrypt_blocks(tmp1, tmp1, sizeof(tmp1) / 16);
+    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128128::BLOCK_SIZE)
+    {
+        if (memcmp(tmp1 + i, pt128128, uBlock128128::BLOCK_SIZE) != 0)
+        {
+            throw runtime_error("err in ublock128128");
+        }
+    }
+
     memcpy(out, pt128128, uBlock128128::BLOCK_SIZE);
     for (int i = 0; i < 1000000; i++)
     {
@@ -85,21 +119,53 @@ void test_ublock()
     }
     if (memcmp(out, ct128128_1000000, uBlock128128::BLOCK_SIZE) != 0)
     {
-        throw runtime_error("err in ublock");
+        throw runtime_error("err in ublock128128");
     }
     ctx128128.set_key(key128128, uBlock128128::DECRYPTION);
     ctx128128.decrypt_block(out, ct128128);
     if (memcmp(out, pt128128, uBlock128128::BLOCK_SIZE) != 0)
     {
-        throw runtime_error("err in ublock");
+        throw runtime_error("err in ublock128128");
     }
     // ===================== 128256
     ctx128256.set_key(key128256, uBlock128256::ENCRYPTION);
     ctx128256.encrypt_block(out, pt128256);
     if (memcmp(out, ct128256, uBlock128256::BLOCK_SIZE) != 0)
     {
-        throw runtime_error("err in ublock");
+        throw runtime_error("err in ublock128256");
     }
+    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128256::BLOCK_SIZE)
+    {
+        memcpy(tmp1 + i, pt128256, uBlock128256::BLOCK_SIZE);
+    }
+    ctx128256.encrypt_blocks(tmp1, tmp1, sizeof(tmp1) / 16);
+    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128256::BLOCK_SIZE)
+    {
+        if (memcmp(tmp1 + i, ct128256, uBlock128256::BLOCK_SIZE) != 0)
+        {
+            throw runtime_error("err in ublock128256");
+        }
+    }
+
+    ctx128256.set_key(key128256, uBlock128256::DECRYPTION);
+    ctx128256.decrypt_block(out, ct128256);
+    if (memcmp(out, pt128256, uBlock128256::BLOCK_SIZE) != 0)
+    {
+        throw runtime_error("err in ublock128256");
+    }
+    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128256::BLOCK_SIZE)
+    {
+        memcpy(tmp1 + i, ct128256, uBlock128256::BLOCK_SIZE);
+    }
+    ctx128256.decrypt_blocks(tmp1, tmp1, sizeof(tmp1) / 16);
+    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128256::BLOCK_SIZE)
+    {
+        if (memcmp(tmp1 + i, pt128256, uBlock128256::BLOCK_SIZE) != 0)
+        {
+            throw runtime_error("err in ublock128256");
+        }
+    }
+
     memcpy(out, pt128256, uBlock128256::BLOCK_SIZE);
     for (int i = 0; i < 1000000; i++)
     {
@@ -107,21 +173,53 @@ void test_ublock()
     }
     if (memcmp(out, ct128256_1000000, uBlock128256::BLOCK_SIZE) != 0)
     {
-        throw runtime_error("err in ublock");
+        throw runtime_error("err in ublock128256");
     }
     ctx128256.set_key(key128256, uBlock128256::DECRYPTION);
     ctx128256.decrypt_block(out, ct128256);
     if (memcmp(out, pt128256, uBlock128256::BLOCK_SIZE) != 0)
     {
-        throw runtime_error("err in ublock");
+        throw runtime_error("err in ublock128256");
     }
     // ===================== 256256
     ctx256256.set_key(key256256, uBlock256256::ENCRYPTION);
     ctx256256.encrypt_block(out, pt256256);
     if (memcmp(out, ct256256, uBlock256256::BLOCK_SIZE) != 0)
     {
-        throw runtime_error("err in ublock");
+        throw runtime_error("err in ublock256256");
     }
+    for (size_t i = 0; i < sizeof(tmp1); i += uBlock256256::BLOCK_SIZE)
+    {
+        memcpy(tmp1 + i, pt256256, uBlock256256::BLOCK_SIZE);
+    }
+    ctx256256.encrypt_blocks(tmp1, tmp1, sizeof(tmp1) / 32);
+    for (size_t i = 0; i < sizeof(tmp1); i += uBlock256256::BLOCK_SIZE)
+    {
+        if (memcmp(tmp1 + i, ct256256, uBlock256256::BLOCK_SIZE) != 0)
+        {
+            throw runtime_error("err in ublock256256");
+        }
+    }
+
+    ctx256256.set_key(key256256, uBlock256256::DECRYPTION);
+    ctx256256.decrypt_block(out, ct256256);
+    if (memcmp(out, pt256256, uBlock256256::BLOCK_SIZE) != 0)
+    {
+        throw runtime_error("err in ublock256256");
+    }
+    for (size_t i = 0; i < sizeof(tmp1); i += uBlock256256::BLOCK_SIZE)
+    {
+        memcpy(tmp1 + i, ct256256, uBlock256256::BLOCK_SIZE);
+    }
+    ctx256256.decrypt_blocks(tmp1, tmp1, sizeof(tmp1) / 32);
+    for (size_t i = 0; i < sizeof(tmp1); i += uBlock256256::BLOCK_SIZE)
+    {
+        if (memcmp(tmp1 + i, pt256256, uBlock256256::BLOCK_SIZE) != 0)
+        {
+            throw runtime_error("err in ublock256256");
+        }
+    }
+
     memcpy(out, pt256256, uBlock256256::BLOCK_SIZE);
     for (int i = 0; i < 1000000; i++)
     {
@@ -129,12 +227,12 @@ void test_ublock()
     }
     if (memcmp(out, ct256256_1000000, uBlock256256::BLOCK_SIZE) != 0)
     {
-        throw runtime_error("err in ublock");
+        throw runtime_error("err in ublock256256");
     }
     ctx256256.set_key(key256256, uBlock256256::DECRYPTION);
     ctx256256.decrypt_block(out, ct256256);
     if (memcmp(out, pt256256, uBlock256256::BLOCK_SIZE) != 0)
     {
-        throw runtime_error("err in ublock");
+        throw runtime_error("err in ublock256256");
     }
 }

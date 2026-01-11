@@ -7,6 +7,7 @@ add_definitions(
     -DSUPPORT_SM3_YANG15
     -DSUPPORT_SM4_LANG18
     -DSUPPORT_SM4_GONG23
+    -DSUPPORT_UBLOCK_GONG25
 )
 set(PROJECT_BUILD_TEST ON)
 set(THIRD_PARTY 
@@ -295,10 +296,20 @@ if(ARCH_X86_64)
         PROPERTIES
         COMPILE_FLAGS ${UBLOCK_STANDARD_FLAGS}
     )
+    if(COMPILER_MSVC)
+        set(UBLOCK_GONG25_FLAGS "-D__AVX2__")
+    else()
+        set(UBLOCK_GONG25_FLAGS "-mavx2")
+    endif()
+    set_source_files_properties(
+        ${BASE_LIB_SRC_DIRECTORY}/ublock/ublock_gong25.cpp
+        PROPERTIES
+        COMPILE_FLAGS ${UBLOCK_GONG25_FLAGS}
+    )
     set_source_files_properties(
         ${BASE_LIB_SRC_DIRECTORY}/ublock/provider.cpp
         PROPERTIES
-        COMPILE_FLAGS "-DUBLOCK_IMPL_STANDARD"
+        COMPILE_FLAGS "-DUBLOCK_IMPL_STANDARD -DUBLOCK_IMPL_GONG25"
     )
 endif()
 
