@@ -2,6 +2,7 @@
 #define UBLOCK_UBLOCK_H
 
 #include <gmlib/block_cipher_mode/block_cipher.h>
+#include <gmlib/block_cipher_mode/block_cipher_mode.h>
 
 #include <memory>
 
@@ -10,388 +11,391 @@ namespace ublock {
 class uBlock128128 : public block_cipher_mode::BlockCipher
 {
 public:
-    static constexpr const char* NAME = "uBlock-128-128";
+    using Cipher     = std::unique_ptr<block_cipher_mode::BlockCipher>;
+    using CipherMode = std::unique_ptr<block_cipher_mode::BlockCipherMode>;
 
-    /// @brief uBlock128128 Block Size (in bytes)
-    static constexpr std::size_t BLOCK_SIZE = 16;
+public:
+    static Cipher create_cipher(const char* provider = nullptr);
 
-    /// @brief uBlock128128 User Key Length (in bytes)
-    static constexpr std::size_t USER_KEY_LEN = 16;
+    static CipherMode create_ecb_encryptor(const char* provider = nullptr);
+    static CipherMode create_ecb_decryptor(const char* provider = nullptr);
 
-    /// @brief uBlock128128 Maximum Number of Parallel Encryption and Decryption
-    static constexpr std::size_t PARALLEL_NUM = 1;
+    static CipherMode create_cbc_encryptor(const char* provider = nullptr);
+    static CipherMode create_cbc_decryptor(const char* provider = nullptr);
 
+    static CipherMode create_ofb_encryptor(const char* provider = nullptr);
+    static CipherMode create_ofb_decryptor(const char* provider = nullptr);
+
+    static CipherMode create_cfb_encryptor(const char* provider = nullptr);
+    static CipherMode create_cfb_decryptor(const char* provider = nullptr);
+
+    static CipherMode create_ctr_encryptor(const char* provider = nullptr);
+    static CipherMode create_ctr_decryptor(const char* provider = nullptr);
+
+    static CipherMode create_gcm_encryptor(const char* provider = nullptr);
+    static CipherMode create_gcm_decryptor(const char* provider = nullptr);
+
+public:
+    static constexpr const char* NAME              = "uBlock-128-128";
+    static constexpr std::size_t BLOCK_SIZE        = 16;
+    static constexpr std::size_t USER_KEY_LEN      = 16;
+    static constexpr std::size_t PARALLEL_NUM      = 1;
     static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
-    /// @brief uBlock128128 private Context
-    std::unique_ptr<std::uint8_t[]> rk_data_;
+    Cipher impl_ = uBlock128128::create_cipher();
 
 public:
-    /**
-     * @brief   uBlock128128 Context Init
-     * @note    need to call the "set_key" function to Key Schedule
-     */
-    uBlock128128();
+    uBlock128128() noexcept = default;
 
-    /**
-     * @brief                   uBlock128128 Context Init and Key Schedule
-     * @param[in]   user_key    16-bytes secret key
-     * @param[in]   enc         uBlock128128::ENCRYPTION or
-     *                          uBlock128128::DECRYPTION
-     */
-    uBlock128128(const std::uint8_t* user_key, int enc);
+    uBlock128128(const std::uint8_t* user_key, int enc)
+    {
+        this->set_key(user_key, enc);
+    }
 
-    /**
-     * @brief Copy constructor
-     */
-    uBlock128128(const uBlock128128& other);
+    uBlock128128(const uBlock128128& other)
+    {
+        impl_ = other.impl_->clone();
+    }
 
-    /**
-     * @brief Move constructor
-     */
-    uBlock128128(uBlock128128&& other);
+    uBlock128128& operator=(const uBlock128128& other)
+    {
+        if (this != &other)
+        {
+            impl_ = other.impl_->clone();
+        }
+        return *this;
+    }
 
-    /**
-     * @brief Copy assignment operator
-     */
-    uBlock128128& operator=(const uBlock128128& other);
-
-    /**
-     * @brief Move assignment operator
-     */
-    uBlock128128& operator=(uBlock128128&& other);
+    uBlock128128(uBlock128128&& other) noexcept            = default;
+    uBlock128128& operator=(uBlock128128&& other) noexcept = default;
 
 public:
     const char* fetch_name() const noexcept override
     {
-        return NAME;
+        return impl_->fetch_name();
     }
 
-    const char* fetch_impl_algo() const noexcept override;
+    const char* fetch_impl_algo() const noexcept override
+    {
+        return impl_->fetch_impl_algo();
+    }
 
     std::size_t fetch_block_size() const noexcept override
     {
-        return BLOCK_SIZE;
+        return impl_->fetch_block_size();
     }
 
     std::size_t fetch_user_key_len() const noexcept override
     {
-        return USER_KEY_LEN;
+        return impl_->fetch_user_key_len();
     }
 
     std::size_t fetch_parallel_num() const noexcept override
     {
-        return PARALLEL_NUM;
+        return impl_->fetch_parallel_num();
     }
 
     std::size_t fetch_security_strength() const noexcept override
     {
-        return SECURITY_STRENGTH;
+        return impl_->fetch_security_strength();
+    }
+
+    Cipher clone() const override
+    {
+        return std::make_unique<uBlock128128>(*this);
     }
 
 public:
-    /**
-     * @brief                   uBlock128128 Key Schedule
-     * @param[in]   user_key    16-bytes secret key
-     * @param[in]   enc         uBlock128128::ENCRYPTION or
-     *                          uBlock128128::DECRYPTION
-     */
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override;
+    void set_key(const std::uint8_t* user_key, int enc) noexcept override
+    {
+        impl_->set_key(user_key, enc);
+    }
 
-    /**
-     * @brief                   uBlock128128 Encrypt Single Block
-     * @param[out]  ciphertext  16-bytes ciphertext
-     * @param[in]   plaintext   16-bytes plaintext
-     */
     void encrypt_block(std::uint8_t*       ciphertext,
-                       const std::uint8_t* plaintext) const noexcept override;
+                       const std::uint8_t* plaintext) const noexcept override
+    {
+        impl_->encrypt_block(ciphertext, plaintext);
+    }
 
-    /**
-     * @brief                   uBlock128128 Decrypt Single Block
-     * @param[out]  plaintext   16-bytes plaintext
-     * @param[in]   ciphertext  16-bytes ciphertext
-     */
     void decrypt_block(std::uint8_t*       plaintext,
-                       const std::uint8_t* ciphertext) const noexcept override;
+                       const std::uint8_t* ciphertext) const noexcept override
+    {
+        impl_->decrypt_block(plaintext, ciphertext);
+    }
 
-    /**
-     * @brief                   uBlock128128 Encrypt Multiple Blocks
-     * @param[out]  ciphertext  16 x block_num -bytes ciphertext
-     * @param[in]   plaintext   16 x block_num -bytes plaintext
-     * @param[in]   block_num   block number
-     */
     void encrypt_blocks(std::uint8_t*       ciphertext,
                         const std::uint8_t* plaintext,
-                        std::size_t         block_num) const noexcept override;
+                        std::size_t         block_num) const noexcept override
+    {
+        impl_->encrypt_blocks(ciphertext, plaintext, block_num);
+    }
 
-    /**
-     * @brief                   uBlock128128 Decrypt Multiple Blocks
-     * @param[out]  plaintext   16 x block_num -bytes plaintext
-     * @param[in]   ciphertext  16 x block_num -bytes ciphertext
-     * @param[in]   block_num   block number
-     */
     void decrypt_blocks(std::uint8_t*       plaintext,
                         const std::uint8_t* ciphertext,
-                        std::size_t         block_num) const noexcept override;
+                        std::size_t         block_num) const noexcept override
+    {
+        impl_->decrypt_blocks(plaintext, ciphertext, block_num);
+    }
 };
 
 class uBlock128256 : public block_cipher_mode::BlockCipher
 {
 public:
-    static constexpr const char* NAME = "uBlock-128-256";
+    using Cipher     = std::unique_ptr<block_cipher_mode::BlockCipher>;
+    using CipherMode = std::unique_ptr<block_cipher_mode::BlockCipherMode>;
 
-    /// @brief uBlock128256 Block Size (in bytes)
-    static constexpr std::size_t BLOCK_SIZE = 16;
+public:
+    static Cipher create_cipher(const char* provider = nullptr);
 
-    /// @brief uBlock128256 User Key Length (in bytes)
-    static constexpr std::size_t USER_KEY_LEN = 32;
+    static CipherMode create_ecb_encryptor(const char* provider = nullptr);
+    static CipherMode create_ecb_decryptor(const char* provider = nullptr);
 
-    /// @brief uBlock128256 Maximum Number of Parallel Encryption and Decryption
-    static constexpr std::size_t PARALLEL_NUM = 1;
+    static CipherMode create_cbc_encryptor(const char* provider = nullptr);
+    static CipherMode create_cbc_decryptor(const char* provider = nullptr);
 
+    static CipherMode create_ofb_encryptor(const char* provider = nullptr);
+    static CipherMode create_ofb_decryptor(const char* provider = nullptr);
+
+    static CipherMode create_cfb_encryptor(const char* provider = nullptr);
+    static CipherMode create_cfb_decryptor(const char* provider = nullptr);
+
+    static CipherMode create_ctr_encryptor(const char* provider = nullptr);
+    static CipherMode create_ctr_decryptor(const char* provider = nullptr);
+
+    static CipherMode create_gcm_encryptor(const char* provider = nullptr);
+    static CipherMode create_gcm_decryptor(const char* provider = nullptr);
+
+public:
+    static constexpr const char* NAME              = "uBlock-128-256";
+    static constexpr std::size_t BLOCK_SIZE        = 16;
+    static constexpr std::size_t USER_KEY_LEN      = 32;
+    static constexpr std::size_t PARALLEL_NUM      = 1;
     static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
-    /// @brief uBlock128256 private Context
-    std::unique_ptr<std::uint8_t[]> rk_data_;
+    Cipher impl_ = uBlock128256::create_cipher();
 
 public:
-    /**
-     * @brief   uBlock128256 Context Init
-     * @note    need to call the "set_key" function to Key Schedule
-     */
-    uBlock128256();
+    uBlock128256() noexcept = default;
 
-    /**
-     * @brief                   uBlock128256 Context Init and Key Schedule
-     * @param[in]   user_key    16-bytes secret key
-     * @param[in]   enc         uBlock128256::ENCRYPTION or
-     *                          uBlock128256::DECRYPTION
-     */
-    uBlock128256(const std::uint8_t* user_key, int enc);
+    uBlock128256(const std::uint8_t* user_key, int enc)
+    {
+        this->set_key(user_key, enc);
+    }
 
-    /**
-     * @brief Copy constructor
-     */
-    uBlock128256(const uBlock128256& other);
+    uBlock128256(const uBlock128256& other)
+    {
+        impl_ = other.impl_->clone();
+    }
 
-    /**
-     * @brief Move constructor
-     */
-    uBlock128256(uBlock128256&& other);
+    uBlock128256& operator=(const uBlock128256& other)
+    {
+        if (this != &other)
+        {
+            impl_ = other.impl_->clone();
+        }
+        return *this;
+    }
 
-    /**
-     * @brief Copy assignment operator
-     */
-    uBlock128256& operator=(const uBlock128256& other);
-
-    /**
-     * @brief Move assignment operator
-     */
-    uBlock128256& operator=(uBlock128256&& other);
+    uBlock128256(uBlock128256&& other) noexcept            = default;
+    uBlock128256& operator=(uBlock128256&& other) noexcept = default;
 
 public:
     const char* fetch_name() const noexcept override
     {
-        return NAME;
+        return impl_->fetch_name();
     }
 
-    const char* fetch_impl_algo() const noexcept override;
+    const char* fetch_impl_algo() const noexcept override
+    {
+        return impl_->fetch_impl_algo();
+    }
 
     std::size_t fetch_block_size() const noexcept override
     {
-        return BLOCK_SIZE;
+        return impl_->fetch_block_size();
     }
 
     std::size_t fetch_user_key_len() const noexcept override
     {
-        return USER_KEY_LEN;
+        return impl_->fetch_user_key_len();
     }
 
     std::size_t fetch_parallel_num() const noexcept override
     {
-        return PARALLEL_NUM;
+        return impl_->fetch_parallel_num();
     }
 
     std::size_t fetch_security_strength() const noexcept override
     {
-        return SECURITY_STRENGTH;
+        return impl_->fetch_security_strength();
+    }
+
+    Cipher clone() const override
+    {
+        return std::make_unique<uBlock128256>(*this);
     }
 
 public:
-    /**
-     * @brief                   uBlock128256 Key Schedule
-     * @param[in]   user_key    16-bytes secret key
-     * @param[in]   enc         uBlock128256::ENCRYPTION or
-     *                          uBlock128256::DECRYPTION
-     */
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override;
+    void set_key(const std::uint8_t* user_key, int enc) noexcept override
+    {
+        impl_->set_key(user_key, enc);
+    }
 
-    /**
-     * @brief                   uBlock128256 Encrypt Single Block
-     * @param[out]  ciphertext  16-bytes ciphertext
-     * @param[in]   plaintext   16-bytes plaintext
-     */
     void encrypt_block(std::uint8_t*       ciphertext,
-                       const std::uint8_t* plaintext) const noexcept override;
+                       const std::uint8_t* plaintext) const noexcept override
+    {
+        impl_->encrypt_block(ciphertext, plaintext);
+    }
 
-    /**
-     * @brief                   uBlock128256 Decrypt Single Block
-     * @param[out]  plaintext   16-bytes plaintext
-     * @param[in]   ciphertext  16-bytes ciphertext
-     */
     void decrypt_block(std::uint8_t*       plaintext,
-                       const std::uint8_t* ciphertext) const noexcept override;
+                       const std::uint8_t* ciphertext) const noexcept override
+    {
+        impl_->decrypt_block(plaintext, ciphertext);
+    }
 
-    /**
-     * @brief                   uBlock128256 Encrypt Multiple Blocks
-     * @param[out]  ciphertext  16 x block_num -bytes ciphertext
-     * @param[in]   plaintext   16 x block_num -bytes plaintext
-     * @param[in]   block_num   block number
-     */
     void encrypt_blocks(std::uint8_t*       ciphertext,
                         const std::uint8_t* plaintext,
-                        std::size_t         block_num) const noexcept override;
+                        std::size_t         block_num) const noexcept override
+    {
+        impl_->encrypt_blocks(ciphertext, plaintext, block_num);
+    }
 
-    /**
-     * @brief                   uBlock128256 Decrypt Multiple Blocks
-     * @param[out]  plaintext   16 x block_num -bytes plaintext
-     * @param[in]   ciphertext  16 x block_num -bytes ciphertext
-     * @param[in]   block_num   block number
-     */
     void decrypt_blocks(std::uint8_t*       plaintext,
                         const std::uint8_t* ciphertext,
-                        std::size_t         block_num) const noexcept override;
+                        std::size_t         block_num) const noexcept override
+    {
+        impl_->decrypt_blocks(plaintext, ciphertext, block_num);
+    }
 };
 
 class uBlock256256 : public block_cipher_mode::BlockCipher
 {
 public:
-    static constexpr const char* NAME = "uBlock-256-256";
+    using Cipher     = std::unique_ptr<block_cipher_mode::BlockCipher>;
+    using CipherMode = std::unique_ptr<block_cipher_mode::BlockCipherMode>;
 
-    /// @brief uBlock256256 Block Size (in bytes)
-    static constexpr std::size_t BLOCK_SIZE = 32;
+public:
+    static Cipher create_cipher(const char* provider = nullptr);
 
-    /// @brief uBlock256256 User Key Length (in bytes)
-    static constexpr std::size_t USER_KEY_LEN = 32;
+    static CipherMode create_ecb_encryptor(const char* provider = nullptr);
+    static CipherMode create_ecb_decryptor(const char* provider = nullptr);
 
-    /// @brief uBlock256256 Maximum Number of Parallel Encryption and Decryption
-    static constexpr std::size_t PARALLEL_NUM = 1;
+    static CipherMode create_cbc_encryptor(const char* provider = nullptr);
+    static CipherMode create_cbc_decryptor(const char* provider = nullptr);
 
+    static CipherMode create_ofb_encryptor(const char* provider = nullptr);
+    static CipherMode create_ofb_decryptor(const char* provider = nullptr);
+
+    static CipherMode create_cfb_encryptor(const char* provider = nullptr);
+    static CipherMode create_cfb_decryptor(const char* provider = nullptr);
+
+    static CipherMode create_ctr_encryptor(const char* provider = nullptr);
+    static CipherMode create_ctr_decryptor(const char* provider = nullptr);
+
+public:
+    static constexpr const char* NAME              = "uBlock-256-256";
+    static constexpr std::size_t BLOCK_SIZE        = 32;
+    static constexpr std::size_t USER_KEY_LEN      = 32;
+    static constexpr std::size_t PARALLEL_NUM      = 1;
     static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
-    /// @brief uBlock256256 private Context
-    std::unique_ptr<std::uint8_t[]> rk_data_;
+    Cipher impl_ = uBlock256256::create_cipher();
 
 public:
-    /**
-     * @brief   uBlock256256 Context Init
-     * @note    need to call the "set_key" function to Key Schedule
-     */
-    uBlock256256();
+    uBlock256256() noexcept = default;
 
-    /**
-     * @brief                   uBlock256256 Context Init and Key Schedule
-     * @param[in]   user_key    16-bytes secret key
-     * @param[in]   enc         uBlock256256::ENCRYPTION or
-     *                          uBlock256256::DECRYPTION
-     */
-    uBlock256256(const std::uint8_t* user_key, int enc);
+    uBlock256256(const std::uint8_t* user_key, int enc)
+    {
+        this->set_key(user_key, enc);
+    }
 
-    /**
-     * @brief Copy constructor
-     */
-    uBlock256256(const uBlock256256& other);
+    uBlock256256(const uBlock256256& other)
+    {
+        impl_ = other.impl_->clone();
+    }
 
-    /**
-     * @brief Move constructor
-     */
-    uBlock256256(uBlock256256&& other);
+    uBlock256256& operator=(const uBlock256256& other)
+    {
+        if (this != &other)
+        {
+            impl_ = other.impl_->clone();
+        }
+        return *this;
+    }
 
-    /**
-     * @brief Copy assignment operator
-     */
-    uBlock256256& operator=(const uBlock256256& other);
-
-    /**
-     * @brief Move assignment operator
-     */
-    uBlock256256& operator=(uBlock256256&& other);
+    uBlock256256(uBlock256256&& other) noexcept            = default;
+    uBlock256256& operator=(uBlock256256&& other) noexcept = default;
 
 public:
     const char* fetch_name() const noexcept override
     {
-        return NAME;
+        return impl_->fetch_name();
     }
 
-    const char* fetch_impl_algo() const noexcept override;
+    const char* fetch_impl_algo() const noexcept override
+    {
+        return impl_->fetch_impl_algo();
+    }
 
     std::size_t fetch_block_size() const noexcept override
     {
-        return BLOCK_SIZE;
+        return impl_->fetch_block_size();
     }
 
     std::size_t fetch_user_key_len() const noexcept override
     {
-        return USER_KEY_LEN;
+        return impl_->fetch_user_key_len();
     }
 
     std::size_t fetch_parallel_num() const noexcept override
     {
-        return PARALLEL_NUM;
+        return impl_->fetch_parallel_num();
     }
 
     std::size_t fetch_security_strength() const noexcept override
     {
-        return SECURITY_STRENGTH;
+        return impl_->fetch_security_strength();
+    }
+
+    Cipher clone() const override
+    {
+        return std::make_unique<uBlock256256>(*this);
     }
 
 public:
-    /**
-     * @brief                   uBlock256256 Key Schedule
-     * @param[in]   user_key    16-bytes secret key
-     * @param[in]   enc         uBlock256256::ENCRYPTION or
-     *                          uBlock256256::DECRYPTION
-     */
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override;
+    void set_key(const std::uint8_t* user_key, int enc) noexcept override
+    {
+        impl_->set_key(user_key, enc);
+    }
 
-    /**
-     * @brief                   uBlock256256 Encrypt Single Block
-     * @param[out]  ciphertext  16-bytes ciphertext
-     * @param[in]   plaintext   16-bytes plaintext
-     */
     void encrypt_block(std::uint8_t*       ciphertext,
-                       const std::uint8_t* plaintext) const noexcept override;
+                       const std::uint8_t* plaintext) const noexcept override
+    {
+        impl_->encrypt_block(ciphertext, plaintext);
+    }
 
-    /**
-     * @brief                   uBlock256256 Decrypt Single Block
-     * @param[out]  plaintext   16-bytes plaintext
-     * @param[in]   ciphertext  16-bytes ciphertext
-     */
     void decrypt_block(std::uint8_t*       plaintext,
-                       const std::uint8_t* ciphertext) const noexcept override;
+                       const std::uint8_t* ciphertext) const noexcept override
+    {
+        impl_->decrypt_block(plaintext, ciphertext);
+    }
 
-    /**
-     * @brief                   uBlock256256 Encrypt Multiple Blocks
-     * @param[out]  ciphertext  16 x block_num -bytes ciphertext
-     * @param[in]   plaintext   16 x block_num -bytes plaintext
-     * @param[in]   block_num   block number
-     */
     void encrypt_blocks(std::uint8_t*       ciphertext,
                         const std::uint8_t* plaintext,
-                        std::size_t         block_num) const noexcept override;
+                        std::size_t         block_num) const noexcept override
+    {
+        impl_->encrypt_blocks(ciphertext, plaintext, block_num);
+    }
 
-    /**
-     * @brief                   uBlock256256 Decrypt Multiple Blocks
-     * @param[out]  plaintext   16 x block_num -bytes plaintext
-     * @param[in]   ciphertext  16 x block_num -bytes ciphertext
-     * @param[in]   block_num   block number
-     */
     void decrypt_blocks(std::uint8_t*       plaintext,
                         const std::uint8_t* ciphertext,
-                        std::size_t         block_num) const noexcept override;
+                        std::size_t         block_num) const noexcept override
+    {
+        impl_->decrypt_blocks(plaintext, ciphertext, block_num);
+    }
 };
 
 } // namespace ublock

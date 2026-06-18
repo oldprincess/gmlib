@@ -43,6 +43,43 @@ public:
     }
 
 public:
+    const BlockCipher& fetch_cipher_ctx() const noexcept override
+    {
+        return cipher_;
+    }
+
+public:
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        if (std::strcmp(cmd, "init") == 0)
+        {
+            if (argc != 1)
+            {
+                throw std::invalid_argument(
+                    "invalid number of arguments in EcbEncryptorImpl");
+            }
+            this->init(*(const std::uint8_t**)argv[0]);
+            return;
+        }
+        if (std::strcmp(cmd, "reset") == 0)
+        {
+            if (argc != 0)
+            {
+                throw std::invalid_argument(
+                    "invalid number of arguments in EcbEncryptorImpl");
+            }
+            this->reset();
+            return;
+        }
+        throw std::runtime_error("EcbEncryptorImpl does not support ctrl");
+    }
+
+    std::unique_ptr<BlockCipherMode> clone() const override
+    {
+        return std::unique_ptr<BlockCipherMode>(new EcbEncryptorImpl(*this));
+    }
+
+public:
     void init(const std::uint8_t* user_key)
     {
         cipher_.set_key(user_key, Cipher::ENCRYPTION);
@@ -112,6 +149,43 @@ public:
     EcbDecryptorImpl(const std::uint8_t* user_key)
     {
         this->init(user_key);
+    }
+
+public:
+    const BlockCipher& fetch_cipher_ctx() const noexcept override
+    {
+        return cipher_;
+    }
+
+public:
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        if (std::strcmp(cmd, "init") == 0)
+        {
+            if (argc != 1)
+            {
+                throw std::invalid_argument(
+                    "invalid number of arguments in EcbDecryptorImpl");
+            }
+            this->init(*(const std::uint8_t**)argv[0]);
+            return;
+        }
+        if (std::strcmp(cmd, "reset") == 0)
+        {
+            if (argc != 0)
+            {
+                throw std::invalid_argument(
+                    "invalid number of arguments in EcbDecryptorImpl");
+            }
+            this->reset();
+            return;
+        }
+        throw std::runtime_error("EcbDecryptorImpl does not support ctrl");
+    }
+
+    std::unique_ptr<BlockCipherMode> clone() const override
+    {
+        return std::unique_ptr<BlockCipherMode>(new EcbDecryptorImpl(*this));
     }
 
 public:

@@ -44,6 +44,49 @@ public:
         this->init(user_key, iv);
     }
 
+    ~CtrCryptorImpl()
+    {
+        std::memset(counter_, 0, sizeof(counter_));
+    }
+
+public:
+    const BlockCipher& fetch_cipher_ctx() const noexcept override
+    {
+        return cipher_;
+    }
+
+public:
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        if (std::strcmp(cmd, "init") == 0)
+        {
+            if (argc != 2)
+            {
+                throw std::invalid_argument(
+                    "invalid number of arguments in CtrCryptorImpl");
+            }
+            this->init(*(const std::uint8_t**)argv[0],
+                       *(const std::uint8_t**)argv[1]);
+            return;
+        }
+        if (std::strcmp(cmd, "reset") == 0)
+        {
+            if (argc != 1)
+            {
+                throw std::invalid_argument(
+                    "invalid number of arguments in CtrCryptorImpl");
+            }
+            this->reset(*(const std::uint8_t**)argv[0]);
+            return;
+        }
+        throw std::runtime_error("CtrCryptorImpl does not support ctrl");
+    }
+
+    std::unique_ptr<BlockCipherMode> clone() const override
+    {
+        return std::unique_ptr<BlockCipherMode>(new CtrCryptorImpl(*this));
+    }
+
 public:
     void init(const std::uint8_t* user_key, const std::uint8_t* iv)
     {
@@ -64,17 +107,17 @@ private:
         {
             return;
         }
-        constexpr std::size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+        constexpr std::size_t block_size = Cipher::BLOCK_SIZE;
         // generate counter
         std::uint8_t* cur_counter = out;
-        std::memcpy(cur_counter, counter_, BLOCK_SIZE);
+        std::memcpy(cur_counter, counter_, block_size);
         for (std::size_t i = 1; i < block_num; i++)
         {
-            std::uint8_t* nxt_counter = cur_counter + BLOCK_SIZE;
-            internal::ctr_inc<BLOCK_SIZE>(nxt_counter, cur_counter);
+            std::uint8_t* nxt_counter = cur_counter + block_size;
+            internal::ctr_inc<block_size>(nxt_counter, cur_counter);
             cur_counter = nxt_counter;
         }
-        internal::ctr_inc<BLOCK_SIZE>(counter_, cur_counter);
+        internal::ctr_inc<block_size>(counter_, cur_counter);
         // generate key stream
         cipher_.encrypt_blocks(out, out, block_num);
     }
@@ -84,9 +127,9 @@ protected:
                        const std::uint8_t* in,
                        std::size_t         block_num) override
     {
-        constexpr std::size_t BLOCK_SIZE     = Cipher::BLOCK_SIZE;
+        constexpr std::size_t block_size     = Cipher::BLOCK_SIZE;
         constexpr std::size_t PARALLEL_NUM   = Cipher::PARALLEL_NUM;
-        constexpr std::size_t PARALLEL_BYTES = BLOCK_SIZE * PARALLEL_NUM;
+        constexpr std::size_t PARALLEL_BYTES = block_size * PARALLEL_NUM;
 
         std::uint8_t key_stream[PARALLEL_BYTES];
         while (block_num >= PARALLEL_NUM)
@@ -98,7 +141,7 @@ protected:
         }
         if (block_num)
         {
-            std::size_t remain_bytes = block_num * BLOCK_SIZE;
+            std::size_t remain_bytes = block_num * block_size;
             this->gen_block_key_stream(key_stream, block_num);
             memory_utils::memxor_n(out, in, key_stream, remain_bytes);
         }
@@ -108,13 +151,13 @@ protected:
                      const std::uint8_t* in,
                      std::size_t         inl) override
     {
-        constexpr std::size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+        constexpr std::size_t block_size = Cipher::BLOCK_SIZE;
 
         if (inl == 0)
         {
             return;
         }
-        std::uint8_t key_stream[BLOCK_SIZE];
+        std::uint8_t key_stream[block_size];
         this->gen_block_key_stream(key_stream, 1);
         memory_utils::memxor_n(out, key_stream, in, inl);
     }

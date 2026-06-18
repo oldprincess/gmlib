@@ -31,6 +31,12 @@ public:
         this->init(user_key, iv, iv_len, hash);
     }
 
+    ~GctrCryptorImpl()
+    {
+        std::memset(counter_, 0, sizeof(counter_));
+        std::memset(counter0_, 0, sizeof(counter0_));
+    }
+
 protected:
     const std::uint8_t* get_counter0() const noexcept
     {
@@ -128,11 +134,10 @@ protected:
         {
             return;
         }
-        constexpr std::size_t BLOCK_SIZE     = Cipher::BLOCK_SIZE;
+        constexpr std::size_t block_size     = Cipher::BLOCK_SIZE;
         constexpr std::size_t PARALLEL_NUM   = Cipher::PARALLEL_NUM;
-        constexpr std::size_t PARALLEL_BYTES = BLOCK_SIZE * PARALLEL_NUM;
+        constexpr std::size_t PARALLEL_BYTES = block_size * PARALLEL_NUM;
 
-        std::uint8_t* base_out = out;
         // gctr
         std::uint8_t key_stream[PARALLEL_BYTES];
         while (block_num >= PARALLEL_NUM)
@@ -144,7 +149,7 @@ protected:
         }
         if (block_num)
         {
-            std::size_t remain_bytes = block_num * BLOCK_SIZE;
+            std::size_t remain_bytes = block_num * block_size;
             this->gen_block_key_stream(key_stream, block_num);
             memory_utils::memxor_n(out, in, key_stream, remain_bytes);
         }
@@ -203,6 +208,66 @@ public:
                      std::size_t         aad_len)
     {
         this->init(user_key, iv, iv_len, aad, aad_len);
+    }
+
+    ~GcmEncryptorImpl()
+    {
+        std::memset(tag_, 0, sizeof(tag_));
+        aad_len_ = 0;
+        ct_len_  = 0;
+    }
+
+public:
+    const BlockCipher& fetch_cipher_ctx() const noexcept override
+    {
+        return this->cipher_;
+    }
+
+public:
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        if (std::strcmp(cmd, "init") == 0)
+        {
+            if (argc != 5)
+            {
+                throw std::invalid_argument(
+                    "invalid number of arguments in GcmEncryptorImpl");
+            }
+            this->init(*(const std::uint8_t**)argv[0],
+                       *(const std::uint8_t**)argv[1],
+                       *(const std::size_t*)argv[2],
+                       *(const std::uint8_t**)argv[3],
+                       *(const std::size_t*)argv[4]);
+            return;
+        }
+        if (std::strcmp(cmd, "reset") == 0)
+        {
+            if (argc != 4)
+            {
+                throw std::invalid_argument(
+                    "invalid number of arguments in GcmEncryptorImpl");
+            }
+            this->reset(*(const std::uint8_t**)argv[0],
+                        *(const std::size_t*)argv[1],
+                        *(const std::uint8_t**)argv[2],
+                        *(const std::size_t*)argv[3]);
+            return;
+        }
+        if (std::strcmp(cmd, "get_tag") == 0)
+        {
+            if (argc != 1)
+            {
+                throw std::invalid_argument("invalid number of arguments");
+            }
+            std::memcpy(*(std::uint8_t**)argv[0], tag_, sizeof(tag_));
+            return;
+        }
+        throw std::runtime_error("GcmEncryptorImpl does not support ctrl");
+    }
+
+    std::unique_ptr<BlockCipherMode> clone() const override
+    {
+        return std::unique_ptr<BlockCipherMode>(new GcmEncryptorImpl(*this));
     }
 
 public:
@@ -339,6 +404,66 @@ public:
                      std::size_t         aad_len)
     {
         this->init(user_key, iv, iv_len, aad, aad_len);
+    }
+
+    ~GcmDecryptorImpl()
+    {
+        std::memset(tag_, 0, sizeof(tag_));
+        aad_len_ = 0;
+        ct_len_  = 0;
+    }
+
+public:
+    const BlockCipher& fetch_cipher_ctx() const noexcept override
+    {
+        return this->cipher_;
+    }
+
+public:
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        if (std::strcmp(cmd, "init") == 0)
+        {
+            if (argc != 5)
+            {
+                throw std::invalid_argument(
+                    "invalid number of arguments in GcmDecryptorImpl");
+            }
+            this->init(*(const std::uint8_t**)argv[0],
+                       *(const std::uint8_t**)argv[1],
+                       *(const std::size_t*)argv[2],
+                       *(const std::uint8_t**)argv[3],
+                       *(const std::size_t*)argv[4]);
+            return;
+        }
+        if (std::strcmp(cmd, "reset") == 0)
+        {
+            if (argc != 4)
+            {
+                throw std::invalid_argument(
+                    "invalid number of arguments in GcmDecryptorImpl");
+            }
+            this->reset(*(const std::uint8_t**)argv[0],
+                        *(const std::size_t*)argv[1],
+                        *(const std::uint8_t**)argv[2],
+                        *(const std::size_t*)argv[3]);
+            return;
+        }
+        if (std::strcmp(cmd, "set_tag") == 0)
+        {
+            if (argc != 1)
+            {
+                throw std::invalid_argument("invalid number of arguments");
+            }
+            this->set_tag(*(const std::uint8_t**)argv[0]);
+            return;
+        }
+        throw std::runtime_error("GcmDecryptorImpl does not support ctrl");
+    }
+
+    std::unique_ptr<BlockCipherMode> clone() const override
+    {
+        return std::unique_ptr<BlockCipherMode>(new GcmDecryptorImpl(*this));
     }
 
 public:

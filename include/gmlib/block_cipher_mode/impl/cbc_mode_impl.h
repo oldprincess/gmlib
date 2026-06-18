@@ -2,6 +2,7 @@
 #define BLOCK_CIPHER_MODE_IMPL_CBC_MODE_IMPL_H
 
 #include <gmlib/block_cipher_mode/impl/block_cipher_mode_impl.h>
+#include <gmlib/block_cipher_mode/impl/type_traits.h>
 #include <gmlib/memory_utils/memxor.h>
 
 #include <stdexcept>
@@ -11,6 +12,8 @@ namespace block_cipher_mode::impl {
 template <class Cipher>
 class CbcEncryptorImpl : public BlockCipherModeImpl<Cipher::BLOCK_SIZE>
 {
+    static_assert(is_valid_block_cipher_v<Cipher>, "invalid block cipher");
+
 public:
     static constexpr std::size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
 
@@ -44,7 +47,49 @@ public:
         this->init(user_key, iv);
     }
 
+    ~CbcEncryptorImpl()
+    {
+        std::memset(iv_, 0, sizeof(iv_));
+    }
+
 public:
+    const BlockCipher& fetch_cipher_ctx() const noexcept override
+    {
+        return cipher_;
+    }
+
+public:
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        if (std::strcmp(cmd, "init") == 0)
+        {
+            if (argc != 2)
+            {
+                throw std::invalid_argument(
+                    "invalid number of arguments in CbcEncryptorImpl");
+            }
+            this->init(*(const std::uint8_t**)argv[0],
+                       *(const std::uint8_t**)argv[1]);
+            return;
+        }
+        if (std::strcmp(cmd, "reset") == 0)
+        {
+            if (argc != 1)
+            {
+                throw std::invalid_argument(
+                    "invalid number of arguments in CbcEncryptorImpl");
+            }
+            this->reset(*(const std::uint8_t**)argv[0]);
+            return;
+        }
+        throw std::runtime_error("CbcEncryptorImpl does not support ctrl");
+    }
+
+    std::unique_ptr<BlockCipherMode> clone() const override
+    {
+        return std::unique_ptr<BlockCipherMode>(new CbcEncryptorImpl(*this));
+    }
+
     void init(const std::uint8_t* user_key, const std::uint8_t* iv)
     {
         cipher_.set_key(user_key, Cipher::ENCRYPTION);
@@ -94,6 +139,8 @@ protected:
 template <class Cipher>
 class CbcDecryptorImpl : public BlockCipherModeImpl<Cipher::BLOCK_SIZE>
 {
+    static_assert(is_valid_block_cipher_v<Cipher>, "invalid block cipher");
+
 public:
     static constexpr std::size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
 
@@ -125,6 +172,48 @@ public:
     CbcDecryptorImpl(const std::uint8_t* user_key, const std::uint8_t* iv)
     {
         this->init(user_key, iv);
+    }
+    ~CbcDecryptorImpl()
+    {
+        std::memset(iv_, 0, sizeof(iv_));
+    }
+
+public:
+    const BlockCipher& fetch_cipher_ctx() const noexcept override
+    {
+        return cipher_;
+    }
+
+public:
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        if (std::strcmp(cmd, "init") == 0)
+        {
+            if (argc != 2)
+            {
+                throw std::invalid_argument(
+                    "invalid number of arguments in CbcDecryptorImpl");
+            }
+            this->init(*(const std::uint8_t**)argv[0],
+                       *(const std::uint8_t**)argv[1]);
+            return;
+        }
+        if (std::strcmp(cmd, "reset") == 0)
+        {
+            if (argc != 1)
+            {
+                throw std::invalid_argument(
+                    "invalid number of arguments in CbcDecryptorImpl");
+            }
+            this->reset(*(const std::uint8_t**)argv[0]);
+            return;
+        }
+        throw std::runtime_error("CbcDecryptorImpl does not support ctrl");
+    }
+
+    std::unique_ptr<BlockCipherMode> clone() const override
+    {
+        return std::unique_ptr<BlockCipherMode>(new CbcDecryptorImpl(*this));
     }
 
 public:

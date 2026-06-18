@@ -14,6 +14,13 @@ protected:
     std::uint8_t buf_[BLOCK_SIZE_];
     std::size_t  buf_size_ = 0;
 
+protected:
+    ~BlockCipherModeImpl()
+    {
+        std::memset(buf_, 0, sizeof(buf_));
+        buf_size_ = 0;
+    }
+
 public:
     void update(std::uint8_t*       out,
                 std::size_t*        outl,
@@ -90,6 +97,64 @@ protected:
     virtual void final_block(std::uint8_t*       out,
                              const std::uint8_t* in,
                              std::size_t         inl) = 0;
+};
+
+class BlockCipherModeForwarder : public BlockCipherMode
+{
+protected:
+    static void dispatch_ctrl(BlockCipherMode& mode,
+                              const char*      cmd,
+                              std::size_t      argc,
+                              void*            argv[])
+    {
+        mode.ctrl(cmd, argc, argv);
+    }
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        return impl().fetch_name();
+    }
+
+    std::size_t fetch_block_size() const noexcept override
+    {
+        return impl().fetch_block_size();
+    }
+
+    std::size_t fetch_user_key_len() const noexcept override
+    {
+        return impl().fetch_user_key_len();
+    }
+
+    const BlockCipher& fetch_cipher_ctx() const noexcept override
+    {
+        return impl().fetch_cipher_ctx();
+    }
+
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        impl().ctrl(cmd, argc, argv);
+    }
+
+    void update(std::uint8_t*       out,
+                std::size_t*        outl,
+                const std::uint8_t* in,
+                std::size_t         inl) override
+    {
+        impl().update(out, outl, in, inl);
+    }
+
+    void do_final(std::uint8_t*       out,
+                  std::size_t*        outl,
+                  const std::uint8_t* in  = nullptr,
+                  std::size_t         inl = 0) override
+    {
+        impl().do_final(out, outl, in, inl);
+    }
+
+private:
+    virtual BlockCipherMode&       impl() noexcept       = 0;
+    virtual const BlockCipherMode& impl() const noexcept = 0;
 };
 
 } // namespace block_cipher_mode::impl

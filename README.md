@@ -79,7 +79,6 @@ This project will be updated on the GitHub platform and randomly synchronized to
 * Windows平台
 
 ```bash
-cd gmlib/make
 mkdir build
 cd build
 cmake ..
@@ -89,7 +88,6 @@ cmake --build . --config=Release
 * Linux平台
 
 ```bash
-cd gmlib/make
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release

@@ -29,20 +29,6 @@ static inline void ctr_inc16(std::uint8_t* out, const std::uint8_t* in) noexcept
     memory_utils::store32_be(out + 0, tmp & UINT32_MAX);
 }
 
-static void ctr_inc_n(std::uint8_t*       out,
-                      const std::uint8_t* in,
-                      std::size_t         n) noexcept
-{
-    std::uint16_t t = 1;
-    for (std::size_t i = 0; i < n; i++)
-    {
-        std::size_t pos = n - 1 - i;
-        t += (std::uint16_t)in[pos];
-        out[pos] = t & 0xFF;
-        t >>= 8;
-    }
-}
-
 template <std::size_t BLOCK_SIZE>
 static inline void ctr_inc(std::uint8_t* out, const std::uint8_t* in) noexcept
 {
@@ -51,12 +37,22 @@ static inline void ctr_inc(std::uint8_t* out, const std::uint8_t* in) noexcept
         ctr_inc16(out, in);
         return;
     }
-    if constexpr (BLOCK_SIZE == 8)
+    else if constexpr (BLOCK_SIZE == 8)
     {
         ctr_inc8(out, in);
         return;
     }
-    ctr_inc_n(out, in, BLOCK_SIZE);
+    else
+    {
+        std::uint16_t t = 1;
+        for (std::size_t i = 0; i < BLOCK_SIZE; i++)
+        {
+            std::size_t pos = BLOCK_SIZE - 1 - i;
+            t += (std::uint16_t)in[pos];
+            out[pos] = t & 0xFF;
+            t >>= 8;
+        }
+    }
 }
 
 } // namespace block_cipher_mode::impl::internal

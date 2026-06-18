@@ -15,7 +15,7 @@ set(THIRD_PARTY
     asn1
     ballet
     base64
-    # block_cipher_mode
+    block_cipher_mode
     cpuinfo
     des
     ghash
@@ -83,9 +83,9 @@ endif()
 set(PROJECT_NAME_ gmlib)
 set(CMAKE_CXX_STANDARD 17)
 
-set(BASE_INCLUDE_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-set(BASE_LIB_SRC_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR}/../src)
-set(BASE_TEST_SRC_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../test)
+set(BASE_INCLUDE_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(BASE_LIB_SRC_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(BASE_TEST_SRC_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test)
 
 file(GLOB_RECURSE PROJECT_INCLUDE  ${BASE_INCLUDE_DIRECTORY}/*.h)
 file(GLOB_RECURSE PROJECT_LIB_SRC  ${BASE_LIB_SRC_DIRECTORY}/*.cpp)
@@ -105,6 +105,12 @@ endif()
 ## ================================================= ##
 #######################################################
 
+# des
+set_source_files_properties(
+    ${BASE_LIB_SRC_DIRECTORY}/des/provider.cpp
+    PROPERTIES
+    COMPILE_FLAGS ""
+)
 # aes
 if(ARCH_X86 OR ARCH_X86_64)
     if(COMPILER_MSVC)
@@ -114,6 +120,7 @@ if(ARCH_X86 OR ARCH_X86_64)
     endif()
     set_source_files_properties(
         ${BASE_LIB_SRC_DIRECTORY}/aes/aes_aesni.cpp
+        ${BASE_LIB_SRC_DIRECTORY}/aes/provider_aes_aesni.cpp
         PROPERTIES
         COMPILE_FLAGS ${AES_AESNI_FLAGS}
     )
@@ -130,6 +137,7 @@ elseif(ARCH_AARCH64)
     endif()
     set_source_files_properties(
         ${BASE_LIB_SRC_DIRECTORY}/aes/aes_arm_aes.cpp
+        ${BASE_LIB_SRC_DIRECTORY}/aes/provider_aes_arm_aes.cpp
         PROPERTIES
         COMPILE_FLAGS ${AES_ARM_AES_FLAGS}
     )
@@ -270,11 +278,13 @@ if(ARCH_X86_64)
     endif()
     set_source_files_properties(
         ${BASE_LIB_SRC_DIRECTORY}/sm4/sm4_lang18.cpp
+        ${BASE_LIB_SRC_DIRECTORY}/sm4/provider_sm4_lang18.cpp
         PROPERTIES
         COMPILE_FLAGS ${SM4_LANG18_FLAGS}
     )
     set_source_files_properties(
         ${BASE_LIB_SRC_DIRECTORY}/sm4/sm4_gong23.cpp
+        ${BASE_LIB_SRC_DIRECTORY}/sm4/provider_sm4_gong23.cpp
         PROPERTIES
         COMPILE_FLAGS ${SM4_GONG23_FLAGS}
     )
@@ -293,6 +303,7 @@ if(ARCH_X86_64)
     endif()
     set_source_files_properties(
         ${BASE_LIB_SRC_DIRECTORY}/ublock/ublock_standard.cpp
+        ${BASE_LIB_SRC_DIRECTORY}/ublock/provider_ublock_standard.cpp
         PROPERTIES
         COMPILE_FLAGS ${UBLOCK_STANDARD_FLAGS}
     )
@@ -303,6 +314,7 @@ if(ARCH_X86_64)
     endif()
     set_source_files_properties(
         ${BASE_LIB_SRC_DIRECTORY}/ublock/ublock_gong25.cpp
+        ${BASE_LIB_SRC_DIRECTORY}/ublock/provider_ublock_gong25.cpp
         PROPERTIES
         COMPILE_FLAGS ${UBLOCK_GONG25_FLAGS}
     )
@@ -320,6 +332,7 @@ endif()
 #######################################################
 
 if(${PROJECT_BUILD_TEST})
+    enable_testing()
     foreach(THIRD_PARTY_NAME ${THIRD_PARTY})
         file(   
             GLOB_RECURSE
@@ -336,6 +349,7 @@ if(${PROJECT_BUILD_TEST})
             PUBLIC
             ${PROJECT_NAME_}_static
         )
+        add_test(NAME ${THIRD_PARTY_NAME}_test COMMAND ${THIRD_PARTY_NAME}_test)
     endforeach()
 endif()
 

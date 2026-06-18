@@ -3,6 +3,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
+#include <stdexcept>
 
 namespace block_cipher_mode {
 
@@ -18,10 +20,10 @@ public:
 public:
     virtual const char* fetch_name() const noexcept = 0;
 
-    virtual const char* fetch_impl_algo() const noexcept
+    virtual const char* fetch_impl_algo() const
     {
-        return nullptr;
-    };
+        throw std::runtime_error("Not implemented");
+    }
 
     virtual std::size_t fetch_block_size() const noexcept = 0;
 
@@ -30,6 +32,12 @@ public:
     virtual std::size_t fetch_parallel_num() const noexcept = 0;
 
     virtual std::size_t fetch_security_strength() const noexcept = 0;
+
+public:
+    virtual std::unique_ptr<BlockCipher> clone() const
+    {
+        throw std::runtime_error("Not implemented");
+    }
 
 public:
     virtual void set_key(const std::uint8_t* user_key, int enc) = 0;

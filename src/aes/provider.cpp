@@ -1,355 +1,1222 @@
 #include <gmlib/aes/aes.h>
-#include <gmlib/cpuinfo/cpuinfo.h>
 
-#include <cstdio>
-#include <cstdlib>
 #include <cstring>
+#include <stdexcept>
 
 #include "config.h"
-// x86_64
-#include "aes_aesni.h"
-// arm
-#include "aes_arm_aes.h"
-// universal
-#include "aes_lut.h"
+#include "provider_aes_aesni.h"
+#include "provider_aes_arm_aes.h"
+#include "provider_aes_lut.h"
 
 namespace aes {
 
-struct AESProvider
+AES128::Cipher AES128::create_cipher(const char* provider)
 {
-    bool (*available)();
-
-    const char* algo_name;
-
-    void (*enc_key_init)(std::uint8_t* round_key, const std::uint8_t* user_key);
-
-    void (*dec_key_init)(std::uint8_t* round_key, const std::uint8_t* user_key);
-
-    void (*enc_block)(const std::uint8_t* round_key,
-                      std::uint8_t*       ciphertext,
-                      const std::uint8_t* plaintext);
-
-    void (*dec_block)(const std::uint8_t* round_key,
-                      std::uint8_t*       plaintext,
-                      const std::uint8_t* ciphertext);
-
-    void (*enc_blocks)(const std::uint8_t* round_key,
-                       std::uint8_t*       ciphertext,
-                       const std::uint8_t* plaintext,
-                       std::size_t         block_num);
-
-    void (*dec_blocks)(const std::uint8_t* round_key,
-                       std::uint8_t*       plaintext,
-                       const std::uint8_t* ciphertext,
-                       std::size_t         block_num);
-};
-
-static AESProvider aes128_providers[] = {
-// x86_64
 #if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
     {
-        []() {
-            return cpuinfo::x86_64::cpu_supports_aes() &&
-                   cpuinfo::x86_64::cpu_supports_sse2();
-        },
-        aes::internal::aesni::AES_ALGO_NAME,
-        aes::internal::aesni::aes128_enc_key_init,
-        aes::internal::aesni::aes128_dec_key_init,
-        aes::internal::aesni::aes128_enc_block,
-        aes::internal::aesni::aes128_dec_block,
-        aes::internal::aesni::aes128_enc_blocks,
-        aes::internal::aesni::aes128_dec_blocks,
-    },
-#endif
-// arm
-#if defined(AES_IMPL_ARM_AES)
-    {
-        []() {
-            return (cpuinfo::arm::cpu_supports_aes() &&
-                    cpuinfo::arm::cpu_supports_neon()) ||
-                   (cpuinfo::aarch64::cpu_supports_aes() &&
-                    cpuinfo::aarch64::cpu_supports_asimd());
-        },
-        aes::internal::arm_aes::AES_ALGO_NAME,
-        aes::internal::arm_aes::aes128_enc_key_init,
-        aes::internal::arm_aes::aes128_dec_key_init,
-        aes::internal::arm_aes::aes128_enc_block,
-        aes::internal::arm_aes::aes128_dec_block,
-        aes::internal::arm_aes::aes128_enc_blocks,
-        aes::internal::arm_aes::aes128_dec_blocks,
-    },
-#endif
-    // universal
-    {
-        []() { return true; },
-        aes::internal::lut::AES_ALGO_NAME,
-        aes::internal::lut::aes128_enc_key_init,
-        aes::internal::lut::aes128_dec_key_init,
-        aes::internal::lut::aes128_enc_block,
-        aes::internal::lut::aes128_dec_block,
-        aes::internal::lut::aes128_enc_blocks,
-        aes::internal::lut::aes128_dec_blocks,
-    },
-    // end
-    {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
-};
-
-static AESProvider aes192_providers[] = {
-// x86_64
-#if defined(AES_IMPL_AESNI)
-    {
-        []() {
-            return cpuinfo::x86_64::cpu_supports_aes() &&
-                   cpuinfo::x86_64::cpu_supports_sse2();
-        },
-        aes::internal::aesni::AES_ALGO_NAME,
-        aes::internal::aesni::aes192_enc_key_init,
-        aes::internal::aesni::aes192_dec_key_init,
-        aes::internal::aesni::aes192_enc_block,
-        aes::internal::aesni::aes192_dec_block,
-        aes::internal::aesni::aes192_enc_blocks,
-        aes::internal::aesni::aes192_dec_blocks,
-    },
-#endif
-// arm
-#if defined(AES_IMPL_ARM_AES)
-    {
-        []() {
-            return (cpuinfo::arm::cpu_supports_aes() &&
-                    cpuinfo::arm::cpu_supports_neon()) ||
-                   (cpuinfo::aarch64::cpu_supports_aes() &&
-                    cpuinfo::aarch64::cpu_supports_asimd());
-        },
-        aes::internal::arm_aes::AES_ALGO_NAME,
-        aes::internal::arm_aes::aes192_enc_key_init,
-        aes::internal::arm_aes::aes192_dec_key_init,
-        aes::internal::arm_aes::aes192_enc_block,
-        aes::internal::arm_aes::aes192_dec_block,
-        aes::internal::arm_aes::aes192_enc_blocks,
-        aes::internal::arm_aes::aes192_dec_blocks,
-    },
-#endif
-    // universal
-    {
-        []() { return true; },
-        aes::internal::lut::AES_ALGO_NAME,
-        aes::internal::lut::aes192_enc_key_init,
-        aes::internal::lut::aes192_dec_key_init,
-        aes::internal::lut::aes192_enc_block,
-        aes::internal::lut::aes192_dec_block,
-        aes::internal::lut::aes192_enc_blocks,
-        aes::internal::lut::aes192_dec_blocks,
-    },
-    // end
-    {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
-};
-
-static AESProvider aes256_providers[] = {
-// x86_64
-#if defined(AES_IMPL_AESNI)
-    {
-        []() {
-            return cpuinfo::x86_64::cpu_supports_aes() &&
-                   cpuinfo::x86_64::cpu_supports_sse2();
-        },
-        aes::internal::aesni::AES_ALGO_NAME,
-        aes::internal::aesni::aes256_enc_key_init,
-        aes::internal::aesni::aes256_dec_key_init,
-        aes::internal::aesni::aes256_enc_block,
-        aes::internal::aesni::aes256_dec_block,
-        aes::internal::aesni::aes256_enc_blocks,
-        aes::internal::aesni::aes256_dec_blocks,
-    },
-#endif
-// arm
-#if defined(AES_IMPL_ARM_AES)
-    {
-        []() {
-            return (cpuinfo::arm::cpu_supports_aes() &&
-                    cpuinfo::arm::cpu_supports_neon()) ||
-                   (cpuinfo::aarch64::cpu_supports_aes() &&
-                    cpuinfo::aarch64::cpu_supports_asimd());
-        },
-        aes::internal::arm_aes::AES_ALGO_NAME,
-        aes::internal::arm_aes::aes256_enc_key_init,
-        aes::internal::arm_aes::aes256_dec_key_init,
-        aes::internal::arm_aes::aes256_enc_block,
-        aes::internal::arm_aes::aes256_dec_block,
-        aes::internal::arm_aes::aes256_enc_blocks,
-        aes::internal::arm_aes::aes256_dec_blocks,
-    },
-#endif
-    // universal
-    {
-        []() { return true; },
-        aes::internal::lut::AES_ALGO_NAME,
-        aes::internal::lut::aes256_enc_key_init,
-        aes::internal::lut::aes256_dec_key_init,
-        aes::internal::lut::aes256_enc_block,
-        aes::internal::lut::aes256_dec_block,
-        aes::internal::lut::aes256_enc_blocks,
-        aes::internal::lut::aes256_dec_blocks,
-    },
-    // end
-    {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr},
-};
-
-static const AESProvider* get_provider(const AESProvider* providers,
-                                       const char* name = nullptr) noexcept
-{
-    std::size_t idx = 0;
-    while (providers[idx].algo_name != nullptr)
-    {
-        if (providers[idx].available())
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
         {
-            if (name == nullptr)
-            {
-                return &providers[idx];
-            }
-
-            if (std::strcmp(providers[idx].algo_name, name) == 0)
-            {
-                return &providers[idx];
-            }
+            return aes::internal::aesni::create_cipher_128();
         }
-        idx += 1;
     }
-    std::printf("[AES PROVIDER] Provider %s is not available. %s:%d\n",
-                name ? name : "", __FILE__, __LINE__);
-    std::exit(-1);
-}
-
-#define AES128_PROVIDER get_provider(aes128_providers)
-#define AES192_PROVIDER get_provider(aes192_providers)
-#define AES256_PROVIDER get_provider(aes256_providers)
-
-const char* AES128::fetch_impl_algo() const noexcept
-{
-    return AES128_PROVIDER->algo_name;
-}
-
-void AES128::set_key(const std::uint8_t* user_key, int enc) noexcept
-{
-    if (enc == ENCRYPTION)
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
     {
-        AES128_PROVIDER->enc_key_init(rk_data_, user_key);
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cipher_128();
+        }
     }
-    else
+#endif
+    if (aes::internal::lut::provider_available())
     {
-        AES128_PROVIDER->dec_key_init(rk_data_, user_key);
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cipher_128();
+        }
     }
+
+    throw std::runtime_error("No provider available");
 }
 
-void AES128::encrypt_block(std::uint8_t*       ciphertext,
-                           const std::uint8_t* plaintext) const noexcept
+AES128::CipherMode AES128::create_ecb_encryptor(const char* provider)
 {
-    AES128_PROVIDER->enc_block(rk_data_, ciphertext, plaintext);
-}
-
-void AES128::decrypt_block(std::uint8_t*       plaintext,
-                           const std::uint8_t* ciphertext) const noexcept
-{
-    AES128_PROVIDER->dec_block(rk_data_, plaintext, ciphertext);
-}
-
-void AES128::encrypt_blocks(std::uint8_t*       ciphertext,
-                            const std::uint8_t* plaintext,
-                            std::size_t         block_num) const noexcept
-{
-    AES128_PROVIDER->enc_blocks(rk_data_, ciphertext, plaintext, block_num);
-}
-
-void AES128::decrypt_blocks(std::uint8_t*       plaintext,
-                            const std::uint8_t* ciphertext,
-                            std::size_t         block_num) const noexcept
-{
-    AES128_PROVIDER->dec_blocks(rk_data_, plaintext, ciphertext, block_num);
-}
-
-const char* AES192::fetch_impl_algo() const noexcept
-{
-    return AES192_PROVIDER->algo_name;
-}
-
-void AES192::set_key(const std::uint8_t* user_key, int enc) noexcept
-{
-    if (enc == ENCRYPTION)
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
     {
-        AES192_PROVIDER->enc_key_init(rk_data_, user_key);
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ecb_encryptor_128();
+        }
     }
-    else
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
     {
-        AES192_PROVIDER->dec_key_init(rk_data_, user_key);
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ecb_encryptor_128();
+        }
     }
-}
-
-void AES192::encrypt_block(std::uint8_t*       ciphertext,
-                           const std::uint8_t* plaintext) const noexcept
-{
-    AES192_PROVIDER->enc_block(rk_data_, ciphertext, plaintext);
-}
-
-void AES192::decrypt_block(std::uint8_t*       plaintext,
-                           const std::uint8_t* ciphertext) const noexcept
-{
-    AES192_PROVIDER->dec_block(rk_data_, plaintext, ciphertext);
-}
-
-void AES192::encrypt_blocks(std::uint8_t*       ciphertext,
-                            const std::uint8_t* plaintext,
-                            std::size_t         block_num) const noexcept
-{
-    AES192_PROVIDER->enc_blocks(rk_data_, ciphertext, plaintext, block_num);
-}
-
-void AES192::decrypt_blocks(std::uint8_t*       plaintext,
-                            const std::uint8_t* ciphertext,
-                            std::size_t         block_num) const noexcept
-{
-    AES192_PROVIDER->dec_blocks(rk_data_, plaintext, ciphertext, block_num);
-}
-
-const char* AES256::fetch_impl_algo() const noexcept
-{
-    return AES256_PROVIDER->algo_name;
-}
-
-void AES256::set_key(const std::uint8_t* user_key, int enc) noexcept
-{
-    if (enc == ENCRYPTION)
+#endif
+    if (aes::internal::lut::provider_available())
     {
-        AES256_PROVIDER->enc_key_init(rk_data_, user_key);
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ecb_encryptor_128();
+        }
     }
-    else
+
+    throw std::runtime_error("No provider available");
+}
+
+AES128::CipherMode AES128::create_ecb_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
     {
-        AES256_PROVIDER->dec_key_init(rk_data_, user_key);
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ecb_decryptor_128();
+        }
     }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ecb_decryptor_128();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ecb_decryptor_128();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
 }
 
-void AES256::encrypt_block(std::uint8_t*       ciphertext,
-                           const std::uint8_t* plaintext) const noexcept
+AES128::CipherMode AES128::create_cbc_encryptor(const char* provider)
 {
-    AES256_PROVIDER->enc_block(rk_data_, ciphertext, plaintext);
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_cbc_encryptor_128();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cbc_encryptor_128();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cbc_encryptor_128();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
 }
 
-void AES256::decrypt_block(std::uint8_t*       plaintext,
-                           const std::uint8_t* ciphertext) const noexcept
+AES128::CipherMode AES128::create_cbc_decryptor(const char* provider)
 {
-    AES256_PROVIDER->dec_block(rk_data_, plaintext, ciphertext);
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_cbc_decryptor_128();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cbc_decryptor_128();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cbc_decryptor_128();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
 }
 
-void AES256::encrypt_blocks(std::uint8_t*       ciphertext,
-                            const std::uint8_t* plaintext,
-                            std::size_t         block_num) const noexcept
+AES128::CipherMode AES128::create_ofb_encryptor(const char* provider)
 {
-    AES256_PROVIDER->enc_blocks(rk_data_, ciphertext, plaintext, block_num);
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ofb_encryptor_128();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ofb_encryptor_128();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ofb_encryptor_128();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
 }
 
-void AES256::decrypt_blocks(std::uint8_t*       plaintext,
-                            const std::uint8_t* ciphertext,
-                            std::size_t         block_num) const noexcept
+AES128::CipherMode AES128::create_ofb_decryptor(const char* provider)
 {
-    AES256_PROVIDER->dec_blocks(rk_data_, plaintext, ciphertext, block_num);
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ofb_decryptor_128();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ofb_decryptor_128();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ofb_decryptor_128();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
 }
 
-}; // namespace aes
+AES128::CipherMode AES128::create_cfb_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_cfb_encryptor_128();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cfb_encryptor_128();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cfb_encryptor_128();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES128::CipherMode AES128::create_cfb_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_cfb_decryptor_128();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cfb_decryptor_128();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cfb_decryptor_128();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES128::CipherMode AES128::create_ctr_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ctr_encryptor_128();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ctr_encryptor_128();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ctr_encryptor_128();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES128::CipherMode AES128::create_ctr_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ctr_decryptor_128();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ctr_decryptor_128();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ctr_decryptor_128();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES128::CipherMode AES128::create_gcm_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_gcm_encryptor_128();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_gcm_encryptor_128();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_gcm_encryptor_128();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES128::CipherMode AES128::create_gcm_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_gcm_decryptor_128();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_gcm_decryptor_128();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_gcm_decryptor_128();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES192::Cipher AES192::create_cipher(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_cipher_192();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cipher_192();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cipher_192();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES192::CipherMode AES192::create_ecb_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ecb_encryptor_192();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ecb_encryptor_192();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ecb_encryptor_192();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES192::CipherMode AES192::create_ecb_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ecb_decryptor_192();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ecb_decryptor_192();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ecb_decryptor_192();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES192::CipherMode AES192::create_cbc_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_cbc_encryptor_192();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cbc_encryptor_192();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cbc_encryptor_192();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES192::CipherMode AES192::create_cbc_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_cbc_decryptor_192();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cbc_decryptor_192();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cbc_decryptor_192();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES192::CipherMode AES192::create_ofb_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ofb_encryptor_192();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ofb_encryptor_192();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ofb_encryptor_192();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES192::CipherMode AES192::create_ofb_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ofb_decryptor_192();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ofb_decryptor_192();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ofb_decryptor_192();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES192::CipherMode AES192::create_cfb_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_cfb_encryptor_192();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cfb_encryptor_192();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cfb_encryptor_192();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES192::CipherMode AES192::create_cfb_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_cfb_decryptor_192();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cfb_decryptor_192();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cfb_decryptor_192();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES192::CipherMode AES192::create_ctr_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ctr_encryptor_192();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ctr_encryptor_192();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ctr_encryptor_192();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES192::CipherMode AES192::create_ctr_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ctr_decryptor_192();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ctr_decryptor_192();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ctr_decryptor_192();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES192::CipherMode AES192::create_gcm_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_gcm_encryptor_192();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_gcm_encryptor_192();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_gcm_encryptor_192();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES192::CipherMode AES192::create_gcm_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_gcm_decryptor_192();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_gcm_decryptor_192();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_gcm_decryptor_192();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES256::Cipher AES256::create_cipher(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_cipher_256();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cipher_256();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cipher_256();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES256::CipherMode AES256::create_ecb_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ecb_encryptor_256();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ecb_encryptor_256();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ecb_encryptor_256();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES256::CipherMode AES256::create_ecb_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ecb_decryptor_256();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ecb_decryptor_256();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ecb_decryptor_256();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES256::CipherMode AES256::create_cbc_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_cbc_encryptor_256();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cbc_encryptor_256();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cbc_encryptor_256();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES256::CipherMode AES256::create_cbc_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_cbc_decryptor_256();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cbc_decryptor_256();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cbc_decryptor_256();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES256::CipherMode AES256::create_ofb_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ofb_encryptor_256();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ofb_encryptor_256();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ofb_encryptor_256();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES256::CipherMode AES256::create_ofb_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ofb_decryptor_256();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ofb_decryptor_256();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ofb_decryptor_256();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES256::CipherMode AES256::create_cfb_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_cfb_encryptor_256();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cfb_encryptor_256();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cfb_encryptor_256();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES256::CipherMode AES256::create_cfb_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_cfb_decryptor_256();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_cfb_decryptor_256();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_cfb_decryptor_256();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES256::CipherMode AES256::create_ctr_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ctr_encryptor_256();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ctr_encryptor_256();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ctr_encryptor_256();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES256::CipherMode AES256::create_ctr_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_ctr_decryptor_256();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_ctr_decryptor_256();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_ctr_decryptor_256();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES256::CipherMode AES256::create_gcm_encryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_gcm_encryptor_256();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_gcm_encryptor_256();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_gcm_encryptor_256();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+AES256::CipherMode AES256::create_gcm_decryptor(const char* provider)
+{
+#if defined(AES_IMPL_AESNI)
+    if (aes::internal::aesni::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
+        {
+            return aes::internal::aesni::create_gcm_decryptor_256();
+        }
+    }
+#endif
+#if defined(AES_IMPL_ARM_AES)
+    if (aes::internal::arm_aes::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
+        {
+            return aes::internal::arm_aes::create_gcm_decryptor_256();
+        }
+    }
+#endif
+    if (aes::internal::lut::provider_available())
+    {
+        if (provider == nullptr || std::strcmp(provider, "lut") == 0)
+        {
+            return aes::internal::lut::create_gcm_decryptor_256();
+        }
+    }
+
+    throw std::runtime_error("No provider available");
+}
+
+} // namespace aes
