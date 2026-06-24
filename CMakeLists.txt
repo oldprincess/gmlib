@@ -174,6 +174,7 @@ if(ARCH_X86_64)
     endif()
     set_source_files_properties(
         ${BASE_LIB_SRC_DIRECTORY}/ghash/ghash_pclmul.cpp
+        ${BASE_LIB_SRC_DIRECTORY}/ghash/provider_ghash_pclmul.cpp
         PROPERTIES
         COMPILE_FLAGS ${GHASH_PCLMUL_FLAGS}
     )
@@ -244,6 +245,11 @@ if(ARCH_X86_64)
         COMPILE_FLAGS ${SHA1_SHA_FLAGS}
     )
     set_source_files_properties(
+        ${BASE_LIB_SRC_DIRECTORY}/sha1/provider_sha1_sha.cpp
+        PROPERTIES
+        COMPILE_FLAGS ${SHA1_SHA_FLAGS}
+    )
+    set_source_files_properties(
         ${BASE_LIB_SRC_DIRECTORY}/sha1/provider.cpp
         PROPERTIES
         COMPILE_FLAGS "-DSHA1_IMPL_SHA"
@@ -258,6 +264,11 @@ if(ARCH_X86_64)
     endif()
     set_source_files_properties(
         ${BASE_LIB_SRC_DIRECTORY}/sha2/sha224_256_sha.cpp
+        PROPERTIES
+        COMPILE_FLAGS ${SHA2_SHA_FLAGS}
+    )
+    set_source_files_properties(
+        ${BASE_LIB_SRC_DIRECTORY}/sha2/provider_sha2_sha.cpp
         PROPERTIES
         COMPILE_FLAGS ${SHA2_SHA_FLAGS}
     )

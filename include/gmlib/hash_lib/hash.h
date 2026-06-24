@@ -3,11 +3,15 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 
 namespace hash_lib {
 
 class Hash
 {
+public:
+    using HashPtr = std::unique_ptr<Hash>;
+
 public:
     virtual ~Hash() = default;
 
@@ -33,6 +37,11 @@ public:
     virtual void do_final(std::uint8_t*       digest,
                           const std::uint8_t* in  = nullptr,
                           std::size_t         inl = 0) = 0;
+
+public:
+    virtual void ctrl(const char* cmd, std::size_t argc, void* argv[]) = 0;
+
+    virtual HashPtr clone() const = 0;
 };
 
 } // namespace hash_lib

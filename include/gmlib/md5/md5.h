@@ -1,11 +1,11 @@
 #ifndef MD5_MD5_H
 #define MD5_MD5_H
 
-#include <gmlib/hash_lib/impl/hash_impl.h>
+#include <gmlib/hash_lib/hash.h>
 
 namespace md5 {
 
-class MD5 : public hash_lib::impl::HashImpl<64>
+class MD5 : public hash_lib::Hash
 {
 public:
     static constexpr const char* NAME = "MD5";
@@ -19,28 +19,41 @@ public:
     /// @brief MD5 Security Strength (in bytes)
     static constexpr std::size_t SECURITY_STRENGTH = 8;
 
+public:
+    static hash_lib::Hash::HashPtr create_hash(const char* provider = nullptr);
+
 private:
-    /// @brief MD5 private Context
-    std::uint32_t state_[4];
-    std::uint64_t data_bits_;
+    hash_lib::Hash::HashPtr impl_ = create_hash();
 
 public:
-    /**
-     * @brief MD5 Context Init
-     */
-    MD5() noexcept;
+    MD5() noexcept = default;
 
-public:
-    /**
-     * @brief   get the Name of Hash Algorithm
-     * @return  Name of Hash Algorithm
-     */
-    const char* fetch_name() const noexcept override
+    MD5(const MD5& other) : impl_(other.impl_->clone())
     {
-        return NAME;
     }
 
-    const char* fetch_impl_algo() const noexcept override;
+    MD5& operator=(const MD5& other)
+    {
+        if (this != &other)
+        {
+            impl_ = other.impl_->clone();
+        }
+        return *this;
+    }
+
+    MD5(MD5&& other) noexcept            = default;
+    MD5& operator=(MD5&& other) noexcept = default;
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        return impl_->fetch_name();
+    }
+
+    const char* fetch_impl_algo() const noexcept override
+    {
+        return impl_->fetch_impl_algo();
+    }
 
     std::size_t fetch_block_size() const noexcept override
     {
@@ -58,29 +71,33 @@ public:
     }
 
 public:
-    /**
-     * @brief MD5 Context Reset (re-init)
-     */
-    void reset() noexcept override;
+    void reset() override
+    {
+        impl_->reset();
+    }
 
-private:
-    /**
-     * @brief                   MD5 message update
-     * @param[in]   in          BLOCK_SIZE x block_num -bytes input data
-     * @param[in]   block_num   input data block number
-     */
-    void update_blocks(const std::uint8_t* in,
-                       std::size_t         block_num) noexcept override;
+    void update(const std::uint8_t* in, std::size_t inl) override
+    {
+        impl_->update(in, inl);
+    }
 
-    /**
-     * @brief               MD5 update final message block and output digest
-     * @param[out]  digest  16-bytes digest data
-     * @param[in]   in      input data, not bigger than 64 bytes
-     * @param[in]   inl     input length (in bytes)
-     */
-    void final_block(std::uint8_t*       digest,
-                     const std::uint8_t* in,
-                     std::size_t         inl) noexcept override;
+    void do_final(std::uint8_t*       digest,
+                  const std::uint8_t* in  = nullptr,
+                  std::size_t         inl = 0) override
+    {
+        impl_->do_final(digest, in, inl);
+    }
+
+public:
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        impl_->ctrl(cmd, argc, argv);
+    }
+
+    hash_lib::Hash::HashPtr clone() const override
+    {
+        return impl_->clone();
+    }
 };
 
 } // namespace md5

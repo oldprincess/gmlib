@@ -1,7 +1,7 @@
 #ifndef SM3_SM3_H
 #define SM3_SM3_H
 
-#include <gmlib/hash_lib/impl/hash_impl.h>
+#include <gmlib/hash_lib/hash.h>
 
 namespace sm3 {
 
@@ -9,7 +9,7 @@ namespace sm3 {
  * @brief   SM3 cryptographic hash algorithm
  * @details GB/T 32905-2016
  */
-class SM3 : public hash_lib::impl::HashImpl<64>
+class SM3 : public hash_lib::Hash
 {
 public:
     static constexpr const char* NAME = "SM3";
@@ -23,28 +23,41 @@ public:
     /// @brief SM3 Security Strength (in bytes)
     static constexpr std::size_t SECURITY_STRENGTH = 16;
 
+public:
+    static hash_lib::Hash::HashPtr create_hash(const char* provider = nullptr);
+
 private:
-    /// @brief SM3 private Context
-    std::uint32_t state_[8];
-    std::uint64_t data_bits_;
+    hash_lib::Hash::HashPtr impl_ = create_hash();
 
 public:
-    /**
-     * @brief SM3 Context Init
-     */
-    SM3() noexcept;
+    SM3() noexcept = default;
 
-public:
-    /**
-     * @brief   get the Name of Hash Algorithm
-     * @return  Name of Hash Algorithm
-     */
-    const char* fetch_name() const noexcept override
+    SM3(const SM3& other) : impl_(other.impl_->clone())
     {
-        return NAME;
     }
 
-    const char* fetch_impl_algo() const noexcept override;
+    SM3& operator=(const SM3& other)
+    {
+        if (this != &other)
+        {
+            impl_ = other.impl_->clone();
+        }
+        return *this;
+    }
+
+    SM3(SM3&& other) noexcept            = default;
+    SM3& operator=(SM3&& other) noexcept = default;
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        return impl_->fetch_name();
+    }
+
+    const char* fetch_impl_algo() const noexcept override
+    {
+        return impl_->fetch_impl_algo();
+    }
 
     std::size_t fetch_block_size() const noexcept override
     {
@@ -62,28 +75,33 @@ public:
     }
 
 public:
-    /**
-     * @brief SM3 Context Reset (re-init)
-     */
-    void reset() noexcept override;
+    void reset() override
+    {
+        impl_->reset();
+    }
 
-private:
-    /**
-     * @brief                   SM3 message update
-     * @param[in]   in          BLOCK_SIZE x block_num -bytes input data
-     * @param[in]   block_num   input data block number
-     */
-    void update_blocks(const std::uint8_t* in, std::size_t block_num) override;
+    void update(const std::uint8_t* in, std::size_t inl) override
+    {
+        impl_->update(in, inl);
+    }
 
-    /**
-     * @brief               SM3 update final message block and output digest
-     * @param[out]  digest  32-bytes digest data
-     * @param[in]   in      input data, not bigger than 64 bytes
-     * @param[in]   inl     input length (in bytes)
-     */
-    void final_block(std::uint8_t*       digest,
-                     const std::uint8_t* in,
-                     std::size_t         inl) override;
+    void do_final(std::uint8_t*       digest,
+                  const std::uint8_t* in  = nullptr,
+                  std::size_t         inl = 0) override
+    {
+        impl_->do_final(digest, in, inl);
+    }
+
+public:
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        impl_->ctrl(cmd, argc, argv);
+    }
+
+    hash_lib::Hash::HashPtr clone() const override
+    {
+        return impl_->clone();
+    }
 };
 
 } // namespace sm3

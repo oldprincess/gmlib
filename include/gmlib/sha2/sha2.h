@@ -1,11 +1,11 @@
 #ifndef SHA224_SHA2_H
 #define SHA224_SHA2_H
 
-#include <gmlib/hash_lib/impl/hash_impl.h>
+#include <gmlib/hash_lib/hash.h>
 
 namespace sha2 {
 
-class SHA224 : public hash_lib::impl::HashImpl<64>
+class SHA224 : public hash_lib::Hash
 {
 public:
     static constexpr const char* NAME = "SHA224";
@@ -19,28 +19,41 @@ public:
     /// @brief SHA224 Security Strength (in bytes)
     static constexpr std::size_t SECURITY_STRENGTH = 14;
 
+public:
+    static hash_lib::Hash::HashPtr create_hash(const char* provider = nullptr);
+
 private:
-    /// @brief SHA224 private Context
-    std::uint8_t state_[32];
-    std::uint64_t data_bits_;
+    hash_lib::Hash::HashPtr impl_ = create_hash();
 
 public:
-    /**
-     * @brief SHA224 Context Init
-     */
-    SHA224() noexcept;
+    SHA224() noexcept = default;
 
-public:
-    /**
-     * @brief   get the Name of Hash Algorithm
-     * @return  Name of Hash Algorithm
-     */
-    const char* fetch_name() const noexcept override
+    SHA224(const SHA224& other) : impl_(other.impl_->clone())
     {
-        return NAME;
     }
 
-    const char* fetch_impl_algo() const noexcept override;
+    SHA224& operator=(const SHA224& other)
+    {
+        if (this != &other)
+        {
+            impl_ = other.impl_->clone();
+        }
+        return *this;
+    }
+
+    SHA224(SHA224&& other) noexcept            = default;
+    SHA224& operator=(SHA224&& other) noexcept = default;
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        return impl_->fetch_name();
+    }
+
+    const char* fetch_impl_algo() const noexcept override
+    {
+        return impl_->fetch_impl_algo();
+    }
 
     std::size_t fetch_block_size() const noexcept override
     {
@@ -58,31 +71,36 @@ public:
     }
 
 public:
-    /**
-     * @brief SHA224 Context Reset (re-init)
-     */
-    void reset() noexcept override;
+    void reset() override
+    {
+        impl_->reset();
+    }
 
-private:
-    /**
-     * @brief                   SHA224 message update
-     * @param[in]   in          BLOCK_SIZE x block_num -bytes input data
-     * @param[in]   block_num   input data block number
-     */
-    void update_blocks(const std::uint8_t* in, std::size_t block_num) override;
+    void update(const std::uint8_t* in, std::size_t inl) override
+    {
+        impl_->update(in, inl);
+    }
 
-    /**
-     * @brief               SHA224 update final message block and output digest
-     * @param[out]  digest  24-bytes digest data
-     * @param[in]   in      input data, not bigger than 64 bytes
-     * @param[in]   inl     input length (in bytes)
-     */
-    void final_block(std::uint8_t*       digest,
-                     const std::uint8_t* in,
-                     std::size_t         inl) override;
+    void do_final(std::uint8_t*       digest,
+                  const std::uint8_t* in  = nullptr,
+                  std::size_t         inl = 0) override
+    {
+        impl_->do_final(digest, in, inl);
+    }
+
+public:
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        impl_->ctrl(cmd, argc, argv);
+    }
+
+    hash_lib::Hash::HashPtr clone() const override
+    {
+        return impl_->clone();
+    }
 };
 
-class SHA256 : public hash_lib::impl::HashImpl<64>
+class SHA256 : public hash_lib::Hash
 {
 public:
     static constexpr const char* NAME = "SHA256";
@@ -96,28 +114,41 @@ public:
     /// @brief SHA256 Security Strength (in bytes)
     static constexpr std::size_t SECURITY_STRENGTH = 16;
 
+public:
+    static hash_lib::Hash::HashPtr create_hash(const char* provider = nullptr);
+
 private:
-    /// @brief SHA256 private Context
-    std::uint8_t state_[32];
-    std::uint64_t data_bits_;
+    hash_lib::Hash::HashPtr impl_ = create_hash();
 
 public:
-    /**
-     * @brief SHA256 Context Init
-     */
-    SHA256() noexcept;
+    SHA256() noexcept = default;
 
-public:
-    /**
-     * @brief   get the Name of Hash Algorithm
-     * @return  Name of Hash Algorithm
-     */
-    const char* fetch_name() const noexcept override
+    SHA256(const SHA256& other) : impl_(other.impl_->clone())
     {
-        return NAME;
     }
 
-    const char* fetch_impl_algo() const noexcept override;
+    SHA256& operator=(const SHA256& other)
+    {
+        if (this != &other)
+        {
+            impl_ = other.impl_->clone();
+        }
+        return *this;
+    }
+
+    SHA256(SHA256&& other) noexcept            = default;
+    SHA256& operator=(SHA256&& other) noexcept = default;
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        return impl_->fetch_name();
+    }
+
+    const char* fetch_impl_algo() const noexcept override
+    {
+        return impl_->fetch_impl_algo();
+    }
 
     std::size_t fetch_block_size() const noexcept override
     {
@@ -135,31 +166,36 @@ public:
     }
 
 public:
-    /**
-     * @brief SHA256 Context Reset (re-init)
-     */
-    void reset() noexcept override;
+    void reset() override
+    {
+        impl_->reset();
+    }
 
-private:
-    /**
-     * @brief                   SHA256 message update
-     * @param[in]   in          BLOCK_SIZE x block_num -bytes input data
-     * @param[in]   block_num   input data block number
-     */
-    void update_blocks(const std::uint8_t* in, std::size_t block_num) override;
+    void update(const std::uint8_t* in, std::size_t inl) override
+    {
+        impl_->update(in, inl);
+    }
 
-    /**
-     * @brief               SHA256 update final message block and output digest
-     * @param[out]  digest  32-bytes digest data
-     * @param[in]   in      input data, not bigger than 64 bytes
-     * @param[in]   inl     input length (in bytes)
-     */
-    void final_block(std::uint8_t*       digest,
-                     const std::uint8_t* in,
-                     std::size_t         inl) override;
+    void do_final(std::uint8_t*       digest,
+                  const std::uint8_t* in  = nullptr,
+                  std::size_t         inl = 0) override
+    {
+        impl_->do_final(digest, in, inl);
+    }
+
+public:
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        impl_->ctrl(cmd, argc, argv);
+    }
+
+    hash_lib::Hash::HashPtr clone() const override
+    {
+        return impl_->clone();
+    }
 };
 
-class SHA384 : public hash_lib::impl::HashImpl<128>
+class SHA384 : public hash_lib::Hash
 {
 public:
     static constexpr const char* NAME = "SHA384";
@@ -173,29 +209,41 @@ public:
     /// @brief SHA384 Security Strength (in bytes)
     static constexpr std::size_t SECURITY_STRENGTH = 24;
 
+public:
+    static hash_lib::Hash::HashPtr create_hash(const char* provider = nullptr);
+
 private:
-    /// @brief SHA384 private Context
-    std::uint8_t state_[64];
-    std::uint64_t data_bits_h_;
-    std::uint64_t data_bits_l_;
+    hash_lib::Hash::HashPtr impl_ = create_hash();
 
 public:
-    /**
-     * @brief SHA384 Context Init
-     */
-    SHA384() noexcept;
+    SHA384() noexcept = default;
 
-public:
-    /**
-     * @brief   get the Name of Hash Algorithm
-     * @return  Name of Hash Algorithm
-     */
-    const char* fetch_name() const noexcept override
+    SHA384(const SHA384& other) : impl_(other.impl_->clone())
     {
-        return NAME;
     }
 
-    const char* fetch_impl_algo() const noexcept override;
+    SHA384& operator=(const SHA384& other)
+    {
+        if (this != &other)
+        {
+            impl_ = other.impl_->clone();
+        }
+        return *this;
+    }
+
+    SHA384(SHA384&& other) noexcept            = default;
+    SHA384& operator=(SHA384&& other) noexcept = default;
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        return impl_->fetch_name();
+    }
+
+    const char* fetch_impl_algo() const noexcept override
+    {
+        return impl_->fetch_impl_algo();
+    }
 
     std::size_t fetch_block_size() const noexcept override
     {
@@ -213,31 +261,36 @@ public:
     }
 
 public:
-    /**
-     * @brief SHA384 Context Reset (re-init)
-     */
-    void reset() noexcept override;
+    void reset() override
+    {
+        impl_->reset();
+    }
 
-private:
-    /**
-     * @brief                   SHA384 message update
-     * @param[in]   in          BLOCK_SIZE x block_num -bytes input data
-     * @param[in]   block_num   input data block number
-     */
-    void update_blocks(const std::uint8_t* in, std::size_t block_num) override;
+    void update(const std::uint8_t* in, std::size_t inl) override
+    {
+        impl_->update(in, inl);
+    }
 
-    /**
-     * @brief               SHA384 update final message block and output digest
-     * @param[out]  digest  48-bytes digest data
-     * @param[in]   in      input data, not bigger than 64 bytes
-     * @param[in]   inl     input length (in bytes)
-     */
-    void final_block(std::uint8_t*       digest,
-                     const std::uint8_t* in,
-                     std::size_t         inl) override;
+    void do_final(std::uint8_t*       digest,
+                  const std::uint8_t* in  = nullptr,
+                  std::size_t         inl = 0) override
+    {
+        impl_->do_final(digest, in, inl);
+    }
+
+public:
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        impl_->ctrl(cmd, argc, argv);
+    }
+
+    hash_lib::Hash::HashPtr clone() const override
+    {
+        return impl_->clone();
+    }
 };
 
-class SHA512 : public hash_lib::impl::HashImpl<128>
+class SHA512 : public hash_lib::Hash
 {
 public:
     static constexpr const char* NAME = "SHA512";
@@ -251,29 +304,41 @@ public:
     /// @brief SHA512 Security Strength (in bytes)
     static constexpr std::size_t SECURITY_STRENGTH = 32;
 
+public:
+    static hash_lib::Hash::HashPtr create_hash(const char* provider = nullptr);
+
 private:
-    /// @brief SHA512 private Context
-    std::uint8_t state_[64];
-    std::uint64_t data_bits_h_;
-    std::uint64_t data_bits_l_;
+    hash_lib::Hash::HashPtr impl_ = create_hash();
 
 public:
-    /**
-     * @brief SHA512 Context Init
-     */
-    SHA512() noexcept;
+    SHA512() noexcept = default;
 
-public:
-    /**
-     * @brief   get the Name of Hash Algorithm
-     * @return  Name of Hash Algorithm
-     */
-    const char* fetch_name() const noexcept override
+    SHA512(const SHA512& other) : impl_(other.impl_->clone())
     {
-        return NAME;
     }
 
-    const char* fetch_impl_algo() const noexcept override;
+    SHA512& operator=(const SHA512& other)
+    {
+        if (this != &other)
+        {
+            impl_ = other.impl_->clone();
+        }
+        return *this;
+    }
+
+    SHA512(SHA512&& other) noexcept            = default;
+    SHA512& operator=(SHA512&& other) noexcept = default;
+
+public:
+    const char* fetch_name() const noexcept override
+    {
+        return impl_->fetch_name();
+    }
+
+    const char* fetch_impl_algo() const noexcept override
+    {
+        return impl_->fetch_impl_algo();
+    }
 
     std::size_t fetch_block_size() const noexcept override
     {
@@ -291,28 +356,33 @@ public:
     }
 
 public:
-    /**
-     * @brief SHA512 Context Reset (re-init)
-     */
-    void reset() noexcept override;
+    void reset() override
+    {
+        impl_->reset();
+    }
 
-private:
-    /**
-     * @brief                   SHA512 message update
-     * @param[in]   in          BLOCK_SIZE x block_num -bytes input data
-     * @param[in]   block_num   input data block number
-     */
-    void update_blocks(const std::uint8_t* in, std::size_t block_num) override;
+    void update(const std::uint8_t* in, std::size_t inl) override
+    {
+        impl_->update(in, inl);
+    }
 
-    /**
-     * @brief               SHA512 update final message block and output digest
-     * @param[out]  digest  32-bytes digest data
-     * @param[in]   in      input data, not bigger than 64 bytes
-     * @param[in]   inl     input length (in bytes)
-     */
-    void final_block(std::uint8_t*       digest,
-                     const std::uint8_t* in,
-                     std::size_t         inl) override;
+    void do_final(std::uint8_t*       digest,
+                  const std::uint8_t* in  = nullptr,
+                  std::size_t         inl = 0) override
+    {
+        impl_->do_final(digest, in, inl);
+    }
+
+public:
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        impl_->ctrl(cmd, argc, argv);
+    }
+
+    hash_lib::Hash::HashPtr clone() const override
+    {
+        return impl_->clone();
+    }
 };
 
 } // namespace sha2

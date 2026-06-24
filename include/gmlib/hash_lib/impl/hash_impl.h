@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <stdexcept>
 
 namespace hash_lib::impl {
 
@@ -61,7 +62,7 @@ public:
         }
         if (inl && buf_size_ == 0)
         {
-            std::size_t block_num = inl / 64;
+            std::size_t block_num = inl / BLOCK_SIZE_;
             this->update_blocks(in, block_num);
             in += block_num * BLOCK_SIZE_, inl -= block_num * BLOCK_SIZE_;
             if (inl)
@@ -80,6 +81,15 @@ public:
     {
         this->update(in, inl);
         this->final_block(digest, buf_, buf_size_);
+    }
+
+public:
+    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    {
+        (void)cmd;
+        (void)argc;
+        (void)argv;
+        throw std::runtime_error("HashImpl does not support ctrl");
     }
 
 protected:
