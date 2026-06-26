@@ -100,20 +100,24 @@ const char* asn1_tag_number_name(Asn1TagNumber tag_number) noexcept;
 // ************ ENCODING ******************
 // ****************************************
 
-size_t asn1_encode_tlv_outl(std::size_t value_length) noexcept;
+std::size_t asn1_encode_tlv_outl(std::size_t value_length) noexcept;
 
-size_t asn1_encode_boolean_outl() noexcept;
+std::size_t asn1_encode_boolean_outl() noexcept;
 
-size_t asn1_encode_integer_outl(const std::uint8_t* data,
-                                std::size_t         data_len) noexcept;
+std::size_t asn1_encode_integer_outl(const std::uint8_t* data,
+                                     std::size_t         data_len) noexcept;
 
-size_t asn1_encode_bit_string_outl(std::size_t bits) noexcept;
+std::size_t asn1_encode_bit_string_outl(std::size_t bits) noexcept;
 
-size_t asn1_encode_octet_string_outl(std::size_t data_len) noexcept;
+std::size_t asn1_encode_octet_string_outl(std::size_t data_len) noexcept;
 
-size_t asn1_encode_sequence_outl(std::size_t value_length) noexcept;
+std::size_t asn1_encode_object_identifier_outl(std::size_t data_len) noexcept;
 
-size_t asn1_encode_set_outl(std::size_t value_length) noexcept;
+std::size_t asn1_encode_explicit_outl(std::size_t value_length) noexcept;
+
+std::size_t asn1_encode_sequence_outl(std::size_t value_length) noexcept;
+
+std::size_t asn1_encode_set_outl(std::size_t value_length) noexcept;
 
 void asn1_encode_boolean_tlv(std::uint8_t* out,
                              std::size_t*  outl,
@@ -142,6 +146,16 @@ void asn1_encode_octet_string_tlv(std::uint8_t*       out,
                                   std::size_t*        outl,
                                   const std::uint8_t* data,
                                   std::size_t         data_len) noexcept;
+
+void asn1_encode_object_identifier_tlv(std::uint8_t*       out,
+                                       std::size_t*        outl,
+                                       const std::uint8_t* data,
+                                       std::size_t         data_len) noexcept;
+                                       
+void asn1_encode_explicit_tl(std::uint8_t* out,
+                             std::size_t*  outl,
+                             unsigned int  tag_number,
+                             std::size_t   value_length) noexcept;
 
 void asn1_encode_sequence_tl(std::uint8_t* out,
                              std::size_t*  outl,
@@ -175,6 +189,16 @@ static constexpr std::size_t ASN1_ENCODE_BIT_STRING_MAX_OUTL(
 }
 
 static constexpr std::size_t ASN1_ENCODE_OCTET_STRING_MAX_OUTL(
+    std::size_t value_length) noexcept
+{
+    return ASN1_ENCODE_TLV_MAX_OUTL(value_length);
+}
+static constexpr std::size_t ASN1_ENCODE_OBJECT_IDENTIFIER_MAX_OUTL(
+    std::size_t value_length) noexcept
+{
+    return ASN1_ENCODE_TLV_MAX_OUTL(value_length);
+}
+static constexpr std::size_t ASN1_ENCODE_EXPLICIT_MAX_OUTL(
     std::size_t value_length) noexcept
 {
     return ASN1_ENCODE_TLV_MAX_OUTL(value_length);
@@ -219,6 +243,19 @@ int asn1_decode_octet_string_value(const std::uint8_t** data_ptr,
                                    std::size_t*         read_num,
                                    const std::uint8_t*  in,
                                    std::size_t          inl) noexcept;
+
+int asn1_decode_object_identifier_value(const std::uint8_t** data_ptr,
+                                        std::size_t*         data_length,
+                                        std::size_t*         read_num,
+                                        const std::uint8_t*  in,
+                                        std::size_t          inl) noexcept;
+
+int asn1_decode_explicit_value(const std::uint8_t** value_ptr,
+                               std::size_t*         value_length,
+                               std::size_t*         read_num,
+                               unsigned int         tag_number,
+                               const std::uint8_t*  in,
+                               std::size_t          inl) noexcept;
 
 int asn1_decode_null_value(std::size_t*        read_num,
                            const std::uint8_t* in,
