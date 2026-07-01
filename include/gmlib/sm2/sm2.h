@@ -97,7 +97,7 @@ public:
     SM2PublicKey& operator=(SM2PublicKey&&) noexcept = default;
 
 public:
-    inline void set_hash(std::function<hash_lib::Hash::HashPtr> hash_factory)
+    inline void set_hash(std::function<hash_lib::Hash::HashPtr()> hash_factory)
     {
         hash_ = hash_factory();
     }
@@ -219,7 +219,7 @@ public:
     SM2PrivateKey& operator=(SM2PrivateKey&&) noexcept = default;
 
 public:
-    inline void set_hash(std::function<hash_lib::Hash::HashPtr> hash_factory)
+    inline void set_hash(std::function<hash_lib::Hash::HashPtr()> hash_factory)
     {
         auto hash     = hash_factory();
         auto pub_hash = hash_factory();
