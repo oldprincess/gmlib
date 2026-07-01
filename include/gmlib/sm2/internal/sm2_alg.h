@@ -1,92 +1,119 @@
 #ifndef SM2_INTERNAL_SM2_ALG_H
 #define SM2_INTERNAL_SM2_ALG_H
 
-#include <gmlib/memory_utils/endian.h>
-#include <gmlib/memory_utils/memxor.h>
-#include <gmlib/sm2/internal/sm2p256v1.h>
+#include <gmlib/hash_lib/hash.h>
+#include <gmlib/rng/rng.h>
 
-#include <cstring>
-#include <stdexcept>
+#include <cstddef>
+#include <cstdint>
 
-namespace sm2::internal {
+namespace sm2 {
 
-template <class Hash>
+enum class SM2EcPC : std::uint8_t;
+
+namespace internal {
+
+void sm2_set_public_key(std::uint8_t       public_x[32],
+                        std::uint8_t       public_y[32],
+                        const std::uint8_t x[32],
+                        const std::uint8_t y[32]);
+
+void sm2_get_public_key(std::uint8_t       x[32],
+                        std::uint8_t       y[32],
+                        const std::uint8_t public_x[32],
+                        const std::uint8_t public_y[32]) noexcept;
+
+void sm2_set_private_key(std::uint8_t       private_key[32],
+                         std::uint8_t       public_x[32],
+                         std::uint8_t       public_y[32],
+                         const std::uint8_t input[32]);
+
+void sm2_set_private_key_and_public_key(
+    std::uint8_t       private_key[32],
+    std::uint8_t       public_x[32],
+    std::uint8_t       public_y[32],
+    const std::uint8_t input_private_key[32],
+    const std::uint8_t input_public_x[32],
+    const std::uint8_t input_public_y[32]) noexcept;
+
+void sm2_get_private_key(std::uint8_t       private_key[32],
+                         const std::uint8_t stored_private_key[32]) noexcept;
+
+void sm2_get_private_key_and_public_key(
+    std::uint8_t       private_key[32],
+    std::uint8_t       public_x[32],
+    std::uint8_t       public_y[32],
+    const std::uint8_t stored_private_key[32],
+    const std::uint8_t stored_public_x[32],
+    const std::uint8_t stored_public_y[32]) noexcept;
+
+void sm2_generate_private_key(std::uint8_t private_key[32],
+                              std::uint8_t public_x[32],
+                              std::uint8_t public_y[32],
+                              rng::Rng&    rng);
+
 void sm2_compute_z(std::uint8_t*       z,
                    const std::uint8_t* id,
                    std::size_t         id_len,
                    const std::uint8_t  x[32],
-                   const std::uint8_t  y[32])
-{
-    if (id_len * 8 > UINT16_MAX)
-    {
-        throw std::runtime_error("SM2 ID length too long");
-    }
-    std::uint8_t  ENTL[2];
-    std::uint16_t entl_len = (std::uint16_t)(id_len * 8);
-    ENTL[0]                = entl_len >> 8;
-    ENTL[1]                = entl_len & 0xFF;
-    Hash hash;
-    hash.update(ENTL, 2);
-    hash.update(id, id_len);
-    hash.update(SM2_CURVE_A, 32);
-    hash.update(SM2_CURVE_B, 32);
-    hash.update(SM2_CURVE_GX, 32);
-    hash.update(SM2_CURVE_GY, 32);
-    hash.update(x, 32);
-    hash.update(y, 32);
-    hash.do_final(z);
-}
+                   const std::uint8_t  y[32],
+                   hash_lib::Hash&     hash);
 
-template <class Hash>
 int sm2_kdf_xor(std::uint8_t*       out,
                 const std::uint8_t* in,
                 std::size_t         inl,
-                const std::uint8_t* Z,
-                std::size_t         z_len)
-{
-    constexpr std::size_t     DIGEST_SIZE       = Hash::DIGEST_SIZE;
-    static const std::uint8_t ZERO[DIGEST_SIZE] = {0};
-    if (inl >= DIGEST_SIZE * UINT32_MAX)
-    {
-        throw std::runtime_error("SM2 KDF derived key too long");
-    }
-    if (inl == 0)
-    {
-        return 0;
-    }
-    bool          all_zero = true;
-    std::uint32_t ct       = 1;
-    std::uint8_t  ct_buf[4], dk[DIGEST_SIZE];
-    Hash          hash_save;
-    hash_save.update(Z, z_len);
-    while (inl >= DIGEST_SIZE)
-    {
-        memory_utils::store32_be(ct_buf, ct);
-        auto hash = hash_save;
-        hash.do_final(dk, ct_buf, 4);
-        all_zero = all_zero && (std::memcmp(ZERO, dk, DIGEST_SIZE) == 0);
-        memory_utils::memxor<DIGEST_SIZE>(out, in, dk);
-        out += DIGEST_SIZE, in += DIGEST_SIZE, inl -= DIGEST_SIZE;
-        ct++;
-    }
-    if (inl)
-    {
-        memory_utils::store32_be(ct_buf, ct);
-        auto hash = hash_save;
-        hash.do_final(dk, ct_buf, 4);
-        all_zero = all_zero && (std::memcmp(ZERO, dk, inl) == 0);
-        memory_utils::memxor_n(out, dk, in, inl);
-    }
-    if (all_zero)
-    {
-        return -1;
-    }
-    else
-    {
-        return 0;
-    }
-}
+                const std::uint8_t* z,
+                std::size_t         z_len,
+                hash_lib::Hash&     hash);
 
-} // namespace sm2::internal
+bool sm2_verify(const std::uint8_t  sig_r[32],
+                const std::uint8_t  sig_s[32],
+                const std::uint8_t* msg,
+                std::size_t         msg_len,
+                const std::uint8_t* id,
+                std::size_t         id_len,
+                const std::uint8_t  pub_x[32],
+                const std::uint8_t  pub_y[32],
+                hash_lib::Hash&     hash);
+
+std::size_t sm2_ciphertext_len(std::size_t plaintext_len,
+                               std::size_t digest_size,
+                               SM2EcPC     pc);
+
+void sm2_encrypt(std::uint8_t*       ciphertext,
+                 std::size_t*        ciphertext_len,
+                 const std::uint8_t* plaintext,
+                 std::size_t         plaintext_len,
+                 rng::Rng&           rng,
+                 SM2EcPC             pc,
+                 const std::uint8_t  pub_x[32],
+                 const std::uint8_t  pub_y[32],
+                 hash_lib::Hash&     hash);
+
+void sm2_sign(std::uint8_t        sig_r[32],
+              std::uint8_t        sig_s[32],
+              const std::uint8_t* msg,
+              std::size_t         msg_len,
+              rng::Rng&           rng,
+              const std::uint8_t* id,
+              std::size_t         id_len,
+              const std::uint8_t  private_key[32],
+              const std::uint8_t  pub_x[32],
+              const std::uint8_t  pub_y[32],
+              hash_lib::Hash&     hash);
+
+std::size_t sm2_plaintext_len(const std::uint8_t* ciphertext,
+                              std::size_t         ciphertext_len,
+                              std::size_t         digest_size);
+
+void sm2_decrypt(std::uint8_t*       plaintext,
+                 std::size_t*        plaintext_len,
+                 const std::uint8_t* ciphertext,
+                 std::size_t         ciphertext_len,
+                 const std::uint8_t  private_key[32],
+                 hash_lib::Hash&     hash);
+
+} // namespace internal
+} // namespace sm2
 
 #endif
