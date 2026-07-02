@@ -9,7 +9,7 @@
 
 #if defined(SUPPORT_BASE64_CHROMIUM)
 
-#include <ctype.h>
+#include <cctype>
 
 namespace base64::internal::chromium {
 
@@ -508,13 +508,37 @@ bool base64_is_b64(const char* in, std::size_t inl) noexcept
     {
         return false;
     }
-    for (size_t i = 0; i < inl; i++)
+
+    std::size_t padding = 0;
+
+    if (inl >= 1 && in[inl - 1] == '=')
     {
-        if (!(isalnum(in[i]) || in[i] == '\\' || in[i] == '+'))
+        padding++;
+    }
+
+    if (inl >= 2 && in[inl - 2] == '=')
+    {
+        padding++;
+    }
+
+    for (std::size_t i = 0; i < inl - padding; ++i)
+    {
+        unsigned char c = (unsigned char)(in[i]);
+
+        if (!(std::isalnum(c) || c == '+' || c == '/'))
         {
             return false;
         }
     }
+
+    for (std::size_t i = inl - padding; i < inl; ++i)
+    {
+        if (in[i] != '=')
+        {
+            return false;
+        }
+    }
+
     return true;
 }
 

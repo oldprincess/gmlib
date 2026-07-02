@@ -9,7 +9,7 @@
 
 #if defined(BASE64_IMPL_AVX2)
 
-#include <ctype.h>
+#include <cctype>
 #include <immintrin.h>
 
 namespace base64::internal::avx2 {
@@ -67,9 +67,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * since it relies on shuffles. Alternatives might be faster.
  */
 
-static const uint8_t base64_table_enc[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                          "abcdefghijklmnopqrstuvwxyz"
-                                          "0123456789+/";
+static const uint8_t base64_table_enc[] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "abcdefghijklmnopqrstuvwxyz"
+    "0123456789+/";
 
 // In the lookup table below, note that the value for '=' (character 61) is
 // 254, not 255. This character is used for in-band signaling of the end of
@@ -113,6 +114,7 @@ struct base64_state
     // int flags;// unused
     unsigned char carry;
 };
+
 // Cast away unused variable, silence compiler:
 #define UNUSED(x) ((void)(x))
 
@@ -144,7 +146,7 @@ struct base64_state
 #define CMPGT(s, n)    _mm256_cmpgt_epi8((s), _mm256_set1_epi8(n))
 #define CMPEQ(s, n)    _mm256_cmpeq_epi8((s), _mm256_set1_epi8(n))
 #define REPLACE(s, n)  _mm256_and_si256((s), _mm256_set1_epi8(n))
-#define RANGE(s, a, b) _mm256_andnot_si256(CMPGT((s), (b)), CMPGT((s), (a) - 1))
+#define RANGE(s, a, b) _mm256_andnot_si256(CMPGT((s), (b)), CMPGT((s), (a)-1))
 
 static inline __m256i _mm256_bswap_epi32(const __m256i in)
 {
@@ -672,13 +674,37 @@ bool base64_is_b64(const char *in, std::size_t inl) noexcept
     {
         return false;
     }
-    for (size_t i = 0; i < inl; i++)
+
+    std::size_t padding = 0;
+
+    if (inl >= 1 && in[inl - 1] == '=')
     {
-        if (!(isalnum(in[i]) || in[i] == '\\' || in[i] == '+'))
+        padding++;
+    }
+
+    if (inl >= 2 && in[inl - 2] == '=')
+    {
+        padding++;
+    }
+
+    for (std::size_t i = 0; i < inl - padding; ++i)
+    {
+        unsigned char c = (unsigned char)(in[i]);
+
+        if (!(std::isalnum(c) || c == '+' || c == '/'))
         {
             return false;
         }
     }
+
+    for (std::size_t i = inl - padding; i < inl; ++i)
+    {
+        if (in[i] != '=')
+        {
+            return false;
+        }
+    }
+
     return true;
 }
 
