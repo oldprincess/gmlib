@@ -7,7 +7,7 @@
 
 #include "base64_chromium.h"
 
-#if defined(SUPPORT_BASE64_CHROMIUM)
+#if defined(BASE64_IMPL_CHROMIUM)
 
 #include <cctype>
 
