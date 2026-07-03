@@ -113,7 +113,7 @@ void sm2_generate_private_key(std::uint8_t private_key[32],
     internal::sm2_bn_t d;
     rng.gen(random, sizeof(random));
     internal::sm2_bn_from_bytes(d, random);
-    internal::sm2_bn_mod_n_sub1(d);
+    internal::sm2_bn_mod_n_sub2(d);
     internal::sm2_bn_add_uint32(d, d, 1);
     internal::sm2_bn_to_bytes(private_key, d);
 

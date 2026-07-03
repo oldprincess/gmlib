@@ -22,28 +22,10 @@ enum class SM2EcPC : std::uint8_t
     MIX,
 };
 
-namespace internal {
-
 template <class Hash>
-inline std::unique_ptr<hash_lib::Hash> sm2_create_hash()
-{
-    static_assert(std::is_base_of<hash_lib::Hash, Hash>::value,
-                  "SM2 Hash must derive from hash_lib::Hash");
-    return std::make_unique<Hash>();
-}
-
-template <>
-inline std::unique_ptr<hash_lib::Hash> sm2_create_hash<void>()
-{
-    return nullptr;
-}
-
-} // namespace internal
-
-template <class Hash = void>
 class SM2PrivateKey;
 
-template <class Hash = void>
+template <class Hash>
 class SM2PublicKey
 {
     friend class SM2PrivateKey<Hash>;
@@ -52,18 +34,7 @@ public:
     static constexpr std::size_t SIG_SIZE = 64;
 
 private:
-    std::uint8_t                    x_[32], y_[32];
-    std::unique_ptr<hash_lib::Hash> hash_ = internal::sm2_create_hash<Hash>();
-
-private:
-    inline hash_lib::Hash& require_hash() const
-    {
-        if (!hash_)
-        {
-            throw std::runtime_error("SM2 hash is not set");
-        }
-        return *hash_;
-    }
+    std::uint8_t x_[32], y_[32];
 
 public:
     SM2PublicKey() = default;
@@ -73,35 +44,13 @@ public:
         this->set_pub(x, y);
     }
 
-    inline SM2PublicKey(const SM2PublicKey& other)
-        : hash_(other.hash_ ? other.hash_->clone() : nullptr)
+    ~SM2PublicKey()
     {
-        std::memcpy(x_, other.x_, sizeof(x_));
-        std::memcpy(y_, other.y_, sizeof(y_));
+        std::memset(x_, 0, sizeof(x_));
+        std::memset(y_, 0, sizeof(y_));
     }
-
-    inline SM2PublicKey& operator=(const SM2PublicKey& other)
-    {
-        if (this != &other)
-        {
-            auto hash = other.hash_ ? other.hash_->clone() : nullptr;
-            std::memcpy(x_, other.x_, sizeof(x_));
-            std::memcpy(y_, other.y_, sizeof(y_));
-            hash_ = std::move(hash);
-        }
-        return *this;
-    }
-
-    SM2PublicKey(SM2PublicKey&&) noexcept = default;
-
-    SM2PublicKey& operator=(SM2PublicKey&&) noexcept = default;
 
 public:
-    inline void set_hash(std::function<hash_lib::Hash::HashPtr()> hash_factory)
-    {
-        hash_ = hash_factory();
-    }
-
     inline void set_pub(const std::uint8_t x[32], const std::uint8_t y[32])
     {
         internal::sm2_set_public_key(x_, y_, x, y);
@@ -119,13 +68,14 @@ public:
                        const std::uint8_t* id = internal::SM2_DEFAULT_ID,
                        std::size_t id_len = internal::SM2_DEFAULT_ID_LEN) const
     {
+        Hash hash;
         return internal::sm2_verify( //
             sig_rs, sig_rs + 32,     //
             msg, msg_len,            //
             id, id_len,              //
             x_,                      //
             y_,                      //
-            this->require_hash()     //
+            hash                     //
         );                           //
     }
 
@@ -134,11 +84,11 @@ public:
                                       SM2EcPC pc = SM2EcPC::UNCOMPRESSED) const
     {
         (void)plaintext;
-        return internal::sm2_ciphertext_len(          //
-            plaintext_len,                            //
-            this->require_hash().fetch_digest_size(), //
-            pc                                        //
-        );                                            //
+        return internal::sm2_ciphertext_len( //
+            plaintext_len,                   //
+            Hash::DIGEST_SIZE,               //
+            pc                               //
+        );                                   //
     }
 
     inline void encrypt(std::uint8_t*       ciphertext,
@@ -148,13 +98,14 @@ public:
                         rng::Rng&           rng,
                         SM2EcPC             pc = SM2EcPC::UNCOMPRESSED) const
     {
+        Hash hash;
         internal::sm2_encrypt(ciphertext, ciphertext_len, //
                               plaintext, plaintext_len,   //
                               rng,                        //
                               pc,                         //
                               x_,                         //
                               y_,                         //
-                              this->require_hash()        //
+                              hash                        //
         );                                                //
     }
 };
@@ -168,19 +119,8 @@ public:
     static constexpr std::size_t SIG_SIZE = 64;
 
 private:
-    std::uint8_t                    priv_[32];
-    SM2PublicKey<Hash>              pub_;
-    std::unique_ptr<hash_lib::Hash> hash_ = internal::sm2_create_hash<Hash>();
-
-private:
-    inline hash_lib::Hash& require_hash() const
-    {
-        if (!hash_)
-        {
-            throw std::runtime_error("SM2 hash is not set");
-        }
-        return *hash_;
-    }
+    std::uint8_t       priv_[32];
+    SM2PublicKey<Hash> pub_;
 
 public:
     SM2PrivateKey() = default;
@@ -195,38 +135,12 @@ public:
         this->gen_priv(rng);
     }
 
-    inline SM2PrivateKey(const SM2PrivateKey& other)
-        : pub_(other.pub_),
-          hash_(other.hash_ ? other.hash_->clone() : nullptr)
+    ~SM2PrivateKey()
     {
-        std::memcpy(priv_, other.priv_, sizeof(priv_));
+        std::memset(priv_, 0, sizeof(priv_));
     }
-
-    inline SM2PrivateKey& operator=(const SM2PrivateKey& other)
-    {
-        if (this != &other)
-        {
-            auto hash = other.hash_ ? other.hash_->clone() : nullptr;
-            pub_      = other.pub_;
-            std::memcpy(priv_, other.priv_, sizeof(priv_));
-            hash_ = std::move(hash);
-        }
-        return *this;
-    }
-
-    SM2PrivateKey(SM2PrivateKey&&) noexcept = default;
-
-    SM2PrivateKey& operator=(SM2PrivateKey&&) noexcept = default;
 
 public:
-    inline void set_hash(std::function<hash_lib::Hash::HashPtr()> hash_factory)
-    {
-        auto hash     = hash_factory();
-        auto pub_hash = hash_factory();
-        hash_         = std::move(hash);
-        pub_.hash_    = std::move(pub_hash);
-    }
-
     inline void set_priv(const std::uint8_t private_key[32])
     {
         internal::sm2_set_private_key(priv_, pub_.x_, pub_.y_, private_key);
@@ -275,6 +189,7 @@ public:
                      const std::uint8_t* id = internal::SM2_DEFAULT_ID,
                      std::size_t id_len = internal::SM2_DEFAULT_ID_LEN) const
     {
+        Hash hash;
         internal::sm2_sign(sig_rs, sig_rs + 32, //
                            msg, msg_len,        //
                            rng,                 //
@@ -282,7 +197,7 @@ public:
                            priv_,               //
                            pub_.x_,             //
                            pub_.y_,             //
-                           this->require_hash() //
+                           hash                 //
         );                                      //
     }
 
@@ -319,10 +234,10 @@ public:
     inline std::size_t plaintext_len(const std::uint8_t* ciphertext,
                                      std::size_t         ciphertext_len) const
     {
-        return internal::sm2_plaintext_len(          //
-            ciphertext, ciphertext_len,              //
-            this->require_hash().fetch_digest_size() //
-        );                                           //
+        return internal::sm2_plaintext_len( //
+            ciphertext, ciphertext_len,     //
+            Hash::DIGEST_SIZE               //
+        );                                  //
     }
 
     inline void decrypt(std::uint8_t*       plaintext,
@@ -330,10 +245,11 @@ public:
                         const std::uint8_t* ciphertext,
                         std::size_t         ciphertext_len) const
     {
+        Hash hash;
         internal::sm2_decrypt(plaintext, plaintext_len,   //
                               ciphertext, ciphertext_len, //
                               priv_,                      //
-                              this->require_hash()        //
+                              hash                        //
         );                                                //
     }
 };
