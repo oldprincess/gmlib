@@ -5,6 +5,7 @@ project(gmlib CXX)
 add_definitions(
     -DSUPPORT_BASE64_CHROMIUM
     -DSUPPORT_SM3_YANG15
+    -DSUPPORT_SM4_SM4NI
     -DSUPPORT_SM4_LANG18
     -DSUPPORT_SM4_GONG23
     -DSUPPORT_UBLOCK_GONG25
@@ -281,6 +282,17 @@ endif()
 # sm4
 if(ARCH_X86_64)
     if(COMPILER_MSVC)
+        set(SM4_SM4NI_FLAGS "-D__AES__ -D__SSE2__ -D__SSSE3__")
+    else()
+        set(SM4_SM4NI_FLAGS "-maes -msse2 -mssse3")
+    endif()
+    set_source_files_properties(
+        ${BASE_LIB_SRC_DIRECTORY}/sm4/sm4_sm4ni.cpp
+        ${BASE_LIB_SRC_DIRECTORY}/sm4/provider_sm4_sm4ni.cpp
+        PROPERTIES
+        COMPILE_FLAGS ${SM4_SM4NI_FLAGS}
+    )
+    if(COMPILER_MSVC)
         set(SM4_LANG18_FLAGS "-D__AVX2__")
         set(SM4_GONG23_FLAGS "-D__AVX512BW__ -D__AVX512VL__ -D__AVX512F__ -D__GFNI__")
     else()
@@ -302,7 +314,7 @@ if(ARCH_X86_64)
     set_source_files_properties(
         ${BASE_LIB_SRC_DIRECTORY}/sm4/provider.cpp
         PROPERTIES
-        COMPILE_FLAGS "-DSM4_IMPL_LANG18 -DSM4_IMPL_GONG23"
+        COMPILE_FLAGS "-DSM4_IMPL_SM4NI -DSM4_IMPL_LANG18 -DSM4_IMPL_GONG23"
     )
 endif()
 # ublock

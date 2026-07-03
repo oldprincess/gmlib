@@ -1,5 +1,11 @@
 #ifndef SM4_CONFIG_H
 
+#if defined(SUPPORT_SM4_SM4NI)
+#if defined(__AES__) && defined(__SSE2__) && defined(__SSSE3__)
+#define SM4_IMPL_SM4NI
+#endif
+#endif
+
 #if defined(SUPPORT_SM4_LANG18)
 #if defined(__AVX2__)
 #define SM4_IMPL_LANG18
