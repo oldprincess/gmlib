@@ -131,12 +131,12 @@ std::unique_ptr<BlockCipher> create_cipher()
 
 std::unique_ptr<BlockCipherMode> create_ecb_encryptor()
 {
-    return std::make_unique<CbcEncryptorImpl<SM4>>();
+    return std::make_unique<EcbEncryptorImpl<SM4>>();
 }
 
 std::unique_ptr<BlockCipherMode> create_ecb_decryptor()
 {
-    return std::make_unique<CbcDecryptorImpl<SM4>>();
+    return std::make_unique<EcbDecryptorImpl<SM4>>();
 }
 
 std::unique_ptr<BlockCipherMode> create_cbc_encryptor()
