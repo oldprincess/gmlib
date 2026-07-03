@@ -4,6 +4,7 @@
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>
 
 #include <cstring>
+#include <stdexcept>
 
 namespace block_cipher_mode::impl {
 
@@ -25,8 +26,25 @@ public:
     void update(std::uint8_t*       out,
                 std::size_t*        outl,
                 const std::uint8_t* in,
-                std::size_t         inl)
+                std::size_t         inl) override
     {
+        this->update(out, outl, (std::size_t)(-1), in, inl);
+    }
+
+    void update(std::uint8_t*       out,
+                std::size_t*        outl,
+                std::size_t         outl_max,
+                const std::uint8_t* in,
+                std::size_t         inl) override
+    {
+        std::size_t total_size  = buf_size_ + inl;
+        std::size_t output_size = total_size - total_size % BLOCK_SIZE_;
+        if (output_size > outl_max)
+        {
+            throw std::length_error(
+                "block cipher mode output buffer is too small");
+        }
+
         if (in == 0)
         {
             *outl = 0;
@@ -75,9 +93,24 @@ public:
     void do_final(std::uint8_t*       out,
                   std::size_t*        outl,
                   const std::uint8_t* in  = nullptr,
-                  std::size_t         inl = 0)
+                  std::size_t         inl = 0) override
     {
-        this->update(out, outl, in, inl);
+        this->do_final(out, outl, (std::size_t)(-1), in, inl);
+    }
+
+    void do_final(std::uint8_t*       out,
+                  std::size_t*        outl,
+                  std::size_t         outl_max,
+                  const std::uint8_t* in  = nullptr,
+                  std::size_t         inl = 0) override
+    {
+        if (buf_size_ + inl > outl_max)
+        {
+            throw std::length_error(
+                "block cipher mode output buffer is too small");
+        }
+
+        this->update(out, outl, outl_max, in, inl);
         out += *outl;
         this->final_block(out, buf_, buf_size_);
         *outl += buf_size_;
@@ -141,7 +174,7 @@ public:
                 const std::uint8_t* in,
                 std::size_t         inl) override
     {
-        impl().update(out, outl, in, inl);
+        impl().update(out, outl, (std::size_t)(-1), in, inl);
     }
 
     void do_final(std::uint8_t*       out,
@@ -149,7 +182,25 @@ public:
                   const std::uint8_t* in  = nullptr,
                   std::size_t         inl = 0) override
     {
-        impl().do_final(out, outl, in, inl);
+        impl().do_final(out, outl, (std::size_t)(-1), in, inl);
+    }
+
+    void update(std::uint8_t*       out,
+                std::size_t*        outl,
+                std::size_t         outl_max,
+                const std::uint8_t* in,
+                std::size_t         inl) override
+    {
+        impl().update(out, outl, outl_max, in, inl);
+    }
+
+    void do_final(std::uint8_t*       out,
+                  std::size_t*        outl,
+                  std::size_t         outl_max,
+                  const std::uint8_t* in  = nullptr,
+                  std::size_t         inl = 0) override
+    {
+        impl().do_final(out, outl, outl_max, in, inl);
     }
 
 private:
