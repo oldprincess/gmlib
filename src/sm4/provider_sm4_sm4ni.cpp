@@ -1,5 +1,3 @@
-#include "config.h"
-
 #if defined(SM4_IMPL_SM4NI)
 
 #include <gmlib/block_cipher_mode/impl/cbc_mode_impl.h>

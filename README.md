@@ -110,7 +110,29 @@ Release/sm2_test.exe
 Release/sm2_test.exe speed
 ```
 
-### 2.2 使用
+### 2.2 运行时实现调度
+
+默认情况下，GMLib 会编译适用于目标架构的硬件加速实现，并在运行时根据CPU 支持的指令集选择最优 provider。同一个二进制文件可以在操作系统、ABI 和 CPU 架构相同，但指令集支持不同的处理器上运行；如果当前 CPU不支持加速实现，GMLib 会自动回退到通用的实现。
+
+这里的可移植性仅限于相同的操作系统、ABI 和 CPU 架构，不代表同一个二进制文件可以跨操作系统、跨 ABI 或跨 CPU 架构运行。
+
+如果需要减小二进制文件体积，可以在配置时关闭不需要的实现。以下实现选项默认均为 `ON`：
+
+| CMake 选项 | 对应实现 |
+| --- | --- |
+| `SUPPORT_AES_AESNI`, `SUPPORT_AES_ARM_AES` | AES-NI 和 ARMv8 加密扩展实现 |
+| `SUPPORT_BASE64_AVX2`, `SUPPORT_BASE64_CHROMIUM` | AVX2 和 Chromium Base64 实现 |
+| `SUPPORT_GHASH_PCLMUL` | PCLMULQDQ GHASH 实现 |
+| `SUPPORT_MEMXOR_AVX2`, `SUPPORT_MEMXOR_SSE2` | AVX2 和 SSE2 memxor 实现 |
+| `SUPPORT_NUMBER_X64` | BMI2/MOVBE 大数运算实现 |
+| `SUPPORT_SHA1_SHA`, `SUPPORT_SHA2_SHA` | Intel SHA 扩展实现 |
+| `SUPPORT_SM3_YANG15` | Yang15 SM3 实现 |
+| `SUPPORT_SM4_SM4NI`, `SUPPORT_SM4_LANG18`, `SUPPORT_SM4_GONG23` | SM4 加速实现 |
+| `SUPPORT_UBLOCK_STANDARD`, `SUPPORT_UBLOCK_GONG25` | uBlock 加速实现 |
+
+例如，使用 `cmake .. -DSUPPORT_SM4_GONG23=OFF` 可以不编译 Gong23 SM4实现。如果某个选项已开启，但目标 CPU 架构不支持对应实现，CMake 会输出提示并跳过该实现，不会导致配置失败。显式请求未编译或当前 CPU 不支持的provider 时会抛出 `No provider available`；使用自动选择时则会继续回退到可用的通用实现。
+
+### 2.3 使用
 
 很遗憾，目前本项目只能采用静态库的方式进行使用，后续会支持通过动态库的调用。
 

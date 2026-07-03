@@ -1,6 +1,6 @@
-#include "aes_arm_aes.h"
-
 #if defined(AES_IMPL_ARM_AES)
+
+#include "aes_arm_aes.h"
 
 #include <arm_neon.h>
 

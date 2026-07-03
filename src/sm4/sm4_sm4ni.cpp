@@ -1,6 +1,6 @@
-#include "sm4_sm4ni.h"
-
 #if defined(SM4_IMPL_SM4NI)
+
+#include "sm4_sm4ni.h"
 
 #include <immintrin.h>
 

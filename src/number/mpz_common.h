@@ -1,10 +1,6 @@
 #ifndef NUMBER_INTERNAL_MPZ_COMMON_H
 #define NUMBER_INTERNAL_MPZ_COMMON_H
 
-#include "config.h"
-
-#if defined(NUMBER_IMPL_COMMON)
-
 #include <cstddef>
 #include <cstdint>
 
@@ -45,5 +41,4 @@ void mpz_to_bytes(std::uint8_t*        r,
 
 } // namespace number::internal::common
 
-#endif
 #endif

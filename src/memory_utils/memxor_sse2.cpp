@@ -1,4 +1,4 @@
-#if defined(__SSE2__)
+#if defined(MEMXOR_IMPL_SSE2)
 
 #include "memxor_sse2.h"
 

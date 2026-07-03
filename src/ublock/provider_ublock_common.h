@@ -1,10 +1,6 @@
 #ifndef UBLOCK_INTERNAL_PROVIDER_UBLOCK_COMMON_H
 #define UBLOCK_INTERNAL_PROVIDER_UBLOCK_COMMON_H
 
-#include "config.h"
-
-#if defined(UBLOCK_IMPL_COMMON)
-
 #include <gmlib/block_cipher_mode/block_cipher.h>
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>
 
@@ -57,6 +53,5 @@ std::unique_ptr<BlockCipherMode> create_ecb_decryptor_256256();
 
 } // namespace ublock::internal::common
 
-#endif
 
 #endif

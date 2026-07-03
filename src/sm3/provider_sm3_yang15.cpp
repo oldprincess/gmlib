@@ -1,5 +1,3 @@
-#include "config.h"
-
 #if defined(SM3_IMPL_YANG15)
 
 #include <gmlib/hash_lib/impl/hash_impl.h>

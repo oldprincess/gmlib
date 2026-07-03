@@ -6,10 +6,6 @@
 #ifndef AES_INTERNAL_AES_LUT_H
 #define AES_INTERNAL_AES_LUT_H
 
-#include "config.h"
-
-#if defined(AES_IMPL_LUT)
-
 #include <cstddef>
 #include <cstdint>
 
@@ -180,7 +176,5 @@ void aes256_dec_blocks(const std::uint8_t  round_key[15 * 16],
                        std::size_t         block_num) noexcept;
 
 }; // namespace aes::internal::lut
-
-#endif
 
 #endif

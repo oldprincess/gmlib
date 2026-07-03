@@ -3,7 +3,6 @@
 #include <cstring>
 #include <stdexcept>
 
-#include "config.h"
 #include "provider_ublock_common.h"
 #include "provider_ublock_gong25.h"
 #include "provider_ublock_standard.h"

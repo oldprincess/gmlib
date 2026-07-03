@@ -1,6 +1,6 @@
-#include "ublock_gong25.h"
-
 #if defined(UBLOCK_IMPL_GONG25)
+
+#include "ublock_gong25.h"
 
 #include <immintrin.h>
 
@@ -1671,8 +1671,8 @@ static inline void _ublock128_bs_key_init(std::uint8_t m256i_subkey[8][32],
     s  = _mm_and_si128(t, con3);
     s  = _mm_xor_si128(_mm_slli_epi64(s, 1), s);
     s  = _mm_xor_si128(_mm_slli_epi64(s, 2), s);
-    t1 = _mm256_set1_epi64x(_mm_extract_epi64(s, 1));
-    t0 = _mm256_set1_epi64x(_mm_extract_epi64(s, 0));
+    t1 = _mm256_broadcastq_epi64(_mm_srli_si128(s, 8));
+    t0 = _mm256_broadcastq_epi64(s);
     _mm256_storeu_si256((__m256i *)m256i_subkey[3], t1);
     _mm256_storeu_si256((__m256i *)m256i_subkey[7], t0);
 
@@ -1680,8 +1680,8 @@ static inline void _ublock128_bs_key_init(std::uint8_t m256i_subkey[8][32],
     s  = _mm_and_si128(t, con3);
     s  = _mm_xor_si128(_mm_slli_epi64(s, 1), s);
     s  = _mm_xor_si128(_mm_slli_epi64(s, 2), s);
-    t1 = _mm256_set1_epi64x(_mm_extract_epi64(s, 1));
-    t0 = _mm256_set1_epi64x(_mm_extract_epi64(s, 0));
+    t1 = _mm256_broadcastq_epi64(_mm_srli_si128(s, 8));
+    t0 = _mm256_broadcastq_epi64(s);
     _mm256_storeu_si256((__m256i *)m256i_subkey[2], t1);
     _mm256_storeu_si256((__m256i *)m256i_subkey[6], t0);
 
@@ -1689,8 +1689,8 @@ static inline void _ublock128_bs_key_init(std::uint8_t m256i_subkey[8][32],
     s  = _mm_and_si128(t, con3);
     s  = _mm_xor_si128(_mm_slli_epi64(s, 1), s);
     s  = _mm_xor_si128(_mm_slli_epi64(s, 2), s);
-    t1 = _mm256_set1_epi64x(_mm_extract_epi64(s, 1));
-    t0 = _mm256_set1_epi64x(_mm_extract_epi64(s, 0));
+    t1 = _mm256_broadcastq_epi64(_mm_srli_si128(s, 8));
+    t0 = _mm256_broadcastq_epi64(s);
     _mm256_storeu_si256((__m256i *)m256i_subkey[1], t1);
     _mm256_storeu_si256((__m256i *)m256i_subkey[5], t0);
 
@@ -1698,8 +1698,8 @@ static inline void _ublock128_bs_key_init(std::uint8_t m256i_subkey[8][32],
     s  = _mm_and_si128(t, con3);
     s  = _mm_xor_si128(_mm_slli_epi64(s, 1), s);
     s  = _mm_xor_si128(_mm_slli_epi64(s, 2), s);
-    t1 = _mm256_set1_epi64x(_mm_extract_epi64(s, 1));
-    t0 = _mm256_set1_epi64x(_mm_extract_epi64(s, 0));
+    t1 = _mm256_broadcastq_epi64(_mm_srli_si128(s, 8));
+    t0 = _mm256_broadcastq_epi64(s);
     _mm256_storeu_si256((__m256i *)m256i_subkey[0], t1);
     _mm256_storeu_si256((__m256i *)m256i_subkey[4], t0);
 }

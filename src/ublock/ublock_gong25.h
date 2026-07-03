@@ -1,9 +1,7 @@
+#if defined(UBLOCK_IMPL_GONG25)
+
 #ifndef UBLOCK_INTERNAL_UBLOCK_GONG25_H
 #define UBLOCK_INTERNAL_UBLOCK_GONG25_H
-
-#include "config.h"
-
-#if defined(UBLOCK_IMPL_GONG25)
 
 #include <cstddef>
 #include <cstdint>

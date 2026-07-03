@@ -1,7 +1,3 @@
-#include "config.h"
-
-#if defined(SHA1_IMPL_COMMON)
-
 #include <gmlib/hash_lib/impl/hash_impl.h>
 
 #include <stdexcept>
@@ -92,5 +88,3 @@ hash_lib::Hash::HashPtr create_hash()
 }
 
 } // namespace sha1::internal::common
-
-#endif

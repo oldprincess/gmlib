@@ -1,7 +1,6 @@
-#include "config.h"
-
 #if defined(GHASH_IMPL_PCLMUL)
 
+#include <gmlib/cpuinfo/cpuinfo.h>
 #include <gmlib/hash_lib/impl/hash_impl.h>
 
 #include <cstring>
@@ -100,7 +99,9 @@ protected:
 
 bool provider_available()
 {
-    return true;
+    return cpuinfo::x86_64::cpu_supports_pclmulqdq() &&
+           cpuinfo::x86_64::cpu_supports_sse2() &&
+           cpuinfo::x86_64::cpu_supports_ssse3();
 }
 
 hash_lib::Hash::HashPtr create_hash()

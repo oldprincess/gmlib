@@ -3,7 +3,6 @@
 #include <cstring>
 #include <stdexcept>
 
-#include "config.h"
 #include "provider_des_common.h"
 
 namespace des {

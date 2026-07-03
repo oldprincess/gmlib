@@ -1,10 +1,6 @@
 #ifndef SHA2_COMMON_H
 #define SHA2_COMMON_H
 
-#include "config.h"
-
-#if defined(SHA2_IMPL_COMMON)
-
 #include <cstddef>
 #include <cstdint>
 
@@ -105,7 +101,5 @@ int sha512_final_block(std::uint8_t        state[64],
 } // namespace common
 } // namespace internal
 } // namespace sha2
-
-#endif
 
 #endif

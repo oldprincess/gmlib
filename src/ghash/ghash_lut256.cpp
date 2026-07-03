@@ -1,7 +1,5 @@
 #include "ghash_lut256.h"
 
-#if defined(GHASH_IMPL_LUT256)
-
 namespace ghash::internal::lut256 {
 
 #define MEM_LOAD64BE(src)                       \
@@ -187,4 +185,3 @@ int ghash_final_block(const GHashCTX*     ctx,
 }
 
 } // namespace ghash::internal::lut256
-#endif

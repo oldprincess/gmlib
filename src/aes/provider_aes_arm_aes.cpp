@@ -1,5 +1,3 @@
-#include "config.h"
-
 #if defined(AES_IMPL_ARM_AES)
 
 #include <gmlib/aes/aes.h>

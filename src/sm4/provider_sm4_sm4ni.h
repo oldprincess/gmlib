@@ -1,9 +1,7 @@
+#if defined(SM4_IMPL_SM4NI)
+
 #ifndef SM4_INTERNAL_PROVIDER_SM4_SM4NI_H
 #define SM4_INTERNAL_PROVIDER_SM4_SM4NI_H
-
-#include "config.h"
-
-#if defined(SM4_IMPL_SM4NI)
 
 #include <gmlib/block_cipher_mode/block_cipher.h>
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>

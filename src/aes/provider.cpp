@@ -3,7 +3,6 @@
 #include <cstring>
 #include <stdexcept>
 
-#include "config.h"
 #include "provider_aes_aesni.h"
 #include "provider_aes_arm_aes.h"
 #include "provider_aes_lut.h"

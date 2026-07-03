@@ -1,7 +1,3 @@
-#include "config.h"
-
-#if defined(GHASH_IMPL_LUT256)
-
 #include <gmlib/hash_lib/impl/hash_impl.h>
 
 #include <cstring>
@@ -109,5 +105,3 @@ hash_lib::Hash::HashPtr create_hash()
 }
 
 } // namespace ghash::internal::lut256
-
-#endif

@@ -1,10 +1,6 @@
 #ifndef UBLOCK_INTERNAL_UBLOCK_COMMON_H
 #define UBLOCK_INTERNAL_UBLOCK_COMMON_H
 
-#include "config.h"
-
-#if defined(UBLOCK_IMPL_COMMON)
-
 #include <cstddef>
 #include <cstdint>
 
@@ -125,5 +121,4 @@ void ublock256256_dec_blocks(const UBlock256256RoundKey* round_key,
 
 }; // namespace ublock::internal::common
 
-#endif
 #endif

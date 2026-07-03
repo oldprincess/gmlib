@@ -1,5 +1,3 @@
-#include "config.h"
-
 #if defined(BASE64_IMPL_CHROMIUM)
 
 #ifndef BASE64_INTERNAL_BASE64_CHROMIUM_H

@@ -1,5 +1,3 @@
-#include "config.h"
-
 #if defined(UBLOCK_IMPL_STANDARD)
 
 #include <gmlib/block_cipher_mode/impl/cbc_mode_impl.h>

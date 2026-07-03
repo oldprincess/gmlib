@@ -1,10 +1,6 @@
 #ifndef BALLET_INTERNAL_BALLET_STANDARD_H
 #define BALLET_INTERNAL_BALLET_STANDARD_H
 
-#include "config.h"
-
-#if defined(BALLET_IMPL_STANDARD)
-
 #include <cstddef>
 #include <cstdint>
 
@@ -233,5 +229,4 @@ void ballet256256_dec_blocks(const Ballet256256RoundKey* round_key,
 
 }; // namespace ballet::internal::standard
 
-#endif
 #endif

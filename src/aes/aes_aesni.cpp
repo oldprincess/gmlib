@@ -1,6 +1,6 @@
-#include "aes_aesni.h"
-
 #if defined(AES_IMPL_AESNI)
+
+#include "aes_aesni.h"
 
 #include <immintrin.h>
 

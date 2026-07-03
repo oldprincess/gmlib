@@ -2,15 +2,24 @@ cmake_minimum_required(VERSION 3.18)
 
 project(gmlib CXX)
 
-add_definitions(
-    -DSUPPORT_BASE64_CHROMIUM
-    -DSUPPORT_SM3_YANG15
-    -DSUPPORT_SM4_SM4NI
-    -DSUPPORT_SM4_LANG18
-    -DSUPPORT_SM4_GONG23
-    -DSUPPORT_UBLOCK_GONG25
-)
-set(PROJECT_BUILD_TEST ON)
+option(PROJECT_BUILD_TEST "Build GMLib tests" ON)
+
+option(SUPPORT_AES_AESNI "Build the AES-NI implementation" ON)
+option(SUPPORT_AES_ARM_AES "Build the ARMv8 Crypto Extensions AES implementation" ON)
+option(SUPPORT_BASE64_AVX2 "Build the AVX2 Base64 implementation" ON)
+option(SUPPORT_BASE64_CHROMIUM "Build the Chromium Base64 implementation" ON)
+option(SUPPORT_GHASH_PCLMUL "Build the PCLMULQDQ GHASH implementation" ON)
+option(SUPPORT_MEMXOR_AVX2 "Build the AVX2 memxor implementation" ON)
+option(SUPPORT_MEMXOR_SSE2 "Build the SSE2 memxor implementation" ON)
+option(SUPPORT_NUMBER_X64 "Build the BMI2/MOVBE number implementation" ON)
+option(SUPPORT_SHA1_SHA "Build the Intel SHA Extensions SHA-1 implementation" ON)
+option(SUPPORT_SHA2_SHA "Build the Intel SHA Extensions SHA-224/256 implementation" ON)
+option(SUPPORT_SM3_YANG15 "Build the Yang15 SM3 implementation" ON)
+option(SUPPORT_SM4_SM4NI "Build the AES-NI based SM4 implementation" ON)
+option(SUPPORT_SM4_LANG18 "Build the AVX2 Lang18 SM4 implementation" ON)
+option(SUPPORT_SM4_GONG23 "Build the AVX-512/GFNI Gong23 SM4 implementation" ON)
+option(SUPPORT_UBLOCK_STANDARD "Build the SSSE3 uBlock implementation" ON)
+option(SUPPORT_UBLOCK_GONG25 "Build the AVX2 Gong25 uBlock implementation" ON)
 set(THIRD_PARTY 
     aes
     asn1
@@ -40,7 +49,19 @@ set(THIRD_PARTY
 ## ================================================= ##
 #######################################################
 
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
+if(CMAKE_VS_PLATFORM_NAME STREQUAL "x64")
+    set(ARCH_X86_64 TRUE)
+    message(STATUS "Detected architecture: x86_64 (Visual Studio x64)")
+elseif(CMAKE_VS_PLATFORM_NAME STREQUAL "Win32")
+    set(ARCH_X86 TRUE)
+    message(STATUS "Detected architecture: x86 (Visual Studio Win32)")
+elseif(CMAKE_VS_PLATFORM_NAME STREQUAL "ARM")
+    set(ARCH_ARM TRUE)
+    message(STATUS "Detected architecture: ARM (Visual Studio ARM)")
+elseif(CMAKE_VS_PLATFORM_NAME STREQUAL "ARM64")
+    set(ARCH_AARCH64 TRUE)
+    message(STATUS "Detected architecture: AArch64 (Visual Studio ARM64)")
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
     set(ARCH_X86_64 TRUE)
     message(STATUS "Detected architecture: x86_64 (AMD64)")
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(i386|i686|x86)$")
@@ -106,246 +127,232 @@ endif()
 ## ================================================= ##
 #######################################################
 
-# des
-set_source_files_properties(
-    ${BASE_LIB_SRC_DIRECTORY}/des/provider.cpp
-    PROPERTIES
-    COMPILE_FLAGS ""
-)
-# aes
-if(ARCH_X86 OR ARCH_X86_64)
-    if(COMPILER_MSVC)
-        set(AES_AESNI_FLAGS "-D__AES__ -D__SSE2__")
-    else()
-        set(AES_AESNI_FLAGS "-maes -msse2")
+function(gmlib_enable_impl impl_macro)
+    target_compile_definitions(${PROJECT_NAME_}_static PRIVATE ${impl_macro})
+    message(STATUS "Enabled implementation: ${impl_macro}")
+endfunction()
+
+function(gmlib_skip_impl option_name required_arch)
+    if(${option_name})
+        message(STATUS "${option_name} is ON, but requires ${required_arch}; implementation skipped")
     endif()
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/aes/aes_aesni.cpp
-        ${BASE_LIB_SRC_DIRECTORY}/aes/provider_aes_aesni.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${AES_AESNI_FLAGS}
-    )
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/aes/provider.cpp
-        PROPERTIES
-        COMPILE_FLAGS "-DAES_IMPL_AESNI"
-    )
-elseif(ARCH_AARCH64)
-    if(COMPILER_MSVC)
-        set(AES_ARM_AES_FLAGS "-D__ARM_NEON -D__ARM_FEATURE_AES=1")
-    else()
-        set(AES_ARM_AES_FLAGS "-march=armv8-a+crypto")
-    endif()
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/aes/aes_arm_aes.cpp
-        ${BASE_LIB_SRC_DIRECTORY}/aes/provider_aes_arm_aes.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${AES_ARM_AES_FLAGS}
-    )
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/aes/provider.cpp
-        PROPERTIES
-        COMPILE_FLAGS "-DAES_IMPL_ARM_AES"
-    )
+endfunction()
+
+# Portable implementations selected at build time.
+if(SUPPORT_BASE64_CHROMIUM)
+    gmlib_enable_impl(BASE64_IMPL_CHROMIUM)
 endif()
-# base64
-if(ARCH_X86_64)
-    if(COMPILER_MSVC)
-        set(BASE64_AVX2_FLAGS "-D__AVX2__")
-    else()
-        set(BASE64_AVX2_FLAGS "-mavx2")
-    endif()
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/base64/base64_avx2.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${BASE64_AVX2_FLAGS}
-    )
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/base64/provider.cpp
-        PROPERTIES
-        COMPILE_FLAGS "-DBASE64_IMPL_AVX2"
-    )
+if(SUPPORT_SM3_YANG15)
+    gmlib_enable_impl(SM3_IMPL_YANG15)
 endif()
-# ghash
-if(ARCH_X86_64)
-    if(COMPILER_MSVC)
-        set(GHASH_PCLMUL_FLAGS "-D__PCLMUL__ -D__SSE2__ -D__SSSE3__")
+
+# Architecture-specific implementations. The implementation macro is target-wide
+# and records that an implementation is present in the library. ISA compiler
+# options are deliberately limited to the optimized kernel translation units.
+if(SUPPORT_AES_ARM_AES)
+    if(ARCH_ARM OR ARCH_AARCH64)
+        gmlib_enable_impl(AES_IMPL_ARM_AES)
+        if(NOT COMPILER_MSVC)
+            if(ARCH_ARM)
+                set(AES_ARM_AES_OPTIONS
+                    -march=armv8-a
+                    -mfpu=crypto-neon-fp-armv8)
+            else()
+                set(AES_ARM_AES_OPTIONS -march=armv8-a+crypto)
+            endif()
+            set_source_files_properties(
+                ${BASE_LIB_SRC_DIRECTORY}/aes/aes_arm_aes.cpp
+                PROPERTIES COMPILE_OPTIONS "${AES_ARM_AES_OPTIONS}")
+        endif()
     else()
-        set(GHASH_PCLMUL_FLAGS "-mpclmul -msse2 -mssse3")
+        gmlib_skip_impl(SUPPORT_AES_ARM_AES "ARM or AArch64")
     endif()
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/ghash/ghash_pclmul.cpp
-        ${BASE_LIB_SRC_DIRECTORY}/ghash/provider_ghash_pclmul.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${GHASH_PCLMUL_FLAGS}
-    )
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/ghash/provider.cpp
-        PROPERTIES
-        COMPILE_FLAGS "-DGHASH_IMPL_PCLMUL"
-    )
 endif()
-# memory_utils
-if(ARCH_X86_64)
-    if(COMPILER_MSVC)
-        set(FLAGS "-D__AVX2__")
+
+if(SUPPORT_AES_AESNI)
+    if(ARCH_X86 OR ARCH_X86_64)
+        gmlib_enable_impl(AES_IMPL_AESNI)
+        if(NOT COMPILER_MSVC)
+            set_source_files_properties(
+                ${BASE_LIB_SRC_DIRECTORY}/aes/aes_aesni.cpp
+                PROPERTIES COMPILE_OPTIONS "-maes;-msse2")
+        endif()
     else()
-        set(FLAGS "-mavx2")
+        gmlib_skip_impl(SUPPORT_AES_AESNI "x86 or x86_64")
     endif()
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/memory_utils/memxor_avx2.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${FLAGS}
-    )
-    if(COMPILER_MSVC)
-        set(FLAGS "-D__SSE2__")
-    else()
-        set(FLAGS "-msse2")
-    endif()
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/memory_utils/memxor_sse2.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${FLAGS}
-    )
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/memory_utils/memxor.cpp
-        PROPERTIES
-        COMPILE_FLAGS "-D__AVX2__ -D__SSE2__"
-    )
 endif()
-# number
-if(ARCH_X86_64)
-    if(COMPILER_MSVC)
-        set(NUMBER_X64_FLAGS "-D__MOVBE__ -D__BMI2__")
+
+if(SUPPORT_BASE64_AVX2)
+    if(ARCH_X86 OR ARCH_X86_64)
+        gmlib_enable_impl(BASE64_IMPL_AVX2)
+        if(COMPILER_MSVC)
+            set(BASE64_AVX2_OPTIONS /arch:AVX2)
+        else()
+            set(BASE64_AVX2_OPTIONS -mavx2)
+        endif()
+        set_source_files_properties(
+            ${BASE_LIB_SRC_DIRECTORY}/base64/base64_avx2.cpp
+            PROPERTIES COMPILE_OPTIONS "${BASE64_AVX2_OPTIONS}")
     else()
-        set(NUMBER_X64_FLAGS "-mmovbe -mbmi2")
+        gmlib_skip_impl(SUPPORT_BASE64_AVX2 "x86 or x86_64")
     endif()
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/number/mont256_x64.cpp
-        ${BASE_LIB_SRC_DIRECTORY}/number/mpz_x64.cpp
-        ${BASE_LIB_SRC_DIRECTORY}/number/uint256_x64.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${NUMBER_X64_FLAGS}
-    )
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/number/provider.cpp
-        PROPERTIES
-        COMPILE_FLAGS "-DNUMBER_IMPL_X64"
-    )
 endif()
-# sha1
-if(ARCH_X86_64)
-    if(COMPILER_MSVC)
-        set(SHA1_SHA_FLAGS "-D__SHA__ -D__SSE4_1__")
+
+if(SUPPORT_GHASH_PCLMUL)
+    if(ARCH_X86 OR ARCH_X86_64)
+        gmlib_enable_impl(GHASH_IMPL_PCLMUL)
+        if(NOT COMPILER_MSVC)
+            set_source_files_properties(
+                ${BASE_LIB_SRC_DIRECTORY}/ghash/ghash_pclmul.cpp
+                PROPERTIES COMPILE_OPTIONS "-mpclmul;-msse2;-mssse3")
+        endif()
     else()
-        set(SHA1_SHA_FLAGS "-msha -msse4.1")
+        gmlib_skip_impl(SUPPORT_GHASH_PCLMUL "x86 or x86_64")
     endif()
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/sha1/sha1_sha.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${SHA1_SHA_FLAGS}
-    )
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/sha1/provider_sha1_sha.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${SHA1_SHA_FLAGS}
-    )
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/sha1/provider.cpp
-        PROPERTIES
-        COMPILE_FLAGS "-DSHA1_IMPL_SHA"
-    )
 endif()
-# sha2
-if(ARCH_X86_64)
-    if(COMPILER_MSVC)
-        set(SHA2_SHA_FLAGS "-D__SHA__ -D__SSE4_1__")
+
+if(SUPPORT_MEMXOR_AVX2)
+    if(ARCH_X86 OR ARCH_X86_64)
+        gmlib_enable_impl(MEMXOR_IMPL_AVX2)
+        if(COMPILER_MSVC)
+            set(MEMXOR_AVX2_OPTIONS /arch:AVX2)
+        else()
+            set(MEMXOR_AVX2_OPTIONS -mavx2)
+        endif()
+        set_source_files_properties(
+            ${BASE_LIB_SRC_DIRECTORY}/memory_utils/memxor_avx2.cpp
+            PROPERTIES COMPILE_OPTIONS "${MEMXOR_AVX2_OPTIONS}")
     else()
-        set(SHA2_SHA_FLAGS "-msha -msse4.1")
+        gmlib_skip_impl(SUPPORT_MEMXOR_AVX2 "x86 or x86_64")
     endif()
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/sha2/sha224_256_sha.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${SHA2_SHA_FLAGS}
-    )
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/sha2/provider_sha2_sha.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${SHA2_SHA_FLAGS}
-    )
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/sha2/provider.cpp
-        PROPERTIES
-        COMPILE_FLAGS "-DSHA224_256_IMPL_SHA"
-    )
 endif()
-# sm4
-if(ARCH_X86_64)
-    if(COMPILER_MSVC)
-        set(SM4_SM4NI_FLAGS "-D__AES__ -D__SSE2__ -D__SSSE3__")
+
+if(SUPPORT_MEMXOR_SSE2)
+    if(ARCH_X86 OR ARCH_X86_64)
+        gmlib_enable_impl(MEMXOR_IMPL_SSE2)
+        if(NOT COMPILER_MSVC)
+            set_source_files_properties(
+                ${BASE_LIB_SRC_DIRECTORY}/memory_utils/memxor_sse2.cpp
+                PROPERTIES COMPILE_OPTIONS "-msse2")
+        endif()
     else()
-        set(SM4_SM4NI_FLAGS "-maes -msse2 -mssse3")
+        gmlib_skip_impl(SUPPORT_MEMXOR_SSE2 "x86 or x86_64")
     endif()
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/sm4/sm4_sm4ni.cpp
-        ${BASE_LIB_SRC_DIRECTORY}/sm4/provider_sm4_sm4ni.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${SM4_SM4NI_FLAGS}
-    )
-    if(COMPILER_MSVC)
-        set(SM4_LANG18_FLAGS "-D__AVX2__")
-        set(SM4_GONG23_FLAGS "-D__AVX512BW__ -D__AVX512VL__ -D__AVX512F__ -D__GFNI__")
-    else()
-        set(SM4_LANG18_FLAGS "-mavx2")
-        set(SM4_GONG23_FLAGS "-mavx512bw -mavx512vl -mavx512f -mgfni")
-    endif()
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/sm4/sm4_lang18.cpp
-        ${BASE_LIB_SRC_DIRECTORY}/sm4/provider_sm4_lang18.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${SM4_LANG18_FLAGS}
-    )
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/sm4/sm4_gong23.cpp
-        ${BASE_LIB_SRC_DIRECTORY}/sm4/provider_sm4_gong23.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${SM4_GONG23_FLAGS}
-    )
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/sm4/provider.cpp
-        PROPERTIES
-        COMPILE_FLAGS "-DSM4_IMPL_SM4NI -DSM4_IMPL_LANG18 -DSM4_IMPL_GONG23"
-    )
 endif()
-# ublock
-if(ARCH_X86_64)
-    if(COMPILER_MSVC)
-        set(UBLOCK_STANDARD_FLAGS "-D__SSSE3__")
+
+if(SUPPORT_NUMBER_X64)
+    if(ARCH_X86_64)
+        gmlib_enable_impl(NUMBER_IMPL_X64)
+        if(NOT COMPILER_MSVC)
+            set_source_files_properties(
+                ${BASE_LIB_SRC_DIRECTORY}/number/mont256_x64.cpp
+                ${BASE_LIB_SRC_DIRECTORY}/number/mpz_x64.cpp
+                ${BASE_LIB_SRC_DIRECTORY}/number/uint256_x64.cpp
+                PROPERTIES COMPILE_OPTIONS "-mmovbe;-mbmi2")
+        endif()
     else()
-        set(UBLOCK_STANDARD_FLAGS "-mssse3")
+        gmlib_skip_impl(SUPPORT_NUMBER_X64 "x86_64")
     endif()
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/ublock/ublock_standard.cpp
-        ${BASE_LIB_SRC_DIRECTORY}/ublock/provider_ublock_standard.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${UBLOCK_STANDARD_FLAGS}
-    )
-    if(COMPILER_MSVC)
-        set(UBLOCK_GONG25_FLAGS "-D__AVX2__")
+endif()
+
+if(SUPPORT_SHA1_SHA)
+    if(ARCH_X86 OR ARCH_X86_64)
+        gmlib_enable_impl(SHA1_IMPL_SHA)
+        if(NOT COMPILER_MSVC)
+            set_source_files_properties(
+                ${BASE_LIB_SRC_DIRECTORY}/sha1/sha1_sha.cpp
+                PROPERTIES COMPILE_OPTIONS "-msha;-msse4.1")
+        endif()
     else()
-        set(UBLOCK_GONG25_FLAGS "-mavx2")
+        gmlib_skip_impl(SUPPORT_SHA1_SHA "x86 or x86_64")
     endif()
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/ublock/ublock_gong25.cpp
-        ${BASE_LIB_SRC_DIRECTORY}/ublock/provider_ublock_gong25.cpp
-        PROPERTIES
-        COMPILE_FLAGS ${UBLOCK_GONG25_FLAGS}
-    )
-    set_source_files_properties(
-        ${BASE_LIB_SRC_DIRECTORY}/ublock/provider.cpp
-        PROPERTIES
-        COMPILE_FLAGS "-DUBLOCK_IMPL_STANDARD -DUBLOCK_IMPL_GONG25"
-    )
+endif()
+
+if(SUPPORT_SHA2_SHA)
+    if(ARCH_X86 OR ARCH_X86_64)
+        gmlib_enable_impl(SHA224_256_IMPL_SHA)
+        if(NOT COMPILER_MSVC)
+            set_source_files_properties(
+                ${BASE_LIB_SRC_DIRECTORY}/sha2/sha224_256_sha.cpp
+                PROPERTIES COMPILE_OPTIONS "-msha;-msse4.1")
+        endif()
+    else()
+        gmlib_skip_impl(SUPPORT_SHA2_SHA "x86 or x86_64")
+    endif()
+endif()
+
+if(SUPPORT_SM4_SM4NI)
+    if(ARCH_X86 OR ARCH_X86_64)
+        gmlib_enable_impl(SM4_IMPL_SM4NI)
+        if(NOT COMPILER_MSVC)
+            set_source_files_properties(
+                ${BASE_LIB_SRC_DIRECTORY}/sm4/sm4_sm4ni.cpp
+                PROPERTIES COMPILE_OPTIONS "-maes;-msse2;-mssse3")
+        endif()
+    else()
+        gmlib_skip_impl(SUPPORT_SM4_SM4NI "x86 or x86_64")
+    endif()
+endif()
+
+if(SUPPORT_SM4_LANG18)
+    if(ARCH_X86 OR ARCH_X86_64)
+        gmlib_enable_impl(SM4_IMPL_LANG18)
+        if(COMPILER_MSVC)
+            set(SM4_LANG18_OPTIONS /arch:AVX2)
+        else()
+            set(SM4_LANG18_OPTIONS -mavx2)
+        endif()
+        set_source_files_properties(
+            ${BASE_LIB_SRC_DIRECTORY}/sm4/sm4_lang18.cpp
+            PROPERTIES COMPILE_OPTIONS "${SM4_LANG18_OPTIONS}")
+    else()
+        gmlib_skip_impl(SUPPORT_SM4_LANG18 "x86 or x86_64")
+    endif()
+endif()
+
+if(SUPPORT_SM4_GONG23)
+    if(ARCH_X86 OR ARCH_X86_64)
+        gmlib_enable_impl(SM4_IMPL_GONG23)
+        if(COMPILER_MSVC)
+            set(SM4_GONG23_OPTIONS /arch:AVX512)
+        else()
+            set(SM4_GONG23_OPTIONS -mavx512bw -mavx512vl -mavx512f -mgfni)
+        endif()
+        set_source_files_properties(
+            ${BASE_LIB_SRC_DIRECTORY}/sm4/sm4_gong23.cpp
+            PROPERTIES COMPILE_OPTIONS "${SM4_GONG23_OPTIONS}")
+    else()
+        gmlib_skip_impl(SUPPORT_SM4_GONG23 "x86 or x86_64")
+    endif()
+endif()
+
+if(SUPPORT_UBLOCK_STANDARD)
+    if(ARCH_X86 OR ARCH_X86_64)
+        gmlib_enable_impl(UBLOCK_IMPL_STANDARD)
+        if(NOT COMPILER_MSVC)
+            set_source_files_properties(
+                ${BASE_LIB_SRC_DIRECTORY}/ublock/ublock_standard.cpp
+                PROPERTIES COMPILE_OPTIONS "-mssse3")
+        endif()
+    else()
+        gmlib_skip_impl(SUPPORT_UBLOCK_STANDARD "x86 or x86_64")
+    endif()
+endif()
+
+if(SUPPORT_UBLOCK_GONG25)
+    if(ARCH_X86 OR ARCH_X86_64)
+        gmlib_enable_impl(UBLOCK_IMPL_GONG25)
+        if(COMPILER_MSVC)
+            set(UBLOCK_GONG25_OPTIONS /arch:AVX2)
+        else()
+            set(UBLOCK_GONG25_OPTIONS -mavx2)
+        endif()
+        set_source_files_properties(
+            ${BASE_LIB_SRC_DIRECTORY}/ublock/ublock_gong25.cpp
+            PROPERTIES COMPILE_OPTIONS "${UBLOCK_GONG25_OPTIONS}")
+    else()
+        gmlib_skip_impl(SUPPORT_UBLOCK_GONG25 "x86 or x86_64")
+    endif()
 endif()
 
 #######################################################
@@ -375,4 +382,3 @@ if(${PROJECT_BUILD_TEST})
         add_test(NAME ${THIRD_PARTY_NAME}_test COMMAND ${THIRD_PARTY_NAME}_test)
     endforeach()
 endif()
-

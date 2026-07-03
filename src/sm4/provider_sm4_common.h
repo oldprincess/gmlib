@@ -1,10 +1,6 @@
 #ifndef SM4_INTERNAL_PROVIDER_SM4_COMMON_H
 #define SM4_INTERNAL_PROVIDER_SM4_COMMON_H
 
-#include "config.h"
-
-#if defined(SM4_IMPL_COMMON)
-
 #include <gmlib/block_cipher_mode/block_cipher.h>
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>
 
@@ -42,7 +38,5 @@ std::unique_ptr<BlockCipherMode> create_gcm_encryptor();
 std::unique_ptr<BlockCipherMode> create_gcm_decryptor();
 
 } // namespace sm4::internal::common
-
-#endif
 
 #endif

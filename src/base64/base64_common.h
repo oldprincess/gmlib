@@ -1,7 +1,3 @@
-#include "config.h"
-
-#if defined(BASE64_IMPL_COMMON)
-
 #ifndef BASE64_INTERNAL_BASE64_COMMON_H
 #define BASE64_INTERNAL_BASE64_COMMON_H
 
@@ -24,5 +20,4 @@ int base64_decode(std::uint8_t* out, const char* in, std::size_t inl) noexcept;
 
 } // namespace base64::internal::common
 
-#endif
 #endif

@@ -1,5 +1,3 @@
-#include "config.h"
-
 #if defined(AES_IMPL_AESNI)
 
 #include <gmlib/aes/aes.h>

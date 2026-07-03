@@ -3,7 +3,6 @@
 #include <cstring>
 #include <stdexcept>
 
-#include "config.h"
 #include "provider_sm3_common.h"
 #include "provider_sm3_yang15.h"
 

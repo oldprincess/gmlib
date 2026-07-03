@@ -1,6 +1,6 @@
-#include "sm4_gong23.h"
-
 #if defined(SM4_IMPL_GONG23)
+
+#include "sm4_gong23.h"
 
 #include <immintrin.h>
 

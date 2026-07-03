@@ -1,5 +1,6 @@
-#include "sm3_yang15.h"
 #if defined(SM3_IMPL_YANG15)
+
+#include "sm3_yang15.h"
 
 #include <cstring>
 

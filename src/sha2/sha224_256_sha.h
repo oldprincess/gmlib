@@ -1,9 +1,7 @@
+#if defined(SHA224_256_IMPL_SHA)
+
 #ifndef SHA224_256_SHA_H
 #define SHA224_256_SHA_H
-
-#include "config.h"
-
-#if defined(SHA224_256_IMPL_SHA)
 
 #include <cstddef>
 #include <cstdint>

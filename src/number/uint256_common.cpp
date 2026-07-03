@@ -2,8 +2,6 @@
 
 #include <cstdio>
 #include <cstdlib>
-#if defined(NUMBER_IMPL_COMMON)
-
 namespace number::internal::common {
 
 /// @brief r = a + b + carry
@@ -585,4 +583,3 @@ bool uint256_bittest(const std::uint32_t num[8], int i) noexcept
 }
 
 }; // namespace number::internal::common
-#endif

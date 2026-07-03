@@ -1,6 +1,6 @@
-#include "ghash_pclmul.h"
-
 #if defined(GHASH_IMPL_PCLMUL)
+
+#include "ghash_pclmul.h"
 
 #include <immintrin.h>
 

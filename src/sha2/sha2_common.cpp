@@ -1,7 +1,5 @@
 #include "sha2_common.h"
 
-#if defined(SHA2_IMPL_COMMON)
-
 #include <cstring>
 
 namespace sha2 {
@@ -616,5 +614,3 @@ int sha512_final_block(std::uint8_t        state[64],
 } // namespace common
 } // namespace internal
 } // namespace sha2
-
-#endif

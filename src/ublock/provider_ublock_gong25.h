@@ -1,9 +1,7 @@
+#if defined(UBLOCK_IMPL_GONG25)
+
 #ifndef UBLOCK_INTERNAL_PROVIDER_UBLOCK_GONG25_H
 #define UBLOCK_INTERNAL_PROVIDER_UBLOCK_GONG25_H
-
-#include "config.h"
-
-#if defined(UBLOCK_IMPL_GONG25)
 
 #include <gmlib/block_cipher_mode/block_cipher.h>
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>

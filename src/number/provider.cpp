@@ -6,7 +6,6 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "config.h"
 #include "mont256_common.h"
 #include "mont256_x64.h"
 #include "mpz_common.h"

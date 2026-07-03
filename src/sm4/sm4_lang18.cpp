@@ -1,5 +1,6 @@
-#include "sm4_lang18.h"
 #if defined(SM4_IMPL_LANG18)
+
+#include "sm4_lang18.h"
 
 #include <immintrin.h>
 

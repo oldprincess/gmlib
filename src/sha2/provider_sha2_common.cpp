@@ -1,7 +1,3 @@
-#include "config.h"
-
-#if defined(SHA2_IMPL_COMMON)
-
 #include <gmlib/hash_lib/impl/hash_impl.h>
 
 #include <stdexcept>
@@ -343,5 +339,3 @@ hash_lib::Hash::HashPtr create_sha512()
 }
 
 } // namespace sha2::internal::common
-
-#endif

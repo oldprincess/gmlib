@@ -1,7 +1,3 @@
-#include "config.h"
-
-#if defined(SM4_IMPL_COMMON)
-
 #include <gmlib/block_cipher_mode/impl/cbc_mode_impl.h>
 #include <gmlib/block_cipher_mode/impl/cfb_mode_impl.h>
 #include <gmlib/block_cipher_mode/impl/ctr_mode_impl.h>
@@ -190,5 +186,3 @@ std::unique_ptr<BlockCipherMode> create_gcm_decryptor()
 }
 
 } // namespace sm4::internal::common
-
-#endif

@@ -1,7 +1,5 @@
 #include "sha1_common.h"
 
-#if defined(SHA1_IMPL_COMMON)
-
 #include <cstring>
 
 #define MEM_LOAD32BE(src)                                 \
@@ -180,7 +178,7 @@ int sha1_final_block(std::uint32_t       state[5],
     buf_size += 1;                            // update
     std::memset(buf + buf_size, 0, pad_num);  // pad 0
     buf_size += pad_num;                      // update
-    MEM_STORE64BE(buf + buf_size, data_bits); //
+    MEM_STORE64BE(buf + buf_size, *data_bits); //
     buf_size += 8;                            // update
     // compress
     for (std::size_t i = 0; i < buf_size; i += 64)
@@ -198,4 +196,3 @@ int sha1_final_block(std::uint32_t       state[5],
 }
 
 } // namespace sha1::internal::common
-#endif

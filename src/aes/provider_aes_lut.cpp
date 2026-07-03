@@ -1,7 +1,3 @@
-#include "config.h"
-
-#if defined(AES_IMPL_LUT)
-
 #include <gmlib/aes/aes.h>
 #include <gmlib/block_cipher_mode/impl/cbc_mode_impl.h>
 #include <gmlib/block_cipher_mode/impl/cfb_mode_impl.h>
@@ -197,7 +193,6 @@ std::unique_ptr<BlockCipherMode> create_gcm_decryptor_128()
 }
 
 }; // namespace aes::internal::lut
-
 namespace aes::internal::lut {
 
 class AES192 : public BlockCipher
@@ -358,7 +353,6 @@ std::unique_ptr<BlockCipherMode> create_gcm_decryptor_192()
 }
 
 }; // namespace aes::internal::lut
-
 namespace aes::internal::lut {
 
 class AES256 : public BlockCipher
@@ -519,5 +513,3 @@ std::unique_ptr<BlockCipherMode> create_gcm_decryptor_256()
 }
 
 }; // namespace aes::internal::lut
-
-#endif

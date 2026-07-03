@@ -3,10 +3,6 @@
 
 #include <gmlib/number/mont256.h>
 
-#include "config.h"
-
-#if defined(NUMBER_IMPL_COMMON)
-
 #include <cstddef>
 #include <cstdint>
 
@@ -119,5 +115,4 @@ void mont256_from_bytes_ex(const Mont256CTX*   ctx,
 
 } // namespace number::internal::common
 
-#endif
 #endif

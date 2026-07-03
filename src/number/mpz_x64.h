@@ -1,9 +1,7 @@
+#if defined(NUMBER_IMPL_X64)
+
 #ifndef NUMBER_INTERNAL_MPZ_X64_H
 #define NUMBER_INTERNAL_MPZ_X64_H
-
-#include "config.h"
-
-#if defined(NUMBER_IMPL_X64)
 
 #include <cstddef>
 #include <cstdint>

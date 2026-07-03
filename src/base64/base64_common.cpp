@@ -1,7 +1,5 @@
 #include "base64_common.h"
 
-#if defined(BASE64_IMPL_COMMON)
-
 #include <cctype>
 
 namespace base64::internal::common {
@@ -95,7 +93,7 @@ std::size_t base64_decode_outl(const char* in, std::size_t inl) noexcept
 
 void base64_encode(char* out, const std::uint8_t* in, std::size_t inl) noexcept
 {
-    while (inl > 3)
+    while (inl >= 3)
     {
         uint8_t d0 = *(in + 0), d1 = *(in + 1), d2 = *(in + 2);
         *(out + 0) = B64_TABLE[d0 >> 2];
@@ -187,4 +185,3 @@ int base64_decode(std::uint8_t* out, const char* in, std::size_t inl) noexcept
 }
 
 } // namespace base64::internal::common
-#endif

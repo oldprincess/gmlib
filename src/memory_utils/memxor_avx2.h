@@ -1,4 +1,4 @@
-#if defined(__AVX2__)
+#if defined(MEMXOR_IMPL_AVX2)
 
 #ifndef MEMXOR_AVX2_H
 #define MEMXOR_AVX2_H

@@ -1,8 +1,7 @@
-#include "mont256_x64.h"
-
-#include "uint256_x64.h"
-
 #if defined(NUMBER_IMPL_X64)
+
+#include "mont256_x64.h"
+#include "uint256_x64.h"
 
 #include <immintrin.h>
 

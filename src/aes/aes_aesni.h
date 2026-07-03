@@ -1,9 +1,7 @@
+#if defined(AES_IMPL_AESNI)
+
 #ifndef AES_INTERNAL_AES_AESNI_H
 #define AES_INTERNAL_AES_AESNI_H
-
-#include "config.h"
-
-#if defined(AES_IMPL_AESNI)
 
 #include <cstddef>
 #include <cstdint>

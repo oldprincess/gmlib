@@ -1,9 +1,7 @@
+#if defined(GHASH_IMPL_PCLMUL)
+
 #ifndef GHASH_INTERNAL_GHASH_PCLMUL_H
 #define GHASH_INTERNAL_GHASH_PCLMUL_H
-
-#include "config.h"
-
-#if defined(GHASH_IMPL_PCLMUL)
 
 #include <cstddef>
 #include <cstdint>

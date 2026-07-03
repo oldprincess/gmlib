@@ -1,10 +1,6 @@
 #ifndef SHA1_INTERNAL_SHA1_COMMON_H
 #define SHA1_INTERNAL_SHA1_COMMON_H
 
-#include "config.h"
-
-#if defined(SHA1_IMPL_COMMON)
-
 #include <cstddef>
 #include <cstdint>
 
@@ -33,5 +29,4 @@ int sha1_final_block(std::uint32_t       state[5],
 
 } // namespace sha1::internal::common
 
-#endif
 #endif

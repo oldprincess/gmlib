@@ -4,7 +4,6 @@
 #include "base64_avx2.h"
 #include "base64_chromium.h"
 #include "base64_common.h"
-#include "config.h"
 
 namespace base64 {
 

@@ -1,3 +1,5 @@
+#if defined(UBLOCK_IMPL_STANDARD)
+
 /**
  * part of the code is "derived from
  * https://sfjs.cacrnet.org.cn/site/term/list_76_1.html"
@@ -6,8 +8,6 @@
  * Cryptologic Research, 2019, 6(6): 690-703.
  */
 #include "ublock_standard.h"
-
-#if defined(UBLOCK_IMPL_STANDARD)
 
 #include <immintrin.h>
 

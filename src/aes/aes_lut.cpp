@@ -1,7 +1,5 @@
 #include "aes_lut.h"
 
-#if defined(AES_IMPL_LUT)
-
 namespace aes::internal::lut {
 
 #pragma region "AES LUT PARAM"
@@ -919,4 +917,3 @@ void aes256_dec_blocks(const std::uint8_t  round_key[15 * 16],
 #pragma endregion
 
 }; // namespace aes::internal::lut
-#endif

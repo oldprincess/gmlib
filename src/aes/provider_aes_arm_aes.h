@@ -1,9 +1,7 @@
+#if defined(AES_IMPL_ARM_AES)
+
 #ifndef AES_INTERNAL_PROVIDER_AES_ARM_AES_H
 #define AES_INTERNAL_PROVIDER_AES_ARM_AES_H
-
-#include "config.h"
-
-#if defined(AES_IMPL_ARM_AES)
 
 #include <gmlib/block_cipher_mode/block_cipher.h>
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>

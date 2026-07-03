@@ -1,9 +1,7 @@
+#if defined(SM4_IMPL_GONG23)
+
 #ifndef SM4_INTERNAL_SM4_GONG23_H
 #define SM4_INTERNAL_SM4_GONG23_H
-
-#include "config.h"
-
-#if defined(SM4_IMPL_GONG23)
 
 #include <cstddef>
 #include <cstdint>

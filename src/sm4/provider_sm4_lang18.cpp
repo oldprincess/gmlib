@@ -1,7 +1,6 @@
-#include "config.h"
-
 #if defined(SM4_IMPL_LANG18)
 
+#include <gmlib/cpuinfo/cpuinfo.h>
 #include <gmlib/block_cipher_mode/impl/cbc_mode_impl.h>
 #include <gmlib/block_cipher_mode/impl/cfb_mode_impl.h>
 #include <gmlib/block_cipher_mode/impl/ctr_mode_impl.h>
@@ -29,7 +28,7 @@ using block_cipher_mode::impl::OfbEncryptorImpl;
 
 bool provider_available()
 {
-    return true;
+    return cpuinfo::x86_64::cpu_supports_avx2();
 }
 
 class SM4 : public BlockCipher

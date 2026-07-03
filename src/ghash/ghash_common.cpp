@@ -1,7 +1,5 @@
 #include "ghash_common.h"
 
-#if defined(GHASH_IMPL_COMMON)
-
 namespace ghash::internal::common {
 
 #define MEM_LOAD64BE(src)                       \
@@ -96,4 +94,3 @@ int ghash_final_block(const GHashCTX*     ctx,
 }
 
 } // namespace ghash::internal::common
-#endif

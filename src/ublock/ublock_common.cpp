@@ -1,6 +1,4 @@
 #include "ublock_common.h"
-#if defined(UBLOCK_IMPL_COMMON)
-
 namespace ublock::internal::common {
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -784,4 +782,3 @@ void ublock256256_dec_blocks(const UBlock256256RoundKey *round_key,
 }
 
 } // namespace ublock::internal::common
-#endif

@@ -1,3 +1,5 @@
+#if defined(SHA1_IMPL_SHA)
+
 /**
  * part of the code is "derived from miTLS project. sha1-x86.c"
  *
@@ -9,8 +11,6 @@
  * the miTLS project.
  */
 #include "sha1_sha.h"
-
-#if defined(SHA1_IMPL_SHA)
 
 #include <immintrin.h>
 

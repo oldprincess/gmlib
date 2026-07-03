@@ -1,10 +1,6 @@
 #ifndef DES_INTERNAL_PROVIDER_DES_COMMON_H
 #define DES_INTERNAL_PROVIDER_DES_COMMON_H
 
-#include "config.h"
-
-#if defined(DES_IMPL_COMMON)
-
 #include <gmlib/block_cipher_mode/block_cipher.h>
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>
 
@@ -38,7 +34,5 @@ std::unique_ptr<BlockCipherMode> create_ecb_encryptor();
 std::unique_ptr<BlockCipherMode> create_ecb_decryptor();
 
 } // namespace des::internal::common
-
-#endif
 
 #endif

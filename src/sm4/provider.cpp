@@ -3,7 +3,6 @@
 #include <cstring>
 #include <stdexcept>
 
-#include "config.h"
 #include "provider_sm4_common.h"
 #include "provider_sm4_gong23.h"
 #include "provider_sm4_lang18.h"

@@ -1,6 +1,4 @@
 #include "sm4_common.h"
-#if defined(SM4_IMPL_COMMON)
-
 namespace sm4::internal::common {
 
 #pragma region "SM4 Params"
@@ -225,4 +223,3 @@ void sm4_dec_blocks(const std::uint8_t  round_key[128],
 }
 
 }; // namespace sm4::internal::common
-#endif

@@ -1,5 +1,4 @@
 #include "sm3_common.h"
-#if defined(SM3_IMPL_COMMON)
 #include <cstring>
 
 namespace sm3::internal::common {
@@ -195,4 +194,3 @@ int sm3_final_block(std::uint32_t       state[8],
 }
 
 }; // namespace sm3::internal::common
-#endif

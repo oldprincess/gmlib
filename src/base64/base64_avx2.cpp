@@ -1,3 +1,5 @@
+#if defined(BASE64_IMPL_AVX2)
+
 /**
  * part of the code is "derived from Alfred Klomp's
  * https://github.com/aklomp/base64 (published under BSD) with minor
@@ -6,8 +8,6 @@
  * Copyright (c) 2013-2015, Alfred Klomp All rights reserved.
  */
 #include "base64_avx2.h"
-
-#if defined(BASE64_IMPL_AVX2)
 
 #include <cctype>
 #include <immintrin.h>

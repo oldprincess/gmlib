@@ -1,10 +1,6 @@
 #ifndef GHASH_INTERNAL_GHASH_COMMON_H
 #define GHASH_INTERNAL_GHASH_COMMON_H
 
-#include "config.h"
-
-#if defined(GHASH_IMPL_COMMON)
-
 #include <cstddef>
 #include <cstdint>
 
@@ -35,7 +31,5 @@ int ghash_final_block(const GHashCTX*     ctx,
                       std::size_t         inl) noexcept;
 
 } // namespace ghash::internal::common
-
-#endif
 
 #endif

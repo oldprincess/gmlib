@@ -1,7 +1,3 @@
-#include "config.h"
-
-#if defined(BALLET_IMPL_STANDARD)
-
 #include <gmlib/ballet/ballet.h>
 #include <gmlib/block_cipher_mode/impl/cbc_mode_impl.h>
 #include <gmlib/block_cipher_mode/impl/cfb_mode_impl.h>
@@ -499,5 +495,3 @@ std::unique_ptr<BlockCipherMode> create_ctr_decryptor_256256()
 }
 
 } // namespace ballet::internal::standard
-
-#endif

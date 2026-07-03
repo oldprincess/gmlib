@@ -1,6 +1,6 @@
-#include "sha224_256_sha.h"
-
 #if defined(SHA224_256_IMPL_SHA)
+
+#include "sha224_256_sha.h"
 
 #include <immintrin.h>
 

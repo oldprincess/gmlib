@@ -1,10 +1,6 @@
 #ifndef BALLET_INTERNAL_PROVIDER_BALLET_STANDARD_H
 #define BALLET_INTERNAL_PROVIDER_BALLET_STANDARD_H
 
-#include "config.h"
-
-#if defined(BALLET_IMPL_STANDARD)
-
 #include <gmlib/block_cipher_mode/block_cipher.h>
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>
 
@@ -56,7 +52,5 @@ std::unique_ptr<BlockCipherMode> create_ecb_encryptor_256256();
 std::unique_ptr<BlockCipherMode> create_ecb_decryptor_256256();
 
 } // namespace ballet::internal::standard
-
-#endif
 
 #endif

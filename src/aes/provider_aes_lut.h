@@ -1,10 +1,6 @@
 #ifndef AES_INTERNAL_PROVIDER_AES_LUT_H
 #define AES_INTERNAL_PROVIDER_AES_LUT_H
 
-#include "config.h"
-
-#if defined(AES_IMPL_LUT)
-
 #include <gmlib/block_cipher_mode/block_cipher.h>
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>
 
@@ -58,7 +54,5 @@ std::unique_ptr<BlockCipherMode> create_gcm_encryptor_256();
 std::unique_ptr<BlockCipherMode> create_gcm_decryptor_256();
 
 } // namespace aes::internal::lut
-
-#endif
 
 #endif

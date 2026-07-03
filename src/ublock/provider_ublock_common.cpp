@@ -1,7 +1,3 @@
-#include "config.h"
-
-#if defined(UBLOCK_IMPL_COMMON)
-
 #include <gmlib/block_cipher_mode/impl/cbc_mode_impl.h>
 #include <gmlib/block_cipher_mode/impl/cfb_mode_impl.h>
 #include <gmlib/block_cipher_mode/impl/ctr_mode_impl.h>
@@ -498,5 +494,3 @@ std::unique_ptr<BlockCipherMode> create_ctr_decryptor_256256()
 }
 
 } // namespace ublock::internal::common
-
-#endif

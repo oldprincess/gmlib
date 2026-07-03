@@ -1,10 +1,6 @@
 #ifndef NUMBER_INTERNAL_UINT256_COMMON_H
 #define NUMBER_INTERNAL_UINT256_COMMON_H
 
-#include "config.h"
-
-#if defined(NUMBER_IMPL_COMMON)
-
 #include <cstddef>
 #include <cstdint>
 
@@ -129,7 +125,5 @@ void uint256_to_bytes(std::uint8_t        bytes[32],
 bool uint256_bittest(const std::uint32_t num[8], int i) noexcept;
 
 } // namespace number::internal::common
-
-#endif
 
 #endif

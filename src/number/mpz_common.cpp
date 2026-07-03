@@ -1,7 +1,5 @@
 #include "mpz_common.h"
 
-#if defined(NUMBER_IMPL_COMMON)
-
 #include <cstring>
 
 namespace number::internal::common {
@@ -184,4 +182,3 @@ void mpz_to_bytes(std::uint8_t*        r,
 }
 
 }; // namespace number::internal::common
-#endif

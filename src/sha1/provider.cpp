@@ -4,7 +4,6 @@
 #include <cstring>
 #include <stdexcept>
 
-#include "config.h"
 #include "provider_sha1_common.h"
 #include "provider_sha1_sha.h"
 

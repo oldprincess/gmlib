@@ -1,10 +1,6 @@
 #ifndef SM4_INTERNAL_SM4_COMMON_H
 #define SM4_INTERNAL_SM4_COMMON_H
 
-#include "config.h"
-
-#if defined(SM4_IMPL_COMMON)
-
 #include <cstddef>
 #include <cstdint>
 
@@ -77,5 +73,4 @@ void sm4_dec_blocks(const std::uint8_t  round_key[128],
 
 }; // namespace sm4::internal::common
 
-#endif
 #endif

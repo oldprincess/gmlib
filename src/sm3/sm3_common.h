@@ -1,10 +1,6 @@
 #ifndef SM3_INTERNAL_SM3_COMMON_H
 #define SM3_INTERNAL_SM3_COMMON_H
 
-#include "config.h"
-
-#if defined(SM3_IMPL_COMMON)
-
 #include <cstddef>
 #include <cstdint>
 
@@ -33,5 +29,4 @@ int sm3_final_block(std::uint32_t       state[8],
 
 } // namespace sm3::internal::common
 
-#endif
 #endif

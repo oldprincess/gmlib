@@ -2,8 +2,6 @@
 
 #include "uint256_common.h"
 
-#if defined(NUMBER_IMPL_COMMON)
-
 namespace number::internal::common {
 
 /// @brief r = a + b + carry
@@ -373,4 +371,3 @@ void mont256_from_bytes_ex(const Mont256CTX*   ctx,
 }
 
 }; // namespace number::internal::common
-#endif

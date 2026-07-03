@@ -1,3 +1,5 @@
+#if defined(BASE64_IMPL_CHROMIUM)
+
 /**
  * part of the code is "derived from
  * https://github.com/lemire/fastbase64/blob/master/src/chromiumbase64.c "
@@ -6,8 +8,6 @@
  */
 
 #include "base64_chromium.h"
-
-#if defined(BASE64_IMPL_CHROMIUM)
 
 #include <cctype>
 

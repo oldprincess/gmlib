@@ -1,7 +1,6 @@
-#include "config.h"
-
 #if defined(SHA1_IMPL_SHA)
 
+#include <gmlib/cpuinfo/cpuinfo.h>
 #include <gmlib/hash_lib/impl/hash_impl.h>
 
 #include <stdexcept>
@@ -83,7 +82,8 @@ protected:
 
 bool provider_available()
 {
-    return true;
+    return cpuinfo::x86_64::cpu_supports_sha() &&
+           cpuinfo::x86_64::cpu_supports_sse4_1();
 }
 
 hash_lib::Hash::HashPtr create_hash()

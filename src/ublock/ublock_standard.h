@@ -1,9 +1,7 @@
+#if defined(UBLOCK_IMPL_STANDARD)
+
 #ifndef UBLOCK_INTERNAL_UBLOCK_STANDARD_H
 #define UBLOCK_INTERNAL_UBLOCK_STANDARD_H
-
-#include "config.h"
-
-#if defined(UBLOCK_IMPL_STANDARD)
 
 #include <cstddef>
 #include <cstdint>
