@@ -1,4 +1,4 @@
-#if defined(BASE64_IMPL_AVX2)
+#if defined(SUPPORT_BASE64_AVX2)
 
 /**
  * part of the code is "derived from Alfred Klomp's

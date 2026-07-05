@@ -1,4 +1,4 @@
-#if defined(BASE64_IMPL_CHROMIUM)
+#if defined(SUPPORT_BASE64_CHROMIUM)
 
 /**
  * part of the code is "derived from

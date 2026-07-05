@@ -1,4 +1,4 @@
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
 
 #ifndef SM4_INTERNAL_SM4_SM4NI_H
 #define SM4_INTERNAL_SM4_SM4NI_H

@@ -1,4 +1,4 @@
-#if defined(SHA1_IMPL_SHA)
+#if defined(SUPPORT_SHA1_SHA)
 
 /**
  * part of the code is "derived from miTLS project. sha1-x86.c"

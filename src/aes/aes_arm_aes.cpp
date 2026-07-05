@@ -1,4 +1,4 @@
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
 
 #include "aes_arm_aes.h"
 

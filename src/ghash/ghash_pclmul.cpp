@@ -1,4 +1,4 @@
-#if defined(GHASH_IMPL_PCLMUL)
+#if defined(SUPPORT_GHASH_PCLMUL)
 
 #include "ghash_pclmul.h"
 

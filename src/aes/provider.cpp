@@ -11,7 +11,7 @@ namespace aes {
 
 AES128::Cipher AES128::create_cipher(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -20,7 +20,7 @@ AES128::Cipher AES128::create_cipher(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -42,7 +42,7 @@ AES128::Cipher AES128::create_cipher(const char* provider)
 
 AES128::CipherMode AES128::create_ecb_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -51,7 +51,7 @@ AES128::CipherMode AES128::create_ecb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -73,7 +73,7 @@ AES128::CipherMode AES128::create_ecb_encryptor(const char* provider)
 
 AES128::CipherMode AES128::create_ecb_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -82,7 +82,7 @@ AES128::CipherMode AES128::create_ecb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -104,7 +104,7 @@ AES128::CipherMode AES128::create_ecb_decryptor(const char* provider)
 
 AES128::CipherMode AES128::create_cbc_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -113,7 +113,7 @@ AES128::CipherMode AES128::create_cbc_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -135,7 +135,7 @@ AES128::CipherMode AES128::create_cbc_encryptor(const char* provider)
 
 AES128::CipherMode AES128::create_cbc_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -144,7 +144,7 @@ AES128::CipherMode AES128::create_cbc_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -166,7 +166,7 @@ AES128::CipherMode AES128::create_cbc_decryptor(const char* provider)
 
 AES128::CipherMode AES128::create_ofb_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -175,7 +175,7 @@ AES128::CipherMode AES128::create_ofb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -197,7 +197,7 @@ AES128::CipherMode AES128::create_ofb_encryptor(const char* provider)
 
 AES128::CipherMode AES128::create_ofb_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -206,7 +206,7 @@ AES128::CipherMode AES128::create_ofb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -228,7 +228,7 @@ AES128::CipherMode AES128::create_ofb_decryptor(const char* provider)
 
 AES128::CipherMode AES128::create_cfb_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -237,7 +237,7 @@ AES128::CipherMode AES128::create_cfb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -259,7 +259,7 @@ AES128::CipherMode AES128::create_cfb_encryptor(const char* provider)
 
 AES128::CipherMode AES128::create_cfb_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -268,7 +268,7 @@ AES128::CipherMode AES128::create_cfb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -290,7 +290,7 @@ AES128::CipherMode AES128::create_cfb_decryptor(const char* provider)
 
 AES128::CipherMode AES128::create_ctr_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -299,7 +299,7 @@ AES128::CipherMode AES128::create_ctr_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -321,7 +321,7 @@ AES128::CipherMode AES128::create_ctr_encryptor(const char* provider)
 
 AES128::CipherMode AES128::create_ctr_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -330,7 +330,7 @@ AES128::CipherMode AES128::create_ctr_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -352,7 +352,7 @@ AES128::CipherMode AES128::create_ctr_decryptor(const char* provider)
 
 AES128::CipherMode AES128::create_gcm_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -361,7 +361,7 @@ AES128::CipherMode AES128::create_gcm_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -383,7 +383,7 @@ AES128::CipherMode AES128::create_gcm_encryptor(const char* provider)
 
 AES128::CipherMode AES128::create_gcm_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -392,7 +392,7 @@ AES128::CipherMode AES128::create_gcm_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -414,7 +414,7 @@ AES128::CipherMode AES128::create_gcm_decryptor(const char* provider)
 
 AES192::Cipher AES192::create_cipher(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -423,7 +423,7 @@ AES192::Cipher AES192::create_cipher(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -445,7 +445,7 @@ AES192::Cipher AES192::create_cipher(const char* provider)
 
 AES192::CipherMode AES192::create_ecb_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -454,7 +454,7 @@ AES192::CipherMode AES192::create_ecb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -476,7 +476,7 @@ AES192::CipherMode AES192::create_ecb_encryptor(const char* provider)
 
 AES192::CipherMode AES192::create_ecb_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -485,7 +485,7 @@ AES192::CipherMode AES192::create_ecb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -507,7 +507,7 @@ AES192::CipherMode AES192::create_ecb_decryptor(const char* provider)
 
 AES192::CipherMode AES192::create_cbc_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -516,7 +516,7 @@ AES192::CipherMode AES192::create_cbc_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -538,7 +538,7 @@ AES192::CipherMode AES192::create_cbc_encryptor(const char* provider)
 
 AES192::CipherMode AES192::create_cbc_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -547,7 +547,7 @@ AES192::CipherMode AES192::create_cbc_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -569,7 +569,7 @@ AES192::CipherMode AES192::create_cbc_decryptor(const char* provider)
 
 AES192::CipherMode AES192::create_ofb_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -578,7 +578,7 @@ AES192::CipherMode AES192::create_ofb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -600,7 +600,7 @@ AES192::CipherMode AES192::create_ofb_encryptor(const char* provider)
 
 AES192::CipherMode AES192::create_ofb_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -609,7 +609,7 @@ AES192::CipherMode AES192::create_ofb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -631,7 +631,7 @@ AES192::CipherMode AES192::create_ofb_decryptor(const char* provider)
 
 AES192::CipherMode AES192::create_cfb_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -640,7 +640,7 @@ AES192::CipherMode AES192::create_cfb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -662,7 +662,7 @@ AES192::CipherMode AES192::create_cfb_encryptor(const char* provider)
 
 AES192::CipherMode AES192::create_cfb_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -671,7 +671,7 @@ AES192::CipherMode AES192::create_cfb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -693,7 +693,7 @@ AES192::CipherMode AES192::create_cfb_decryptor(const char* provider)
 
 AES192::CipherMode AES192::create_ctr_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -702,7 +702,7 @@ AES192::CipherMode AES192::create_ctr_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -724,7 +724,7 @@ AES192::CipherMode AES192::create_ctr_encryptor(const char* provider)
 
 AES192::CipherMode AES192::create_ctr_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -733,7 +733,7 @@ AES192::CipherMode AES192::create_ctr_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -755,7 +755,7 @@ AES192::CipherMode AES192::create_ctr_decryptor(const char* provider)
 
 AES192::CipherMode AES192::create_gcm_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -764,7 +764,7 @@ AES192::CipherMode AES192::create_gcm_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -786,7 +786,7 @@ AES192::CipherMode AES192::create_gcm_encryptor(const char* provider)
 
 AES192::CipherMode AES192::create_gcm_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -795,7 +795,7 @@ AES192::CipherMode AES192::create_gcm_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -817,7 +817,7 @@ AES192::CipherMode AES192::create_gcm_decryptor(const char* provider)
 
 AES256::Cipher AES256::create_cipher(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -826,7 +826,7 @@ AES256::Cipher AES256::create_cipher(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -848,7 +848,7 @@ AES256::Cipher AES256::create_cipher(const char* provider)
 
 AES256::CipherMode AES256::create_ecb_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -857,7 +857,7 @@ AES256::CipherMode AES256::create_ecb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -879,7 +879,7 @@ AES256::CipherMode AES256::create_ecb_encryptor(const char* provider)
 
 AES256::CipherMode AES256::create_ecb_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -888,7 +888,7 @@ AES256::CipherMode AES256::create_ecb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -910,7 +910,7 @@ AES256::CipherMode AES256::create_ecb_decryptor(const char* provider)
 
 AES256::CipherMode AES256::create_cbc_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -919,7 +919,7 @@ AES256::CipherMode AES256::create_cbc_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -941,7 +941,7 @@ AES256::CipherMode AES256::create_cbc_encryptor(const char* provider)
 
 AES256::CipherMode AES256::create_cbc_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -950,7 +950,7 @@ AES256::CipherMode AES256::create_cbc_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -972,7 +972,7 @@ AES256::CipherMode AES256::create_cbc_decryptor(const char* provider)
 
 AES256::CipherMode AES256::create_ofb_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -981,7 +981,7 @@ AES256::CipherMode AES256::create_ofb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -1003,7 +1003,7 @@ AES256::CipherMode AES256::create_ofb_encryptor(const char* provider)
 
 AES256::CipherMode AES256::create_ofb_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -1012,7 +1012,7 @@ AES256::CipherMode AES256::create_ofb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -1034,7 +1034,7 @@ AES256::CipherMode AES256::create_ofb_decryptor(const char* provider)
 
 AES256::CipherMode AES256::create_cfb_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -1043,7 +1043,7 @@ AES256::CipherMode AES256::create_cfb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -1065,7 +1065,7 @@ AES256::CipherMode AES256::create_cfb_encryptor(const char* provider)
 
 AES256::CipherMode AES256::create_cfb_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -1074,7 +1074,7 @@ AES256::CipherMode AES256::create_cfb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -1096,7 +1096,7 @@ AES256::CipherMode AES256::create_cfb_decryptor(const char* provider)
 
 AES256::CipherMode AES256::create_ctr_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -1105,7 +1105,7 @@ AES256::CipherMode AES256::create_ctr_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -1127,7 +1127,7 @@ AES256::CipherMode AES256::create_ctr_encryptor(const char* provider)
 
 AES256::CipherMode AES256::create_ctr_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -1136,7 +1136,7 @@ AES256::CipherMode AES256::create_ctr_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -1158,7 +1158,7 @@ AES256::CipherMode AES256::create_ctr_decryptor(const char* provider)
 
 AES256::CipherMode AES256::create_gcm_encryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -1167,7 +1167,7 @@ AES256::CipherMode AES256::create_gcm_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)
@@ -1189,7 +1189,7 @@ AES256::CipherMode AES256::create_gcm_encryptor(const char* provider)
 
 AES256::CipherMode AES256::create_gcm_decryptor(const char* provider)
 {
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
     if (aes::internal::aesni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "aesni") == 0)
@@ -1198,7 +1198,7 @@ AES256::CipherMode AES256::create_gcm_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
     if (aes::internal::arm_aes::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "arm_aes") == 0)

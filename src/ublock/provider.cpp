@@ -11,7 +11,7 @@ namespace ublock {
 
 uBlock128128::Cipher uBlock128128::create_cipher(const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -20,7 +20,7 @@ uBlock128128::Cipher uBlock128128::create_cipher(const char* provider)
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -43,7 +43,7 @@ uBlock128128::Cipher uBlock128128::create_cipher(const char* provider)
 uBlock128128::CipherMode uBlock128128::create_ecb_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -52,7 +52,7 @@ uBlock128128::CipherMode uBlock128128::create_ecb_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -75,7 +75,7 @@ uBlock128128::CipherMode uBlock128128::create_ecb_encryptor(
 uBlock128128::CipherMode uBlock128128::create_ecb_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -84,7 +84,7 @@ uBlock128128::CipherMode uBlock128128::create_ecb_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -107,7 +107,7 @@ uBlock128128::CipherMode uBlock128128::create_ecb_decryptor(
 uBlock128128::CipherMode uBlock128128::create_cbc_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -116,7 +116,7 @@ uBlock128128::CipherMode uBlock128128::create_cbc_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -139,7 +139,7 @@ uBlock128128::CipherMode uBlock128128::create_cbc_encryptor(
 uBlock128128::CipherMode uBlock128128::create_cbc_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -148,7 +148,7 @@ uBlock128128::CipherMode uBlock128128::create_cbc_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -171,7 +171,7 @@ uBlock128128::CipherMode uBlock128128::create_cbc_decryptor(
 uBlock128128::CipherMode uBlock128128::create_ofb_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -180,7 +180,7 @@ uBlock128128::CipherMode uBlock128128::create_ofb_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -203,7 +203,7 @@ uBlock128128::CipherMode uBlock128128::create_ofb_encryptor(
 uBlock128128::CipherMode uBlock128128::create_ofb_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -212,7 +212,7 @@ uBlock128128::CipherMode uBlock128128::create_ofb_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -235,7 +235,7 @@ uBlock128128::CipherMode uBlock128128::create_ofb_decryptor(
 uBlock128128::CipherMode uBlock128128::create_cfb_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -244,7 +244,7 @@ uBlock128128::CipherMode uBlock128128::create_cfb_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -267,7 +267,7 @@ uBlock128128::CipherMode uBlock128128::create_cfb_encryptor(
 uBlock128128::CipherMode uBlock128128::create_cfb_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -276,7 +276,7 @@ uBlock128128::CipherMode uBlock128128::create_cfb_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -299,7 +299,7 @@ uBlock128128::CipherMode uBlock128128::create_cfb_decryptor(
 uBlock128128::CipherMode uBlock128128::create_ctr_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -308,7 +308,7 @@ uBlock128128::CipherMode uBlock128128::create_ctr_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -331,7 +331,7 @@ uBlock128128::CipherMode uBlock128128::create_ctr_encryptor(
 uBlock128128::CipherMode uBlock128128::create_ctr_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -340,7 +340,7 @@ uBlock128128::CipherMode uBlock128128::create_ctr_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -363,7 +363,7 @@ uBlock128128::CipherMode uBlock128128::create_ctr_decryptor(
 uBlock128128::CipherMode uBlock128128::create_gcm_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -372,7 +372,7 @@ uBlock128128::CipherMode uBlock128128::create_gcm_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -395,7 +395,7 @@ uBlock128128::CipherMode uBlock128128::create_gcm_encryptor(
 uBlock128128::CipherMode uBlock128128::create_gcm_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -404,7 +404,7 @@ uBlock128128::CipherMode uBlock128128::create_gcm_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -426,7 +426,7 @@ uBlock128128::CipherMode uBlock128128::create_gcm_decryptor(
 
 uBlock128256::Cipher uBlock128256::create_cipher(const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -435,7 +435,7 @@ uBlock128256::Cipher uBlock128256::create_cipher(const char* provider)
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -458,7 +458,7 @@ uBlock128256::Cipher uBlock128256::create_cipher(const char* provider)
 uBlock128256::CipherMode uBlock128256::create_ecb_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -467,7 +467,7 @@ uBlock128256::CipherMode uBlock128256::create_ecb_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -490,7 +490,7 @@ uBlock128256::CipherMode uBlock128256::create_ecb_encryptor(
 uBlock128256::CipherMode uBlock128256::create_ecb_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -499,7 +499,7 @@ uBlock128256::CipherMode uBlock128256::create_ecb_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -522,7 +522,7 @@ uBlock128256::CipherMode uBlock128256::create_ecb_decryptor(
 uBlock128256::CipherMode uBlock128256::create_cbc_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -531,7 +531,7 @@ uBlock128256::CipherMode uBlock128256::create_cbc_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -554,7 +554,7 @@ uBlock128256::CipherMode uBlock128256::create_cbc_encryptor(
 uBlock128256::CipherMode uBlock128256::create_cbc_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -563,7 +563,7 @@ uBlock128256::CipherMode uBlock128256::create_cbc_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -586,7 +586,7 @@ uBlock128256::CipherMode uBlock128256::create_cbc_decryptor(
 uBlock128256::CipherMode uBlock128256::create_ofb_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -595,7 +595,7 @@ uBlock128256::CipherMode uBlock128256::create_ofb_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -618,7 +618,7 @@ uBlock128256::CipherMode uBlock128256::create_ofb_encryptor(
 uBlock128256::CipherMode uBlock128256::create_ofb_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -627,7 +627,7 @@ uBlock128256::CipherMode uBlock128256::create_ofb_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -650,7 +650,7 @@ uBlock128256::CipherMode uBlock128256::create_ofb_decryptor(
 uBlock128256::CipherMode uBlock128256::create_cfb_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -659,7 +659,7 @@ uBlock128256::CipherMode uBlock128256::create_cfb_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -682,7 +682,7 @@ uBlock128256::CipherMode uBlock128256::create_cfb_encryptor(
 uBlock128256::CipherMode uBlock128256::create_cfb_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -691,7 +691,7 @@ uBlock128256::CipherMode uBlock128256::create_cfb_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -714,7 +714,7 @@ uBlock128256::CipherMode uBlock128256::create_cfb_decryptor(
 uBlock128256::CipherMode uBlock128256::create_ctr_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -723,7 +723,7 @@ uBlock128256::CipherMode uBlock128256::create_ctr_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -746,7 +746,7 @@ uBlock128256::CipherMode uBlock128256::create_ctr_encryptor(
 uBlock128256::CipherMode uBlock128256::create_ctr_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -755,7 +755,7 @@ uBlock128256::CipherMode uBlock128256::create_ctr_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -778,7 +778,7 @@ uBlock128256::CipherMode uBlock128256::create_ctr_decryptor(
 uBlock128256::CipherMode uBlock128256::create_gcm_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -787,7 +787,7 @@ uBlock128256::CipherMode uBlock128256::create_gcm_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -810,7 +810,7 @@ uBlock128256::CipherMode uBlock128256::create_gcm_encryptor(
 uBlock128256::CipherMode uBlock128256::create_gcm_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -819,7 +819,7 @@ uBlock128256::CipherMode uBlock128256::create_gcm_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -841,7 +841,7 @@ uBlock128256::CipherMode uBlock128256::create_gcm_decryptor(
 
 uBlock256256::Cipher uBlock256256::create_cipher(const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -850,7 +850,7 @@ uBlock256256::Cipher uBlock256256::create_cipher(const char* provider)
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -873,7 +873,7 @@ uBlock256256::Cipher uBlock256256::create_cipher(const char* provider)
 uBlock256256::CipherMode uBlock256256::create_ecb_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -882,7 +882,7 @@ uBlock256256::CipherMode uBlock256256::create_ecb_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -905,7 +905,7 @@ uBlock256256::CipherMode uBlock256256::create_ecb_encryptor(
 uBlock256256::CipherMode uBlock256256::create_ecb_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -914,7 +914,7 @@ uBlock256256::CipherMode uBlock256256::create_ecb_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -937,7 +937,7 @@ uBlock256256::CipherMode uBlock256256::create_ecb_decryptor(
 uBlock256256::CipherMode uBlock256256::create_cbc_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -946,7 +946,7 @@ uBlock256256::CipherMode uBlock256256::create_cbc_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -969,7 +969,7 @@ uBlock256256::CipherMode uBlock256256::create_cbc_encryptor(
 uBlock256256::CipherMode uBlock256256::create_cbc_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -978,7 +978,7 @@ uBlock256256::CipherMode uBlock256256::create_cbc_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -1001,7 +1001,7 @@ uBlock256256::CipherMode uBlock256256::create_cbc_decryptor(
 uBlock256256::CipherMode uBlock256256::create_ofb_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -1010,7 +1010,7 @@ uBlock256256::CipherMode uBlock256256::create_ofb_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -1033,7 +1033,7 @@ uBlock256256::CipherMode uBlock256256::create_ofb_encryptor(
 uBlock256256::CipherMode uBlock256256::create_ofb_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -1042,7 +1042,7 @@ uBlock256256::CipherMode uBlock256256::create_ofb_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -1065,7 +1065,7 @@ uBlock256256::CipherMode uBlock256256::create_ofb_decryptor(
 uBlock256256::CipherMode uBlock256256::create_cfb_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -1074,7 +1074,7 @@ uBlock256256::CipherMode uBlock256256::create_cfb_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -1097,7 +1097,7 @@ uBlock256256::CipherMode uBlock256256::create_cfb_encryptor(
 uBlock256256::CipherMode uBlock256256::create_cfb_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -1106,7 +1106,7 @@ uBlock256256::CipherMode uBlock256256::create_cfb_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -1129,7 +1129,7 @@ uBlock256256::CipherMode uBlock256256::create_cfb_decryptor(
 uBlock256256::CipherMode uBlock256256::create_ctr_encryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -1138,7 +1138,7 @@ uBlock256256::CipherMode uBlock256256::create_ctr_encryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)
@@ -1161,7 +1161,7 @@ uBlock256256::CipherMode uBlock256256::create_ctr_encryptor(
 uBlock256256::CipherMode uBlock256256::create_ctr_decryptor(
     const char* provider)
 {
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
     if (ublock::internal::gong25::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong25") == 0)
@@ -1170,7 +1170,7 @@ uBlock256256::CipherMode uBlock256256::create_ctr_decryptor(
         }
     }
 #endif
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
     if (ublock::internal::standard::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "standard") == 0)

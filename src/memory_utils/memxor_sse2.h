@@ -1,4 +1,4 @@
-#if defined(MEMXOR_IMPL_SSE2)
+#if defined(SUPPORT_MEMXOR_SSE2)
 
 #ifndef MEMXOR_SSE2_H
 #define MEMXOR_SSE2_H

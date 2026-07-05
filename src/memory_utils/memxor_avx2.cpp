@@ -1,4 +1,4 @@
-#if defined(MEMXOR_IMPL_AVX2)
+#if defined(SUPPORT_MEMXOR_AVX2)
 
 #include "memxor_avx2.h"
 

@@ -1,4 +1,4 @@
-#if defined(SHA224_256_IMPL_SHA)
+#if defined(SUPPORT_SHA2_SHA)
 
 #include "sha224_256_sha.h"
 

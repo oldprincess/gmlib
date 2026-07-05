@@ -1,4 +1,4 @@
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
 
 #ifndef SM4_INTERNAL_SM4_LANG18_H
 #define SM4_INTERNAL_SM4_LANG18_H

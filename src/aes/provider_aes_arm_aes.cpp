@@ -1,4 +1,4 @@
-#if defined(AES_IMPL_ARM_AES)
+#if defined(SUPPORT_AES_ARM_AES)
 
 #include <gmlib/aes/aes.h>
 #include <gmlib/block_cipher_mode/impl/cbc_mode_impl.h>

@@ -1,10 +1,10 @@
 #include <gmlib/cpuinfo/cpuinfo.h>
 #include <gmlib/memory_utils/memxor.h>
 
-#if defined(MEMXOR_IMPL_AVX2)
+#if defined(SUPPORT_MEMXOR_AVX2)
 #include "memxor_avx2.h"
 #endif
-#if defined(MEMXOR_IMPL_SSE2)
+#if defined(SUPPORT_MEMXOR_SSE2)
 #include "memxor_sse2.h"
 #endif
 
@@ -19,13 +19,13 @@ typedef void (*memxor_n_t)(void       *out,
 
 static memxor_n_t fetch_impl()
 {
-#if defined(MEMXOR_IMPL_AVX2)
+#if defined(SUPPORT_MEMXOR_AVX2)
     if (cpuinfo::x86_64::cpu_supports_avx2())
     {
         return avx2::memxor_n;
     }
 #endif
-#if defined(MEMXOR_IMPL_SSE2)
+#if defined(SUPPORT_MEMXOR_SSE2)
     if (cpuinfo::x86_64::cpu_supports_sse2())
     {
         return sse2::memxor_n;

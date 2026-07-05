@@ -1,4 +1,4 @@
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
 
 #include <gmlib/cpuinfo/cpuinfo.h>
 #include <gmlib/block_cipher_mode/impl/cbc_mode_impl.h>

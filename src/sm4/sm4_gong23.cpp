@@ -1,4 +1,4 @@
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
 
 #include "sm4_gong23.h"
 

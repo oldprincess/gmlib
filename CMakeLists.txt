@@ -127,9 +127,9 @@ endif()
 ## ================================================= ##
 #######################################################
 
-function(gmlib_enable_impl impl_macro)
-    target_compile_definitions(${PROJECT_NAME_}_static PRIVATE ${impl_macro})
-    message(STATUS "Enabled implementation: ${impl_macro}")
+function(gmlib_enable_impl support_macro)
+    target_compile_definitions(${PROJECT_NAME_}_static PRIVATE ${support_macro})
+    message(STATUS "Enabled implementation: ${support_macro}")
 endfunction()
 
 function(gmlib_skip_impl option_name required_arch)
@@ -140,18 +140,18 @@ endfunction()
 
 # Portable implementations selected at build time.
 if(SUPPORT_BASE64_CHROMIUM)
-    gmlib_enable_impl(BASE64_IMPL_CHROMIUM)
+    gmlib_enable_impl(SUPPORT_BASE64_CHROMIUM)
 endif()
 if(SUPPORT_SM3_YANG15)
-    gmlib_enable_impl(SM3_IMPL_YANG15)
+    gmlib_enable_impl(SUPPORT_SM3_YANG15)
 endif()
 
-# Architecture-specific implementations. The implementation macro is target-wide
+# Architecture-specific implementations. The support macro is target-wide
 # and records that an implementation is present in the library. ISA compiler
 # options are deliberately limited to the optimized kernel translation units.
 if(SUPPORT_AES_ARM_AES)
     if(ARCH_ARM OR ARCH_AARCH64)
-        gmlib_enable_impl(AES_IMPL_ARM_AES)
+        gmlib_enable_impl(SUPPORT_AES_ARM_AES)
         if(NOT COMPILER_MSVC)
             if(ARCH_ARM)
                 set(AES_ARM_AES_OPTIONS
@@ -171,7 +171,7 @@ endif()
 
 if(SUPPORT_AES_AESNI)
     if(ARCH_X86 OR ARCH_X86_64)
-        gmlib_enable_impl(AES_IMPL_AESNI)
+        gmlib_enable_impl(SUPPORT_AES_AESNI)
         if(NOT COMPILER_MSVC)
             set_source_files_properties(
                 ${BASE_LIB_SRC_DIRECTORY}/aes/aes_aesni.cpp
@@ -184,7 +184,7 @@ endif()
 
 if(SUPPORT_BASE64_AVX2)
     if(ARCH_X86 OR ARCH_X86_64)
-        gmlib_enable_impl(BASE64_IMPL_AVX2)
+        gmlib_enable_impl(SUPPORT_BASE64_AVX2)
         if(COMPILER_MSVC)
             set(BASE64_AVX2_OPTIONS /arch:AVX2)
         else()
@@ -200,7 +200,7 @@ endif()
 
 if(SUPPORT_GHASH_PCLMUL)
     if(ARCH_X86 OR ARCH_X86_64)
-        gmlib_enable_impl(GHASH_IMPL_PCLMUL)
+        gmlib_enable_impl(SUPPORT_GHASH_PCLMUL)
         if(NOT COMPILER_MSVC)
             set_source_files_properties(
                 ${BASE_LIB_SRC_DIRECTORY}/ghash/ghash_pclmul.cpp
@@ -213,7 +213,7 @@ endif()
 
 if(SUPPORT_MEMXOR_AVX2)
     if(ARCH_X86 OR ARCH_X86_64)
-        gmlib_enable_impl(MEMXOR_IMPL_AVX2)
+        gmlib_enable_impl(SUPPORT_MEMXOR_AVX2)
         if(COMPILER_MSVC)
             set(MEMXOR_AVX2_OPTIONS /arch:AVX2)
         else()
@@ -229,7 +229,7 @@ endif()
 
 if(SUPPORT_MEMXOR_SSE2)
     if(ARCH_X86 OR ARCH_X86_64)
-        gmlib_enable_impl(MEMXOR_IMPL_SSE2)
+        gmlib_enable_impl(SUPPORT_MEMXOR_SSE2)
         if(NOT COMPILER_MSVC)
             set_source_files_properties(
                 ${BASE_LIB_SRC_DIRECTORY}/memory_utils/memxor_sse2.cpp
@@ -242,7 +242,7 @@ endif()
 
 if(SUPPORT_NUMBER_X64)
     if(ARCH_X86_64)
-        gmlib_enable_impl(NUMBER_IMPL_X64)
+        gmlib_enable_impl(SUPPORT_NUMBER_X64)
         if(NOT COMPILER_MSVC)
             set_source_files_properties(
                 ${BASE_LIB_SRC_DIRECTORY}/number/mont256_x64.cpp
@@ -257,7 +257,7 @@ endif()
 
 if(SUPPORT_SHA1_SHA)
     if(ARCH_X86 OR ARCH_X86_64)
-        gmlib_enable_impl(SHA1_IMPL_SHA)
+        gmlib_enable_impl(SUPPORT_SHA1_SHA)
         if(NOT COMPILER_MSVC)
             set_source_files_properties(
                 ${BASE_LIB_SRC_DIRECTORY}/sha1/sha1_sha.cpp
@@ -270,7 +270,7 @@ endif()
 
 if(SUPPORT_SHA2_SHA)
     if(ARCH_X86 OR ARCH_X86_64)
-        gmlib_enable_impl(SHA224_256_IMPL_SHA)
+        gmlib_enable_impl(SUPPORT_SHA2_SHA)
         if(NOT COMPILER_MSVC)
             set_source_files_properties(
                 ${BASE_LIB_SRC_DIRECTORY}/sha2/sha224_256_sha.cpp
@@ -283,7 +283,7 @@ endif()
 
 if(SUPPORT_SM4_SM4NI)
     if(ARCH_X86 OR ARCH_X86_64)
-        gmlib_enable_impl(SM4_IMPL_SM4NI)
+        gmlib_enable_impl(SUPPORT_SM4_SM4NI)
         if(NOT COMPILER_MSVC)
             set_source_files_properties(
                 ${BASE_LIB_SRC_DIRECTORY}/sm4/sm4_sm4ni.cpp
@@ -296,7 +296,7 @@ endif()
 
 if(SUPPORT_SM4_LANG18)
     if(ARCH_X86 OR ARCH_X86_64)
-        gmlib_enable_impl(SM4_IMPL_LANG18)
+        gmlib_enable_impl(SUPPORT_SM4_LANG18)
         if(COMPILER_MSVC)
             set(SM4_LANG18_OPTIONS /arch:AVX2)
         else()
@@ -312,7 +312,7 @@ endif()
 
 if(SUPPORT_SM4_GONG23)
     if(ARCH_X86 OR ARCH_X86_64)
-        gmlib_enable_impl(SM4_IMPL_GONG23)
+        gmlib_enable_impl(SUPPORT_SM4_GONG23)
         if(COMPILER_MSVC)
             set(SM4_GONG23_OPTIONS /arch:AVX512)
         else()
@@ -328,7 +328,7 @@ endif()
 
 if(SUPPORT_UBLOCK_STANDARD)
     if(ARCH_X86 OR ARCH_X86_64)
-        gmlib_enable_impl(UBLOCK_IMPL_STANDARD)
+        gmlib_enable_impl(SUPPORT_UBLOCK_STANDARD)
         if(NOT COMPILER_MSVC)
             set_source_files_properties(
                 ${BASE_LIB_SRC_DIRECTORY}/ublock/ublock_standard.cpp
@@ -341,7 +341,7 @@ endif()
 
 if(SUPPORT_UBLOCK_GONG25)
     if(ARCH_X86 OR ARCH_X86_64)
-        gmlib_enable_impl(UBLOCK_IMPL_GONG25)
+        gmlib_enable_impl(SUPPORT_UBLOCK_GONG25)
         if(COMPILER_MSVC)
             set(UBLOCK_GONG25_OPTIONS /arch:AVX2)
         else()

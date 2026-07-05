@@ -1,4 +1,4 @@
-#if defined(UBLOCK_IMPL_GONG25)
+#if defined(SUPPORT_UBLOCK_GONG25)
 
 #include "ublock_gong25.h"
 

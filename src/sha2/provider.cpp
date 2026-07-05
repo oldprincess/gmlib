@@ -13,7 +13,7 @@ namespace sha2 {
 
 hash_lib::Hash::HashPtr SHA224::create_hash(const char* provider)
 {
-#if defined(SHA224_256_IMPL_SHA)
+#if defined(SUPPORT_SHA2_SHA)
     if (internal::sha::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sha") == 0)
@@ -36,7 +36,7 @@ hash_lib::Hash::HashPtr SHA224::create_hash(const char* provider)
 
 hash_lib::Hash::HashPtr SHA256::create_hash(const char* provider)
 {
-#if defined(SHA224_256_IMPL_SHA)
+#if defined(SUPPORT_SHA2_SHA)
     if (internal::sha::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sha") == 0)

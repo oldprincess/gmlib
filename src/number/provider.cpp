@@ -86,7 +86,7 @@ struct NumberProvider
 
 static const NumberProvider number_providers[] = {
 
-#if defined(NUMBER_IMPL_X64)
+#if defined(SUPPORT_NUMBER_X64)
     {
         []() {
             static bool available = cpuinfo::x86_64::cpu_supports_bmi2() &&

@@ -1,4 +1,4 @@
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
 
 #include <gmlib/block_cipher_mode/impl/cbc_mode_impl.h>
 #include <gmlib/block_cipher_mode/impl/cfb_mode_impl.h>

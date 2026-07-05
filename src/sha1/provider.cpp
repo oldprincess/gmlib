@@ -11,7 +11,7 @@ namespace sha1 {
 
 hash_lib::Hash::HashPtr SHA1::create_hash(const char* provider)
 {
-#if defined(SHA1_IMPL_SHA)
+#if defined(SUPPORT_SHA1_SHA)
     if (internal::sha::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sha") == 0)

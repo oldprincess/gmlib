@@ -1,4 +1,4 @@
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
 
 #ifndef AES_INTERNAL_AES_AESNI_H
 #define AES_INTERNAL_AES_AESNI_H

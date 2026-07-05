@@ -12,7 +12,7 @@ namespace sm4 {
 
 SM4::Cipher SM4::create_cipher(const char* provider)
 {
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
     if (sm4::internal::gong23::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong23") == 0)
@@ -21,7 +21,7 @@ SM4::Cipher SM4::create_cipher(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
     if (sm4::internal::lang18::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "lang18") == 0)
@@ -30,7 +30,7 @@ SM4::Cipher SM4::create_cipher(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
     if (sm4::internal::sm4ni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sm4ni") == 0)
@@ -52,7 +52,7 @@ SM4::Cipher SM4::create_cipher(const char* provider)
 
 SM4::CipherMode SM4::create_ecb_encryptor(const char* provider)
 {
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
     if (sm4::internal::gong23::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong23") == 0)
@@ -61,7 +61,7 @@ SM4::CipherMode SM4::create_ecb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
     if (sm4::internal::lang18::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "lang18") == 0)
@@ -70,7 +70,7 @@ SM4::CipherMode SM4::create_ecb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
     if (sm4::internal::sm4ni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sm4ni") == 0)
@@ -92,7 +92,7 @@ SM4::CipherMode SM4::create_ecb_encryptor(const char* provider)
 
 SM4::CipherMode SM4::create_ecb_decryptor(const char* provider)
 {
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
     if (sm4::internal::gong23::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong23") == 0)
@@ -101,7 +101,7 @@ SM4::CipherMode SM4::create_ecb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
     if (sm4::internal::lang18::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "lang18") == 0)
@@ -110,7 +110,7 @@ SM4::CipherMode SM4::create_ecb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
     if (sm4::internal::sm4ni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sm4ni") == 0)
@@ -132,7 +132,7 @@ SM4::CipherMode SM4::create_ecb_decryptor(const char* provider)
 
 SM4::CipherMode SM4::create_cbc_encryptor(const char* provider)
 {
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
     if (sm4::internal::gong23::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong23") == 0)
@@ -141,7 +141,7 @@ SM4::CipherMode SM4::create_cbc_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
     if (sm4::internal::lang18::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "lang18") == 0)
@@ -150,7 +150,7 @@ SM4::CipherMode SM4::create_cbc_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
     if (sm4::internal::sm4ni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sm4ni") == 0)
@@ -172,7 +172,7 @@ SM4::CipherMode SM4::create_cbc_encryptor(const char* provider)
 
 SM4::CipherMode SM4::create_cbc_decryptor(const char* provider)
 {
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
     if (sm4::internal::gong23::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong23") == 0)
@@ -181,7 +181,7 @@ SM4::CipherMode SM4::create_cbc_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
     if (sm4::internal::lang18::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "lang18") == 0)
@@ -190,7 +190,7 @@ SM4::CipherMode SM4::create_cbc_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
     if (sm4::internal::sm4ni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sm4ni") == 0)
@@ -212,7 +212,7 @@ SM4::CipherMode SM4::create_cbc_decryptor(const char* provider)
 
 SM4::CipherMode SM4::create_ofb_encryptor(const char* provider)
 {
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
     if (sm4::internal::gong23::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong23") == 0)
@@ -221,7 +221,7 @@ SM4::CipherMode SM4::create_ofb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
     if (sm4::internal::lang18::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "lang18") == 0)
@@ -230,7 +230,7 @@ SM4::CipherMode SM4::create_ofb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
     if (sm4::internal::sm4ni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sm4ni") == 0)
@@ -252,7 +252,7 @@ SM4::CipherMode SM4::create_ofb_encryptor(const char* provider)
 
 SM4::CipherMode SM4::create_ofb_decryptor(const char* provider)
 {
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
     if (sm4::internal::gong23::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong23") == 0)
@@ -261,7 +261,7 @@ SM4::CipherMode SM4::create_ofb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
     if (sm4::internal::lang18::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "lang18") == 0)
@@ -270,7 +270,7 @@ SM4::CipherMode SM4::create_ofb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
     if (sm4::internal::sm4ni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sm4ni") == 0)
@@ -292,7 +292,7 @@ SM4::CipherMode SM4::create_ofb_decryptor(const char* provider)
 
 SM4::CipherMode SM4::create_cfb_encryptor(const char* provider)
 {
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
     if (sm4::internal::gong23::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong23") == 0)
@@ -301,7 +301,7 @@ SM4::CipherMode SM4::create_cfb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
     if (sm4::internal::lang18::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "lang18") == 0)
@@ -310,7 +310,7 @@ SM4::CipherMode SM4::create_cfb_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
     if (sm4::internal::sm4ni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sm4ni") == 0)
@@ -332,7 +332,7 @@ SM4::CipherMode SM4::create_cfb_encryptor(const char* provider)
 
 SM4::CipherMode SM4::create_cfb_decryptor(const char* provider)
 {
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
     if (sm4::internal::gong23::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong23") == 0)
@@ -341,7 +341,7 @@ SM4::CipherMode SM4::create_cfb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
     if (sm4::internal::lang18::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "lang18") == 0)
@@ -350,7 +350,7 @@ SM4::CipherMode SM4::create_cfb_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
     if (sm4::internal::sm4ni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sm4ni") == 0)
@@ -372,7 +372,7 @@ SM4::CipherMode SM4::create_cfb_decryptor(const char* provider)
 
 SM4::CipherMode SM4::create_ctr_encryptor(const char* provider)
 {
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
     if (sm4::internal::gong23::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong23") == 0)
@@ -381,7 +381,7 @@ SM4::CipherMode SM4::create_ctr_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
     if (sm4::internal::lang18::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "lang18") == 0)
@@ -390,7 +390,7 @@ SM4::CipherMode SM4::create_ctr_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
     if (sm4::internal::sm4ni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sm4ni") == 0)
@@ -412,7 +412,7 @@ SM4::CipherMode SM4::create_ctr_encryptor(const char* provider)
 
 SM4::CipherMode SM4::create_ctr_decryptor(const char* provider)
 {
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
     if (sm4::internal::gong23::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong23") == 0)
@@ -421,7 +421,7 @@ SM4::CipherMode SM4::create_ctr_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
     if (sm4::internal::lang18::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "lang18") == 0)
@@ -430,7 +430,7 @@ SM4::CipherMode SM4::create_ctr_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
     if (sm4::internal::sm4ni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sm4ni") == 0)
@@ -452,7 +452,7 @@ SM4::CipherMode SM4::create_ctr_decryptor(const char* provider)
 
 SM4::CipherMode SM4::create_gcm_encryptor(const char* provider)
 {
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
     if (sm4::internal::gong23::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong23") == 0)
@@ -461,7 +461,7 @@ SM4::CipherMode SM4::create_gcm_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
     if (sm4::internal::lang18::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "lang18") == 0)
@@ -470,7 +470,7 @@ SM4::CipherMode SM4::create_gcm_encryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
     if (sm4::internal::sm4ni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sm4ni") == 0)
@@ -492,7 +492,7 @@ SM4::CipherMode SM4::create_gcm_encryptor(const char* provider)
 
 SM4::CipherMode SM4::create_gcm_decryptor(const char* provider)
 {
-#if defined(SM4_IMPL_GONG23)
+#if defined(SUPPORT_SM4_GONG23)
     if (sm4::internal::gong23::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "gong23") == 0)
@@ -501,7 +501,7 @@ SM4::CipherMode SM4::create_gcm_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
     if (sm4::internal::lang18::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "lang18") == 0)
@@ -510,7 +510,7 @@ SM4::CipherMode SM4::create_gcm_decryptor(const char* provider)
         }
     }
 #endif
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
     if (sm4::internal::sm4ni::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "sm4ni") == 0)

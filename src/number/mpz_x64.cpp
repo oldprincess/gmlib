@@ -1,4 +1,4 @@
-#if defined(NUMBER_IMPL_X64)
+#if defined(SUPPORT_NUMBER_X64)
 
 #include "mpz_x64.h"
 

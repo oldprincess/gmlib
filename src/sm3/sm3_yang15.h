@@ -1,4 +1,4 @@
-#if defined(SM3_IMPL_YANG15)
+#if defined(SUPPORT_SM3_YANG15)
 
 #ifndef SM3_INTERNAL_SM3_YANG15_H
 #define SM3_INTERNAL_SM3_YANG15_H

@@ -1,4 +1,4 @@
-#if defined(SM3_IMPL_YANG15)
+#if defined(SUPPORT_SM3_YANG15)
 
 #include <gmlib/hash_lib/impl/hash_impl.h>
 

@@ -1,4 +1,4 @@
-#if defined(SM4_IMPL_LANG18)
+#if defined(SUPPORT_SM4_LANG18)
 
 #include "sm4_lang18.h"
 

@@ -12,7 +12,7 @@ namespace ghash {
 
 hash_lib::Hash::HashPtr GHash::create_hash(const char* provider)
 {
-#if defined(GHASH_IMPL_PCLMUL)
+#if defined(SUPPORT_GHASH_PCLMUL)
     if (ghash::internal::pclmul::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "pclmul") == 0)

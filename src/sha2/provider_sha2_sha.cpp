@@ -1,4 +1,4 @@
-#if defined(SHA224_256_IMPL_SHA)
+#if defined(SUPPORT_SHA2_SHA)
 
 #include <gmlib/cpuinfo/cpuinfo.h>
 #include <gmlib/hash_lib/impl/hash_impl.h>

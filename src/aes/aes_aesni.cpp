@@ -1,4 +1,4 @@
-#if defined(AES_IMPL_AESNI)
+#if defined(SUPPORT_AES_AESNI)
 
 #include "aes_aesni.h"
 

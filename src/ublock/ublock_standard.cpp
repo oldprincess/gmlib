@@ -1,4 +1,4 @@
-#if defined(UBLOCK_IMPL_STANDARD)
+#if defined(SUPPORT_UBLOCK_STANDARD)
 
 /**
  * part of the code is "derived from

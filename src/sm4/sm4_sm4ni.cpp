@@ -1,4 +1,4 @@
-#if defined(SM4_IMPL_SM4NI)
+#if defined(SUPPORT_SM4_SM4NI)
 
 #include "sm4_sm4ni.h"
 

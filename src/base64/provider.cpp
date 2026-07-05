@@ -19,7 +19,7 @@ struct Provider
 
 static Provider create_provider() noexcept
 {
-#if defined(BASE64_IMPL_AVX2)
+#if defined(SUPPORT_BASE64_AVX2)
     if (cpuinfo::x86_64::cpu_supports_avx2())
     {
         return {
@@ -32,7 +32,7 @@ static Provider create_provider() noexcept
         };
     }
 #endif
-#if defined(BASE64_IMPL_CHROMIUM)
+#if defined(SUPPORT_BASE64_CHROMIUM)
     return {
         internal::chromium::base64_is_b64,
         internal::chromium::base64_encode_outl,

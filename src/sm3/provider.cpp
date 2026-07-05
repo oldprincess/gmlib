@@ -10,7 +10,7 @@ namespace sm3 {
 
 hash_lib::Hash::HashPtr SM3::create_hash(const char* provider)
 {
-#if defined(SM3_IMPL_YANG15)
+#if defined(SUPPORT_SM3_YANG15)
     if (internal::yang15::provider_available())
     {
         if (provider == nullptr || std::strcmp(provider, "yang15") == 0)
