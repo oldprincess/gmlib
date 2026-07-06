@@ -1,6 +1,7 @@
 #include <gmlib/memory_utils/endian.h>
 #include <gmlib/memory_utils/memxor.h>
 #include <gmlib/sm2/internal/sm2_alg.h>
+#include <gmlib/sm2/internal/sm2_const.h>
 #include <gmlib/sm2/internal/sm2p256v1.h>
 #include <gmlib/sm2/sm2.h>
 

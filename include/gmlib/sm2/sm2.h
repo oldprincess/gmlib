@@ -4,7 +4,7 @@
 #include <gmlib/hash_lib/hash.h>
 #include <gmlib/rng/rng.h>
 #include <gmlib/sm2/internal/sm2_alg.h>
-#include <gmlib/sm2/internal/sm2p256v1.h>
+#include <gmlib/sm2/internal/sm2_const.h>
 
 #include <cstring>
 #include <functional>
