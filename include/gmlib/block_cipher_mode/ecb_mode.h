@@ -52,7 +52,7 @@ public:
 public:
     std::unique_ptr<BlockCipherMode> clone() const override
     {
-        return std::make_unique<EcbEncryptor>(*this);
+        return impl_->clone();
     }
 
     void init(const std::uint8_t* user_key)
@@ -125,7 +125,7 @@ public:
 public:
     std::unique_ptr<BlockCipherMode> clone() const override
     {
-        return std::make_unique<EcbDecryptor>(*this);
+        return impl_->clone();
     }
 
     void init(const std::uint8_t* user_key)

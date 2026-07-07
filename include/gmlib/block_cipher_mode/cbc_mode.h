@@ -54,7 +54,7 @@ public:
 public:
     std::unique_ptr<BlockCipherMode> clone() const override
     {
-        return std::make_unique<CbcEncryptor>(*this);
+        return impl_->clone();
     }
 
     void init(const std::uint8_t* user_key, const std::uint8_t* iv)
@@ -132,7 +132,7 @@ public:
 public:
     std::unique_ptr<BlockCipherMode> clone() const override
     {
-        return std::make_unique<CbcDecryptor>(*this);
+        return impl_->clone();
     }
 
     void init(const std::uint8_t* user_key, const std::uint8_t* iv)

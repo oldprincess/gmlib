@@ -105,7 +105,7 @@ public:
 
     Cipher clone() const override
     {
-        return std::make_unique<DES>(*this);
+        return impl_->clone();
     }
 
 public:

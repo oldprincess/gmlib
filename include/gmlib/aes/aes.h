@@ -103,7 +103,7 @@ public:
 
     Cipher clone() const override
     {
-        return std::make_unique<AES128>(*this);
+        return impl_->clone();
     }
 
 public:
@@ -234,7 +234,7 @@ public:
 
     Cipher clone() const override
     {
-        return std::make_unique<AES192>(*this);
+        return impl_->clone();
     }
 
 public:
@@ -365,7 +365,7 @@ public:
 
     Cipher clone() const override
     {
-        return std::make_unique<AES256>(*this);
+        return impl_->clone();
     }
 
 public:
