@@ -135,7 +135,7 @@ protected:
         while (block_num >= PARALLEL_NUM)
         {
             this->gen_block_key_stream(key_stream, PARALLEL_NUM);
-            memory_utils::memxor<PARALLEL_BYTES>(out, in, key_stream);
+            memory_utils::memxor_n(out, in, key_stream, PARALLEL_BYTES);
             in += PARALLEL_BYTES, out += PARALLEL_BYTES;
             block_num -= PARALLEL_NUM;
         }

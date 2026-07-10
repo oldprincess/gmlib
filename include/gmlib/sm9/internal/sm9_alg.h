@@ -113,7 +113,7 @@ public:
         while (inl >= Hash::DIGEST_SIZE)
         {
             this->gen_keystream(buf, Hash::DIGEST_SIZE);
-            memory_utils::memxor<Hash::DIGEST_SIZE>(out, in, buf);
+            memory_utils::memxor_n(out, in, buf, Hash::DIGEST_SIZE);
             out += Hash::DIGEST_SIZE;
             in += Hash::DIGEST_SIZE;
             inl -= Hash::DIGEST_SIZE;

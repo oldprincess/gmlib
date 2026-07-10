@@ -111,7 +111,7 @@ protected:
         while (block_num)
         {
             cipher_.encrypt_block(iv_, pre_ct);
-            memory_utils::memxor<block_size>(out, in, iv_);
+            memory_utils::memxor_n(out, in, iv_, block_size);
             pre_ct = out;
             in += block_size, out += block_size, block_num--;
         }
@@ -240,7 +240,7 @@ private:
             std::memcpy(buffer + BLOCK_SIZE, in, REMAIN);
             std::memcpy(iv_, in + REMAIN, BLOCK_SIZE);
             cipher_.encrypt_blocks(buffer, buffer, PARALLEL_NUM);
-            memory_utils::memxor<PARALLEL_BYTES>(out, in, buffer);
+            memory_utils::memxor_n(out, in, buffer, PARALLEL_BYTES);
             out += PARALLEL_BYTES;
             in += PARALLEL_BYTES, block_num -= PARALLEL_NUM;
         }

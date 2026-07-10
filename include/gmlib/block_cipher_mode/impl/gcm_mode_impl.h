@@ -143,7 +143,7 @@ protected:
         while (block_num >= PARALLEL_NUM)
         {
             this->gen_block_key_stream(key_stream, PARALLEL_NUM);
-            memory_utils::memxor<PARALLEL_BYTES>(out, in, key_stream);
+            memory_utils::memxor_n(out, in, key_stream, PARALLEL_BYTES);
             in += PARALLEL_BYTES, out += PARALLEL_BYTES;
             block_num -= PARALLEL_NUM;
         }
@@ -359,7 +359,7 @@ protected:
         hash_.do_final(tag_);
         this->GctrCryptorImpl<Cipher>::cipher_.encrypt_block(
             t, this->GctrCryptorImpl<Cipher>::get_counter0());
-        memory_utils::memxor<16>(tag_, tag_, t);
+        memory_utils::memxor_n(tag_, tag_, t, 16);
     }
 };
 
@@ -558,7 +558,7 @@ private:
         hash_.do_final(tag);
         this->GctrCryptorImpl<Cipher>::cipher_.encrypt_block(
             t, this->GctrCryptorImpl<Cipher>::get_counter0());
-        memory_utils::memxor<16>(tag, tag, t);
+        memory_utils::memxor_n(tag, tag, t, 16);
         if (std::memcmp(tag, tag_, 16) != 0)
         {
             throw std::runtime_error("invalid gcm ciphertext");

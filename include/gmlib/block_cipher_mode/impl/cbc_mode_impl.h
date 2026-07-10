@@ -110,7 +110,7 @@ protected:
         std::uint8_t* cur_iv = iv_;
         while (block_num)
         {
-            memory_utils::memxor<BLOCK_SIZE>(iv_, in, cur_iv);
+            memory_utils::memxor_n(iv_, in, cur_iv, BLOCK_SIZE);
             cipher_.encrypt_block(out, iv_);
             cur_iv = out;
             in += BLOCK_SIZE, out += BLOCK_SIZE, block_num--;
@@ -244,9 +244,9 @@ private:
             std::memcpy(next_iv, in + REMAIN, BLOCK_SIZE);
 
             cipher_.decrypt_blocks(buffer, in, PARALLEL_NUM);
-            memory_utils::memxor<BLOCK_SIZE>(out, buffer, iv_);
+            memory_utils::memxor_n(out, buffer, iv_, BLOCK_SIZE);
             std::uint8_t *ptr1 = out + BLOCK_SIZE, *ptr2 = buffer + BLOCK_SIZE;
-            memory_utils::memxor<REMAIN>(ptr1, ptr2, in);
+            memory_utils::memxor_n(ptr1, ptr2, in, REMAIN);
             in += PARALLEL_BYTES, out += PARALLEL_BYTES;
             block_num -= PARALLEL_NUM;
 
@@ -258,7 +258,7 @@ private:
             std::memcpy(next_iv, in + remain, BLOCK_SIZE);
 
             cipher_.decrypt_blocks(buffer, in, block_num);
-            memory_utils::memxor<BLOCK_SIZE>(out, buffer, iv_);
+            memory_utils::memxor_n(out, buffer, iv_, BLOCK_SIZE);
             std::uint8_t* ptr1 = out + BLOCK_SIZE;
             std::uint8_t* ptr2 = buffer + BLOCK_SIZE;
             memory_utils::memxor_n(ptr1, ptr2, in, remain);

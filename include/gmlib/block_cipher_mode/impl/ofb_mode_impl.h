@@ -124,7 +124,7 @@ protected:
         while (block_num)
         {
             this->gen_key_stream(key_stream, 1);
-            memory_utils::memxor<block_size>(out, in, key_stream);
+            memory_utils::memxor_n(out, in, key_stream, block_size);
             in += block_size, out += block_size, block_num--;
         }
     }
