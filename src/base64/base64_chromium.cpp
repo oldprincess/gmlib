@@ -9,8 +9,6 @@
 
 #include "base64_chromium.h"
 
-#include <cctype>
-
 namespace base64::internal::chromium {
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -372,7 +370,8 @@ static size_t chromium_base64_encode(char* dest, const uint8_t* str, size_t len)
 
     switch (len - i)
     {
-        case 0: break;
+        case 0:
+            break;
         case 1:
             t1   = str[i];
             *p++ = e0[t1];
@@ -502,44 +501,42 @@ static size_t chromium_base64_decode(uint8_t* dest, const char* src, size_t len)
 // **************************************************
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 
+// 0=invalid, 1=data char (A-Za-z0-9+/), 2=padding ('=')
+static const uint8_t B64_CHAR_CLASS[256] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
+    0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
+
 bool base64_is_b64(const char* in, std::size_t inl) noexcept
 {
-    if (inl % 4 != 0)
+    if (inl % 4 != 0) return false;
+    int padding_count = 0;
+    for (std::size_t i = 0; i < inl; ++i)
     {
-        return false;
-    }
-
-    std::size_t padding = 0;
-
-    if (inl >= 1 && in[inl - 1] == '=')
-    {
-        padding++;
-    }
-
-    if (inl >= 2 && in[inl - 2] == '=')
-    {
-        padding++;
-    }
-
-    for (std::size_t i = 0; i < inl - padding; ++i)
-    {
-        unsigned char c = (unsigned char)(in[i]);
-
-        if (!(std::isalnum(c) || c == '+' || c == '/'))
+        uint8_t cls = B64_CHAR_CLASS[(unsigned char)in[i]];
+        if (cls == 0)
+        {
+            return false;
+        }
+        if (cls == 2)
+        {
+            padding_count++;
+        }
+        else if (padding_count > 0)
         {
             return false;
         }
     }
-
-    for (std::size_t i = inl - padding; i < inl; ++i)
-    {
-        if (in[i] != '=')
-        {
-            return false;
-        }
-    }
-
-    return true;
+    return padding_count <= 2;
 }
 
 std::size_t base64_encode_outl(std::size_t inl) noexcept

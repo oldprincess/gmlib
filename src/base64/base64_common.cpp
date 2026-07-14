@@ -1,7 +1,5 @@
 #include "base64_common.h"
 
-#include <cctype>
-
 namespace base64::internal::common {
 
 // base64_char -> byte
@@ -30,44 +28,42 @@ static const uint8_t B64_MAP[256] = {
 static const char B64_TABLE[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
+// 0=invalid, 1=data char (A-Za-z0-9+/), 2=padding ('=')
+static const uint8_t B64_CHAR_CLASS[256] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
+    0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
+
 bool base64_is_b64(const char* in, std::size_t inl) noexcept
 {
-    if (inl % 4 != 0)
+    if (inl % 4 != 0) return false;
+    int padding_count = 0;
+    for (std::size_t i = 0; i < inl; ++i)
     {
-        return false;
-    }
-
-    std::size_t padding = 0;
-
-    if (inl >= 1 && in[inl - 1] == '=')
-    {
-        padding++;
-    }
-
-    if (inl >= 2 && in[inl - 2] == '=')
-    {
-        padding++;
-    }
-
-    for (std::size_t i = 0; i < inl - padding; ++i)
-    {
-        unsigned char c = (unsigned char)(in[i]);
-
-        if (!(std::isalnum(c) || c == '+' || c == '/'))
+        uint8_t cls = B64_CHAR_CLASS[(unsigned char)in[i]];
+        if (cls == 0)
+        {
+            return false;
+        }
+        if (cls == 2)
+        {
+            padding_count++;
+        }
+        else if (padding_count > 0)
         {
             return false;
         }
     }
-
-    for (std::size_t i = inl - padding; i < inl; ++i)
-    {
-        if (in[i] != '=')
-        {
-            return false;
-        }
-    }
-
-    return true;
+    return padding_count <= 2;
 }
 
 std::size_t base64_encode_outl(std::size_t inl) noexcept
@@ -125,61 +121,43 @@ void base64_encode(char* out, const std::uint8_t* in, std::size_t inl) noexcept
 
 int base64_decode(std::uint8_t* out, const char* in, std::size_t inl) noexcept
 {
-    if (inl == 0)
-    {
-        return 0;
-    }
-    if (!base64_is_b64(in, inl))
-    {
-        return -1;
-    }
+    if (inl == 0) return 0;
+    if (inl % 4 != 0) return -1;
 
-    char    c[4];
-    uint8_t d[4];
-    int     buf_size = 0;
-    while (inl)
+    int padding = 0;
+    if (in[inl - 1] == '=') padding++;
+    if (in[inl - 2] == '=') padding++;
+
+    std::size_t data_len    = inl - padding;
+    std::size_t full_blocks = data_len / 4;
+    const char* p           = in;
+
+    for (std::size_t i = 0; i < full_blocks; i++, p += 4)
     {
-        if (buf_size == 4)
-        {
-            d[0] = B64_MAP[(int)c[0]], d[1] = B64_MAP[(int)c[1]];
-            d[2] = B64_MAP[(int)c[2]], d[3] = B64_MAP[(int)c[3]];
-
-            *(out + 0) = (d[0] << 2) | (d[1] >> 4);
-            *(out + 1) = (d[1] << 4) | (d[2] >> 2);
-            *(out + 2) = (d[2] << 6) | (d[3]);
-            out += 3, buf_size = 0;
-        }
-
-        c[buf_size] = *in;
-        in += 1, inl -= 1, buf_size += 1;
-    }
-    // final block
-    if (c[3] == '=' && c[2] == '=')
-    {
-        d[0] = B64_MAP[(int)c[0]];
-        d[1] = B64_MAP[(int)c[1]];
-
-        *(out + 0) = (d[0] << 2) | (d[1] >> 4);
-        out += 1;
-    }
-    else if (c[3] == '=')
-    {
-        d[0] = B64_MAP[(int)c[0]], d[1] = B64_MAP[(int)c[1]];
-        d[2] = B64_MAP[(int)c[2]];
-
-        *(out + 0) = (d[0] << 2) | (d[1] >> 4);
-        *(out + 1) = (d[1] << 4) | (d[2] >> 2);
-        out += 2;
-    }
-    else
-    {
-        d[0] = B64_MAP[(int)c[0]], d[1] = B64_MAP[(int)c[1]];
-        d[2] = B64_MAP[(int)c[2]], d[3] = B64_MAP[(int)c[3]];
-
-        *(out + 0) = (d[0] << 2) | (d[1] >> 4);
-        *(out + 1) = (d[1] << 4) | (d[2] >> 2);
-        *(out + 2) = (d[2] << 6) | (d[3]);
+        uint8_t d0 = B64_MAP[(unsigned char)p[0]];
+        uint8_t d1 = B64_MAP[(unsigned char)p[1]];
+        uint8_t d2 = B64_MAP[(unsigned char)p[2]];
+        uint8_t d3 = B64_MAP[(unsigned char)p[3]];
+        if ((d0 | d1 | d2 | d3) > 63) return -1;
+        out[0] = (d0 << 2) | (d1 >> 4);
+        out[1] = (d1 << 4) | (d2 >> 2);
+        out[2] = (d2 << 6) | d3;
         out += 3;
+    }
+
+    int remaining = data_len % 4;
+    if (remaining == 0) return 0;
+
+    uint8_t d0 = B64_MAP[(unsigned char)p[0]];
+    uint8_t d1 = B64_MAP[(unsigned char)p[1]];
+    if (d0 > 63 || d1 > 63) return -1;
+    out[0] = (d0 << 2) | (d1 >> 4);
+
+    if (remaining == 3)
+    {
+        uint8_t d2 = B64_MAP[(unsigned char)p[2]];
+        if (d2 > 63) return -1;
+        out[1] = (d1 << 4) | (d2 >> 2);
     }
     return 0;
 }
