@@ -2,9 +2,23 @@
 #define BLOCK_CIPHER_MODE_IMPL_GCM_MODE_IMPL_H
 
 #include <gmlib/block_cipher_mode/impl/block_cipher_mode_impl.h>
-#include <gmlib/block_cipher_mode/impl/internal/gctr_inc.h>
 #include <gmlib/ghash/ghash.h>
+#include <gmlib/memory_utils/endian.h>
 #include <gmlib/memory_utils/memxor.h>
+
+namespace block_cipher_mode::impl::internal {
+
+static inline void gctr_inc(std::uint8_t       out[16],
+                            const std::uint8_t in[16]) noexcept
+{
+    ((std::uint32_t*)out)[0] = ((const std::uint32_t*)in)[0];
+    ((std::uint32_t*)out)[1] = ((const std::uint32_t*)in)[1];
+    ((std::uint32_t*)out)[2] = ((const std::uint32_t*)in)[2];
+    std::uint32_t tmp        = memory_utils::load32_be(in + 12) + 1;
+    memory_utils::store32_be(out + 12, tmp);
+}
+
+} // namespace block_cipher_mode::impl::internal
 
 namespace block_cipher_mode::impl {
 
@@ -183,6 +197,7 @@ public:
     {
         return "GCM-ENC";
     }
+
     std::size_t fetch_block_size() const noexcept override
     {
         return BLOCK_SIZE;
@@ -233,11 +248,10 @@ public:
                 throw std::invalid_argument(
                     "invalid number of arguments in GcmEncryptorImpl");
             }
-            this->init(*(const std::uint8_t**)argv[0],
-                       *(const std::uint8_t**)argv[1],
-                       *(const std::size_t*)argv[2],
-                       *(const std::uint8_t**)argv[3],
-                       *(const std::size_t*)argv[4]);
+            this->init(
+                *(const std::uint8_t**)argv[0], *(const std::uint8_t**)argv[1],
+                *(const std::size_t*)argv[2], *(const std::uint8_t**)argv[3],
+                *(const std::size_t*)argv[4]);
             return;
         }
         if (std::strcmp(cmd, "reset") == 0)
@@ -247,10 +261,9 @@ public:
                 throw std::invalid_argument(
                     "invalid number of arguments in GcmEncryptorImpl");
             }
-            this->reset(*(const std::uint8_t**)argv[0],
-                        *(const std::size_t*)argv[1],
-                        *(const std::uint8_t**)argv[2],
-                        *(const std::size_t*)argv[3]);
+            this->reset(
+                *(const std::uint8_t**)argv[0], *(const std::size_t*)argv[1],
+                *(const std::uint8_t**)argv[2], *(const std::size_t*)argv[3]);
             return;
         }
         if (std::strcmp(cmd, "get_tag") == 0)
@@ -429,11 +442,10 @@ public:
                 throw std::invalid_argument(
                     "invalid number of arguments in GcmDecryptorImpl");
             }
-            this->init(*(const std::uint8_t**)argv[0],
-                       *(const std::uint8_t**)argv[1],
-                       *(const std::size_t*)argv[2],
-                       *(const std::uint8_t**)argv[3],
-                       *(const std::size_t*)argv[4]);
+            this->init(
+                *(const std::uint8_t**)argv[0], *(const std::uint8_t**)argv[1],
+                *(const std::size_t*)argv[2], *(const std::uint8_t**)argv[3],
+                *(const std::size_t*)argv[4]);
             return;
         }
         if (std::strcmp(cmd, "reset") == 0)
@@ -443,10 +455,9 @@ public:
                 throw std::invalid_argument(
                     "invalid number of arguments in GcmDecryptorImpl");
             }
-            this->reset(*(const std::uint8_t**)argv[0],
-                        *(const std::size_t*)argv[1],
-                        *(const std::uint8_t**)argv[2],
-                        *(const std::size_t*)argv[3]);
+            this->reset(
+                *(const std::uint8_t**)argv[0], *(const std::size_t*)argv[1],
+                *(const std::uint8_t**)argv[2], *(const std::size_t*)argv[3]);
             return;
         }
         if (std::strcmp(cmd, "set_tag") == 0)

@@ -2,10 +2,86 @@
 #define BLOCK_CIPHER_MODE_IMPL_CTR_MODE_IMPL_H
 
 #include <gmlib/block_cipher_mode/impl/block_cipher_mode_impl.h>
-#include <gmlib/block_cipher_mode/impl/internal/ctr_inc.h>
+#include <gmlib/memory_utils/endian.h>
 #include <gmlib/memory_utils/memxor.h>
 
+#include <cstddef>
 #include <stdexcept>
+
+namespace block_cipher_mode::impl::internal {
+
+static inline void ctr_inc8(std::uint8_t* out, const std::uint8_t* in) noexcept
+{
+    uint64_t tmp = 1;
+    tmp += memory_utils::load32_be(in + 4);
+    memory_utils::store32_be(out + 4, tmp & UINT32_MAX);
+    tmp = memory_utils::load32_be(in + 0) + (tmp >> 32);
+    memory_utils::store32_be(out + 0, tmp & UINT32_MAX);
+}
+
+static inline void ctr_inc16(std::uint8_t* out, const std::uint8_t* in) noexcept
+{
+    uint64_t tmp = 1;
+    tmp += memory_utils::load32_be(in + 12);
+    memory_utils::store32_be(out + 12, tmp & UINT32_MAX);
+    tmp = memory_utils::load32_be(in + 8) + (tmp >> 32);
+    memory_utils::store32_be(out + 8, tmp & UINT32_MAX);
+    tmp = memory_utils::load32_be(in + 4) + (tmp >> 32);
+    memory_utils::store32_be(out + 4, tmp & UINT32_MAX);
+    tmp = memory_utils::load32_be(in + 0) + (tmp >> 32);
+    memory_utils::store32_be(out + 0, tmp & UINT32_MAX);
+}
+
+static inline void ctr_inc32(std::uint8_t* out, const std::uint8_t* in) noexcept
+{
+    uint64_t tmp = 1;
+    tmp += memory_utils::load32_be(in + 28);
+    memory_utils::store32_be(out + 28, tmp & UINT32_MAX);
+    tmp = memory_utils::load32_be(in + 24) + (tmp >> 32);
+    memory_utils::store32_be(out + 24, tmp & UINT32_MAX);
+    tmp = memory_utils::load32_be(in + 20) + (tmp >> 32);
+    memory_utils::store32_be(out + 20, tmp & UINT32_MAX);
+    tmp = memory_utils::load32_be(in + 16) + (tmp >> 32);
+    memory_utils::store32_be(out + 16, tmp & UINT32_MAX);
+    tmp = memory_utils::load32_be(in + 12) + (tmp >> 32);
+    memory_utils::store32_be(out + 12, tmp & UINT32_MAX);
+    tmp = memory_utils::load32_be(in + 8) + (tmp >> 32);
+    memory_utils::store32_be(out + 8, tmp & UINT32_MAX);
+    tmp = memory_utils::load32_be(in + 4) + (tmp >> 32);
+    memory_utils::store32_be(out + 4, tmp & UINT32_MAX);
+    tmp = memory_utils::load32_be(in + 0) + (tmp >> 32);
+    memory_utils::store32_be(out + 0, tmp & UINT32_MAX);
+}
+
+template <std::size_t BLOCK_SIZE>
+static inline void ctr_inc(std::uint8_t* out, const std::uint8_t* in) noexcept
+{
+    if constexpr (BLOCK_SIZE == 32)
+    {
+        ctr_inc32(out, in);
+    }
+    else if constexpr (BLOCK_SIZE == 16)
+    {
+        ctr_inc16(out, in);
+    }
+    else if constexpr (BLOCK_SIZE == 8)
+    {
+        ctr_inc8(out, in);
+    }
+    else
+    {
+        std::uint16_t t = 1;
+        for (std::size_t i = 0; i < BLOCK_SIZE; i++)
+        {
+            std::size_t pos = BLOCK_SIZE - 1 - i;
+            t += (std::uint16_t)in[pos];
+            out[pos] = t & 0xFF;
+            t >>= 8;
+        }
+    }
+}
+
+} // namespace block_cipher_mode::impl::internal
 
 namespace block_cipher_mode::impl {
 
@@ -39,6 +115,7 @@ private:
 
 public:
     CtrCryptorImpl() = default;
+
     CtrCryptorImpl(const std::uint8_t* user_key, const std::uint8_t* iv)
     {
         this->init(user_key, iv);
