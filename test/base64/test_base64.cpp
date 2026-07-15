@@ -172,10 +172,11 @@ void test_base64()
     const char* const* name_list = get_provider_name_list();
     for (int i = 0; name_list[i] != nullptr; i++)
     {
-        const Base64Provider* p = get_provider(name_list[i]);
+        const Base64Provider* p = get_base64_provider(name_list[i]);
         if (p == nullptr)
         {
-            std::fprintf(stderr, "err: get_provider('%s') returned null\n",
+            std::fprintf(stderr,
+                         "err: get_base64_provider('%s') returned null\n",
                          name_list[i]);
             std::exit(-1);
         }

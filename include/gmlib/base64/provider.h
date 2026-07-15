@@ -67,7 +67,7 @@ struct Base64Provider
                          std::size_t   inl) noexcept = nullptr;
 };
 
-const Base64Provider* get_provider(const char* name) noexcept;
+const Base64Provider* get_base64_provider(const char* name) noexcept;
 
 const char* const* get_provider_name_list() noexcept;
 

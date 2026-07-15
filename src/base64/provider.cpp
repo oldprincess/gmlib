@@ -65,7 +65,7 @@ static const Provider base64_common_provider = {
     },
 };
 
-const Base64Provider* get_provider(const char* name) noexcept
+const Base64Provider* get_base64_provider(const char* name) noexcept
 {
     if (name == nullptr)
     {
