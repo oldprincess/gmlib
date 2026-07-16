@@ -21,7 +21,7 @@ using AES256Provider = block_cipher_mode::BlockCipherModeProvider;
 const AES128Provider* get_aes128_provider(const char* name) noexcept;
 
 /**
- * @brief   Get the list of available AES-192 provider names.
+ * @brief   Get the list of available AES-128 provider names.
  * @return  Null-terminated array of provider name strings. The array is
  *          statically allocated and must not be freed by the caller.
  */
