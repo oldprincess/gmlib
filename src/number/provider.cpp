@@ -311,11 +311,6 @@ constexpr std::size_t array_size(const T (&)[N]) noexcept
     return N;
 }
 
-struct ProviderNameList
-{
-    const char* names[array_size(number_providers) + 1];
-};
-
 const NumberProvider* get_number_provider(const char* name) noexcept
 {
     if (name == nullptr)
@@ -350,6 +345,10 @@ const NumberProvider* get_number_provider(const char* name) noexcept
 const char* const* get_number_supported_provider_names() noexcept
 {
     static const auto provider_name_list = []() {
+        struct ProviderNameList
+        {
+            const char* names[array_size(number_providers) + 1];
+        };
         ProviderNameList list;
         int              idx = 0;
         for (const Provider& provider : number_providers)
