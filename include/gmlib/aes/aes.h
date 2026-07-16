@@ -1,39 +1,151 @@
 #ifndef AES_AES_H
 #define AES_AES_H
 
+#include <gmlib/aes/provider.h>
 #include <gmlib/block_cipher_mode/block_cipher.h>
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>
 
 #include <memory>
+#include <stdexcept>
 
 namespace aes {
 
 class AES128 : public block_cipher_mode::BlockCipher
 {
 public:
-    using Cipher = std::unique_ptr<block_cipher_mode::BlockCipher>;
+    using Cipher     = std::unique_ptr<block_cipher_mode::BlockCipher>;
     using CipherMode = std::unique_ptr<block_cipher_mode::BlockCipherMode>;
 
 public:
-    static Cipher create_cipher(const char* provider = nullptr);
+    static Cipher create_cipher(const char* provider = nullptr)
+    {
+        auto* p = get_aes128_provider(provider);
+        if (p == nullptr || p->create_cipher == nullptr)
+        {
+            throw std::runtime_error("AES128: cipher not available");
+        }
+        return p->create_cipher();
+    }
 
-    static CipherMode create_ecb_encryptor(const char* provider = nullptr);
-    static CipherMode create_ecb_decryptor(const char* provider = nullptr);
+    static CipherMode create_ecb_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes128_provider(provider);
+        if (p == nullptr || p->create_ecb_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES128: ECB encryptor not available");
+        }
+        return p->create_ecb_encryptor();
+    }
 
-    static CipherMode create_cbc_encryptor(const char* provider = nullptr);
-    static CipherMode create_cbc_decryptor(const char* provider = nullptr);
+    static CipherMode create_ecb_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes128_provider(provider);
+        if (p == nullptr || p->create_ecb_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES128: ECB decryptor not available");
+        }
+        return p->create_ecb_decryptor();
+    }
 
-    static CipherMode create_ofb_encryptor(const char* provider = nullptr);
-    static CipherMode create_ofb_decryptor(const char* provider = nullptr);
+    static CipherMode create_cbc_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes128_provider(provider);
+        if (p == nullptr || p->create_cbc_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES128: CBC encryptor not available");
+        }
+        return p->create_cbc_encryptor();
+    }
 
-    static CipherMode create_cfb_encryptor(const char* provider = nullptr);
-    static CipherMode create_cfb_decryptor(const char* provider = nullptr);
+    static CipherMode create_cbc_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes128_provider(provider);
+        if (p == nullptr || p->create_cbc_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES128: CBC decryptor not available");
+        }
+        return p->create_cbc_decryptor();
+    }
 
-    static CipherMode create_ctr_encryptor(const char* provider = nullptr);
-    static CipherMode create_ctr_decryptor(const char* provider = nullptr);
+    static CipherMode create_cfb_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes128_provider(provider);
+        if (p == nullptr || p->create_cfb_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES128: CFB encryptor not available");
+        }
+        return p->create_cfb_encryptor();
+    }
 
-    static CipherMode create_gcm_encryptor(const char* provider = nullptr);
-    static CipherMode create_gcm_decryptor(const char* provider = nullptr);
+    static CipherMode create_cfb_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes128_provider(provider);
+        if (p == nullptr || p->create_cfb_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES128: CFB decryptor not available");
+        }
+        return p->create_cfb_decryptor();
+    }
+
+    static CipherMode create_ofb_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes128_provider(provider);
+        if (p == nullptr || p->create_ofb_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES128: OFB encryptor not available");
+        }
+        return p->create_ofb_encryptor();
+    }
+
+    static CipherMode create_ofb_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes128_provider(provider);
+        if (p == nullptr || p->create_ofb_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES128: OFB decryptor not available");
+        }
+        return p->create_ofb_decryptor();
+    }
+
+    static CipherMode create_ctr_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes128_provider(provider);
+        if (p == nullptr || p->create_ctr_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES128: CTR encryptor not available");
+        }
+        return p->create_ctr_encryptor();
+    }
+
+    static CipherMode create_ctr_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes128_provider(provider);
+        if (p == nullptr || p->create_ctr_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES128: CTR decryptor not available");
+        }
+        return p->create_ctr_decryptor();
+    }
+
+    static CipherMode create_gcm_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes128_provider(provider);
+        if (p == nullptr || p->create_gcm_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES128: GCM encryptor not available");
+        }
+        return p->create_gcm_encryptor();
+    }
+
+    static CipherMode create_gcm_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes128_provider(provider);
+        if (p == nullptr || p->create_gcm_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES128: GCM decryptor not available");
+        }
+        return p->create_gcm_decryptor();
+    }
 
 public:
     static constexpr const char* NAME              = "AES128";
@@ -142,29 +254,139 @@ public:
 class AES192 : public block_cipher_mode::BlockCipher
 {
 public:
-    using Cipher = std::unique_ptr<block_cipher_mode::BlockCipher>;
+    using Cipher     = std::unique_ptr<block_cipher_mode::BlockCipher>;
     using CipherMode = std::unique_ptr<block_cipher_mode::BlockCipherMode>;
 
 public:
-    static Cipher create_cipher(const char* provider = nullptr);
+    static Cipher create_cipher(const char* provider = nullptr)
+    {
+        auto* p = get_aes192_provider(provider);
+        if (p == nullptr || p->create_cipher == nullptr)
+        {
+            throw std::runtime_error("AES192: cipher not available");
+        }
+        return p->create_cipher();
+    }
 
-    static CipherMode create_ecb_encryptor(const char* provider = nullptr);
-    static CipherMode create_ecb_decryptor(const char* provider = nullptr);
+    static CipherMode create_ecb_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes192_provider(provider);
+        if (p == nullptr || p->create_ecb_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES192: ECB encryptor not available");
+        }
+        return p->create_ecb_encryptor();
+    }
 
-    static CipherMode create_cbc_encryptor(const char* provider = nullptr);
-    static CipherMode create_cbc_decryptor(const char* provider = nullptr);
+    static CipherMode create_ecb_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes192_provider(provider);
+        if (p == nullptr || p->create_ecb_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES192: ECB decryptor not available");
+        }
+        return p->create_ecb_decryptor();
+    }
 
-    static CipherMode create_ofb_encryptor(const char* provider = nullptr);
-    static CipherMode create_ofb_decryptor(const char* provider = nullptr);
+    static CipherMode create_cbc_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes192_provider(provider);
+        if (p == nullptr || p->create_cbc_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES192: CBC encryptor not available");
+        }
+        return p->create_cbc_encryptor();
+    }
 
-    static CipherMode create_cfb_encryptor(const char* provider = nullptr);
-    static CipherMode create_cfb_decryptor(const char* provider = nullptr);
+    static CipherMode create_cbc_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes192_provider(provider);
+        if (p == nullptr || p->create_cbc_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES192: CBC decryptor not available");
+        }
+        return p->create_cbc_decryptor();
+    }
 
-    static CipherMode create_ctr_encryptor(const char* provider = nullptr);
-    static CipherMode create_ctr_decryptor(const char* provider = nullptr);
+    static CipherMode create_cfb_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes192_provider(provider);
+        if (p == nullptr || p->create_cfb_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES192: CFB encryptor not available");
+        }
+        return p->create_cfb_encryptor();
+    }
 
-    static CipherMode create_gcm_encryptor(const char* provider = nullptr);
-    static CipherMode create_gcm_decryptor(const char* provider = nullptr);
+    static CipherMode create_cfb_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes192_provider(provider);
+        if (p == nullptr || p->create_cfb_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES192: CFB decryptor not available");
+        }
+        return p->create_cfb_decryptor();
+    }
+
+    static CipherMode create_ofb_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes192_provider(provider);
+        if (p == nullptr || p->create_ofb_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES192: OFB encryptor not available");
+        }
+        return p->create_ofb_encryptor();
+    }
+
+    static CipherMode create_ofb_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes192_provider(provider);
+        if (p == nullptr || p->create_ofb_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES192: OFB decryptor not available");
+        }
+        return p->create_ofb_decryptor();
+    }
+
+    static CipherMode create_ctr_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes192_provider(provider);
+        if (p == nullptr || p->create_ctr_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES192: CTR encryptor not available");
+        }
+        return p->create_ctr_encryptor();
+    }
+
+    static CipherMode create_ctr_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes192_provider(provider);
+        if (p == nullptr || p->create_ctr_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES192: CTR decryptor not available");
+        }
+        return p->create_ctr_decryptor();
+    }
+
+    static CipherMode create_gcm_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes192_provider(provider);
+        if (p == nullptr || p->create_gcm_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES192: GCM encryptor not available");
+        }
+        return p->create_gcm_encryptor();
+    }
+
+    static CipherMode create_gcm_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes192_provider(provider);
+        if (p == nullptr || p->create_gcm_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES192: GCM decryptor not available");
+        }
+        return p->create_gcm_decryptor();
+    }
 
 public:
     static constexpr const char* NAME              = "AES192";
@@ -273,29 +495,139 @@ public:
 class AES256 : public block_cipher_mode::BlockCipher
 {
 public:
-    using Cipher = std::unique_ptr<block_cipher_mode::BlockCipher>;
+    using Cipher     = std::unique_ptr<block_cipher_mode::BlockCipher>;
     using CipherMode = std::unique_ptr<block_cipher_mode::BlockCipherMode>;
 
 public:
-    static Cipher create_cipher(const char* provider = nullptr);
+    static Cipher create_cipher(const char* provider = nullptr)
+    {
+        auto* p = get_aes256_provider(provider);
+        if (p == nullptr || p->create_cipher == nullptr)
+        {
+            throw std::runtime_error("AES256: cipher not available");
+        }
+        return p->create_cipher();
+    }
 
-    static CipherMode create_ecb_encryptor(const char* provider = nullptr);
-    static CipherMode create_ecb_decryptor(const char* provider = nullptr);
+    static CipherMode create_ecb_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes256_provider(provider);
+        if (p == nullptr || p->create_ecb_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES256: ECB encryptor not available");
+        }
+        return p->create_ecb_encryptor();
+    }
 
-    static CipherMode create_cbc_encryptor(const char* provider = nullptr);
-    static CipherMode create_cbc_decryptor(const char* provider = nullptr);
+    static CipherMode create_ecb_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes256_provider(provider);
+        if (p == nullptr || p->create_ecb_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES256: ECB decryptor not available");
+        }
+        return p->create_ecb_decryptor();
+    }
 
-    static CipherMode create_ofb_encryptor(const char* provider = nullptr);
-    static CipherMode create_ofb_decryptor(const char* provider = nullptr);
+    static CipherMode create_cbc_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes256_provider(provider);
+        if (p == nullptr || p->create_cbc_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES256: CBC encryptor not available");
+        }
+        return p->create_cbc_encryptor();
+    }
 
-    static CipherMode create_cfb_encryptor(const char* provider = nullptr);
-    static CipherMode create_cfb_decryptor(const char* provider = nullptr);
+    static CipherMode create_cbc_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes256_provider(provider);
+        if (p == nullptr || p->create_cbc_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES256: CBC decryptor not available");
+        }
+        return p->create_cbc_decryptor();
+    }
 
-    static CipherMode create_ctr_encryptor(const char* provider = nullptr);
-    static CipherMode create_ctr_decryptor(const char* provider = nullptr);
+    static CipherMode create_cfb_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes256_provider(provider);
+        if (p == nullptr || p->create_cfb_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES256: CFB encryptor not available");
+        }
+        return p->create_cfb_encryptor();
+    }
 
-    static CipherMode create_gcm_encryptor(const char* provider = nullptr);
-    static CipherMode create_gcm_decryptor(const char* provider = nullptr);
+    static CipherMode create_cfb_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes256_provider(provider);
+        if (p == nullptr || p->create_cfb_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES256: CFB decryptor not available");
+        }
+        return p->create_cfb_decryptor();
+    }
+
+    static CipherMode create_ofb_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes256_provider(provider);
+        if (p == nullptr || p->create_ofb_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES256: OFB encryptor not available");
+        }
+        return p->create_ofb_encryptor();
+    }
+
+    static CipherMode create_ofb_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes256_provider(provider);
+        if (p == nullptr || p->create_ofb_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES256: OFB decryptor not available");
+        }
+        return p->create_ofb_decryptor();
+    }
+
+    static CipherMode create_ctr_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes256_provider(provider);
+        if (p == nullptr || p->create_ctr_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES256: CTR encryptor not available");
+        }
+        return p->create_ctr_encryptor();
+    }
+
+    static CipherMode create_ctr_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes256_provider(provider);
+        if (p == nullptr || p->create_ctr_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES256: CTR decryptor not available");
+        }
+        return p->create_ctr_decryptor();
+    }
+
+    static CipherMode create_gcm_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes256_provider(provider);
+        if (p == nullptr || p->create_gcm_encryptor == nullptr)
+        {
+            throw std::runtime_error("AES256: GCM encryptor not available");
+        }
+        return p->create_gcm_encryptor();
+    }
+
+    static CipherMode create_gcm_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_aes256_provider(provider);
+        if (p == nullptr || p->create_gcm_decryptor == nullptr)
+        {
+            throw std::runtime_error("AES256: GCM decryptor not available");
+        }
+        return p->create_gcm_decryptor();
+    }
 
 public:
     static constexpr const char* NAME              = "AES256";
