@@ -1,7 +1,6 @@
 #ifndef SM2_SM2P256V1_COMMON_H
 #define SM2_SM2P256V1_COMMON_H
 
-#include <gmlib/number/mont256.h>
 #include <gmlib/number/provider.h>
 
 #include <cstddef>

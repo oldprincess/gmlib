@@ -10,7 +10,7 @@ namespace sm2::internal::common {
 
 CommonContext::CommonContext() noexcept
 {
-    number_provider = number::get_provider(nullptr);
+    number_provider = number::get_number_provider(nullptr);
     assert(number_provider != nullptr);
     assert(number_provider->uint256_from_bytes != nullptr);
 
