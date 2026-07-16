@@ -1,153 +1,99 @@
-#include <gmlib/des/des.h>
+#include <gmlib/des/provider.h>
 
+#include <cstddef>
 #include <cstring>
-#include <stdexcept>
 
 #include "provider_des_common.h"
 
 namespace des {
 
-DES::Cipher DES::create_cipher(const char* provider)
+struct Provider
 {
-    if (des::internal::common::provider_available())
-    {
-        if (provider == nullptr || std::strcmp(provider, "common") == 0)
-        {
-            return des::internal::common::create_cipher();
-        }
-    }
+    bool (*available)() noexcept;
 
-    throw std::runtime_error("No provider available");
+    block_cipher_mode::BlockCipherModeProvider fns;
+};
+
+static const Provider providers[] = {
+    {
+        []() noexcept -> bool {
+            return des::internal::common::provider_available();
+        },
+        {
+            "common",
+            des::internal::common::create_cipher,
+            des::internal::common::create_ecb_encryptor,
+            des::internal::common::create_ecb_decryptor,
+            des::internal::common::create_cbc_encryptor,
+            des::internal::common::create_cbc_decryptor,
+            des::internal::common::create_cfb_encryptor,
+            des::internal::common::create_cfb_decryptor,
+            des::internal::common::create_ofb_encryptor,
+            des::internal::common::create_ofb_decryptor,
+            des::internal::common::create_ctr_encryptor,
+            des::internal::common::create_ctr_decryptor,
+            nullptr,
+            nullptr,
+        },
+    },
+};
+
+template <typename T, std::size_t N>
+constexpr std::size_t array_size(const T (&)[N]) noexcept
+{
+    return N;
 }
 
-DES::CipherMode DES::create_ecb_encryptor(const char* provider)
+const DESProvider* get_des_provider(const char* name) noexcept
 {
-    if (des::internal::common::provider_available())
+    if (name == nullptr)
     {
-        if (provider == nullptr || std::strcmp(provider, "common") == 0)
-        {
-            return des::internal::common::create_ecb_encryptor();
-        }
+        static const DESProvider* default_provider = []() {
+            for (const Provider& provider : providers)
+            {
+                if (provider.available())
+                {
+                    return &provider.fns;
+                }
+            }
+            return static_cast<const DESProvider*>(nullptr);
+        }();
+        return default_provider;
     }
-
-    throw std::runtime_error("No provider available");
+    else
+    {
+        for (const Provider& provider : providers)
+        {
+            if (provider.available() &&
+                std::strcmp(provider.fns.algo_name, name) == 0)
+            {
+                return &provider.fns;
+            }
+        }
+        return nullptr;
+    }
 }
 
-DES::CipherMode DES::create_ecb_decryptor(const char* provider)
+const char* const* get_des_supported_provider_names() noexcept
 {
-    if (des::internal::common::provider_available())
-    {
-        if (provider == nullptr || std::strcmp(provider, "common") == 0)
+    static const auto provider_name_list = []() {
+        struct ProviderNameList
         {
-            return des::internal::common::create_ecb_decryptor();
+            const char* names[array_size(providers) + 1];
+        };
+        ProviderNameList list;
+        int              idx = 0;
+        for (const Provider& provider : providers)
+        {
+            if (provider.available())
+            {
+                list.names[idx++] = provider.fns.algo_name;
+            }
         }
-    }
-
-    throw std::runtime_error("No provider available");
+        list.names[idx] = nullptr;
+        return list;
+    }();
+    return provider_name_list.names;
 }
 
-DES::CipherMode DES::create_cbc_encryptor(const char* provider)
-{
-    if (des::internal::common::provider_available())
-    {
-        if (provider == nullptr || std::strcmp(provider, "common") == 0)
-        {
-            return des::internal::common::create_cbc_encryptor();
-        }
-    }
-
-    throw std::runtime_error("No provider available");
-}
-
-DES::CipherMode DES::create_cbc_decryptor(const char* provider)
-{
-    if (des::internal::common::provider_available())
-    {
-        if (provider == nullptr || std::strcmp(provider, "common") == 0)
-        {
-            return des::internal::common::create_cbc_decryptor();
-        }
-    }
-
-    throw std::runtime_error("No provider available");
-}
-
-DES::CipherMode DES::create_ofb_encryptor(const char* provider)
-{
-    if (des::internal::common::provider_available())
-    {
-        if (provider == nullptr || std::strcmp(provider, "common") == 0)
-        {
-            return des::internal::common::create_ofb_encryptor();
-        }
-    }
-
-    throw std::runtime_error("No provider available");
-}
-
-DES::CipherMode DES::create_ofb_decryptor(const char* provider)
-{
-    if (des::internal::common::provider_available())
-    {
-        if (provider == nullptr || std::strcmp(provider, "common") == 0)
-        {
-            return des::internal::common::create_ofb_decryptor();
-        }
-    }
-
-    throw std::runtime_error("No provider available");
-}
-
-DES::CipherMode DES::create_cfb_encryptor(const char* provider)
-{
-    if (des::internal::common::provider_available())
-    {
-        if (provider == nullptr || std::strcmp(provider, "common") == 0)
-        {
-            return des::internal::common::create_cfb_encryptor();
-        }
-    }
-
-    throw std::runtime_error("No provider available");
-}
-
-DES::CipherMode DES::create_cfb_decryptor(const char* provider)
-{
-    if (des::internal::common::provider_available())
-    {
-        if (provider == nullptr || std::strcmp(provider, "common") == 0)
-        {
-            return des::internal::common::create_cfb_decryptor();
-        }
-    }
-
-    throw std::runtime_error("No provider available");
-}
-
-DES::CipherMode DES::create_ctr_encryptor(const char* provider)
-{
-    if (des::internal::common::provider_available())
-    {
-        if (provider == nullptr || std::strcmp(provider, "common") == 0)
-        {
-            return des::internal::common::create_ctr_encryptor();
-        }
-    }
-
-    throw std::runtime_error("No provider available");
-}
-
-DES::CipherMode DES::create_ctr_decryptor(const char* provider)
-{
-    if (des::internal::common::provider_available())
-    {
-        if (provider == nullptr || std::strcmp(provider, "common") == 0)
-        {
-            return des::internal::common::create_ctr_decryptor();
-        }
-    }
-
-    throw std::runtime_error("No provider available");
-}
-
-}; // namespace des
+} // namespace des
