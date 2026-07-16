@@ -69,7 +69,7 @@ struct Base64Provider
 
 const Base64Provider* get_base64_provider(const char* name) noexcept;
 
-const char* const* get_provider_name_list() noexcept;
+const char* const* get_base64_supported_provider_names() noexcept;
 
 } // namespace base64
 

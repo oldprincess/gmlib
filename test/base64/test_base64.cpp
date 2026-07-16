@@ -169,7 +169,7 @@ static void test_provider(const Base64Provider* p)
 
 void test_base64()
 {
-    const char* const* name_list = get_provider_name_list();
+    const char* const* name_list = get_base64_supported_provider_names();
     for (int i = 0; name_list[i] != nullptr; i++)
     {
         const Base64Provider* p = get_base64_provider(name_list[i]);

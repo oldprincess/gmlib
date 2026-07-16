@@ -707,7 +707,7 @@ struct NumberProvider
 
 const NumberProvider* get_number_provider(const char* name) noexcept;
 
-const char* const* get_number_provider_names() noexcept;
+const char* const* get_number_supported_provider_names() noexcept;
 
 } // namespace number
 

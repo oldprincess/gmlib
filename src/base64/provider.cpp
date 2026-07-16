@@ -134,7 +134,7 @@ struct ProviderNameList
     ];
 };
 
-const char* const* get_provider_name_list() noexcept
+const char* const* get_base64_supported_provider_names() noexcept
 {
     static const ProviderNameList list = []() noexcept -> ProviderNameList {
         ProviderNameList list;
