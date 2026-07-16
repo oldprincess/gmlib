@@ -3,8 +3,10 @@
 
 #include <gmlib/block_cipher_mode/block_cipher.h>
 #include <gmlib/block_cipher_mode/block_cipher_mode.h>
+#include <gmlib/sm4/provider.h>
 
 #include <memory>
+#include <stdexcept>
 
 namespace sm4 {
 
@@ -19,25 +21,135 @@ public:
     using CipherMode = std::unique_ptr<block_cipher_mode::BlockCipherMode>;
 
 public:
-    static Cipher create_cipher(const char* provider = nullptr);
+    static Cipher create_cipher(const char* provider = nullptr)
+    {
+        auto* p = get_sm4_provider(provider);
+        if (p == nullptr || p->create_cipher == nullptr)
+        {
+            throw std::runtime_error("No provider available");
+        }
+        return p->create_cipher();
+    }
 
-    static CipherMode create_ecb_encryptor(const char* provider = nullptr);
-    static CipherMode create_ecb_decryptor(const char* provider = nullptr);
+    static CipherMode create_ecb_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_sm4_provider(provider);
+        if (p == nullptr || p->create_ecb_encryptor == nullptr)
+        {
+            throw std::runtime_error("No provider available");
+        }
+        return p->create_ecb_encryptor();
+    }
 
-    static CipherMode create_cbc_encryptor(const char* provider = nullptr);
-    static CipherMode create_cbc_decryptor(const char* provider = nullptr);
+    static CipherMode create_ecb_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_sm4_provider(provider);
+        if (p == nullptr || p->create_ecb_decryptor == nullptr)
+        {
+            throw std::runtime_error("No provider available");
+        }
+        return p->create_ecb_decryptor();
+    }
 
-    static CipherMode create_ofb_encryptor(const char* provider = nullptr);
-    static CipherMode create_ofb_decryptor(const char* provider = nullptr);
+    static CipherMode create_cbc_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_sm4_provider(provider);
+        if (p == nullptr || p->create_cbc_encryptor == nullptr)
+        {
+            throw std::runtime_error("No provider available");
+        }
+        return p->create_cbc_encryptor();
+    }
 
-    static CipherMode create_cfb_encryptor(const char* provider = nullptr);
-    static CipherMode create_cfb_decryptor(const char* provider = nullptr);
+    static CipherMode create_cbc_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_sm4_provider(provider);
+        if (p == nullptr || p->create_cbc_decryptor == nullptr)
+        {
+            throw std::runtime_error("No provider available");
+        }
+        return p->create_cbc_decryptor();
+    }
 
-    static CipherMode create_ctr_encryptor(const char* provider = nullptr);
-    static CipherMode create_ctr_decryptor(const char* provider = nullptr);
+    static CipherMode create_ofb_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_sm4_provider(provider);
+        if (p == nullptr || p->create_ofb_encryptor == nullptr)
+        {
+            throw std::runtime_error("No provider available");
+        }
+        return p->create_ofb_encryptor();
+    }
 
-    static CipherMode create_gcm_encryptor(const char* provider = nullptr);
-    static CipherMode create_gcm_decryptor(const char* provider = nullptr);
+    static CipherMode create_ofb_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_sm4_provider(provider);
+        if (p == nullptr || p->create_ofb_decryptor == nullptr)
+        {
+            throw std::runtime_error("No provider available");
+        }
+        return p->create_ofb_decryptor();
+    }
+
+    static CipherMode create_cfb_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_sm4_provider(provider);
+        if (p == nullptr || p->create_cfb_encryptor == nullptr)
+        {
+            throw std::runtime_error("No provider available");
+        }
+        return p->create_cfb_encryptor();
+    }
+
+    static CipherMode create_cfb_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_sm4_provider(provider);
+        if (p == nullptr || p->create_cfb_decryptor == nullptr)
+        {
+            throw std::runtime_error("No provider available");
+        }
+        return p->create_cfb_decryptor();
+    }
+
+    static CipherMode create_ctr_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_sm4_provider(provider);
+        if (p == nullptr || p->create_ctr_encryptor == nullptr)
+        {
+            throw std::runtime_error("No provider available");
+        }
+        return p->create_ctr_encryptor();
+    }
+
+    static CipherMode create_ctr_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_sm4_provider(provider);
+        if (p == nullptr || p->create_ctr_decryptor == nullptr)
+        {
+            throw std::runtime_error("No provider available");
+        }
+        return p->create_ctr_decryptor();
+    }
+
+    static CipherMode create_gcm_encryptor(const char* provider = nullptr)
+    {
+        auto* p = get_sm4_provider(provider);
+        if (p == nullptr || p->create_gcm_encryptor == nullptr)
+        {
+            throw std::runtime_error("No provider available");
+        }
+        return p->create_gcm_encryptor();
+    }
+
+    static CipherMode create_gcm_decryptor(const char* provider = nullptr)
+    {
+        auto* p = get_sm4_provider(provider);
+        if (p == nullptr || p->create_gcm_decryptor == nullptr)
+        {
+            throw std::runtime_error("No provider available");
+        }
+        return p->create_gcm_decryptor();
+    }
 
 public:
     static constexpr const char* NAME = "SM4";
