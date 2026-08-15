@@ -1,12 +1,12 @@
-#if defined(SUPPORT_SM4_LANG18)
+#if defined(SUPPORT_SM4_LANG18_AVX2)
 
-#include "sm4_lang18.h"
+#include "sm4_lang18_avx2.h"
 
 #include <immintrin.h>
 
 #include "sm4_lang18_tb.h"
 
-namespace sm4::internal::lang18 {
+namespace sm4::internal::lang18_avx2 {
 
 using namespace sm4::internal::lang18_tables;
 
@@ -298,6 +298,213 @@ static void sm4_compute_blocks_x4(const std::uint32_t round_key[32],
     MEM_STORE32BE(out + 60, x[0 + 12]);
 }
 
+#define MM256_PACK0_EPI32(a, b, c, d)                  \
+    _mm256_unpacklo_epi64(_mm256_unpacklo_epi32(a, b), \
+                          _mm256_unpacklo_epi32(c, d))
+#define MM256_PACK1_EPI32(a, b, c, d)                  \
+    _mm256_unpackhi_epi64(_mm256_unpacklo_epi32(a, b), \
+                          _mm256_unpacklo_epi32(c, d))
+#define MM256_PACK2_EPI32(a, b, c, d)                  \
+    _mm256_unpacklo_epi64(_mm256_unpackhi_epi32(a, b), \
+                          _mm256_unpackhi_epi32(c, d))
+#define MM256_PACK3_EPI32(a, b, c, d)                  \
+    _mm256_unpackhi_epi64(_mm256_unpackhi_epi32(a, b), \
+                          _mm256_unpackhi_epi32(c, d))
+
+/**
+ * @brief               SM4 block encryption/decryption
+ * @param round_key     32-dword encryption/decryption round key
+ * @param out           8x16-byte output block
+ * @param in            8x16-byte input block
+ */
+static void avx2_sm4_compute_blocks_x8(const std::uint32_t round_key[32],
+                                       std::uint8_t        out[128],
+                                       const std::uint8_t  in[128]) noexcept
+{
+    __m256i X[4], tmp[4], mask, vindex;
+    mask   = _mm256_set1_epi32(0xFF);
+    tmp[0] = _mm256_loadu_si256((const __m256i *)in + 0);
+    tmp[1] = _mm256_loadu_si256((const __m256i *)in + 1);
+    tmp[2] = _mm256_loadu_si256((const __m256i *)in + 2);
+    tmp[3] = _mm256_loadu_si256((const __m256i *)in + 3);
+
+    X[0] = MM256_PACK0_EPI32(tmp[0], tmp[1], tmp[2], tmp[3]);
+    X[1] = MM256_PACK1_EPI32(tmp[0], tmp[1], tmp[2], tmp[3]);
+    X[2] = MM256_PACK2_EPI32(tmp[0], tmp[1], tmp[2], tmp[3]);
+    X[3] = MM256_PACK3_EPI32(tmp[0], tmp[1], tmp[2], tmp[3]);
+
+    vindex =
+        _mm256_setr_epi8(3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12,
+                         3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12);
+    X[0] = _mm256_shuffle_epi8(X[0], vindex);
+    X[1] = _mm256_shuffle_epi8(X[1], vindex);
+    X[2] = _mm256_shuffle_epi8(X[2], vindex);
+    X[3] = _mm256_shuffle_epi8(X[3], vindex);
+
+    for (int i = 0; i < 32; i += 1)
+    {
+        tmp[0] = _mm256_set1_epi32(round_key[i]);
+        tmp[0] = _mm256_xor_si256(tmp[0], X[1]);
+        tmp[0] = _mm256_xor_si256(tmp[0], X[2]);
+        tmp[0] = _mm256_xor_si256(tmp[0], X[3]);
+
+        tmp[1] = _mm256_srli_epi32(tmp[0], 8);
+        tmp[2] = _mm256_srli_epi32(tmp[0], 16);
+        tmp[3] = _mm256_srli_epi32(tmp[0], 24);
+        tmp[0] = _mm256_and_si256(tmp[0], mask);
+        tmp[1] = _mm256_and_si256(tmp[1], mask);
+        tmp[2] = _mm256_and_si256(tmp[2], mask);
+
+        tmp[0] = _mm256_i32gather_epi32((const int *)T3, tmp[0], 4);
+        tmp[1] = _mm256_i32gather_epi32((const int *)T2, tmp[1], 4);
+        tmp[2] = _mm256_i32gather_epi32((const int *)T1, tmp[2], 4);
+        tmp[3] = _mm256_i32gather_epi32((const int *)T0, tmp[3], 4);
+
+        tmp[0] = _mm256_xor_si256(tmp[0], tmp[1]);
+        tmp[0] = _mm256_xor_si256(X[0], tmp[0]);
+        tmp[2] = _mm256_xor_si256(tmp[2], tmp[3]);
+        tmp[0] = _mm256_xor_si256(tmp[0], tmp[2]);
+
+        X[0] = X[1];
+        X[1] = X[2];
+        X[2] = X[3];
+        X[3] = tmp[0];
+    }
+    X[0] = _mm256_shuffle_epi8(X[0], vindex);
+    X[1] = _mm256_shuffle_epi8(X[1], vindex);
+    X[2] = _mm256_shuffle_epi8(X[2], vindex);
+    X[3] = _mm256_shuffle_epi8(X[3], vindex);
+
+    tmp[0] = MM256_PACK0_EPI32(X[3], X[2], X[1], X[0]);
+    tmp[1] = MM256_PACK1_EPI32(X[3], X[2], X[1], X[0]);
+    tmp[2] = MM256_PACK2_EPI32(X[3], X[2], X[1], X[0]);
+    tmp[3] = MM256_PACK3_EPI32(X[3], X[2], X[1], X[0]);
+    _mm256_storeu_si256((__m256i *)out + 0, tmp[0]);
+    _mm256_storeu_si256((__m256i *)out + 1, tmp[1]);
+    _mm256_storeu_si256((__m256i *)out + 2, tmp[2]);
+    _mm256_storeu_si256((__m256i *)out + 3, tmp[3]);
+}
+
+/**
+ * @brief               SM4 block encryption/decryption
+ * @param round_key     32-dword encryption/decryption round key
+ * @param out           16x16-byte output block
+ * @param in            16x16-byte input block
+ */
+static void avx2_sm4_compute_blocks_x16(const std::uint32_t round_key[32],
+                                        std::uint8_t        out[256],
+                                        const std::uint8_t  in[256]) noexcept
+{
+    __m256i X[8], tmp[8], mask, vindex;
+    mask   = _mm256_set1_epi32(0xFF);
+    tmp[0] = _mm256_loadu_si256((const __m256i *)in + 0);
+    tmp[1] = _mm256_loadu_si256((const __m256i *)in + 1);
+    tmp[2] = _mm256_loadu_si256((const __m256i *)in + 2);
+    tmp[3] = _mm256_loadu_si256((const __m256i *)in + 3);
+    tmp[4] = _mm256_loadu_si256((const __m256i *)in + 4);
+    tmp[5] = _mm256_loadu_si256((const __m256i *)in + 5);
+    tmp[6] = _mm256_loadu_si256((const __m256i *)in + 6);
+    tmp[7] = _mm256_loadu_si256((const __m256i *)in + 7);
+
+    X[0] = MM256_PACK0_EPI32(tmp[0], tmp[1], tmp[2], tmp[3]);
+    X[1] = MM256_PACK1_EPI32(tmp[0], tmp[1], tmp[2], tmp[3]);
+    X[2] = MM256_PACK2_EPI32(tmp[0], tmp[1], tmp[2], tmp[3]);
+    X[3] = MM256_PACK3_EPI32(tmp[0], tmp[1], tmp[2], tmp[3]);
+    X[4] = MM256_PACK0_EPI32(tmp[4], tmp[5], tmp[6], tmp[7]);
+    X[5] = MM256_PACK1_EPI32(tmp[4], tmp[5], tmp[6], tmp[7]);
+    X[6] = MM256_PACK2_EPI32(tmp[4], tmp[5], tmp[6], tmp[7]);
+    X[7] = MM256_PACK3_EPI32(tmp[4], tmp[5], tmp[6], tmp[7]);
+    vindex =
+        _mm256_setr_epi8(3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12,
+                         3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12);
+    X[0] = _mm256_shuffle_epi8(X[0], vindex);
+    X[1] = _mm256_shuffle_epi8(X[1], vindex);
+    X[2] = _mm256_shuffle_epi8(X[2], vindex);
+    X[3] = _mm256_shuffle_epi8(X[3], vindex);
+    X[4] = _mm256_shuffle_epi8(X[4], vindex);
+    X[5] = _mm256_shuffle_epi8(X[5], vindex);
+    X[6] = _mm256_shuffle_epi8(X[6], vindex);
+    X[7] = _mm256_shuffle_epi8(X[7], vindex);
+    for (int i = 0; i < 32; i += 1)
+    {
+        tmp[4] = _mm256_set1_epi32(round_key[i]);
+        tmp[0] = _mm256_xor_si256(tmp[4], X[1]);
+        tmp[0] = _mm256_xor_si256(tmp[0], X[2]);
+        tmp[0] = _mm256_xor_si256(tmp[0], X[3]);
+        tmp[4] = _mm256_xor_si256(tmp[4], X[5]);
+        tmp[4] = _mm256_xor_si256(tmp[4], X[6]);
+        tmp[4] = _mm256_xor_si256(tmp[4], X[7]);
+
+        tmp[1] = _mm256_srli_epi32(tmp[0], 8);
+        tmp[2] = _mm256_srli_epi32(tmp[0], 16);
+        tmp[3] = _mm256_srli_epi32(tmp[0], 24);
+        tmp[0] = _mm256_and_si256(tmp[0], mask);
+        tmp[1] = _mm256_and_si256(tmp[1], mask);
+        tmp[2] = _mm256_and_si256(tmp[2], mask);
+
+        tmp[5] = _mm256_srli_epi32(tmp[4], 8);
+        tmp[6] = _mm256_srli_epi32(tmp[4], 16);
+        tmp[7] = _mm256_srli_epi32(tmp[4], 24);
+        tmp[4] = _mm256_and_si256(tmp[4], mask);
+        tmp[5] = _mm256_and_si256(tmp[5], mask);
+        tmp[6] = _mm256_and_si256(tmp[6], mask);
+
+        tmp[0] = _mm256_i32gather_epi32((const int *)T3, tmp[0], 4);
+        tmp[1] = _mm256_i32gather_epi32((const int *)T2, tmp[1], 4);
+        tmp[2] = _mm256_i32gather_epi32((const int *)T1, tmp[2], 4);
+        tmp[3] = _mm256_i32gather_epi32((const int *)T0, tmp[3], 4);
+
+        tmp[4] = _mm256_i32gather_epi32((const int *)T3, tmp[4], 4);
+        tmp[5] = _mm256_i32gather_epi32((const int *)T2, tmp[5], 4);
+        tmp[6] = _mm256_i32gather_epi32((const int *)T1, tmp[6], 4);
+        tmp[7] = _mm256_i32gather_epi32((const int *)T0, tmp[7], 4);
+
+        tmp[0] = _mm256_xor_si256(tmp[0], tmp[1]);
+        tmp[0] = _mm256_xor_si256(X[0], tmp[0]);
+        tmp[2] = _mm256_xor_si256(tmp[2], tmp[3]);
+        tmp[0] = _mm256_xor_si256(tmp[0], tmp[2]);
+
+        tmp[4] = _mm256_xor_si256(tmp[4], tmp[5]);
+        tmp[4] = _mm256_xor_si256(X[4], tmp[4]);
+        tmp[6] = _mm256_xor_si256(tmp[6], tmp[7]);
+        tmp[4] = _mm256_xor_si256(tmp[4], tmp[6]);
+
+        X[0] = X[1];
+        X[4] = X[5];
+        X[1] = X[2];
+        X[5] = X[6];
+        X[2] = X[3];
+        X[6] = X[7];
+        X[3] = tmp[0];
+        X[7] = tmp[4];
+    }
+    X[0] = _mm256_shuffle_epi8(X[0], vindex);
+    X[1] = _mm256_shuffle_epi8(X[1], vindex);
+    X[2] = _mm256_shuffle_epi8(X[2], vindex);
+    X[3] = _mm256_shuffle_epi8(X[3], vindex);
+    X[4] = _mm256_shuffle_epi8(X[4], vindex);
+    X[5] = _mm256_shuffle_epi8(X[5], vindex);
+    X[6] = _mm256_shuffle_epi8(X[6], vindex);
+    X[7] = _mm256_shuffle_epi8(X[7], vindex);
+
+    tmp[0] = MM256_PACK0_EPI32(X[3], X[2], X[1], X[0]);
+    tmp[1] = MM256_PACK1_EPI32(X[3], X[2], X[1], X[0]);
+    tmp[2] = MM256_PACK2_EPI32(X[3], X[2], X[1], X[0]);
+    tmp[3] = MM256_PACK3_EPI32(X[3], X[2], X[1], X[0]);
+    tmp[4] = MM256_PACK0_EPI32(X[7], X[6], X[5], X[4]);
+    tmp[5] = MM256_PACK1_EPI32(X[7], X[6], X[5], X[4]);
+    tmp[6] = MM256_PACK2_EPI32(X[7], X[6], X[5], X[4]);
+    tmp[7] = MM256_PACK3_EPI32(X[7], X[6], X[5], X[4]);
+    _mm256_storeu_si256((__m256i *)out + 0, tmp[0]);
+    _mm256_storeu_si256((__m256i *)out + 1, tmp[1]);
+    _mm256_storeu_si256((__m256i *)out + 2, tmp[2]);
+    _mm256_storeu_si256((__m256i *)out + 3, tmp[3]);
+    _mm256_storeu_si256((__m256i *)out + 4, tmp[4]);
+    _mm256_storeu_si256((__m256i *)out + 5, tmp[5]);
+    _mm256_storeu_si256((__m256i *)out + 6, tmp[6]);
+    _mm256_storeu_si256((__m256i *)out + 7, tmp[7]);
+}
+
 /**
  * @brief               SM4 block encryption/decryption
  * @param round_key     32-dword encryption/decryption round key
@@ -310,6 +517,16 @@ static void sm4_compute_blocks(const std::uint32_t round_key[32],
                                const std::uint8_t *in,
                                std::size_t         block_num) noexcept
 {
+    while (block_num >= 16)
+    {
+        avx2_sm4_compute_blocks_x16(round_key, out, in);
+        out += 16 * 16, in += 16 * 16, block_num -= 16;
+    }
+    while (block_num >= 8)
+    {
+        avx2_sm4_compute_blocks_x8(round_key, out, in);
+        out += 16 * 8, in += 16 * 8, block_num -= 8;
+    }
     while (block_num >= 4)
     {
         sm4_compute_blocks_x4(round_key, out, in);
@@ -364,5 +581,5 @@ void sm4_dec_blocks(const SM4Context   *ctx,
     sm4_compute_blocks(ctx->round_key, plaintext, ciphertext, block_num);
 }
 
-}; // namespace sm4::internal::lang18
+}; // namespace sm4::internal::lang18_avx2
 #endif

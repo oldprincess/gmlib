@@ -14,7 +14,8 @@ option(SUPPORT_SHA1_SHA "Build the Intel SHA Extensions SHA-1 implementation" ON
 option(SUPPORT_SHA2_SHA "Build the Intel SHA Extensions SHA-224/256 implementation" ON)
 option(SUPPORT_SM3_YANG15 "Build the Yang15 SM3 implementation" ON)
 option(SUPPORT_SM4_SM4NI "Build the AES-NI based SM4 implementation" ON)
-option(SUPPORT_SM4_LANG18 "Build the AVX2 Lang18 SM4 implementation" ON)
+option(SUPPORT_SM4_LANG18 "Build the portable Lang18 SM4 implementation" ON)
+option(SUPPORT_SM4_LANG18_AVX2 "Build the AVX2 Lang18 SM4 implementation" ON)
 option(SUPPORT_SM4_GONG23 "Build the AVX-512/GFNI Gong23 SM4 implementation" ON)
 option(SUPPORT_UBLOCK_STANDARD "Build the SSSE3 uBlock implementation" ON)
 option(SUPPORT_UBLOCK_GONG25 "Build the AVX2 Gong25 uBlock implementation" ON)
@@ -264,18 +265,22 @@ if(SUPPORT_SM4_SM4NI)
 endif()
 
 if(SUPPORT_SM4_LANG18)
+    gmlib_enable_impl(SUPPORT_SM4_LANG18)
+endif()
+
+if(SUPPORT_SM4_LANG18_AVX2)
     if(ARCH_X86 OR ARCH_X86_64)
-        gmlib_enable_impl(SUPPORT_SM4_LANG18)
+        gmlib_enable_impl(SUPPORT_SM4_LANG18_AVX2)
         if(COMPILER_MSVC)
-            set(SM4_LANG18_OPTIONS /arch:AVX2)
+            set(SM4_LANG18_AVX2_OPTIONS /arch:AVX2)
         else()
-            set(SM4_LANG18_OPTIONS -mavx2)
+            set(SM4_LANG18_AVX2_OPTIONS -mavx2)
         endif()
         set_source_files_properties(
-            ${BASE_LIB_SRC_DIRECTORY}/sm4/sm4_lang18.cpp
-            PROPERTIES COMPILE_OPTIONS "${SM4_LANG18_OPTIONS}")
+            ${BASE_LIB_SRC_DIRECTORY}/sm4/sm4_lang18_avx2.cpp
+            PROPERTIES COMPILE_OPTIONS "${SM4_LANG18_AVX2_OPTIONS}")
     else()
-        gmlib_skip_impl(SUPPORT_SM4_LANG18 "x86 or x86_64")
+        gmlib_skip_impl(SUPPORT_SM4_LANG18_AVX2 "x86 or x86_64")
     endif()
 endif()
 

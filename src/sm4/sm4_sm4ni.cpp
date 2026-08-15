@@ -294,17 +294,15 @@ static void sm4_compute4(const uint32_t rk[32], void *src, const void *dst)
 
 // ==================================================
 
-void sm4_enc_key_init(std::uint8_t       round_key[128],
-                      const std::uint8_t user_key[16]) noexcept
+void sm4_enc_key_init(SM4Context *ctx, const std::uint8_t user_key[16]) noexcept
 {
-    sm4_key_schedule(user_key, (std::uint32_t *)round_key);
+    sm4_key_schedule(user_key, ctx->round_key);
 }
 
-void sm4_dec_key_init(std::uint8_t       round_key[128],
-                      const std::uint8_t user_key[16]) noexcept
+void sm4_dec_key_init(SM4Context *ctx, const std::uint8_t user_key[16]) noexcept
 {
-    sm4_key_schedule(user_key, (std::uint32_t *)round_key);
-    std::uint32_t *rk_u32 = (std::uint32_t *)round_key;
+    sm4_key_schedule(user_key, ctx->round_key);
+    std::uint32_t *rk_u32 = ctx->round_key;
     for (int i = 0; i < 16; i++)
     {
         std::uint32_t tmp = rk_u32[i];
@@ -313,57 +311,57 @@ void sm4_dec_key_init(std::uint8_t       round_key[128],
     }
 }
 
-void sm4_enc_block(const std::uint8_t round_key[128],
+void sm4_enc_block(const SM4Context  *ctx,
                    std::uint8_t       ciphertext[16],
                    const std::uint8_t plaintext[16]) noexcept
 {
-    sm4_compute((const std::uint32_t *)round_key, plaintext, ciphertext);
+    sm4_compute(ctx->round_key, plaintext, ciphertext);
 }
 
-void sm4_dec_block(const std::uint8_t round_key[128],
+void sm4_dec_block(const SM4Context  *ctx,
                    std::uint8_t       plaintext[16],
                    const std::uint8_t ciphertext[16]) noexcept
 {
-    sm4_compute((const std::uint32_t *)round_key, ciphertext, plaintext);
+    sm4_compute(ctx->round_key, ciphertext, plaintext);
 }
 
-static void sm4_compute_blocks(const std::uint8_t  round_key[128],
+static void sm4_compute_blocks(const SM4Context   *ctx,
                                std::uint8_t       *ciphertext,
                                const std::uint8_t *plaintext,
                                std::size_t         block_num) noexcept
 {
     while (block_num >= 4)
     {
-        sm4_compute4((const std::uint32_t *)round_key, //
-                     (void *)plaintext,                //
-                     (const void *)ciphertext          //
-        );                                             //
+        sm4_compute4(ctx->round_key,          //
+                     (void *)plaintext,       //
+                     (const void *)ciphertext //
+        );                                    //
         plaintext += 16 * 4;
         ciphertext += 16 * 4;
         block_num -= 4;
     }
     while (block_num--)
     {
-        sm4_compute((const std::uint32_t *)round_key, plaintext, ciphertext);
+        sm4_compute(ctx->round_key, plaintext, ciphertext);
         plaintext += 16;
         ciphertext += 16;
     }
 }
 
-void sm4_enc_blocks(const std::uint8_t  round_key[128],
+void sm4_enc_blocks(const SM4Context   *ctx,
                     std::uint8_t       *ciphertext,
                     const std::uint8_t *plaintext,
                     std::size_t         block_num) noexcept
 {
-    sm4_compute_blocks(round_key, ciphertext, plaintext, block_num);
+    sm4_compute_blocks(ctx, ciphertext, plaintext, block_num);
 }
 
-void sm4_dec_blocks(const std::uint8_t  round_key[128],
+void sm4_dec_blocks(const SM4Context   *ctx,
                     std::uint8_t       *plaintext,
                     const std::uint8_t *ciphertext,
                     std::size_t         block_num) noexcept
 {
-    sm4_compute_blocks(round_key, plaintext, ciphertext, block_num);
+    sm4_compute_blocks(ctx, plaintext, ciphertext, block_num);
 }
 
 } // namespace sm4::internal::sm4ni

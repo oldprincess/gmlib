@@ -1,12 +1,12 @@
-#if defined(SUPPORT_SM4_SM4NI)
+#if defined(SUPPORT_SM4_LANG18_AVX2)
 
-#include "provider_sm4_sm4ni.h"
+#include "provider_sm4_lang18_avx2.h"
 
 #include <gmlib/cpuinfo/cpuinfo.h>
 
-#include "sm4_sm4ni.h"
+#include "sm4_lang18_avx2.h"
 
-namespace sm4::internal::sm4ni {
+namespace sm4::internal::lang18_avx2 {
 namespace {
 
 struct Traits
@@ -23,9 +23,7 @@ struct Traits
 
     static bool is_available() noexcept
     {
-        return cpuinfo::x86_64::cpu_supports_aes() &&
-               cpuinfo::x86_64::cpu_supports_sse2() &&
-               cpuinfo::x86_64::cpu_supports_ssse3();
+        return cpuinfo::x86_64::cpu_supports_avx2();
     }
 
     static constexpr auto enc_key_init   = sm4_enc_key_init;
@@ -44,6 +42,6 @@ using ProviderImpl =
 const block_cipher_mode::impl::BlockCipherModeProviderEntry provider =
     ProviderImpl::entry;
 
-} // namespace sm4::internal::sm4ni
+} // namespace sm4::internal::lang18_avx2
 
 #endif

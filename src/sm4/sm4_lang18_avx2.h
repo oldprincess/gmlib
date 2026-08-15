@@ -1,18 +1,18 @@
-#if defined(SUPPORT_SM4_LANG18)
+#if defined(SUPPORT_SM4_LANG18_AVX2)
 
-#ifndef SM4_INTERNAL_SM4_LANG18_H
-#define SM4_INTERNAL_SM4_LANG18_H
+#ifndef SM4_INTERNAL_SM4_LANG18_AVX2_H
+#define SM4_INTERNAL_SM4_LANG18_AVX2_H
 
 #include <cstddef>
 #include <cstdint>
 
-namespace sm4::internal::lang18 {
+namespace sm4::internal::lang18_avx2 {
 
 constexpr std::size_t SM4_BLOCK_SIZE   = 16;
 constexpr std::size_t SM4_USER_KEY_LEN = 16;
-constexpr std::size_t SM4_PARALLEL_NUM = 4;
+constexpr std::size_t SM4_PARALLEL_NUM = 16;
 
-constexpr const char* SM4_ALGO_NAME = "lang18";
+constexpr const char* SM4_ALGO_NAME = "lang18_avx2";
 
 struct SM4Context
 {
@@ -85,7 +85,7 @@ void sm4_dec_blocks(const SM4Context*   ctx,
                     const std::uint8_t* ciphertext,
                     std::size_t         block_num) noexcept;
 
-}; // namespace sm4::internal::lang18
+}; // namespace sm4::internal::lang18_avx2
 
 #endif
 #endif
