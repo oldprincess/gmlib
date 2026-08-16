@@ -1,10 +1,6 @@
-#include <gmlib/sm4/sm4_mode.h>
-
-#include <cstring>
+#include <iterator>
 
 #include "test.h"
-
-using namespace sm4;
 
 static std::uint8_t iv[16] = {
     0xbe, 0x55, 0x89, 0x8f, 0xe7, 0x64, 0x47, 0x23,
@@ -191,62 +187,14 @@ static std::uint8_t ct[1024] = {
     0x9a, 0x1f, 0xf7, 0x79,
 };
 
-void test_sm4_ofb_mode()
+std::vector<block_cipher_mode::test::ModeKat> get_sm4_ofb_kats()
 {
-    std::uint8_t buf[1024];
-    std::size_t  size, n;
-
-    auto e = SM4OfbEncryptor(user_key, iv);
-    e.do_final(buf, &size, pt, 1024);
-    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ofb_mode");
-    }
-    e.reset(iv);
-    e.update(buf, &n, pt, 100);
-    size = n;
-    e.do_final(buf + size, &n, pt + 100, 1024 - 100);
-    size += n;
-    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ofb_mode");
-    }
-    e.reset(iv);
-    e.update(buf, &n, pt, 100);
-    size = n;
-    e.update(buf + size, &n, pt + 100, 1024 - 100);
-    size += n;
-    e.do_final(buf + size, &n, nullptr, 0);
-    size += n;
-    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in Ofb_mode");
-    }
-
-    auto d = SM4OfbDecryptor(user_key, iv);
-    d.do_final(buf, &size, ct, 1024);
-    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ofb_mode");
-    }
-    d.reset(iv);
-    d.update(buf, &n, ct, 100);
-    size = n;
-    d.do_final(buf + size, &n, ct + 100, 1024 - 100);
-    size += n;
-    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ofb_mode");
-    }
-    d.reset(iv);
-    d.update(buf, &n, ct, 100);
-    size = n;
-    d.update(buf + size, &n, ct + 100, 1024 - 100);
-    size += n;
-    d.do_final(buf + size, &n, nullptr, 0);
-    size += n;
-    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ofb_mode");
-    }
+    return {{
+        "legacy-1024",
+        "OFB",
+        {std::begin(user_key), std::end(user_key)},
+        {std::begin(iv), std::end(iv)},
+        {std::begin(pt), std::end(pt)},
+        {std::begin(ct), std::end(ct)},
+    }};
 }

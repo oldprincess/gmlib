@@ -1,10 +1,6 @@
-#include <gmlib/sm4/sm4_mode.h>
-
-#include <cstring>
+#include <iterator>
 
 #include "test.h"
-
-using namespace sm4;
 
 static std::uint8_t iv[16] = {
     0x1d, 0x4a, 0x0c, 0x5b, 0x24, 0xb4, 0x7e, 0x4b,
@@ -191,62 +187,14 @@ static std::uint8_t ct[1024] = {
     0x02, 0x1e, 0xbf, 0xc9,
 };
 
-void test_sm4_cfb_mode()
+std::vector<block_cipher_mode::test::ModeKat> get_sm4_cfb_kats()
 {
-    std::uint8_t buf[1024];
-    std::size_t  size, n;
-
-    auto e = SM4CfbEncryptor(user_key, iv);
-    e.do_final(buf, &size, pt, 1024);
-    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in cfb_mode");
-    }
-    e.reset(iv);
-    e.update(buf, &n, pt, 100);
-    size = n;
-    e.do_final(buf + size, &n, pt + 100, 1024 - 100);
-    size += n;
-    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in cfb_mode");
-    }
-    e.reset(iv);
-    e.update(buf, &n, pt, 100);
-    size = n;
-    e.update(buf + size, &n, pt + 100, 1024 - 100);
-    size += n;
-    e.do_final(buf + size, &n, nullptr, 0);
-    size += n;
-    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in Cfb_mode");
-    }
-
-    auto d = SM4CfbDecryptor(user_key, iv);
-    d.do_final(buf, &size, ct, 1024);
-    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in cfb_mode");
-    }
-    d.reset(iv);
-    d.update(buf, &n, ct, 100);
-    size = n;
-    d.do_final(buf + size, &n, ct + 100, 1024 - 100);
-    size += n;
-    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in cfb_mode");
-    }
-    d.reset(iv);
-    d.update(buf, &n, ct, 100);
-    size = n;
-    d.update(buf + size, &n, ct + 100, 1024 - 100);
-    size += n;
-    d.do_final(buf + size, &n, nullptr, 0);
-    size += n;
-    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in cfb_mode");
-    }
+    return {{
+        "legacy-1024",
+        "CFB",
+        {std::begin(user_key), std::end(user_key)},
+        {std::begin(iv), std::end(iv)},
+        {std::begin(pt), std::end(pt)},
+        {std::begin(ct), std::end(ct)},
+    }};
 }

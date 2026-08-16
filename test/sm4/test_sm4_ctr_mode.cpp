@@ -1,10 +1,6 @@
-#include <gmlib/sm4/sm4_mode.h>
-
-#include <cstring>
+#include <iterator>
 
 #include "test.h"
-
-using namespace sm4;
 
 static std::uint8_t iv[16] = {
     0x88, 0x80, 0xbd, 0xd8, 0xa0, 0x19, 0xc3, 0x20,
@@ -191,62 +187,14 @@ static std::uint8_t ct[1024] = {
     0x03, 0xc1, 0xc9, 0xa9,
 };
 
-void test_sm4_ctr_mode()
+std::vector<block_cipher_mode::test::ModeKat> get_sm4_ctr_kats()
 {
-    std::uint8_t buf[1024];
-    std::size_t  size, n;
-
-    auto e = SM4CtrEncryptor(user_key, iv);
-    e.do_final(buf, &size, pt, 1024);
-    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ctr_mode");
-    }
-    e.reset(iv);
-    e.update(buf, &n, pt, 100);
-    size = n;
-    e.do_final(buf + size, &n, pt + 100, 1024 - 100);
-    size += n;
-    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ctr_mode");
-    }
-    e.reset(iv);
-    e.update(buf, &n, pt, 100);
-    size = n;
-    e.update(buf + size, &n, pt + 100, 1024 - 100);
-    size += n;
-    e.do_final(buf + size, &n, nullptr, 0);
-    size += n;
-    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in Ctr_mode");
-    }
-
-    auto d = SM4CtrDecryptor(user_key, iv);
-    d.do_final(buf, &size, ct, 1024);
-    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ctr_mode");
-    }
-    d.reset(iv);
-    d.update(buf, &n, ct, 100);
-    size = n;
-    d.do_final(buf + size, &n, ct + 100, 1024 - 100);
-    size += n;
-    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ctr_mode");
-    }
-    d.reset(iv);
-    d.update(buf, &n, ct, 100);
-    size = n;
-    d.update(buf + size, &n, ct + 100, 1024 - 100);
-    size += n;
-    d.do_final(buf + size, &n, nullptr, 0);
-    size += n;
-    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ctr_mode");
-    }
+    return {{
+        "legacy-1024",
+        "CTR",
+        {std::begin(user_key), std::end(user_key)},
+        {std::begin(iv), std::end(iv)},
+        {std::begin(pt), std::end(pt)},
+        {std::begin(ct), std::end(ct)},
+    }};
 }

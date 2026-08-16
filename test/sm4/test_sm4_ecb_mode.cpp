@@ -1,10 +1,6 @@
-#include <gmlib/sm4/sm4_mode.h>
-
-#include <cstring>
+#include <iterator>
 
 #include "test.h"
-
-using namespace sm4;
 
 static std::uint8_t user_key[16] = {
     0xd1, 0x37, 0xc6, 0xa7, 0xe8, 0x0c, 0x32, 0x31,
@@ -187,62 +183,14 @@ static std::uint8_t ct[1024] = {
     0x90, 0xf6, 0x1d, 0x7f,
 };
 
-void test_sm4_ecb_mode()
+std::vector<block_cipher_mode::test::ModeKat> get_sm4_ecb_kats()
 {
-    std::uint8_t buf[1024];
-    std::size_t  size, n;
-
-    auto e = SM4EcbEncryptor(user_key);
-    e.do_final(buf, &size, pt, 1024);
-    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ecb_mode");
-    }
-    e.reset();
-    e.update(buf, &n, pt, 100);
-    size = n;
-    e.do_final(buf + size, &n, pt + 100, 1024 - 100);
-    size += n;
-    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ecb_mode");
-    }
-    e.reset();
-    e.update(buf, &n, pt, 100);
-    size = n;
-    e.update(buf + size, &n, pt + 100, 1024 - 100);
-    size += n;
-    e.do_final(buf + size, &n, nullptr, 0);
-    size += n;
-    if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ecb_mode");
-    }
-
-    auto d = SM4EcbDecryptor(user_key);
-    d.do_final(buf, &size, ct, 1024);
-    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ecb_mode");
-    }
-    d.reset();
-    d.update(buf, &n, ct, 100);
-    size = n;
-    d.do_final(buf + size, &n, ct + 100, 1024 - 100);
-    size += n;
-    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ecb_mode");
-    }
-    d.reset();
-    d.update(buf, &n, ct, 100);
-    size = n;
-    d.update(buf + size, &n, ct + 100, 1024 - 100);
-    size += n;
-    d.do_final(buf + size, &n, nullptr, 0);
-    size += n;
-    if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
-    {
-        throw std::runtime_error("err in ecb_mode");
-    }
+    return {{
+        "legacy-1024",
+        "ECB",
+        {std::begin(user_key), std::end(user_key)},
+        {},
+        {std::begin(pt), std::end(pt)},
+        {std::begin(ct), std::end(ct)},
+    }};
 }

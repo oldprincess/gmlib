@@ -1,7 +1,6 @@
-#include <gmlib/sm4/sm4.h>
+#include <iterator>
 
-#include <cstring>
-#include <stdexcept>
+#include "test.h"
 
 static std::uint8_t user_key[16] = {
     0xd1, 0x37, 0xc6, 0xa7, 0xe8, 0x0c, 0x32, 0x31,
@@ -184,19 +183,12 @@ static std::uint8_t ct[1024] = {
     0x90, 0xf6, 0x1d, 0x7f,
 };
 
-void test_sm4()
+std::vector<block_cipher_mode::test::CipherKat> get_sm4_cipher_kats()
 {
-    auto         cipher = sm4::SM4(user_key, sm4::SM4::ENCRYPTION);
-    std::uint8_t out[1024];
-    cipher.encrypt_blocks(out, pt, 1024 / sm4::SM4::BLOCK_SIZE);
-    if (std::memcmp(out, ct, 1024) != 0)
-    {
-        throw std::runtime_error("err in sm4");
-    }
-    cipher.set_key(user_key, sm4::SM4::DECRYPTION);
-    cipher.decrypt_blocks(out, ct, 1024 / sm4::SM4::BLOCK_SIZE);
-    if (std::memcmp(out, pt, 1024) != 0)
-    {
-        throw std::runtime_error("err in sm4");
-    }
+    return {{
+        "legacy-1024",
+        {std::begin(user_key), std::end(user_key)},
+        {std::begin(pt), std::end(pt)},
+        {std::begin(ct), std::end(ct)},
+    }};
 }
