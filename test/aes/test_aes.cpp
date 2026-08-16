@@ -1,7 +1,9 @@
-#include <gmlib/aes/aes.h>
+#include <iterator>
 
-#include <cstring>
-#include <stdexcept>
+#include "test.h"
+
+// test vectors from NIST
+// https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines/example-values
 
 static std::uint8_t user_key[32] = {
     0x04, 0xb5, 0xf0, 0x47, 0x03, 0xe2, 0x02, 0x5f, 0x5d, 0x08, 0x46,
@@ -65,68 +67,31 @@ static std::uint8_t ct256[] = {
     0x90, 0x84, 0xae, 0xf2, 0x60, 0x1d, 0xaa, 0xdf,
 };
 
-using namespace aes;
+namespace {
 
-static void test_aes128()
+std::vector<block_cipher_mode::test::CipherKat> make_cipher_kats(
+    std::size_t         key_len,
+    const std::uint8_t* ciphertext)
 {
-    std::uint8_t out[sizeof(pt)];
-
-    AES128 cipher;
-    cipher.set_key(user_key, AES128::ENCRYPTION);
-    cipher.encrypt_blocks(out, pt, sizeof(pt) / AES128::BLOCK_SIZE);
-    if (std::memcmp(out, ct128, sizeof(ct128)) != 0)
-    {
-        throw std::runtime_error("err in aes128 enc");
-    }
-    cipher.set_key(user_key, AES128::DECRYPTION);
-    cipher.decrypt_blocks(out, ct128, sizeof(ct128) / AES128::BLOCK_SIZE);
-    if (std::memcmp(out, pt, sizeof(pt)) != 0)
-    {
-        throw std::runtime_error("err in aes128 dec");
-    }
+    return {{"nist-example",
+             {std::begin(user_key), std::begin(user_key) + key_len},
+             {std::begin(pt), std::end(pt)},
+             {ciphertext, ciphertext + sizeof(pt)}}};
 }
 
-static void test_aes192()
-{
-    std::uint8_t out[sizeof(pt)];
+} // namespace
 
-    AES192 cipher;
-    cipher.set_key(user_key, AES192::ENCRYPTION);
-    cipher.encrypt_blocks(out, pt, sizeof(pt) / AES192::BLOCK_SIZE);
-    if (std::memcmp(out, ct192, sizeof(ct192)) != 0)
-    {
-        throw std::runtime_error("err in aes192");
-    }
-    cipher.set_key(user_key, AES192::DECRYPTION);
-    cipher.decrypt_blocks(out, ct192, sizeof(ct192) / AES192::BLOCK_SIZE);
-    if (std::memcmp(out, pt, sizeof(pt)) != 0)
-    {
-        throw std::runtime_error("err in aes192");
-    }
+std::vector<block_cipher_mode::test::CipherKat> get_aes128_cipher_kats()
+{
+    return make_cipher_kats(16, ct128);
 }
 
-static void test_aes256()
+std::vector<block_cipher_mode::test::CipherKat> get_aes192_cipher_kats()
 {
-    std::uint8_t out[sizeof(pt)];
-
-    AES256 cipher;
-    cipher.set_key(user_key, AES256::ENCRYPTION);
-    cipher.encrypt_blocks(out, pt, sizeof(pt) / AES256::BLOCK_SIZE);
-    if (std::memcmp(out, ct256, sizeof(ct256)) != 0)
-    {
-        throw std::runtime_error("err in aes256");
-    }
-    cipher.set_key(user_key, AES256::DECRYPTION);
-    cipher.decrypt_blocks(out, ct256, sizeof(ct256) / AES256::BLOCK_SIZE);
-    if (std::memcmp(out, pt, sizeof(pt)) != 0)
-    {
-        throw std::runtime_error("err in aes256");
-    }
+    return make_cipher_kats(24, ct192);
 }
 
-void test_aes()
+std::vector<block_cipher_mode::test::CipherKat> get_aes256_cipher_kats()
 {
-    test_aes128();
-    test_aes192();
-    test_aes256();
+    return make_cipher_kats(32, ct256);
 }

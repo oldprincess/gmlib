@@ -8,7 +8,7 @@
 
 namespace aes::internal::aesni {
 
-constexpr const char* AES_ALGO_NAME = "aseni";
+constexpr const char* AES_ALGO_NAME = "aesni";
 
 constexpr std::size_t AES128_BLOCK_SIZE   = 16;
 constexpr std::size_t AES128_USER_KEY_LEN = 16;
