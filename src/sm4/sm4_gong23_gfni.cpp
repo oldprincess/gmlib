@@ -1,12 +1,12 @@
-#if defined(SUPPORT_SM4_GONG23)
+#if defined(SUPPORT_SM4_GONG23_GFNI)
 
-#include "sm4_gong23.h"
+#include "sm4_gong23_gfni.h"
 
 #include <immintrin.h>
 
 #pragma region "SM4 GFNI"
 
-namespace sm4::internal::gong23::gfni {
+namespace sm4::internal::gong23_gfni::gfni {
 
 static uint8_t Matrix_A1[64] = {
     0x0d,                                           // 0, 0, 0, 0, 1, 1, 0, 1
@@ -1010,11 +1010,11 @@ static void sm4_gfni_v2_avx512_crypt(const std::uint32_t *trk,
     }
 }
 
-} // namespace sm4::internal::gong23::gfni
+} // namespace sm4::internal::gong23_gfni::gfni
 
 #pragma endregion
 
-namespace sm4::internal::gong23 {
+namespace sm4::internal::gong23_gfni {
 
 #pragma region "SM4 Params"
 
@@ -1245,6 +1245,6 @@ void sm4_dec_blocks(const SM4Context   *ctx,
     }
 }
 
-} // namespace sm4::internal::gong23
+} // namespace sm4::internal::gong23_gfni
 
 #endif

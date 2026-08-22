@@ -1,0 +1,49 @@
+#if defined(SUPPORT_SM4_GONG23_AESNI)
+
+#include "provider_sm4_gong23_aesni.h"
+
+#include <gmlib/cpuinfo/cpuinfo.h>
+
+#include "sm4_gong23_aesni.h"
+
+namespace sm4::internal::gong23_aesni {
+namespace {
+
+struct Traits
+{
+    static constexpr const char* NAME      = "SM4";
+    static constexpr const char* ALGO_NAME = SM4_ALGO_NAME;
+
+    static constexpr std::size_t BLOCK_SIZE        = SM4_BLOCK_SIZE;
+    static constexpr std::size_t USER_KEY_LEN      = SM4_USER_KEY_LEN;
+    static constexpr std::size_t PARALLEL_NUM      = SM4_PARALLEL_NUM;
+    static constexpr std::size_t SECURITY_STRENGTH = SM4_USER_KEY_LEN;
+
+    using Context = SM4Context;
+
+    static bool is_available() noexcept
+    {
+        return cpuinfo::x86_64::cpu_supports_aes() &&
+               cpuinfo::x86_64::cpu_supports_sse2() &&
+               cpuinfo::x86_64::cpu_supports_ssse3();
+    }
+
+    static constexpr auto enc_key_init   = sm4_enc_key_init;
+    static constexpr auto dec_key_init   = sm4_dec_key_init;
+    static constexpr auto encrypt_block  = sm4_enc_block;
+    static constexpr auto decrypt_block  = sm4_dec_block;
+    static constexpr auto encrypt_blocks = sm4_enc_blocks;
+    static constexpr auto decrypt_blocks = sm4_dec_blocks;
+};
+
+using ProviderImpl =
+    block_cipher_mode::impl::BlockCipherModeProviderImpl<Traits>;
+
+} // namespace
+
+const block_cipher_mode::impl::BlockCipherModeProviderEntry provider =
+    ProviderImpl::entry;
+
+} // namespace sm4::internal::gong23_aesni
+
+#endif

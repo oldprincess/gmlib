@@ -1,12 +1,12 @@
-#if defined(SUPPORT_SM4_GONG23)
+#if defined(SUPPORT_SM4_GONG23_GFNI)
 
-#include "provider_sm4_gong23.h"
+#include "provider_sm4_gong23_gfni.h"
 
 #include <gmlib/cpuinfo/cpuinfo.h>
 
-#include "sm4_gong23.h"
+#include "sm4_gong23_gfni.h"
 
-namespace sm4::internal::gong23 {
+namespace sm4::internal::gong23_gfni {
 namespace {
 
 struct Traits
@@ -45,6 +45,6 @@ using ProviderImpl =
 const block_cipher_mode::impl::BlockCipherModeProviderEntry provider =
     ProviderImpl::entry;
 
-} // namespace sm4::internal::gong23
+} // namespace sm4::internal::gong23_gfni
 
 #endif

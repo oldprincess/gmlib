@@ -3,8 +3,11 @@
 #include <array>
 
 #include "provider_sm4_common.h"
-#if defined(SUPPORT_SM4_GONG23)
-#include "provider_sm4_gong23.h"
+#if defined(SUPPORT_SM4_GONG23_GFNI)
+#include "provider_sm4_gong23_gfni.h"
+#endif
+#if defined(SUPPORT_SM4_GONG23_AESNI)
+#include "provider_sm4_gong23_aesni.h"
 #endif
 #if defined(SUPPORT_SM4_LANG18_AVX2)
 #include "provider_sm4_lang18_avx2.h"
@@ -22,11 +25,14 @@ namespace {
 using block_cipher_mode::impl::BlockCipherModeProviderEntry;
 
 static const BlockCipherModeProviderEntry* const providers[] = {
-#if defined(SUPPORT_SM4_GONG23)
-    &internal::gong23::provider,
+#if defined(SUPPORT_SM4_GONG23_GFNI)
+    &internal::gong23_gfni::provider,
 #endif
 #if defined(SUPPORT_SM4_LANG18_AVX2)
     &internal::lang18_avx2::provider,
+#endif
+#if defined(SUPPORT_SM4_GONG23_AESNI)
+    &internal::gong23_aesni::provider,
 #endif
 #if defined(SUPPORT_SM4_LANG18)
     &internal::lang18::provider,
