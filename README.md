@@ -127,10 +127,10 @@ Release/sm2_test.exe speed
 | `SUPPORT_NUMBER_X64` | BMI2/MOVBE 大数运算实现 |
 | `SUPPORT_SHA1_SHA`, `SUPPORT_SHA2_SHA` | Intel SHA 扩展实现 |
 | `SUPPORT_SM3_YANG15` | Yang15 SM3 实现 |
-| `SUPPORT_SM4_SM4NI`, `SUPPORT_SM4_LANG18`, `SUPPORT_SM4_GONG23` | SM4 加速实现 |
+| `SUPPORT_SM4_SM4NI`, `SUPPORT_SM4_LANG18`, `SUPPORT_SM4_GONG23_GFNI`, `SUPPORT_SM4_GONG23_AESNI` | SM4 加速实现 |
 | `SUPPORT_UBLOCK_STANDARD`, `SUPPORT_UBLOCK_GONG25` | uBlock 加速实现 |
 
-例如，使用 `cmake .. -DSUPPORT_SM4_GONG23=OFF` 可以不编译 Gong23 SM4实现。如果某个选项已开启，但目标 CPU 架构不支持对应实现，CMake 会输出提示并跳过该实现，不会导致配置失败。显式请求未编译或当前 CPU 不支持的provider 时会抛出 `No provider available`；使用自动选择时则会继续回退到可用的通用实现。
+例如，使用 `cmake .. -DSUPPORT_SM4_GONG23_GFNI=OFF` 可以不编译 Gong23 GFNI SM4实现。如果某个选项已开启，但目标 CPU 架构不支持对应实现，CMake 会输出提示并跳过该实现，不会导致配置失败。显式请求未编译或当前 CPU 不支持的provider 时会抛出 `No provider available`；使用自动选择时则会继续回退到可用的通用实现。
 
 ### 2.3 使用
 

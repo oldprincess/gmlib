@@ -20,7 +20,7 @@
 
 > 郎欢, 张蕾, 吴文玲. SM4的快速软件实现技术. 中国科学院大学学报, 2018, 35(2): 180-187.
 
-* sm4_gong23
+* sm4_gong23_gfni / sm4_gong23_aesni
 
 使用龚等人的优化方法加速. [链接](https://www.journalofcybersec.com/CN/Y2023/V1/I3/86)
 
