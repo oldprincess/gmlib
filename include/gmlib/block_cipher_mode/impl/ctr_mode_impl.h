@@ -6,78 +6,178 @@
 #include <gmlib/memory_utils/memxor.h>
 
 #include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <stdexcept>
 
 namespace block_cipher_mode::impl::internal {
 
-static inline void ctr_inc8(std::uint8_t* out, const std::uint8_t* in) noexcept
+struct CtrU64TypeTraits
 {
-    uint64_t tmp = 1;
-    tmp += memory_utils::load32_be(in + 4);
-    memory_utils::store32_be(out + 4, tmp & UINT32_MAX);
-    tmp = memory_utils::load32_be(in + 0) + (tmp >> 32);
-    memory_utils::store32_be(out + 0, tmp & UINT32_MAX);
+    using T = std::uint64_t;
+
+    static constexpr std::size_t MAX = UINT64_MAX;
+
+    static constexpr auto load_be_aligned = memory_utils::load64_be_aligned;
+
+    static constexpr auto store_be_aligned = memory_utils::store64_be_aligned;
+};
+
+struct CtrU32TypeTraits
+{
+    using T = std::uint32_t;
+
+    static constexpr std::size_t MAX = UINT32_MAX;
+
+    static constexpr auto load_be_aligned = memory_utils::load32_be_aligned;
+
+    static constexpr auto store_be_aligned = memory_utils::store32_be_aligned;
+};
+
+template <class Traits, std::size_t BLOCK_SIZE, std::size_t BATCH_SIZE>
+static inline void ctr_generate_fixed_batch(std::uint8_t* out,
+                                            std::uint8_t* counter) noexcept
+
+{
+    static_assert(BATCH_SIZE < Traits::MAX, "invalid batch size");
+    static_assert((BLOCK_SIZE >= sizeof(Traits::T) &&
+                   BLOCK_SIZE % sizeof(Traits::T) == 0),
+                  "invalid block size");
+    if constexpr (BATCH_SIZE == 0)
+    {
+        return;
+    }
+
+    std::uint8_t* low_ptr = counter + BLOCK_SIZE - sizeof(Traits::T);
+    Traits::T     low     = Traits::load_be_aligned(low_ptr);
+    if (BATCH_SIZE <= Traits::MAX - low)
+    {
+        for (std::size_t i = 0; i < BATCH_SIZE; ++i)
+        {
+            std::uint8_t* dst = out + i * BLOCK_SIZE;
+            if constexpr (BLOCK_SIZE > sizeof(Traits::T))
+            {
+                std::memcpy(dst, counter, BLOCK_SIZE - sizeof(Traits::T));
+                dst += BLOCK_SIZE - sizeof(Traits::T);
+            }
+            Traits::store_be_aligned(dst, low + (Traits::T)i);
+        }
+        low += (Traits::T)BATCH_SIZE;
+        Traits::store_be_aligned(low_ptr, low);
+        return;
+    }
+
+    constexpr std::size_t LIMB_NUM = BLOCK_SIZE / sizeof(Traits::T);
+    Traits::T             limbs[LIMB_NUM];
+    for (std::size_t i = 0; i < LIMB_NUM; ++i)
+    {
+        std::uint8_t* src = counter + i * sizeof(Traits::T);
+        limbs[i]          = Traits::load_be_aligned(src);
+    }
+    for (std::size_t i = 0; i < BATCH_SIZE; ++i)
+    {
+        std::uint8_t* dst   = out + i * BLOCK_SIZE;
+        Traits::T     carry = (Traits::T)i;
+        for (std::size_t j = 0; j < LIMB_NUM; ++j)
+        {
+            Traits::T dst_j = limbs[LIMB_NUM - 1 - j] + carry;
+            carry           = dst_j < carry ? 1 : 0;
+            Traits::store_be_aligned(                               //
+                dst + (LIMB_NUM - 1 - j) * sizeof(Traits::T), dst_j //
+            );                                                      //
+        }
+    }
+    Traits::T carry = (Traits::T)BATCH_SIZE;
+    for (std::size_t j = 0; j < LIMB_NUM; ++j)
+    {
+        Traits::T dst_j = limbs[LIMB_NUM - 1 - j] + carry;
+        carry           = dst_j < carry ? 1 : 0;
+        Traits::store_be_aligned(                                   //
+            counter + (LIMB_NUM - 1 - j) * sizeof(Traits::T), dst_j //
+        );                                                          //
+    }
 }
 
-static inline void ctr_inc16(std::uint8_t* out, const std::uint8_t* in) noexcept
+template <class Traits, std::size_t BLOCK_SIZE>
+static inline void ctr_generate_batched(std::uint8_t* out,
+                                        std::uint8_t* counter,
+                                        std::size_t   block_num) noexcept
 {
-    uint64_t tmp = 1;
-    tmp += memory_utils::load32_be(in + 12);
-    memory_utils::store32_be(out + 12, tmp & UINT32_MAX);
-    tmp = memory_utils::load32_be(in + 8) + (tmp >> 32);
-    memory_utils::store32_be(out + 8, tmp & UINT32_MAX);
-    tmp = memory_utils::load32_be(in + 4) + (tmp >> 32);
-    memory_utils::store32_be(out + 4, tmp & UINT32_MAX);
-    tmp = memory_utils::load32_be(in + 0) + (tmp >> 32);
-    memory_utils::store32_be(out + 0, tmp & UINT32_MAX);
+    while (block_num >= 16)
+    {
+        ctr_generate_fixed_batch<Traits, BLOCK_SIZE, 16>(out, counter);
+        out += BLOCK_SIZE * 16;
+        block_num -= 16;
+    }
+    if (block_num >= 8)
+    {
+        ctr_generate_fixed_batch<Traits, BLOCK_SIZE, 8>(out, counter);
+        out += BLOCK_SIZE * 8;
+        block_num -= 8;
+    }
+    if (block_num >= 4)
+    {
+        ctr_generate_fixed_batch<Traits, BLOCK_SIZE, 4>(out, counter);
+        out += BLOCK_SIZE * 4;
+        block_num -= 4;
+    }
+    while (block_num != 0)
+    {
+        ctr_generate_fixed_batch<Traits, BLOCK_SIZE, 1>(out, counter);
+        out += BLOCK_SIZE;
+        --block_num;
+    }
 }
 
-static inline void ctr_inc32(std::uint8_t* out, const std::uint8_t* in) noexcept
-{
-    uint64_t tmp = 1;
-    tmp += memory_utils::load32_be(in + 28);
-    memory_utils::store32_be(out + 28, tmp & UINT32_MAX);
-    tmp = memory_utils::load32_be(in + 24) + (tmp >> 32);
-    memory_utils::store32_be(out + 24, tmp & UINT32_MAX);
-    tmp = memory_utils::load32_be(in + 20) + (tmp >> 32);
-    memory_utils::store32_be(out + 20, tmp & UINT32_MAX);
-    tmp = memory_utils::load32_be(in + 16) + (tmp >> 32);
-    memory_utils::store32_be(out + 16, tmp & UINT32_MAX);
-    tmp = memory_utils::load32_be(in + 12) + (tmp >> 32);
-    memory_utils::store32_be(out + 12, tmp & UINT32_MAX);
-    tmp = memory_utils::load32_be(in + 8) + (tmp >> 32);
-    memory_utils::store32_be(out + 8, tmp & UINT32_MAX);
-    tmp = memory_utils::load32_be(in + 4) + (tmp >> 32);
-    memory_utils::store32_be(out + 4, tmp & UINT32_MAX);
-    tmp = memory_utils::load32_be(in + 0) + (tmp >> 32);
-    memory_utils::store32_be(out + 0, tmp & UINT32_MAX);
-}
-
+/**
+ * @pre When a limb implementation is selected, `out` and `counter` satisfy
+ *      the natural alignment requirement of that limb type.
+ */
 template <std::size_t BLOCK_SIZE>
-static inline void ctr_inc(std::uint8_t* out, const std::uint8_t* in) noexcept
+static inline void ctr_generate(std::uint8_t* out,
+                                std::uint8_t* counter,
+                                std::size_t   block_num) noexcept
 {
-    if constexpr (BLOCK_SIZE == 32)
+    static_assert(BLOCK_SIZE > 0, "CTR block size must be positive");
+
+    if (block_num == 0)
     {
-        ctr_inc32(out, in);
+        return;
     }
-    else if constexpr (BLOCK_SIZE == 16)
+
+    if constexpr (BLOCK_SIZE % sizeof(std::uint64_t) == 0 &&
+                  sizeof(std::size_t) == sizeof(std::uint64_t))
     {
-        ctr_inc16(out, in);
+        ctr_generate_batched<CtrU64TypeTraits, BLOCK_SIZE>(out, counter,
+                                                           block_num);
     }
-    else if constexpr (BLOCK_SIZE == 8)
+    else if constexpr (BLOCK_SIZE % sizeof(std::uint32_t) == 0)
     {
-        ctr_inc8(out, in);
+        ctr_generate_batched<CtrU32TypeTraits, BLOCK_SIZE>(out, counter,
+                                                           block_num);
     }
     else
     {
-        std::uint16_t t = 1;
-        for (std::size_t i = 0; i < BLOCK_SIZE; i++)
+        const auto increment_counter = [](std::uint8_t*       dst,
+                                          const std::uint8_t* src) noexcept {
+            std::uint16_t carry = 1;
+            for (std::size_t i = BLOCK_SIZE; i != 0; --i)
+            {
+                carry += src[i - 1];
+                dst[i - 1] = static_cast<std::uint8_t>(carry);
+                carry >>= 8;
+            }
+        };
+
+        std::uint8_t* current = out;
+        std::memcpy(current, counter, BLOCK_SIZE);
+        for (std::size_t i = 1; i < block_num; ++i)
         {
-            std::size_t pos = BLOCK_SIZE - 1 - i;
-            t += (std::uint16_t)in[pos];
-            out[pos] = t & 0xFF;
-            t >>= 8;
+            std::uint8_t* next = current + BLOCK_SIZE;
+            increment_counter(next, current);
+            current = next;
         }
+        increment_counter(counter, current);
     }
 }
 
@@ -110,8 +210,8 @@ public:
     }
 
 private:
-    Cipher       cipher_;
-    std::uint8_t counter_[Cipher::BLOCK_SIZE];
+    Cipher cipher_;
+    alignas(std::uint64_t) std::uint8_t counter_[Cipher::BLOCK_SIZE];
 
 public:
     CtrCryptorImpl() = default;
@@ -186,15 +286,7 @@ private:
         }
         constexpr std::size_t block_size = Cipher::BLOCK_SIZE;
         // generate counter
-        std::uint8_t* cur_counter = out;
-        std::memcpy(cur_counter, counter_, block_size);
-        for (std::size_t i = 1; i < block_num; i++)
-        {
-            std::uint8_t* nxt_counter = cur_counter + block_size;
-            internal::ctr_inc<block_size>(nxt_counter, cur_counter);
-            cur_counter = nxt_counter;
-        }
-        internal::ctr_inc<block_size>(counter_, cur_counter);
+        internal::ctr_generate<block_size>(out, counter_, block_num);
         // generate key stream
         cipher_.encrypt_blocks(out, out, block_num);
     }
@@ -208,7 +300,7 @@ protected:
         constexpr std::size_t PARALLEL_NUM   = Cipher::PARALLEL_NUM;
         constexpr std::size_t PARALLEL_BYTES = block_size * PARALLEL_NUM;
 
-        std::uint8_t key_stream[PARALLEL_BYTES];
+        alignas(std::uint64_t) std::uint8_t key_stream[PARALLEL_BYTES];
         while (block_num >= PARALLEL_NUM)
         {
             this->gen_block_key_stream(key_stream, PARALLEL_NUM);
@@ -234,7 +326,7 @@ protected:
         {
             return;
         }
-        std::uint8_t key_stream[block_size];
+        alignas(std::uint64_t) std::uint8_t key_stream[block_size];
         this->gen_block_key_stream(key_stream, 1);
         memory_utils::memxor_n(out, key_stream, in, inl);
     }

@@ -8,14 +8,54 @@
 
 namespace block_cipher_mode::impl::internal {
 
-static inline void gctr_inc(std::uint8_t       out[16],
-                            const std::uint8_t in[16]) noexcept
+template <std::size_t BATCH_SIZE>
+static inline void gctr_generate_fixed_batch(std::uint8_t* out,
+                                             std::uint8_t  counter[16]) noexcept
 {
-    ((std::uint32_t*)out)[0] = ((const std::uint32_t*)in)[0];
-    ((std::uint32_t*)out)[1] = ((const std::uint32_t*)in)[1];
-    ((std::uint32_t*)out)[2] = ((const std::uint32_t*)in)[2];
-    std::uint32_t tmp        = memory_utils::load32_be(in + 12) + 1;
-    memory_utils::store32_be(out + 12, tmp);
+    static_assert(BATCH_SIZE > 0, "GCTR batch size must be positive");
+
+    alignas(std::uint32_t) std::uint8_t counter_prefix[12];
+    std::memcpy(counter_prefix, counter, sizeof(counter_prefix));
+    const std::uint32_t low = memory_utils::load32_be_aligned(counter + 12);
+    for (std::size_t i = 0; i < BATCH_SIZE; ++i)
+    {
+        std::uint8_t* dst = out + i * 16;
+        std::memcpy(dst, counter_prefix, sizeof(counter_prefix));
+        memory_utils::store32_be_aligned(dst + 12, low + (std::uint32_t)(i));
+    }
+    memory_utils::store32_be_aligned(                 //
+        counter + 12, low + (std::uint32_t)BATCH_SIZE //
+    );                                                //
+}
+
+static inline void gctr_generate_batched(std::uint8_t* out,
+                                         std::uint8_t  counter[16],
+                                         std::size_t   block_num) noexcept
+{
+    while (block_num >= 16)
+    {
+        gctr_generate_fixed_batch<16>(out, counter);
+        out += 16 * 16;
+        block_num -= 16;
+    }
+    if (block_num >= 8)
+    {
+        gctr_generate_fixed_batch<8>(out, counter);
+        out += 16 * 8;
+        block_num -= 8;
+    }
+    if (block_num >= 4)
+    {
+        gctr_generate_fixed_batch<4>(out, counter);
+        out += 16 * 4;
+        block_num -= 4;
+    }
+    while (block_num != 0)
+    {
+        gctr_generate_fixed_batch<1>(out, counter);
+        out += 16;
+        --block_num;
+    }
 }
 
 } // namespace block_cipher_mode::impl::internal
@@ -30,9 +70,9 @@ public:
     static constexpr std::size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
 
 protected:
-    Cipher       cipher_;
-    std::uint8_t counter_[16];
-    std::uint8_t counter0_[16];
+    Cipher cipher_;
+    alignas(std::uint32_t) std::uint8_t counter_[16];
+    alignas(std::uint32_t) std::uint8_t counter0_[16];
 
 public:
     GctrCryptorImpl() = default;
@@ -87,7 +127,8 @@ public:
             hash.do_final(counter0_);
             hash.reset();
         }
-        internal::gctr_inc(counter_, counter0_);
+        std::memcpy(counter_, counter0_, sizeof(counter_));
+        internal::gctr_generate_fixed_batch<1>(counter_, counter_);
     }
 
     void reset(const std::uint8_t* iv, std::size_t iv_len, ghash::GHash& hash)
@@ -115,7 +156,8 @@ public:
             hash.do_final(counter0_);
             hash.reset();
         }
-        internal::gctr_inc(counter_, counter0_);
+        std::memcpy(counter_, counter0_, sizeof(counter_));
+        internal::gctr_generate_fixed_batch<1>(counter_, counter_);
     }
 
 private:
@@ -126,15 +168,7 @@ private:
             return;
         }
         // generate counter
-        std::uint8_t* cur_counter = out;
-        std::memcpy(cur_counter, counter_, 16);
-        for (std::size_t i = 1; i < block_num; i++)
-        {
-            std::uint8_t* nxt_counter = cur_counter + 16;
-            internal::gctr_inc(nxt_counter, cur_counter);
-            cur_counter = nxt_counter;
-        }
-        internal::gctr_inc(counter_, cur_counter);
+        internal::gctr_generate_batched(out, counter_, block_num);
         // generate key stream
         cipher_.encrypt_blocks(out, out, block_num);
     }
@@ -153,7 +187,7 @@ protected:
         constexpr std::size_t PARALLEL_BYTES = block_size * PARALLEL_NUM;
 
         // gctr
-        std::uint8_t key_stream[PARALLEL_BYTES];
+        alignas(std::uint32_t) std::uint8_t key_stream[PARALLEL_BYTES];
         while (block_num >= PARALLEL_NUM)
         {
             this->gen_block_key_stream(key_stream, PARALLEL_NUM);
@@ -175,7 +209,7 @@ protected:
     {
         if (inl != 0)
         {
-            std::uint8_t key_stream[16];
+            alignas(std::uint32_t) std::uint8_t key_stream[16];
             this->gen_block_key_stream(key_stream, 1);
             memory_utils::memxor_n(out, key_stream, in, inl);
         }
