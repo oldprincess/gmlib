@@ -1,5 +1,6 @@
 #include <gmlib/ghash/ghash.h>
 
+#include <cstdio>
 #include <cstring>
 #include <stdexcept>
 
