@@ -45,7 +45,7 @@ static void AES_128_Key_Expansion(const unsigned char* userkey,
     __m128i  temp1, temp2;
     __m128i* Key_Schedule = (__m128i*)key;
 
-    temp1            = _mm_loadu_si128((__m128i*)userkey);
+    temp1            = _mm_loadu_si128((const __m128i*)userkey);
     Key_Schedule[0]  = temp1;
     temp2            = _mm_aeskeygenassist_si128(temp1, 0x1);
     temp1            = AES_128_ASSIST(temp1, temp2);
@@ -111,8 +111,8 @@ static void AES_192_Key_Expansion(const unsigned char* userkey,
 {
     __m128i  temp1, temp2, temp3;
     __m128i* Key_Schedule = (__m128i*)key;
-    temp1                 = _mm_loadu_si128((__m128i*)userkey);
-    temp3                 = _mm_loadu_si128((__m128i*)(userkey + 16));
+    temp1                 = _mm_loadu_si128((const __m128i*)userkey);
+    temp3                 = _mm_loadu_si128((const __m128i*)(userkey + 16));
     Key_Schedule[0]       = temp1;
     Key_Schedule[1]       = temp3;
     temp2                 = _mm_aeskeygenassist_si128(temp3, 0x1);
@@ -192,8 +192,8 @@ static void AES_256_Key_Expansion(const unsigned char* userkey,
 {
     __m128i  temp1, temp2, temp3;
     __m128i* Key_Schedule = (__m128i*)key;
-    temp1                 = _mm_loadu_si128((__m128i*)userkey);
-    temp3                 = _mm_loadu_si128((__m128i*)(userkey + 16));
+    temp1                 = _mm_loadu_si128((const __m128i*)userkey);
+    temp3                 = _mm_loadu_si128((const __m128i*)(userkey + 16));
     Key_Schedule[0]       = temp1;
     Key_Schedule[1]       = temp3;
     temp2                 = _mm_aeskeygenassist_si128(temp3, 0x01);

@@ -14,10 +14,10 @@ using namespace sm4::internal::lang18_tables;
 
 static inline std::uint32_t MEM_LOAD32BE(const void *src)
 {
-    return ((std::uint32_t)(((std::uint8_t *)src)[0]) << 24) |
-           ((std::uint32_t)(((std::uint8_t *)src)[1]) << 16) |
-           ((std::uint32_t)(((std::uint8_t *)src)[2]) << 8) |
-           ((std::uint32_t)(((std::uint8_t *)src)[3]) << 0);
+    return ((std::uint32_t)(((const std::uint8_t *)src)[0]) << 24) |
+           ((std::uint32_t)(((const std::uint8_t *)src)[1]) << 16) |
+           ((std::uint32_t)(((const std::uint8_t *)src)[2]) << 8) |
+           ((std::uint32_t)(((const std::uint8_t *)src)[3]) << 0);
 }
 
 static inline void MEM_STORE32BE(void *dst, std::uint32_t a)

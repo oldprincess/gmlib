@@ -137,7 +137,7 @@ static void sm4_compute(const std::uint32_t rk[32],
     store_u32_be(x0, ciphertext + 12);
 }
 
-static void sm4_compute4(const uint32_t rk[32], void *src, const void *dst)
+static void sm4_compute4(const uint32_t rk[32], const void *src, void *dst)
 {
     // nibble mask
     static const std::uint64_t c0f_data[2] = {
@@ -205,18 +205,19 @@ static void sm4_compute4(const uint32_t rk[32], void *src, const void *dst)
 
     __m128i x, y, t0, t1, t2, t3;
 
-    std::uint32_t k, *p32, v[4];
-    int           i;
+    std::uint32_t        k, *p32, v[4];
+    const std::uint32_t *src32;
+    int                  i;
 
-    p32 = (std::uint32_t *)src;
-    t0  = _mm_set_epi32(p32[12], p32[8], p32[4], p32[0]);
-    t0  = _mm_shuffle_epi8(t0, flp);
-    t1  = _mm_set_epi32(p32[13], p32[9], p32[5], p32[1]);
-    t1  = _mm_shuffle_epi8(t1, flp);
-    t2  = _mm_set_epi32(p32[14], p32[10], p32[6], p32[2]);
-    t2  = _mm_shuffle_epi8(t2, flp);
-    t3  = _mm_set_epi32(p32[15], p32[11], p32[7], p32[3]);
-    t3  = _mm_shuffle_epi8(t3, flp);
+    src32 = (const std::uint32_t *)src;
+    t0    = _mm_set_epi32(src32[12], src32[8], src32[4], src32[0]);
+    t0    = _mm_shuffle_epi8(t0, flp);
+    t1    = _mm_set_epi32(src32[13], src32[9], src32[5], src32[1]);
+    t1    = _mm_shuffle_epi8(t1, flp);
+    t2    = _mm_set_epi32(src32[14], src32[10], src32[6], src32[2]);
+    t2    = _mm_shuffle_epi8(t2, flp);
+    t3    = _mm_set_epi32(src32[15], src32[11], src32[7], src32[3]);
+    t3    = _mm_shuffle_epi8(t3, flp);
 
 #define SM4_TAU_L1                                                        \
     {                                                                     \
@@ -333,8 +334,8 @@ static void sm4_compute_blocks(const SM4Context   *ctx,
     while (block_num >= 4)
     {
         sm4_compute4(ctx->round_key,          //
-                     (void *)plaintext,       //
-                     (const void *)ciphertext //
+                     (const void *)plaintext, //
+                     (void *)ciphertext       //
         );                                    //
         plaintext += 16 * 4;
         ciphertext += 16 * 4;

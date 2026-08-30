@@ -6,11 +6,11 @@
 
 namespace sm3::internal::yang15 {
 
-#define MEM_LOAD32BE(src)                                 \
-    (((std::uint32_t)(((std::uint8_t*)(src))[0]) << 24) | \
-     ((std::uint32_t)(((std::uint8_t*)(src))[1]) << 16) | \
-     ((std::uint32_t)(((std::uint8_t*)(src))[2]) << 8) |  \
-     ((std::uint32_t)(((std::uint8_t*)(src))[3]) << 0))
+#define MEM_LOAD32BE(src)                                       \
+    (((std::uint32_t)(((const std::uint8_t*)(src))[0]) << 24) | \
+     ((std::uint32_t)(((const std::uint8_t*)(src))[1]) << 16) | \
+     ((std::uint32_t)(((const std::uint8_t*)(src))[2]) << 8) |  \
+     ((std::uint32_t)(((const std::uint8_t*)(src))[3]) << 0))
 
 #define MEM_STORE32BE(dst, a)                                       \
     (((std::uint8_t*)(dst))[0] = ((std::uint32_t)(a) >> 24) & 0xFF, \

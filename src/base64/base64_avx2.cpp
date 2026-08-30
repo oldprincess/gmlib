@@ -284,7 +284,7 @@ static void base64_stream_encode_avx2(struct base64_state *state,
                 while (srclen >= 32)
                 {
                     // Load string:
-                    __m256i str = _mm256_loadu_si256((__m256i *)c);
+                    __m256i str = _mm256_loadu_si256((const __m256i *)c);
 
                     // Reshuffle:
                     str = enc_reshuffle(str);
@@ -388,7 +388,7 @@ static int base64_stream_decode_avx2(struct base64_state *state,
                 while (srclen >= 45)
                 {
                     // Load string:
-                    __m256i str = _mm256_loadu_si256((__m256i *)c);
+                    __m256i str = _mm256_loadu_si256((const __m256i *)c);
 
                     // The input consists of six character sets in the Base64
                     // alphabet, which we need to map back to the 6-bit values

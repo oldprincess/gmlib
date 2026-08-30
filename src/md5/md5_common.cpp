@@ -11,11 +11,11 @@
 
 namespace md5::internal::common {
 
-#define MEM_LOAD32LE(src)                                 \
-    (((std::uint32_t)(((std::uint8_t*)(src))[0]) << 0) |  \
-     ((std::uint32_t)(((std::uint8_t*)(src))[1]) << 8) |  \
-     ((std::uint32_t)(((std::uint8_t*)(src))[2]) << 16) | \
-     ((std::uint32_t)(((std::uint8_t*)(src))[3]) << 24))
+#define MEM_LOAD32LE(src)                                       \
+    (((std::uint32_t)(((const std::uint8_t*)(src))[0]) << 0) |  \
+     ((std::uint32_t)(((const std::uint8_t*)(src))[1]) << 8) |  \
+     ((std::uint32_t)(((const std::uint8_t*)(src))[2]) << 16) | \
+     ((std::uint32_t)(((const std::uint8_t*)(src))[3]) << 24))
 
 #define MEM_STORE32LE(dst, a)                                       \
     (((std::uint8_t*)(dst))[0] = ((std::uint32_t)(a) >> 0) & 0xFF,  \

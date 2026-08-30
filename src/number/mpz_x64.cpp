@@ -16,7 +16,7 @@
 #define _subborrow_u64(a, b, c, d) \
     _subborrow_u64(a, b, c, (long long unsigned int*)d)
 
-#define _loadbe_i64(ptr)     __builtin_bswap64(*(std::uint64_t*)(ptr))
+#define _loadbe_i64(ptr)     __builtin_bswap64(*(const std::uint64_t*)(ptr))
 #define _storebe_i64(ptr, a) *(std::uint64_t*)(ptr) = __builtin_bswap64(a)
 
 #endif

@@ -6,11 +6,11 @@ namespace sha2 {
 namespace internal {
 namespace common {
 
-#define MEM_LOAD32BE(src)                                 \
-    (((std::uint32_t)(((std::uint8_t*)(src))[0]) << 24) | \
-     ((std::uint32_t)(((std::uint8_t*)(src))[1]) << 16) | \
-     ((std::uint32_t)(((std::uint8_t*)(src))[2]) << 8) |  \
-     ((std::uint32_t)(((std::uint8_t*)(src))[3]) << 0))
+#define MEM_LOAD32BE(src)                                       \
+    (((std::uint32_t)(((const std::uint8_t*)(src))[0]) << 24) | \
+     ((std::uint32_t)(((const std::uint8_t*)(src))[1]) << 16) | \
+     ((std::uint32_t)(((const std::uint8_t*)(src))[2]) << 8) |  \
+     ((std::uint32_t)(((const std::uint8_t*)(src))[3]) << 0))
 
 #define MEM_STORE32BE(dst, a)                                       \
     (((std::uint8_t*)(dst))[0] = ((std::uint32_t)(a) >> 24) & 0xFF, \
@@ -18,15 +18,15 @@ namespace common {
      ((std::uint8_t*)(dst))[2] = ((std::uint32_t)(a) >> 8) & 0xFF,  \
      ((std::uint8_t*)(dst))[3] = ((std::uint32_t)(a) >> 0) & 0xFF)
 
-#define MEM_LOAD64BE(src)                                 \
-    (((std::uint64_t)(((std::uint8_t*)(src))[0]) << 56) | \
-     ((std::uint64_t)(((std::uint8_t*)(src))[1]) << 48) | \
-     ((std::uint64_t)(((std::uint8_t*)(src))[2]) << 40) | \
-     ((std::uint64_t)(((std::uint8_t*)(src))[3]) << 32) | \
-     ((std::uint64_t)(((std::uint8_t*)(src))[4]) << 24) | \
-     ((std::uint64_t)(((std::uint8_t*)(src))[5]) << 16) | \
-     ((std::uint64_t)(((std::uint8_t*)(src))[6]) << 8) |  \
-     ((std::uint64_t)(((std::uint8_t*)(src))[7]) << 0))
+#define MEM_LOAD64BE(src)                                       \
+    (((std::uint64_t)(((const std::uint8_t*)(src))[0]) << 56) | \
+     ((std::uint64_t)(((const std::uint8_t*)(src))[1]) << 48) | \
+     ((std::uint64_t)(((const std::uint8_t*)(src))[2]) << 40) | \
+     ((std::uint64_t)(((const std::uint8_t*)(src))[3]) << 32) | \
+     ((std::uint64_t)(((const std::uint8_t*)(src))[4]) << 24) | \
+     ((std::uint64_t)(((const std::uint8_t*)(src))[5]) << 16) | \
+     ((std::uint64_t)(((const std::uint8_t*)(src))[6]) << 8) |  \
+     ((std::uint64_t)(((const std::uint8_t*)(src))[7]) << 0))
 
 #define MEM_STORE64BE(dst, a)                                       \
     (((std::uint8_t*)(dst))[0] = ((std::uint64_t)(a) >> 56) & 0xFF, \

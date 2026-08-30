@@ -2,11 +2,11 @@
 
 #include <cstring>
 
-#define MEM_LOAD32BE(src)                                 \
-    (((std::uint32_t)(((std::uint8_t*)(src))[0]) << 24) | \
-     ((std::uint32_t)(((std::uint8_t*)(src))[1]) << 16) | \
-     ((std::uint32_t)(((std::uint8_t*)(src))[2]) << 8) |  \
-     ((std::uint32_t)(((std::uint8_t*)(src))[3]) << 0))
+#define MEM_LOAD32BE(src)                                       \
+    (((std::uint32_t)(((const std::uint8_t*)(src))[0]) << 24) | \
+     ((std::uint32_t)(((const std::uint8_t*)(src))[1]) << 16) | \
+     ((std::uint32_t)(((const std::uint8_t*)(src))[2]) << 8) |  \
+     ((std::uint32_t)(((const std::uint8_t*)(src))[3]) << 0))
 
 #define MEM_STORE32BE(dst, a)                                       \
     (((std::uint8_t*)(dst))[0] = ((std::uint32_t)(a) >> 24) & 0xFF, \
@@ -173,13 +173,13 @@ int sha1_final_block(std::uint32_t       state[5],
     uint8_t buf[64 * 2];
     size_t  buf_size = 0;
     std::memcpy(buf, in, inl);
-    buf_size += inl;                          // update
-    buf[buf_size] = 0x80;                     // 10..0
-    buf_size += 1;                            // update
-    std::memset(buf + buf_size, 0, pad_num);  // pad 0
-    buf_size += pad_num;                      // update
+    buf_size += inl;                           // update
+    buf[buf_size] = 0x80;                      // 10..0
+    buf_size += 1;                             // update
+    std::memset(buf + buf_size, 0, pad_num);   // pad 0
+    buf_size += pad_num;                       // update
     MEM_STORE64BE(buf + buf_size, *data_bits); //
-    buf_size += 8;                            // update
+    buf_size += 8;                             // update
     // compress
     for (std::size_t i = 0; i < buf_size; i += 64)
     {

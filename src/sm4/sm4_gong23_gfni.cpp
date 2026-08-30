@@ -182,7 +182,7 @@ static inline void sm4_gfni_v2_trans_key(std::uint32_t       *out,
     vector A1 = VECTOR_LOAD(Matrix_A1);
     for (int i = 0; i < 32 * 4; i += sizeof(vector))
     {
-        vector t = VECTOR_LOAD((uint8_t *)rk + i);
+        vector t = VECTOR_LOAD((const uint8_t *)rk + i);
         t        = GF2_AFFINE(t, A1, (Matrix_C1));
         VECTOR_STORE((uint8_t *)out + i, t);
     }
@@ -212,10 +212,10 @@ static void sm4_gfni_avx512_crypt(const std::uint32_t *rk,
     t1 = VECTOR_LOAD(Shuffle_Endian); // shuffle vindex
 
     // load vector
-    t[0] = VECTOR_LOAD((vector *)in + 0);
-    t[1] = VECTOR_LOAD((vector *)in + 1);
-    t[2] = VECTOR_LOAD((vector *)in + 2);
-    t[3] = VECTOR_LOAD((vector *)in + 3);
+    t[0] = VECTOR_LOAD((const vector *)in + 0);
+    t[1] = VECTOR_LOAD((const vector *)in + 1);
+    t[2] = VECTOR_LOAD((const vector *)in + 2);
+    t[3] = VECTOR_LOAD((const vector *)in + 3);
     // shuffle endian
     t[0] = VECTOR_SHUFFLE_EPI8(t[0], t1);
     t[1] = VECTOR_SHUFFLE_EPI8(t[1], t1);
@@ -363,25 +363,25 @@ static void sm4_gfni_v2_avx512_crypt(const std::uint32_t *trk,
 
     {
         // ==== load input ==========
-        ZMM0  = VECTOR_LOAD((vector *)in);
-        ZMM4  = VECTOR_LOAD((vector *)in + 1);
-        ZMM8  = VECTOR_LOAD((vector *)in + 2);
-        ZMM12 = VECTOR_LOAD((vector *)in + 3);
+        ZMM0  = VECTOR_LOAD((const vector *)in);
+        ZMM4  = VECTOR_LOAD((const vector *)in + 1);
+        ZMM8  = VECTOR_LOAD((const vector *)in + 2);
+        ZMM12 = VECTOR_LOAD((const vector *)in + 3);
 
-        ZMM1  = VECTOR_LOAD((vector *)in + 4);
-        ZMM5  = VECTOR_LOAD((vector *)in + 5);
-        ZMM9  = VECTOR_LOAD((vector *)in + 6);
-        ZMM13 = VECTOR_LOAD((vector *)in + 7);
+        ZMM1  = VECTOR_LOAD((const vector *)in + 4);
+        ZMM5  = VECTOR_LOAD((const vector *)in + 5);
+        ZMM9  = VECTOR_LOAD((const vector *)in + 6);
+        ZMM13 = VECTOR_LOAD((const vector *)in + 7);
 
-        ZMM2  = VECTOR_LOAD((vector *)in + 8);
-        ZMM6  = VECTOR_LOAD((vector *)in + 9);
-        ZMM10 = VECTOR_LOAD((vector *)in + 10);
-        ZMM14 = VECTOR_LOAD((vector *)in + 11);
+        ZMM2  = VECTOR_LOAD((const vector *)in + 8);
+        ZMM6  = VECTOR_LOAD((const vector *)in + 9);
+        ZMM10 = VECTOR_LOAD((const vector *)in + 10);
+        ZMM14 = VECTOR_LOAD((const vector *)in + 11);
 
-        ZMM3  = VECTOR_LOAD((vector *)in + 12);
-        ZMM7  = VECTOR_LOAD((vector *)in + 13);
-        ZMM11 = VECTOR_LOAD((vector *)in + 14);
-        ZMM15 = VECTOR_LOAD((vector *)in + 15);
+        ZMM3  = VECTOR_LOAD((const vector *)in + 12);
+        ZMM7  = VECTOR_LOAD((const vector *)in + 13);
+        ZMM11 = VECTOR_LOAD((const vector *)in + 14);
+        ZMM15 = VECTOR_LOAD((const vector *)in + 15);
         // // shuffle endian
         // ZMM0 = VECTOR_SHUFFLE_EPI8(ZMM0, ZMM_SHUFFLE_ENDIAN);
         // ZMM4 = VECTOR_SHUFFLE_EPI8(ZMM4, ZMM_SHUFFLE_ENDIAN);
@@ -1020,10 +1020,10 @@ namespace sm4::internal::gong23_gfni {
 
 static inline std::uint32_t MEM_LOAD32BE(const void *src)
 {
-    return ((std::uint32_t)(((std::uint8_t *)src)[0]) << 24) |
-           ((std::uint32_t)(((std::uint8_t *)src)[1]) << 16) |
-           ((std::uint32_t)(((std::uint8_t *)src)[2]) << 8) |
-           ((std::uint32_t)(((std::uint8_t *)src)[3]) << 0);
+    return ((std::uint32_t)(((const std::uint8_t *)src)[0]) << 24) |
+           ((std::uint32_t)(((const std::uint8_t *)src)[1]) << 16) |
+           ((std::uint32_t)(((const std::uint8_t *)src)[2]) << 8) |
+           ((std::uint32_t)(((const std::uint8_t *)src)[3]) << 0);
 }
 
 static inline void MEM_STORE32BE(void *dst, std::uint32_t a)

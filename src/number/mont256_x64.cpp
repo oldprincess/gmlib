@@ -1,9 +1,10 @@
 #if defined(SUPPORT_NUMBER_X64)
 
 #include "mont256_x64.h"
-#include "uint256_x64.h"
 
 #include <immintrin.h>
+
+#include "uint256_x64.h"
 
 #if defined(_MSC_VER)
 #include <intrin.h>
@@ -29,7 +30,7 @@ static void mont256_redc(const Mont256CTX* ctx,
     std::uint64_t m, m_times_p[5]; // m * P
     std::uint64_t hi[4];           // product higher
 
-    std::uint64_t        N_ = *(std::uint64_t*)ctx->N_;
+    std::uint64_t        N_ = *(const std::uint64_t*)ctx->N_;
     const std::uint64_t* P  = (const std::uint64_t*)(ctx->P);
 
     // *****************************************************

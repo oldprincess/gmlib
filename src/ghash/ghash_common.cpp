@@ -2,15 +2,15 @@
 
 namespace ghash::internal::common {
 
-#define MEM_LOAD64BE(src)                       \
-    (((uint64_t)(((uint8_t*)(src))[0]) << 56) | \
-     ((uint64_t)(((uint8_t*)(src))[1]) << 48) | \
-     ((uint64_t)(((uint8_t*)(src))[2]) << 40) | \
-     ((uint64_t)(((uint8_t*)(src))[3]) << 32) | \
-     ((uint64_t)(((uint8_t*)(src))[4]) << 24) | \
-     ((uint64_t)(((uint8_t*)(src))[5]) << 16) | \
-     ((uint64_t)(((uint8_t*)(src))[6]) << 8) |  \
-     ((uint64_t)(((uint8_t*)(src))[7]) << 0))
+#define MEM_LOAD64BE(src)                             \
+    (((uint64_t)(((const uint8_t*)(src))[0]) << 56) | \
+     ((uint64_t)(((const uint8_t*)(src))[1]) << 48) | \
+     ((uint64_t)(((const uint8_t*)(src))[2]) << 40) | \
+     ((uint64_t)(((const uint8_t*)(src))[3]) << 32) | \
+     ((uint64_t)(((const uint8_t*)(src))[4]) << 24) | \
+     ((uint64_t)(((const uint8_t*)(src))[5]) << 16) | \
+     ((uint64_t)(((const uint8_t*)(src))[6]) << 8) |  \
+     ((uint64_t)(((const uint8_t*)(src))[7]) << 0))
 
 #define MEM_STORE64BE(dst, a)                             \
     (((uint8_t*)(dst))[0] = ((uint64_t)(a) >> 56) & 0xFF, \

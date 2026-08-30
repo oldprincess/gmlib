@@ -445,7 +445,7 @@ static size_t chromium_base64_decode(uint8_t* dest, const char* src, size_t len)
 
     uint8_t*       p = (uint8_t*)dest;
     uint32_t       x = 0;
-    const uint8_t* y = (uint8_t*)src;
+    const uint8_t* y = (const uint8_t*)src;
     for (i = 0; i < chunks; ++i, y += 4)
     {
         x = d0[y[0]] | d1[y[1]] | d2[y[2]] | d3[y[3]];
