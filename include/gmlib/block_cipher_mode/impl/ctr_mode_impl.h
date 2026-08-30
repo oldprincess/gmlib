@@ -39,62 +39,63 @@ static inline void ctr_generate_fixed_batch(std::uint8_t* out,
                                             std::uint8_t* counter) noexcept
 
 {
+    using T = typename Traits::T;
+
     static_assert(BATCH_SIZE < Traits::MAX, "invalid batch size");
-    static_assert((BLOCK_SIZE >= sizeof(Traits::T) &&
-                   BLOCK_SIZE % sizeof(Traits::T) == 0),
+    static_assert((BLOCK_SIZE >= sizeof(T) && BLOCK_SIZE % sizeof(T) == 0),
                   "invalid block size");
     if constexpr (BATCH_SIZE == 0)
     {
         return;
     }
 
-    std::uint8_t* low_ptr = counter + BLOCK_SIZE - sizeof(Traits::T);
-    Traits::T     low     = Traits::load_be_aligned(low_ptr);
+    std::uint8_t* low_ptr = counter + BLOCK_SIZE - sizeof(T);
+    T             low     = Traits::load_be_aligned(low_ptr);
     if (BATCH_SIZE <= Traits::MAX - low)
     {
         for (std::size_t i = 0; i < BATCH_SIZE; ++i)
         {
             std::uint8_t* dst = out + i * BLOCK_SIZE;
-            if constexpr (BLOCK_SIZE > sizeof(Traits::T))
+            if constexpr (BLOCK_SIZE > sizeof(T))
             {
-                std::memcpy(dst, counter, BLOCK_SIZE - sizeof(Traits::T));
-                dst += BLOCK_SIZE - sizeof(Traits::T);
+                std::memcpy(dst, counter, BLOCK_SIZE - sizeof(T));
+                dst += BLOCK_SIZE - sizeof(T);
             }
-            Traits::store_be_aligned(dst, low + (Traits::T)i);
+            Traits::store_be_aligned(dst, low + static_cast<T>(i));
         }
-        low += (Traits::T)BATCH_SIZE;
+        low += static_cast<T>(BATCH_SIZE);
         Traits::store_be_aligned(low_ptr, low);
         return;
     }
 
-    constexpr std::size_t LIMB_NUM = BLOCK_SIZE / sizeof(Traits::T);
-    Traits::T             limbs[LIMB_NUM];
+    constexpr std::size_t LIMB_NUM = BLOCK_SIZE / sizeof(T);
+    T                     limbs[LIMB_NUM];
     for (std::size_t i = 0; i < LIMB_NUM; ++i)
     {
-        std::uint8_t* src = counter + i * sizeof(Traits::T);
+        std::uint8_t* src = counter + i * sizeof(T);
         limbs[i]          = Traits::load_be_aligned(src);
     }
     for (std::size_t i = 0; i < BATCH_SIZE; ++i)
     {
         std::uint8_t* dst   = out + i * BLOCK_SIZE;
-        Traits::T     carry = (Traits::T)i;
+        T             carry = static_cast<T>(i);
         for (std::size_t j = 0; j < LIMB_NUM; ++j)
         {
-            Traits::T dst_j = limbs[LIMB_NUM - 1 - j] + carry;
-            carry           = dst_j < carry ? 1 : 0;
-            Traits::store_be_aligned(                               //
-                dst + (LIMB_NUM - 1 - j) * sizeof(Traits::T), dst_j //
-            );                                                      //
+            T dst_j = limbs[LIMB_NUM - 1 - j] + carry;
+            carry   = dst_j < carry ? 1 : 0;
+            Traits::store_be_aligned(                       //
+                dst + (LIMB_NUM - 1 - j) * sizeof(T), dst_j //
+            );                                              //
         }
     }
-    Traits::T carry = (Traits::T)BATCH_SIZE;
+    T carry = static_cast<T>(BATCH_SIZE);
     for (std::size_t j = 0; j < LIMB_NUM; ++j)
     {
-        Traits::T dst_j = limbs[LIMB_NUM - 1 - j] + carry;
-        carry           = dst_j < carry ? 1 : 0;
-        Traits::store_be_aligned(                                   //
-            counter + (LIMB_NUM - 1 - j) * sizeof(Traits::T), dst_j //
-        );                                                          //
+        T dst_j = limbs[LIMB_NUM - 1 - j] + carry;
+        carry   = dst_j < carry ? 1 : 0;
+        Traits::store_be_aligned(                           //
+            counter + (LIMB_NUM - 1 - j) * sizeof(T), dst_j //
+        );                                                  //
     }
 }
 
