@@ -28,11 +28,6 @@ static inline void MEM_STORE32BE(void *dst, std::uint32_t a)
     ((std::uint8_t *)dst)[3] = ((std::uint32_t)a >> 0) & 0xFF;
 }
 
-static inline std::uint32_t rotl(std::uint32_t n, int s)
-{
-    return (n << s) | (n >> (32 - s));
-}
-
 static const std::uint32_t FK[4] = {
     0xa3b1bac6,
     0x56aa3350,
