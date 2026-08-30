@@ -1,99 +1,43 @@
 #include <gmlib/des/provider.h>
 
-#include <cstddef>
-#include <cstring>
+#include <array>
 
 #include "provider_des_common.h"
 
 namespace des {
+namespace {
 
-struct Provider
-{
-    bool (*available)() noexcept;
+using block_cipher_mode::impl::BlockCipherModeProviderEntry;
 
-    block_cipher_mode::BlockCipherModeProvider fns;
+static const BlockCipherModeProviderEntry* const providers[] = {
+    &internal::common::provider,
 };
 
-static const Provider providers[] = {
-    {
-        []() noexcept -> bool {
-            return des::internal::common::provider_available();
-        },
-        {
-            "common",
-            des::internal::common::create_cipher,
-            des::internal::common::create_ecb_encryptor,
-            des::internal::common::create_ecb_decryptor,
-            des::internal::common::create_cbc_encryptor,
-            des::internal::common::create_cbc_decryptor,
-            des::internal::common::create_cfb_encryptor,
-            des::internal::common::create_cfb_decryptor,
-            des::internal::common::create_ofb_encryptor,
-            des::internal::common::create_ofb_decryptor,
-            des::internal::common::create_ctr_encryptor,
-            des::internal::common::create_ctr_decryptor,
-            nullptr,
-            nullptr,
-        },
-    },
-};
+constexpr std::size_t PROVIDER_NUM = std::size(providers);
 
-template <typename T, std::size_t N>
-constexpr std::size_t array_size(const T (&)[N]) noexcept
-{
-    return N;
-}
+} // namespace
 
 const DESProvider* get_des_provider(const char* name) noexcept
 {
     if (name == nullptr)
     {
-        static const DESProvider* default_provider = []() {
-            for (const Provider& provider : providers)
-            {
-                if (provider.available())
-                {
-                    return &provider.fns;
-                }
-            }
-            return static_cast<const DESProvider*>(nullptr);
-        }();
+        static const DESProvider* default_provider =
+            block_cipher_mode::impl::get_provider(nullptr, providers,
+                                                  PROVIDER_NUM);
         return default_provider;
     }
-    else
-    {
-        for (const Provider& provider : providers)
-        {
-            if (provider.available() &&
-                std::strcmp(provider.fns.algo_name, name) == 0)
-            {
-                return &provider.fns;
-            }
-        }
-        return nullptr;
-    }
+    return block_cipher_mode::impl::get_provider(name, providers, PROVIDER_NUM);
 }
 
 const char* const* get_des_supported_provider_names() noexcept
 {
-    static const auto provider_name_list = []() {
-        struct ProviderNameList
-        {
-            const char* names[array_size(providers) + 1];
-        };
-        ProviderNameList list;
-        int              idx = 0;
-        for (const Provider& provider : providers)
-        {
-            if (provider.available())
-            {
-                list.names[idx++] = provider.fns.algo_name;
-            }
-        }
-        list.names[idx] = nullptr;
-        return list;
+    static const auto name_list = []() {
+        std::array<const char*, PROVIDER_NUM + 1> names;
+        block_cipher_mode::impl::get_supported_provider_names(
+            names.data(), providers, PROVIDER_NUM);
+        return names;
     }();
-    return provider_name_list.names;
+    return name_list.data();
 }
 
 } // namespace des
