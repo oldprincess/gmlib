@@ -161,12 +161,34 @@ struct BlockCipherModeProviderImpl
             []() -> std::unique_ptr<BlockCipherMode> {
                 return std::make_unique<CtrDecryptorImpl<BlockCipherAdapter>>();
             },
-            []() -> std::unique_ptr<BlockCipherMode> {
-                return std::make_unique<GcmEncryptorImpl<BlockCipherAdapter>>();
-            },
-            []() -> std::unique_ptr<BlockCipherMode> {
-                return std::make_unique<GcmDecryptorImpl<BlockCipherAdapter>>();
-            },
+            []() constexpr
+            -> decltype(BlockCipherModeProvider::create_gcm_encryptor) {
+                if constexpr (Traits::BLOCK_SIZE == 16)
+                {
+                    return []() -> std::unique_ptr<BlockCipherMode> {
+                        return std::make_unique<
+                            GcmEncryptorImpl<BlockCipherAdapter>>();
+                    };
+                }
+                else
+                {
+                    return nullptr;
+                }
+            }(),
+            []() constexpr
+            -> decltype(BlockCipherModeProvider::create_gcm_decryptor) {
+                if constexpr (Traits::BLOCK_SIZE == 16)
+                {
+                    return []() -> std::unique_ptr<BlockCipherMode> {
+                        return std::make_unique<
+                            GcmDecryptorImpl<BlockCipherAdapter>>();
+                    };
+                }
+                else
+                {
+                    return nullptr;
+                }
+            }(),
         },
     };
 };

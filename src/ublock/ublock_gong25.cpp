@@ -215,7 +215,7 @@ static void uBlock_128128_Encrypt(const std::uint8_t sub_key[17][16],
     __m128i c8  = _mm_loadu_si128((const __m128i *)DATA_c8);
     __m128i state1, state2, k, t1, t2, t3, t4;
 
-    state2 = _mm_loadu_si128((__m128i *)plaintext);
+    state2 = _mm_loadu_si128((const __m128i *)plaintext);
     state1 = _mm_srli_epi16(state2, 4);
     state1 = _mm_and_si128(state1, con);
     state2 = _mm_and_si128(state2, con);
@@ -228,7 +228,7 @@ static void uBlock_128128_Encrypt(const std::uint8_t sub_key[17][16],
 
     for (int i = 0; i < 16; i++)
     {
-        k      = _mm_loadu_si128((__m128i *)sub_key[i]);
+        k      = _mm_loadu_si128((const __m128i *)sub_key[i]);
         state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
         k      = _mm_srli_epi32(k, 4);
         state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
@@ -251,7 +251,7 @@ static void uBlock_128128_Encrypt(const std::uint8_t sub_key[17][16],
         state2 = _mm_shuffle_epi8(state2, L2);
     }
 
-    k      = _mm_loadu_si128((__m128i *)sub_key[16]);
+    k      = _mm_loadu_si128((const __m128i *)sub_key[16]);
     state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
     k      = _mm_srli_epi32(k, 4);
     state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
@@ -316,7 +316,7 @@ static void uBlock_128128_Decrypt(const std::uint8_t sub_key[17][16],
     __m128i c8    = _mm_loadu_si128((const __m128i *)DATA_c8);
     __m128i state1, state2, k, t1, t2, t3, t4;
 
-    state2 = _mm_loadu_si128((__m128i *)ciphertext);
+    state2 = _mm_loadu_si128((const __m128i *)ciphertext);
     state1 = _mm_srli_epi16(state2, 4);
     state1 = _mm_and_si128(state1, con);
     state2 = _mm_and_si128(state2, con);
@@ -329,7 +329,7 @@ static void uBlock_128128_Decrypt(const std::uint8_t sub_key[17][16],
 
     for (int i = 16; i > 0; i--)
     {
-        k      = _mm_loadu_si128((__m128i *)sub_key[i]);
+        k      = _mm_loadu_si128((const __m128i *)sub_key[i]);
         state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
         k      = _mm_srli_epi32(k, 4);
         state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
@@ -352,7 +352,7 @@ static void uBlock_128128_Decrypt(const std::uint8_t sub_key[17][16],
         state2 = _mm_shuffle_epi8(S_Inv, state2);
     }
 
-    k      = _mm_loadu_si128((__m128i *)sub_key[0]);
+    k      = _mm_loadu_si128((const __m128i *)sub_key[0]);
     state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
     k      = _mm_srli_epi32(k, 4);
     state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
@@ -394,7 +394,7 @@ static void uBlock_128256_KeySchedule(std::uint8_t       sub_key[25][16],
 
     __m128i state1, state2, state3, state4, k, t1, t2, t3, t4;
 
-    state2 = _mm_loadu_si128((__m128i *)user_key);
+    state2 = _mm_loadu_si128((const __m128i *)user_key);
     state1 = _mm_srli_epi16(state2, 4);
     state1 = _mm_and_si128(state1, con);
     state2 = _mm_and_si128(state2, con);
@@ -405,7 +405,7 @@ static void uBlock_128256_KeySchedule(std::uint8_t       sub_key[25][16],
     state1 = _mm_xor_si128(t1, t2);
     state2 = _mm_xor_si128(t3, t4);
 
-    state4 = _mm_loadu_si128((__m128i *)(user_key + 16));
+    state4 = _mm_loadu_si128((const __m128i *)(user_key + 16));
     state3 = _mm_srli_epi16(state4, 4);
     state3 = _mm_and_si128(state3, con);
     state4 = _mm_and_si128(state4, con);
@@ -503,7 +503,7 @@ static void uBlock_128256_Encrypt(const std::uint8_t sub_key[25][16],
 
     for (int i = 0; i < 24; i++)
     {
-        k      = _mm_loadu_si128((__m128i *)sub_key[i]);
+        k      = _mm_loadu_si128((const __m128i *)sub_key[i]);
         state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
         k      = _mm_srli_epi32(k, 4);
         state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
@@ -526,7 +526,7 @@ static void uBlock_128256_Encrypt(const std::uint8_t sub_key[25][16],
         state2 = _mm_shuffle_epi8(state2, L2);
     }
 
-    k      = _mm_loadu_si128((__m128i *)sub_key[24]);
+    k      = _mm_loadu_si128((const __m128i *)sub_key[24]);
     state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
     k      = _mm_srli_epi32(k, 4);
     state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
@@ -606,7 +606,7 @@ static void uBlock_128256_Decrypt(const std::uint8_t sub_key[25][16],
 
     for (int i = 24; i > 0; i--)
     {
-        k      = _mm_loadu_si128((__m128i *)sub_key[i]);
+        k      = _mm_loadu_si128((const __m128i *)sub_key[i]);
         state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
         k      = _mm_srli_epi32(k, 4);
         state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));
@@ -629,7 +629,7 @@ static void uBlock_128256_Decrypt(const std::uint8_t sub_key[25][16],
         state2 = _mm_shuffle_epi8(S_Inv, state2);
     }
 
-    k      = _mm_loadu_si128((__m128i *)sub_key[0]);
+    k      = _mm_loadu_si128((const __m128i *)sub_key[0]);
     state1 = _mm_xor_si128(state1, _mm_and_si128(k, con));
     k      = _mm_srli_epi32(k, 4);
     state2 = _mm_xor_si128(state2, _mm_and_si128(k, con));

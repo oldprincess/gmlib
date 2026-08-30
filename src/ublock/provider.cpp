@@ -1,7 +1,6 @@
 #include <gmlib/ublock/provider.h>
 
-#include <cstddef>
-#include <cstring>
+#include <array>
 
 #include "provider_ublock_common.h"
 #if defined(SUPPORT_UBLOCK_GONG25)
@@ -12,390 +11,116 @@
 #endif
 
 namespace ublock {
+namespace {
 
-struct Provider
-{
-    bool (*available)() noexcept;
+using block_cipher_mode::impl::BlockCipherModeProviderEntry;
 
-    block_cipher_mode::BlockCipherModeProvider fns;
-};
-
-static const Provider providers_128128[] = {
+static const BlockCipherModeProviderEntry* const providers_128128[] = {
 #if defined(SUPPORT_UBLOCK_GONG25)
-    {
-        []() noexcept -> bool {
-            return ublock::internal::gong25::provider_available();
-        },
-        {
-            "gong25",
-            ublock::internal::gong25::create_cipher_128128,
-            ublock::internal::gong25::create_ecb_encryptor_128128,
-            ublock::internal::gong25::create_ecb_decryptor_128128,
-            ublock::internal::gong25::create_cbc_encryptor_128128,
-            ublock::internal::gong25::create_cbc_decryptor_128128,
-            ublock::internal::gong25::create_cfb_encryptor_128128,
-            ublock::internal::gong25::create_cfb_decryptor_128128,
-            ublock::internal::gong25::create_ofb_encryptor_128128,
-            ublock::internal::gong25::create_ofb_decryptor_128128,
-            ublock::internal::gong25::create_ctr_encryptor_128128,
-            ublock::internal::gong25::create_ctr_decryptor_128128,
-            ublock::internal::gong25::create_gcm_encryptor_128128,
-            ublock::internal::gong25::create_gcm_decryptor_128128,
-        },
-    },
-
+    &internal::gong25::provider_128128,
 #endif
 #if defined(SUPPORT_UBLOCK_STANDARD)
-    {
-        []() noexcept -> bool {
-            return ublock::internal::standard::provider_available();
-        },
-        {
-            "standard",
-            ublock::internal::standard::create_cipher_128128,
-            ublock::internal::standard::create_ecb_encryptor_128128,
-            ublock::internal::standard::create_ecb_decryptor_128128,
-            ublock::internal::standard::create_cbc_encryptor_128128,
-            ublock::internal::standard::create_cbc_decryptor_128128,
-            ublock::internal::standard::create_cfb_encryptor_128128,
-            ublock::internal::standard::create_cfb_decryptor_128128,
-            ublock::internal::standard::create_ofb_encryptor_128128,
-            ublock::internal::standard::create_ofb_decryptor_128128,
-            ublock::internal::standard::create_ctr_encryptor_128128,
-            ublock::internal::standard::create_ctr_decryptor_128128,
-            ublock::internal::standard::create_gcm_encryptor_128128,
-            ublock::internal::standard::create_gcm_decryptor_128128,
-        },
-    },
-
+    &internal::standard::provider_128128,
 #endif
-    {
-        []() noexcept -> bool {
-            return ublock::internal::common::provider_available();
-        },
-        {
-            "common",
-            ublock::internal::common::create_cipher_128128,
-            ublock::internal::common::create_ecb_encryptor_128128,
-            ublock::internal::common::create_ecb_decryptor_128128,
-            ublock::internal::common::create_cbc_encryptor_128128,
-            ublock::internal::common::create_cbc_decryptor_128128,
-            ublock::internal::common::create_cfb_encryptor_128128,
-            ublock::internal::common::create_cfb_decryptor_128128,
-            ublock::internal::common::create_ofb_encryptor_128128,
-            ublock::internal::common::create_ofb_decryptor_128128,
-            ublock::internal::common::create_ctr_encryptor_128128,
-            ublock::internal::common::create_ctr_decryptor_128128,
-            ublock::internal::common::create_gcm_encryptor_128128,
-            ublock::internal::common::create_gcm_decryptor_128128,
-        },
-    },
+    &internal::common::provider_128128,
 };
 
-static const Provider providers_128256[] = {
+static const BlockCipherModeProviderEntry* const providers_128256[] = {
 #if defined(SUPPORT_UBLOCK_GONG25)
-    {
-        []() noexcept -> bool {
-            return ublock::internal::gong25::provider_available();
-        },
-        {
-            "gong25",
-            ublock::internal::gong25::create_cipher_128256,
-            ublock::internal::gong25::create_ecb_encryptor_128256,
-            ublock::internal::gong25::create_ecb_decryptor_128256,
-            ublock::internal::gong25::create_cbc_encryptor_128256,
-            ublock::internal::gong25::create_cbc_decryptor_128256,
-            ublock::internal::gong25::create_cfb_encryptor_128256,
-            ublock::internal::gong25::create_cfb_decryptor_128256,
-            ublock::internal::gong25::create_ofb_encryptor_128256,
-            ublock::internal::gong25::create_ofb_decryptor_128256,
-            ublock::internal::gong25::create_ctr_encryptor_128256,
-            ublock::internal::gong25::create_ctr_decryptor_128256,
-            ublock::internal::gong25::create_gcm_encryptor_128256,
-            ublock::internal::gong25::create_gcm_decryptor_128256,
-        },
-    },
-
+    &internal::gong25::provider_128256,
 #endif
 #if defined(SUPPORT_UBLOCK_STANDARD)
-    {
-        []() noexcept -> bool {
-            return ublock::internal::standard::provider_available();
-        },
-        {
-            "standard",
-            ublock::internal::standard::create_cipher_128256,
-            ublock::internal::standard::create_ecb_encryptor_128256,
-            ublock::internal::standard::create_ecb_decryptor_128256,
-            ublock::internal::standard::create_cbc_encryptor_128256,
-            ublock::internal::standard::create_cbc_decryptor_128256,
-            ublock::internal::standard::create_cfb_encryptor_128256,
-            ublock::internal::standard::create_cfb_decryptor_128256,
-            ublock::internal::standard::create_ofb_encryptor_128256,
-            ublock::internal::standard::create_ofb_decryptor_128256,
-            ublock::internal::standard::create_ctr_encryptor_128256,
-            ublock::internal::standard::create_ctr_decryptor_128256,
-            ublock::internal::standard::create_gcm_encryptor_128256,
-            ublock::internal::standard::create_gcm_decryptor_128256,
-        },
-    },
-
+    &internal::standard::provider_128256,
 #endif
-    {
-        []() noexcept -> bool {
-            return ublock::internal::common::provider_available();
-        },
-        {
-            "common",
-            ublock::internal::common::create_cipher_128256,
-            ublock::internal::common::create_ecb_encryptor_128256,
-            ublock::internal::common::create_ecb_decryptor_128256,
-            ublock::internal::common::create_cbc_encryptor_128256,
-            ublock::internal::common::create_cbc_decryptor_128256,
-            ublock::internal::common::create_cfb_encryptor_128256,
-            ublock::internal::common::create_cfb_decryptor_128256,
-            ublock::internal::common::create_ofb_encryptor_128256,
-            ublock::internal::common::create_ofb_decryptor_128256,
-            ublock::internal::common::create_ctr_encryptor_128256,
-            ublock::internal::common::create_ctr_decryptor_128256,
-            ublock::internal::common::create_gcm_encryptor_128256,
-            ublock::internal::common::create_gcm_decryptor_128256,
-        },
-    },
+    &internal::common::provider_128256,
 };
 
-static const Provider providers_256256[] = {
+static const BlockCipherModeProviderEntry* const providers_256256[] = {
 #if defined(SUPPORT_UBLOCK_GONG25)
-    {
-        []() noexcept -> bool {
-            return ublock::internal::gong25::provider_available();
-        },
-        {
-            "gong25",
-            ublock::internal::gong25::create_cipher_256256,
-            ublock::internal::gong25::create_ecb_encryptor_256256,
-            ublock::internal::gong25::create_ecb_decryptor_256256,
-            ublock::internal::gong25::create_cbc_encryptor_256256,
-            ublock::internal::gong25::create_cbc_decryptor_256256,
-            ublock::internal::gong25::create_cfb_encryptor_256256,
-            ublock::internal::gong25::create_cfb_decryptor_256256,
-            ublock::internal::gong25::create_ofb_encryptor_256256,
-            ublock::internal::gong25::create_ofb_decryptor_256256,
-            ublock::internal::gong25::create_ctr_encryptor_256256,
-            ublock::internal::gong25::create_ctr_decryptor_256256,
-            nullptr,
-            nullptr,
-        },
-    },
-
+    &internal::gong25::provider_256256,
 #endif
 #if defined(SUPPORT_UBLOCK_STANDARD)
-    {
-        []() noexcept -> bool {
-            return ublock::internal::standard::provider_available();
-        },
-        {
-            "standard",
-            ublock::internal::standard::create_cipher_256256,
-            ublock::internal::standard::create_ecb_encryptor_256256,
-            ublock::internal::standard::create_ecb_decryptor_256256,
-            ublock::internal::standard::create_cbc_encryptor_256256,
-            ublock::internal::standard::create_cbc_decryptor_256256,
-            ublock::internal::standard::create_cfb_encryptor_256256,
-            ublock::internal::standard::create_cfb_decryptor_256256,
-            ublock::internal::standard::create_ofb_encryptor_256256,
-            ublock::internal::standard::create_ofb_decryptor_256256,
-            ublock::internal::standard::create_ctr_encryptor_256256,
-            ublock::internal::standard::create_ctr_decryptor_256256,
-            nullptr,
-            nullptr,
-        },
-    },
-
+    &internal::standard::provider_256256,
 #endif
-    {
-        []() noexcept -> bool {
-            return ublock::internal::common::provider_available();
-        },
-        {
-            "common",
-            ublock::internal::common::create_cipher_256256,
-            ublock::internal::common::create_ecb_encryptor_256256,
-            ublock::internal::common::create_ecb_decryptor_256256,
-            ublock::internal::common::create_cbc_encryptor_256256,
-            ublock::internal::common::create_cbc_decryptor_256256,
-            ublock::internal::common::create_cfb_encryptor_256256,
-            ublock::internal::common::create_cfb_decryptor_256256,
-            ublock::internal::common::create_ofb_encryptor_256256,
-            ublock::internal::common::create_ofb_decryptor_256256,
-            ublock::internal::common::create_ctr_encryptor_256256,
-            ublock::internal::common::create_ctr_decryptor_256256,
-            nullptr,
-            nullptr,
-        },
-    },
+    &internal::common::provider_256256,
 };
 
-template <typename T, std::size_t N>
-constexpr std::size_t array_size(const T (&)[N]) noexcept
-{
-    return N;
-}
+constexpr std::size_t PROVIDER_128128_NUM = std::size(providers_128128);
+constexpr std::size_t PROVIDER_128256_NUM = std::size(providers_128256);
+constexpr std::size_t PROVIDER_256256_NUM = std::size(providers_256256);
+
+} // namespace
 
 const uBlock128128Provider* get_ublock128128_provider(const char* name) noexcept
 {
     if (name == nullptr)
     {
-        static const uBlock128128Provider* default_provider = []() {
-            for (const Provider& provider : providers_128128)
-            {
-                if (provider.available())
-                {
-                    return &provider.fns;
-                }
-            }
-            return static_cast<const uBlock128128Provider*>(nullptr);
-        }();
+        static const uBlock128128Provider* default_provider =
+            block_cipher_mode::impl::get_provider(nullptr, providers_128128,
+                                                  PROVIDER_128128_NUM);
         return default_provider;
     }
-    else
-    {
-        for (const Provider& provider : providers_128128)
-        {
-            if (provider.available() &&
-                std::strcmp(provider.fns.algo_name, name) == 0)
-            {
-                return &provider.fns;
-            }
-        }
-        return nullptr;
-    }
+    return block_cipher_mode::impl::get_provider(name, providers_128128,
+                                                 PROVIDER_128128_NUM);
 }
 
 const char* const* get_ublock128128_supported_provider_names() noexcept
 {
-    static const auto provider_name_list = []() {
-        struct ProviderNameList
-        {
-            const char* names[array_size(providers_128128) + 1];
-        };
-        ProviderNameList list;
-        int              idx = 0;
-        for (const Provider& provider : providers_128128)
-        {
-            if (provider.available())
-            {
-                list.names[idx++] = provider.fns.algo_name;
-            }
-        }
-        list.names[idx] = nullptr;
-        return list;
+    static const auto name_list = []() {
+        std::array<const char*, PROVIDER_128128_NUM + 1> names;
+        block_cipher_mode::impl::get_supported_provider_names(
+            names.data(), providers_128128, PROVIDER_128128_NUM);
+        return names;
     }();
-    return provider_name_list.names;
+    return name_list.data();
 }
 
 const uBlock128256Provider* get_ublock128256_provider(const char* name) noexcept
 {
     if (name == nullptr)
     {
-        static const uBlock128256Provider* default_provider = []() {
-            for (const Provider& provider : providers_128256)
-            {
-                if (provider.available())
-                {
-                    return &provider.fns;
-                }
-            }
-            return static_cast<const uBlock128256Provider*>(nullptr);
-        }();
+        static const uBlock128256Provider* default_provider =
+            block_cipher_mode::impl::get_provider(nullptr, providers_128256,
+                                                  PROVIDER_128256_NUM);
         return default_provider;
     }
-    else
-    {
-        for (const Provider& provider : providers_128256)
-        {
-            if (provider.available() &&
-                std::strcmp(provider.fns.algo_name, name) == 0)
-            {
-                return &provider.fns;
-            }
-        }
-        return nullptr;
-    }
+    return block_cipher_mode::impl::get_provider(name, providers_128256,
+                                                 PROVIDER_128256_NUM);
 }
 
 const char* const* get_ublock128256_supported_provider_names() noexcept
 {
-    static const auto provider_name_list = []() {
-        struct ProviderNameList
-        {
-            const char* names[array_size(providers_128256) + 1];
-        };
-        ProviderNameList list;
-        int              idx = 0;
-        for (const Provider& provider : providers_128256)
-        {
-            if (provider.available())
-            {
-                list.names[idx++] = provider.fns.algo_name;
-            }
-        }
-        list.names[idx] = nullptr;
-        return list;
+    static const auto name_list = []() {
+        std::array<const char*, PROVIDER_128256_NUM + 1> names;
+        block_cipher_mode::impl::get_supported_provider_names(
+            names.data(), providers_128256, PROVIDER_128256_NUM);
+        return names;
     }();
-    return provider_name_list.names;
+    return name_list.data();
 }
 
 const uBlock256256Provider* get_ublock256256_provider(const char* name) noexcept
 {
     if (name == nullptr)
     {
-        static const uBlock256256Provider* default_provider = []() {
-            for (const Provider& provider : providers_256256)
-            {
-                if (provider.available())
-                {
-                    return &provider.fns;
-                }
-            }
-            return static_cast<const uBlock256256Provider*>(nullptr);
-        }();
+        static const uBlock256256Provider* default_provider =
+            block_cipher_mode::impl::get_provider(nullptr, providers_256256,
+                                                  PROVIDER_256256_NUM);
         return default_provider;
     }
-    else
-    {
-        for (const Provider& provider : providers_256256)
-        {
-            if (provider.available() &&
-                std::strcmp(provider.fns.algo_name, name) == 0)
-            {
-                return &provider.fns;
-            }
-        }
-        return nullptr;
-    }
+    return block_cipher_mode::impl::get_provider(name, providers_256256,
+                                                 PROVIDER_256256_NUM);
 }
 
 const char* const* get_ublock256256_supported_provider_names() noexcept
 {
-    static const auto provider_name_list = []() {
-        struct ProviderNameList
-        {
-            const char* names[array_size(providers_256256) + 1];
-        };
-        ProviderNameList list;
-        int              idx = 0;
-        for (const Provider& provider : providers_256256)
-        {
-            if (provider.available())
-            {
-                list.names[idx++] = provider.fns.algo_name;
-            }
-        }
-        list.names[idx] = nullptr;
-        return list;
+    static const auto name_list = []() {
+        std::array<const char*, PROVIDER_256256_NUM + 1> names;
+        block_cipher_mode::impl::get_supported_provider_names(
+            names.data(), providers_256256, PROVIDER_256256_NUM);
+        return names;
     }();
-    return provider_name_list.names;
+    return name_list.data();
 }
 
 } // namespace ublock

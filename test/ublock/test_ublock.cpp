@@ -1,238 +1,126 @@
-#include <gmlib/memory_utils/memdump.h>
-#include <gmlib/ublock/ublock.h>
+#include <cstdint>
 
-#include <cstring>
-#include <stdexcept>
+#include "test.h"
 
-using namespace ublock;
-using namespace std;
+namespace {
 
-static uint8_t key128128[16] = {
+using block_cipher_mode::test::CipherKat;
+using block_cipher_mode::test::ModeKat;
+
+const std::vector<std::uint8_t> KEY_128128 = {
     0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
     0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10,
 };
-static uint8_t pt128128[16] = {
+const std::vector<std::uint8_t> PLAINTEXT_128128 = {
     0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
     0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10,
 };
-static uint8_t ct128128[16] = {
+const std::vector<std::uint8_t> CIPHERTEXT_128128 = {
     0x32, 0x12, 0x2b, 0xed, 0xd0, 0x23, 0xc4, 0x29,
     0x02, 0x34, 0x70, 0xe1, 0x15, 0x8c, 0x14, 0x7d,
 };
-static uint8_t ct128128_1000000[16] = {
+const std::vector<std::uint8_t> CIPHERTEXT_128128_1000000 = {
     0x9d, 0x63, 0x9e, 0x31, 0x06, 0x2f, 0xfb, 0x57,
     0x46, 0x46, 0xe4, 0x28, 0xf9, 0x2e, 0x08, 0xd4,
 };
-static uint8_t key128256[32] = {
-    0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
-    0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10, //
-    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+
+const std::vector<std::uint8_t> KEY_128256 = {
+    0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0xFE, 0xDC, 0xBA,
+    0x98, 0x76, 0x54, 0x32, 0x10, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05,
+    0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 };
-static uint8_t pt128256[16] = {
+const std::vector<std::uint8_t> PLAINTEXT_128256 = {
     0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
     0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10,
 };
-static uint8_t ct128256[16] = {
+const std::vector<std::uint8_t> CIPHERTEXT_128256 = {
     0x64, 0xac, 0xcd, 0x6e, 0x34, 0xca, 0xc8, 0x4d,
     0x38, 0x4c, 0xd4, 0xba, 0x7a, 0xea, 0xdd, 0x19,
 };
-static uint8_t ct128256_1000000[16] = {
+const std::vector<std::uint8_t> CIPHERTEXT_128256_1000000 = {
     0x9f, 0xca, 0x87, 0xe0, 0xfb, 0xae, 0xbc, 0x91,
     0x05, 0xe7, 0x29, 0xd3, 0x55, 0x39, 0x67, 0xff,
 };
-static uint8_t key256256[32] = {
-    0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
-    0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10, //
-    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+
+const std::vector<std::uint8_t> KEY_256256       = KEY_128256;
+const std::vector<std::uint8_t> PLAINTEXT_256256 = {
+    0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0xFE, 0xDC, 0xBA,
+    0x98, 0x76, 0x54, 0x32, 0x10, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05,
+    0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 };
-static uint8_t pt256256[32] = {
-    0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
-    0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10, //
-    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+const std::vector<std::uint8_t> CIPHERTEXT_256256 = {
+    0xd8, 0xe9, 0x35, 0x1c, 0x5f, 0x4d, 0x27, 0xea, 0x84, 0x21, 0x35,
+    0xca, 0x16, 0x40, 0xad, 0x4b, 0x0c, 0xe1, 0x19, 0xbc, 0x25, 0xc0,
+    0x3e, 0x7c, 0x32, 0x9e, 0xa8, 0xfe, 0x93, 0xe7, 0xbd, 0xfe,
 };
-static uint8_t ct256256[32] = {
-    0xd8, 0xe9, 0x35, 0x1c, 0x5f, 0x4d, 0x27, 0xea,
-    0x84, 0x21, 0x35, 0xca, 0x16, 0x40, 0xad, 0x4b, //
-    0x0c, 0xe1, 0x19, 0xbc, 0x25, 0xc0, 0x3e, 0x7c,
-    0x32, 0x9e, 0xa8, 0xfe, 0x93, 0xe7, 0xbd, 0xfe,
-};
-static uint8_t ct256256_1000000[32] = {
-    0x20, 0xe1, 0x48, 0xe6, 0xeb, 0xf9, 0xd9, 0x9b,
-    0x89, 0x4b, 0x2f, 0x7e, 0x5c, 0xcd, 0xe2, 0x3f, //
-    0xc5, 0x8c, 0x95, 0x6c, 0x78, 0x47, 0xfa, 0xd8,
-    0x2e, 0x08, 0x24, 0x41, 0x35, 0x76, 0xc8, 0x9f,
+const std::vector<std::uint8_t> CIPHERTEXT_256256_1000000 = {
+    0x20, 0xe1, 0x48, 0xe6, 0xeb, 0xf9, 0xd9, 0x9b, 0x89, 0x4b, 0x2f,
+    0x7e, 0x5c, 0xcd, 0xe2, 0x3f, 0xc5, 0x8c, 0x95, 0x6c, 0x78, 0x47,
+    0xfa, 0xd8, 0x2e, 0x08, 0x24, 0x41, 0x35, 0x76, 0xc8, 0x9f,
 };
 
-void test_ublock()
+std::vector<CipherKat> make_cipher_kats(
+    const std::vector<std::uint8_t>& key,
+    const std::vector<std::uint8_t>& plaintext,
+    const std::vector<std::uint8_t>& ciphertext,
+    const std::vector<std::uint8_t>& iterated_ciphertext)
 {
-    static uint8_t tmp1[32 * 1024 * 1024 + 32];
-    uBlock128128   ctx128128;
-    uBlock128256   ctx128256;
-    uBlock256256   ctx256256;
-    uint8_t        out[32];
-    // ====================== 128128
-    ctx128128.set_key(key128128, uBlock128128::ENCRYPTION);
-    ctx128128.encrypt_block(out, pt128128);
-    if (memcmp(out, ct128128, uBlock128128::BLOCK_SIZE) != 0)
-    {
-        throw runtime_error("err in ublock128128");
-    }
-    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128128::BLOCK_SIZE)
-    {
-        memcpy(tmp1 + i, pt128128, uBlock128128::BLOCK_SIZE);
-    }
-    ctx128128.encrypt_blocks(tmp1, tmp1, sizeof(tmp1) / 16);
-    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128128::BLOCK_SIZE)
-    {
-        if (memcmp(tmp1 + i, ct128128, uBlock128128::BLOCK_SIZE) != 0)
-        {
-            throw runtime_error("err in ublock128128");
-        }
-    }
+    return {
+        {"official-single-block", key, plaintext, ciphertext},
+        {"official-million-iterations", key, plaintext, iterated_ciphertext,
+         1000000},
+    };
+}
 
-    ctx128128.set_key(key128128, uBlock128128::DECRYPTION);
-    ctx128128.decrypt_block(out, ct128128);
-    if (memcmp(out, pt128128, uBlock128128::BLOCK_SIZE) != 0)
-    {
-        throw runtime_error("err in ublock128128");
-    }
-    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128128::BLOCK_SIZE)
-    {
-        memcpy(tmp1 + i, ct128128, uBlock128128::BLOCK_SIZE);
-    }
-    ctx128128.decrypt_blocks(tmp1, tmp1, sizeof(tmp1) / 16);
-    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128128::BLOCK_SIZE)
-    {
-        if (memcmp(tmp1 + i, pt128128, uBlock128128::BLOCK_SIZE) != 0)
-        {
-            throw runtime_error("err in ublock128128");
-        }
-    }
+std::vector<ModeKat> make_mode_kats(const std::vector<std::uint8_t>& key,
+                                    const std::vector<std::uint8_t>& plaintext,
+                                    const std::vector<std::uint8_t>& ciphertext)
+{
+    const std::vector<std::uint8_t> zero_block(plaintext.size(), 0);
+    return {
+        {"official-single-block", "ECB", key, {}, plaintext, ciphertext},
+        {"official-single-block", "CBC", key, zero_block, plaintext,
+         ciphertext},
+        {"official-single-block", "CFB", key, plaintext, zero_block,
+         ciphertext},
+        {"official-single-block", "OFB", key, plaintext, zero_block,
+         ciphertext},
+        {"official-single-block", "CTR", key, plaintext, zero_block,
+         ciphertext},
+    };
+}
 
-    memcpy(out, pt128128, uBlock128128::BLOCK_SIZE);
-    for (int i = 0; i < 1000000; i++)
-    {
-        ctx128128.encrypt_block(out, out);
-    }
-    if (memcmp(out, ct128128_1000000, uBlock128128::BLOCK_SIZE) != 0)
-    {
-        throw runtime_error("err in ublock128128");
-    }
-    ctx128128.set_key(key128128, uBlock128128::DECRYPTION);
-    ctx128128.decrypt_block(out, ct128128);
-    if (memcmp(out, pt128128, uBlock128128::BLOCK_SIZE) != 0)
-    {
-        throw runtime_error("err in ublock128128");
-    }
-    // ===================== 128256
-    ctx128256.set_key(key128256, uBlock128256::ENCRYPTION);
-    ctx128256.encrypt_block(out, pt128256);
-    if (memcmp(out, ct128256, uBlock128256::BLOCK_SIZE) != 0)
-    {
-        throw runtime_error("err in ublock128256");
-    }
-    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128256::BLOCK_SIZE)
-    {
-        memcpy(tmp1 + i, pt128256, uBlock128256::BLOCK_SIZE);
-    }
-    ctx128256.encrypt_blocks(tmp1, tmp1, sizeof(tmp1) / 16);
-    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128256::BLOCK_SIZE)
-    {
-        if (memcmp(tmp1 + i, ct128256, uBlock128256::BLOCK_SIZE) != 0)
-        {
-            throw runtime_error("err in ublock128256");
-        }
-    }
+} // namespace
 
-    ctx128256.set_key(key128256, uBlock128256::DECRYPTION);
-    ctx128256.decrypt_block(out, ct128256);
-    if (memcmp(out, pt128256, uBlock128256::BLOCK_SIZE) != 0)
-    {
-        throw runtime_error("err in ublock128256");
-    }
-    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128256::BLOCK_SIZE)
-    {
-        memcpy(tmp1 + i, ct128256, uBlock128256::BLOCK_SIZE);
-    }
-    ctx128256.decrypt_blocks(tmp1, tmp1, sizeof(tmp1) / 16);
-    for (size_t i = 0; i < sizeof(tmp1); i += uBlock128256::BLOCK_SIZE)
-    {
-        if (memcmp(tmp1 + i, pt128256, uBlock128256::BLOCK_SIZE) != 0)
-        {
-            throw runtime_error("err in ublock128256");
-        }
-    }
+std::vector<CipherKat> get_ublock128128_cipher_kats()
+{
+    return make_cipher_kats(KEY_128128, PLAINTEXT_128128, CIPHERTEXT_128128,
+                            CIPHERTEXT_128128_1000000);
+}
 
-    memcpy(out, pt128256, uBlock128256::BLOCK_SIZE);
-    for (int i = 0; i < 1000000; i++)
-    {
-        ctx128256.encrypt_block(out, out);
-    }
-    if (memcmp(out, ct128256_1000000, uBlock128256::BLOCK_SIZE) != 0)
-    {
-        throw runtime_error("err in ublock128256");
-    }
-    ctx128256.set_key(key128256, uBlock128256::DECRYPTION);
-    ctx128256.decrypt_block(out, ct128256);
-    if (memcmp(out, pt128256, uBlock128256::BLOCK_SIZE) != 0)
-    {
-        throw runtime_error("err in ublock128256");
-    }
-    // ===================== 256256
-    ctx256256.set_key(key256256, uBlock256256::ENCRYPTION);
-    ctx256256.encrypt_block(out, pt256256);
-    if (memcmp(out, ct256256, uBlock256256::BLOCK_SIZE) != 0)
-    {
-        throw runtime_error("err in ublock256256");
-    }
-    for (size_t i = 0; i < sizeof(tmp1); i += uBlock256256::BLOCK_SIZE)
-    {
-        memcpy(tmp1 + i, pt256256, uBlock256256::BLOCK_SIZE);
-    }
-    ctx256256.encrypt_blocks(tmp1, tmp1, sizeof(tmp1) / 32);
-    for (size_t i = 0; i < sizeof(tmp1); i += uBlock256256::BLOCK_SIZE)
-    {
-        if (memcmp(tmp1 + i, ct256256, uBlock256256::BLOCK_SIZE) != 0)
-        {
-            throw runtime_error("err in ublock256256");
-        }
-    }
+std::vector<ModeKat> get_ublock128128_mode_kats()
+{
+    return make_mode_kats(KEY_128128, PLAINTEXT_128128, CIPHERTEXT_128128);
+}
 
-    ctx256256.set_key(key256256, uBlock256256::DECRYPTION);
-    ctx256256.decrypt_block(out, ct256256);
-    if (memcmp(out, pt256256, uBlock256256::BLOCK_SIZE) != 0)
-    {
-        throw runtime_error("err in ublock256256");
-    }
-    for (size_t i = 0; i < sizeof(tmp1); i += uBlock256256::BLOCK_SIZE)
-    {
-        memcpy(tmp1 + i, ct256256, uBlock256256::BLOCK_SIZE);
-    }
-    ctx256256.decrypt_blocks(tmp1, tmp1, sizeof(tmp1) / 32);
-    for (size_t i = 0; i < sizeof(tmp1); i += uBlock256256::BLOCK_SIZE)
-    {
-        if (memcmp(tmp1 + i, pt256256, uBlock256256::BLOCK_SIZE) != 0)
-        {
-            throw runtime_error("err in ublock256256");
-        }
-    }
+std::vector<CipherKat> get_ublock128256_cipher_kats()
+{
+    return make_cipher_kats(KEY_128256, PLAINTEXT_128256, CIPHERTEXT_128256,
+                            CIPHERTEXT_128256_1000000);
+}
 
-    memcpy(out, pt256256, uBlock256256::BLOCK_SIZE);
-    for (int i = 0; i < 1000000; i++)
-    {
-        ctx256256.encrypt_block(out, out);
-    }
-    if (memcmp(out, ct256256_1000000, uBlock256256::BLOCK_SIZE) != 0)
-    {
-        throw runtime_error("err in ublock256256");
-    }
-    ctx256256.set_key(key256256, uBlock256256::DECRYPTION);
-    ctx256256.decrypt_block(out, ct256256);
-    if (memcmp(out, pt256256, uBlock256256::BLOCK_SIZE) != 0)
-    {
-        throw runtime_error("err in ublock256256");
-    }
+std::vector<ModeKat> get_ublock128256_mode_kats()
+{
+    return make_mode_kats(KEY_128256, PLAINTEXT_128256, CIPHERTEXT_128256);
+}
+
+std::vector<CipherKat> get_ublock256256_cipher_kats()
+{
+    return make_cipher_kats(KEY_256256, PLAINTEXT_256256, CIPHERTEXT_256256,
+                            CIPHERTEXT_256256_1000000);
+}
+
+std::vector<ModeKat> get_ublock256256_mode_kats()
+{
+    return make_mode_kats(KEY_256256, PLAINTEXT_256256, CIPHERTEXT_256256);
 }

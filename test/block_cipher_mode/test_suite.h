@@ -36,6 +36,7 @@ struct CipherKat
     std::vector<std::uint8_t> key;
     std::vector<std::uint8_t> plaintext;
     std::vector<std::uint8_t> ciphertext;
+    std::size_t               iterations = 1;
 };
 
 struct ModeKat
@@ -690,6 +691,28 @@ inline void run_cipher_kat(const TestSuite&               suite,
     const std::size_t blocks = kat.plaintext.size() / suite.cipher.block_size;
     std::vector<std::uint8_t> output(kat.ciphertext.size());
     cipher->set_key(kat.key.data(), BlockCipher::ENCRYPTION);
+
+    if (kat.iterations > 1)
+    {
+        if (blocks != 1)
+        {
+            fail(context, "iterated cipher KAT must contain one block");
+        }
+        output = kat.plaintext;
+        for (std::size_t i = 0; i < kat.iterations; ++i)
+        {
+            cipher->encrypt_block(output.data(), output.data());
+        }
+        require_equal(output, kat.ciphertext, context, "iterated ciphertext");
+
+        cipher->set_key(kat.key.data(), BlockCipher::DECRYPTION);
+        for (std::size_t i = 0; i < kat.iterations; ++i)
+        {
+            cipher->decrypt_block(output.data(), output.data());
+        }
+        require_equal(output, kat.plaintext, context, "iterated plaintext");
+        return;
+    }
 
     std::vector<std::uint8_t> single_block(suite.cipher.block_size);
     cipher->encrypt_block(single_block.data(), kat.plaintext.data());
@@ -1427,6 +1450,8 @@ inline void validate_test_suite(const TestSuite& suite)
                                prefix + ": invalid key length");
         detail::require_config(!kat.plaintext.empty(),
                                prefix + ": plaintext is empty");
+        detail::require_config(kat.iterations != 0,
+                               prefix + ": iteration count is zero");
         detail::require_config(kat.plaintext.size() == kat.ciphertext.size(),
                                prefix + ": plaintext/ciphertext size mismatch");
         detail::require_config(

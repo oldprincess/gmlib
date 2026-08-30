@@ -1,4 +1,5 @@
 #include "ublock_common.h"
+
 namespace ublock::internal::common {
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -7,11 +8,11 @@ namespace ublock::internal::common {
 // **************************************************
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 
-#define MEM_LOAD32BE(src)                                  \
-    (((std::uint32_t)(((std::uint8_t *)(src))[0]) << 24) | \
-     ((std::uint32_t)(((std::uint8_t *)(src))[1]) << 16) | \
-     ((std::uint32_t)(((std::uint8_t *)(src))[2]) << 8) |  \
-     ((std::uint32_t)(((std::uint8_t *)(src))[3]) << 0))
+#define MEM_LOAD32BE(src)                                        \
+    (((std::uint32_t)(((const std::uint8_t *)(src))[0]) << 24) | \
+     ((std::uint32_t)(((const std::uint8_t *)(src))[1]) << 16) | \
+     ((std::uint32_t)(((const std::uint8_t *)(src))[2]) << 8) |  \
+     ((std::uint32_t)(((const std::uint8_t *)(src))[3]) << 0))
 
 #define MEM_STORE32BE(dst, a)                                        \
     (((std::uint8_t *)(dst))[0] = ((std::uint32_t)(a) >> 24) & 0xFF, \
@@ -19,15 +20,15 @@ namespace ublock::internal::common {
      ((std::uint8_t *)(dst))[2] = ((std::uint32_t)(a) >> 8) & 0xFF,  \
      ((std::uint8_t *)(dst))[3] = ((std::uint32_t)(a) >> 0) & 0xFF)
 
-#define MEM_LOAD64BE(src)                                  \
-    (((std::uint64_t)(((std::uint8_t *)(src))[0]) << 56) | \
-     ((std::uint64_t)(((std::uint8_t *)(src))[1]) << 48) | \
-     ((std::uint64_t)(((std::uint8_t *)(src))[2]) << 40) | \
-     ((std::uint64_t)(((std::uint8_t *)(src))[3]) << 32) | \
-     ((std::uint64_t)(((std::uint8_t *)(src))[4]) << 24) | \
-     ((std::uint64_t)(((std::uint8_t *)(src))[5]) << 16) | \
-     ((std::uint64_t)(((std::uint8_t *)(src))[6]) << 8) |  \
-     ((std::uint64_t)(((std::uint8_t *)(src))[7]) << 0))
+#define MEM_LOAD64BE(src)                                        \
+    (((std::uint64_t)(((const std::uint8_t *)(src))[0]) << 56) | \
+     ((std::uint64_t)(((const std::uint8_t *)(src))[1]) << 48) | \
+     ((std::uint64_t)(((const std::uint8_t *)(src))[2]) << 40) | \
+     ((std::uint64_t)(((const std::uint8_t *)(src))[3]) << 32) | \
+     ((std::uint64_t)(((const std::uint8_t *)(src))[4]) << 24) | \
+     ((std::uint64_t)(((const std::uint8_t *)(src))[5]) << 16) | \
+     ((std::uint64_t)(((const std::uint8_t *)(src))[6]) << 8) |  \
+     ((std::uint64_t)(((const std::uint8_t *)(src))[7]) << 0))
 
 #define MEM_STORE64BE(dst, a)                                        \
     (((std::uint8_t *)(dst))[0] = ((std::uint64_t)(a) >> 56) & 0xFF, \
@@ -155,14 +156,17 @@ static inline std::uint32_t Sk_u32(std::uint32_t n) noexcept
     ret |= (std::uint32_t)SBOX[(n >> 0) & 0xF] << 0;
     return ret;
 }
+
 static inline std::uint64_t Sk_u64(std::uint64_t n) noexcept
 {
     return lut_u64_epi4(n, SBOX);
 }
+
 static inline std::uint64_t SIk_u64(std::uint64_t n) noexcept
 {
     return lut_u64_epi4(n, SBOXI);
 }
+
 static inline std::uint32_t Tk_u32(std::uint32_t n) noexcept
 {
     std::uint32_t ret;
@@ -176,6 +180,7 @@ static inline std::uint32_t Tk_u32(std::uint32_t n) noexcept
     ret |= MUL2T[(n >> 0) & 0xF] << 0;
     return ret;
 }
+
 static inline std::uint64_t Tk_u64(std::uint64_t n) noexcept
 {
     std::uint64_t ret;
@@ -197,6 +202,7 @@ static inline std::uint64_t Tk_u64(std::uint64_t n) noexcept
     ret |= (std::uint64_t)MUL2T[(n >> 0) & 0xF] << 0;
     return ret;
 }
+
 static inline std::uint64_t shuffle_u64_epi4(std::uint64_t n,
                                              const int     T[16]) noexcept
 {
@@ -219,6 +225,7 @@ static inline std::uint64_t shuffle_u64_epi4(std::uint64_t n,
     ret |= u64_get_epi4(n, T[15]) << 0;
     return ret;
 }
+
 static inline std::uint64_t shuffle_u64_epi8(std::uint64_t n,
                                              const int     T[8]) noexcept
 {
@@ -233,6 +240,7 @@ static inline std::uint64_t shuffle_u64_epi8(std::uint64_t n,
     ret |= u64_get_epi8(n, T[7]) << 0;
     return ret;
 }
+
 static inline void shuffle_u128_epi8(std::uint64_t n[2],
                                      const int     T[16]) noexcept
 {
@@ -260,6 +268,7 @@ static inline void shuffle_u128_epi8(std::uint64_t n[2],
     n[0] = r[0], n[1] = r[1];
 #undef u128_get_epi8
 }
+
 static inline std::uint64_t rotl_u64_epi32(std::uint64_t n, int s) noexcept
 {
     std::uint32_t n0 = (std::uint32_t)(n >> 32);
@@ -268,6 +277,7 @@ static inline std::uint64_t rotl_u64_epi32(std::uint64_t n, int s) noexcept
     std::uint32_t r1 = (n1 << s) | (n1 >> (32 - s));
     return ((std::uint64_t)r0 << 32) | (std::uint64_t)r1;
 }
+
 static inline void PK1_u64(std::uint32_t *K0, std::uint32_t *K1) noexcept
 {
     std::uint64_t K0K1 = (std::uint64_t)(*K0) << 32 | (std::uint64_t)(*K1);
@@ -275,44 +285,54 @@ static inline void PK1_u64(std::uint32_t *K0, std::uint32_t *K1) noexcept
     *K0                = (std::uint32_t)(ret >> 32);
     *K1                = (std::uint32_t)(ret & UINT32_MAX);
 }
+
 static inline void PK2_u128(std::uint64_t *K0, std::uint64_t *K1) noexcept
 {
     *K0 = shuffle_u64_epi4(*K0, PK2T_H);
     *K1 = shuffle_u64_epi4(*K1, PK2T_L);
 }
+
 static inline void PK3_u128(std::uint64_t *K0, std::uint64_t *K1) noexcept
 {
     *K0 = shuffle_u64_epi4(*K0, PK3T_H);
     *K1 = shuffle_u64_epi4(*K1, PK3T_L);
 }
+
 static inline std::uint64_t PL128_u64(std::uint64_t n) noexcept
 {
     return shuffle_u64_epi8(n, PL128T);
 }
+
 static inline std::uint64_t PR128_u64(std::uint64_t n) noexcept
 {
     return shuffle_u64_epi8(n, PR128T);
 }
+
 static inline std::uint64_t PL128I_u64(std::uint64_t n) noexcept
 {
     return shuffle_u64_epi8(n, PL128IT);
 }
+
 static inline std::uint64_t PR128I_u64(std::uint64_t n) noexcept
 {
     return shuffle_u64_epi8(n, PR128IT);
 }
+
 static inline void PL256_u128(std::uint64_t n[2]) noexcept
 {
     shuffle_u128_epi8(n, PL256T);
 }
+
 static inline void PR256_u128(std::uint64_t n[2]) noexcept
 {
     shuffle_u128_epi8(n, PR256T);
 }
+
 static inline void PL256I_u128(std::uint64_t n[2]) noexcept
 {
     shuffle_u128_epi8(n, PL256IT);
 }
+
 static inline void PR256I_u128(std::uint64_t n[2]) noexcept
 {
     shuffle_u128_epi8(n, PR256IT);
