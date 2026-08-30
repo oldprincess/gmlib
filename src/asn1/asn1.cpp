@@ -13,7 +13,9 @@ static void asn1_encode_identifier_octets(std::uint8_t  out[1],
                                           Asn1TagPC     tag_pc,
                                           Asn1TagNumber tag_number) noexcept
 {
-    out[0] = (std::uint8_t)(tag_class | tag_pc | tag_number);
+    out[0] = (std::uint8_t)tag_class | //
+             (std::uint8_t)tag_pc |    //
+             (std::uint8_t)tag_number;
 }
 
 static void asn1_encode_length_octets(std::uint8_t* out,
@@ -167,11 +169,16 @@ const char* asn1_tag_class_name(Asn1TagClass tag_class) noexcept
 {
     switch (tag_class)
     {
-        case ASN1_TAG_CLASS_UNIVERSAL: return "UNIVERSAL";
-        case ASN1_TAG_CLASS_APPLICATION: return "APPLICATION";
-        case ASN1_TAG_CLASS_CONTEXT_SPECIFIC: return "CONTEXT_SPECIFIC";
-        case ASN1_TAG_CLASS_PRIVATE: return "PRIVATE";
-        default: return "UNKNOWN";
+        case ASN1_TAG_CLASS_UNIVERSAL:
+            return "UNIVERSAL";
+        case ASN1_TAG_CLASS_APPLICATION:
+            return "APPLICATION";
+        case ASN1_TAG_CLASS_CONTEXT_SPECIFIC:
+            return "CONTEXT_SPECIFIC";
+        case ASN1_TAG_CLASS_PRIVATE:
+            return "PRIVATE";
+        default:
+            return "UNKNOWN";
     }
 }
 
@@ -179,9 +186,12 @@ const char* asn1_tag_pc_name(Asn1TagPC tag_pc) noexcept
 {
     switch (tag_pc)
     {
-        case ASN1_TAG_PC_PRIMITIVE: return "PRIMITIVE";
-        case ASN1_TAG_PC_CONSTRUCTED: return "CONSTRUCTED";
-        default: return "UNKNOWN";
+        case ASN1_TAG_PC_PRIMITIVE:
+            return "PRIMITIVE";
+        case ASN1_TAG_PC_CONSTRUCTED:
+            return "CONSTRUCTED";
+        default:
+            return "UNKNOWN";
     }
 }
 
@@ -189,33 +199,60 @@ const char* asn1_tag_number_name(Asn1TagNumber tag_number) noexcept
 {
     switch (tag_number)
     {
-        case ASN1_TAG_END_OF_CONTENTS: return "END_OF_CONTENTS";
-        case ASN1_TAG_BOOLEAN: return "BOOLEAN";
-        case ASN1_TAG_INTEGER: return "INTEGER";
-        case ASN1_TAG_BIT_STRING: return "BIT_STRING";
-        case ASN1_TAG_OCTET_STRING: return "OCTET_STRING";
-        case ASN1_TAG_NULL: return "NULL";
-        case ASN1_TAG_OBJECT_IDENTIFIER: return "OBJECT_IDENTIFIER";
-        case ASN1_TAG_OBJECT_DESCRIPTOR: return "OBJECT_DESCRIPTOR";
-        case ASN1_TAG_EXTERNAL: return "EXTERNAL";
-        case ASN1_TAG_REAL: return "REAL";
-        case ASN1_TAG_ENUMERATED: return "ENUMERATED";
-        case ASN1_TAG_UTF8_STRING: return "UTF8_STRING";
-        case ASN1_TAG_SEQUENCE: return "SEQUENCE";
-        case ASN1_TAG_SET: return "SET";
-        case ASN1_TAG_NUMERIC_STRING: return "NUMERIC_STRING";
-        case ASN1_TAG_PRINTABLE_STRING: return "PRINTABLE_STRING";
-        case ASN1_TAG_TELETEX_STRING: return "TELETEX_STRING";
-        case ASN1_TAG_VIDEOTEX_STRING: return "VIDEOTEX_STRING";
-        case ASN1_TAG_IA5_STRING: return "IA5_STRING";
-        case ASN1_TAG_UTC_TIME: return "UTC_TIME";
-        case ASN1_TAG_GENERALIZED_TIME: return "GENERALIZED_TIME";
-        case ASN1_TAG_GRAPHIC_STRING: return "GRAPHIC_STRING";
-        case ASN1_TAG_VISIBLE_STRING: return "VISIBLE_STRING";
-        case ASN1_TAG_GENERAL_STRING: return "GENERAL_STRING";
-        case ASN1_TAG_UNIVERSAL_STRING: return "UNIVERSAL_STRING";
-        case ASN1_TAG_BMP_STRING: return "BMP_STRING";
-        default: return "UNKNOWN";
+        case ASN1_TAG_END_OF_CONTENTS:
+            return "END_OF_CONTENTS";
+        case ASN1_TAG_BOOLEAN:
+            return "BOOLEAN";
+        case ASN1_TAG_INTEGER:
+            return "INTEGER";
+        case ASN1_TAG_BIT_STRING:
+            return "BIT_STRING";
+        case ASN1_TAG_OCTET_STRING:
+            return "OCTET_STRING";
+        case ASN1_TAG_NULL:
+            return "NULL";
+        case ASN1_TAG_OBJECT_IDENTIFIER:
+            return "OBJECT_IDENTIFIER";
+        case ASN1_TAG_OBJECT_DESCRIPTOR:
+            return "OBJECT_DESCRIPTOR";
+        case ASN1_TAG_EXTERNAL:
+            return "EXTERNAL";
+        case ASN1_TAG_REAL:
+            return "REAL";
+        case ASN1_TAG_ENUMERATED:
+            return "ENUMERATED";
+        case ASN1_TAG_UTF8_STRING:
+            return "UTF8_STRING";
+        case ASN1_TAG_SEQUENCE:
+            return "SEQUENCE";
+        case ASN1_TAG_SET:
+            return "SET";
+        case ASN1_TAG_NUMERIC_STRING:
+            return "NUMERIC_STRING";
+        case ASN1_TAG_PRINTABLE_STRING:
+            return "PRINTABLE_STRING";
+        case ASN1_TAG_TELETEX_STRING:
+            return "TELETEX_STRING";
+        case ASN1_TAG_VIDEOTEX_STRING:
+            return "VIDEOTEX_STRING";
+        case ASN1_TAG_IA5_STRING:
+            return "IA5_STRING";
+        case ASN1_TAG_UTC_TIME:
+            return "UTC_TIME";
+        case ASN1_TAG_GENERALIZED_TIME:
+            return "GENERALIZED_TIME";
+        case ASN1_TAG_GRAPHIC_STRING:
+            return "GRAPHIC_STRING";
+        case ASN1_TAG_VISIBLE_STRING:
+            return "VISIBLE_STRING";
+        case ASN1_TAG_GENERAL_STRING:
+            return "GENERAL_STRING";
+        case ASN1_TAG_UNIVERSAL_STRING:
+            return "UNIVERSAL_STRING";
+        case ASN1_TAG_BMP_STRING:
+            return "BMP_STRING";
+        default:
+            return "UNKNOWN";
     }
 }
 
@@ -581,9 +618,19 @@ int asn1_decode_bit_string_value(const std::uint8_t** data_ptr,
     {
         return -1;
     }
-    if (!(0 <= tlv.value[0] && tlv.value[0] <= 7))
+    if (!(tlv.value[0] <= 7))
     {
         return -1;
+    }
+    if (tlv.value[0] != 0)
+    {
+        static const std::uint8_t UNUSED_MASK[8] = {
+            0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f,
+        };
+        if ((tlv.value[tlv.length - 1] & UNUSED_MASK[tlv.value[0]]) != 0)
+        {
+            return -1;
+        }
     }
     *data_ptr    = tlv.value + 1;
     *data_length = tlv.length - 1;

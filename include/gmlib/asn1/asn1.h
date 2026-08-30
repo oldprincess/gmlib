@@ -151,7 +151,7 @@ void asn1_encode_object_identifier_tlv(std::uint8_t*       out,
                                        std::size_t*        outl,
                                        const std::uint8_t* data,
                                        std::size_t         data_len) noexcept;
-                                       
+
 void asn1_encode_explicit_tl(std::uint8_t* out,
                              std::size_t*  outl,
                              unsigned int  tag_number,
@@ -193,11 +193,13 @@ static constexpr std::size_t ASN1_ENCODE_OCTET_STRING_MAX_OUTL(
 {
     return ASN1_ENCODE_TLV_MAX_OUTL(value_length);
 }
+
 static constexpr std::size_t ASN1_ENCODE_OBJECT_IDENTIFIER_MAX_OUTL(
     std::size_t value_length) noexcept
 {
     return ASN1_ENCODE_TLV_MAX_OUTL(value_length);
 }
+
 static constexpr std::size_t ASN1_ENCODE_EXPLICIT_MAX_OUTL(
     std::size_t value_length) noexcept
 {
