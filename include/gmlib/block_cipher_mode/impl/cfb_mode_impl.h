@@ -4,268 +4,348 @@
 #include <gmlib/block_cipher_mode/impl/block_cipher_mode_impl.h>
 #include <gmlib/memory_utils/memxor.h>
 
-#include <stdexcept>
+#include <cstring>
 
 namespace block_cipher_mode::impl {
 
 template <class Cipher>
-class CfbEncryptorImpl : public BlockCipherModeImpl<Cipher::BLOCK_SIZE>
+class CfbEncryptorImpl : public BlockCipherMode
 {
-public:
-    static constexpr std::size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+private:
+    using Base = BlockCipherMode;
 
+private:
+    static constexpr std::size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
     static constexpr std::size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
-
-public:
-    const char* fetch_name() const noexcept override
-    {
-        return "CFB-ENC";
-    }
-
-    std::size_t fetch_block_size() const noexcept override
-    {
-        return BLOCK_SIZE;
-    }
-
-    std::size_t fetch_user_key_len() const noexcept override
-    {
-        return USER_KEY_LEN;
-    }
+    static constexpr std::size_t PARALLEL_NUM = 1;
 
 private:
     Cipher       cipher_;
-    std::uint8_t iv_[Cipher::BLOCK_SIZE];
+    std::uint8_t iv_[BLOCK_SIZE];
+    std::uint8_t key_stream_buf_[BLOCK_SIZE];
+    std::size_t  key_stream_idx_ = sizeof(key_stream_buf_);
 
 public:
     CfbEncryptorImpl() = default;
 
-    CfbEncryptorImpl(const std::uint8_t* user_key, const std::uint8_t* iv)
-    {
-        this->init(user_key, iv);
-    }
-
-    ~CfbEncryptorImpl()
+    ~CfbEncryptorImpl() override
     {
         std::memset(iv_, 0, sizeof(iv_));
+        std::memset(key_stream_buf_, 0, sizeof(key_stream_buf_));
     }
 
 public:
-    const BlockCipher& fetch_cipher_ctx() const noexcept override
+    const char* get_name() const noexcept override
+    {
+        return "CFB-ENC";
+    }
+
+    const BlockCipher& get_cipher_ctx() const noexcept override
     {
         return cipher_;
     }
 
 public:
-    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    std::unique_ptr<BlockCipherMode> clone() const override final
     {
-        if (std::strcmp(cmd, "init") == 0)
+        return std::make_unique<CfbEncryptorImpl>(*this);
+    }
+
+public:
+    void init(const std::uint8_t* user_key,
+              std::size_t         user_key_len,
+              const std::uint8_t* iv,
+              std::size_t         iv_len,
+              const std::uint8_t* aad,
+              std::size_t         aad_len) override
+    {
+        if (user_key != nullptr)
         {
-            if (argc != 2)
+            if (user_key_len != USER_KEY_LEN)
             {
-                throw std::invalid_argument(
-                    "invalid number of arguments in CfbEncryptorImpl");
+                throw std::invalid_argument(Error::INVALID_KEY_LENGTH);
             }
-            this->init(*(const std::uint8_t**)argv[0],
-                       *(const std::uint8_t**)argv[1]);
-            return;
+            cipher_.set_key(user_key, Cipher::ENCRYPTION);
         }
-        if (std::strcmp(cmd, "reset") == 0)
+        if (iv != nullptr)
         {
-            if (argc != 1)
+            if (iv_len != BLOCK_SIZE)
             {
-                throw std::invalid_argument(
-                    "invalid number of arguments in CfbEncryptorImpl");
+                throw std::invalid_argument(Error::INVALID_IV_LENGTH);
             }
-            this->reset(*(const std::uint8_t**)argv[0]);
-            return;
+            std::memcpy(iv_, iv, BLOCK_SIZE);
         }
-        throw std::runtime_error("CfbEncryptorImpl does not support ctrl");
-    }
-
-    std::unique_ptr<BlockCipherMode> clone() const override
-    {
-        return std::unique_ptr<BlockCipherMode>(new CfbEncryptorImpl(*this));
+        (void)aad;
+        (void)aad_len;
+        key_stream_idx_ = sizeof(key_stream_buf_);
     }
 
 public:
-    void init(const std::uint8_t* user_key, const std::uint8_t* iv)
+    void update(std::uint8_t*       out,
+                std::size_t*        outl,
+                std::size_t         outl_max,
+                const std::uint8_t* in,
+                std::size_t         inl) override
     {
-        cipher_.set_key(user_key, Cipher::ENCRYPTION);
-        std::memcpy(iv_, iv, Cipher::BLOCK_SIZE);
-    }
-
-    void reset(const std::uint8_t* iv) noexcept
-    {
-        this->BlockCipherModeImpl<Cipher::BLOCK_SIZE>::reset();
-        std::memcpy(iv_, iv, Cipher::BLOCK_SIZE);
-    }
-
-protected:
-    void update_blocks(std::uint8_t*       out,
-                       const std::uint8_t* in,
-                       std::size_t         block_num) override
-    {
-        constexpr std::size_t block_size = Cipher::BLOCK_SIZE;
-
-        std::uint8_t* pre_ct = iv_;
-        while (block_num)
+        *outl = 0;
+        if (outl_max < inl)
         {
-            cipher_.encrypt_block(iv_, pre_ct);
-            memory_utils::memxor_n(out, in, iv_, block_size);
-            pre_ct = out;
-            in += block_size, out += block_size, block_num--;
+            throw std::length_error(Error::BUFFER_TOO_SMALL);
         }
-        std::memcpy(iv_, pre_ct, block_size);
-    }
-
-    void final_block(std::uint8_t*       out,
-                     const std::uint8_t* in,
-                     std::size_t         inl) override
-    {
-        if (inl == 0)
+        std::size_t input_len = inl;
+        // prologue
+        if (inl > 0)
         {
-            return;
+            if (key_stream_idx_ < sizeof(key_stream_buf_))
+            {
+                std::size_t update_size = inl;
+                if (sizeof(key_stream_buf_) - key_stream_idx_ < update_size)
+                {
+                    update_size = sizeof(key_stream_buf_) - key_stream_idx_;
+                }
+                memory_utils::memxor_n(                                     //
+                    out, key_stream_buf_ + key_stream_idx_, in, update_size //
+                );                                                          //
+                std::memcpy(                                                //
+                    iv_ + key_stream_idx_ % BLOCK_SIZE, out, update_size    //
+                );                                                          //
+                in += update_size, inl -= update_size;
+                out += update_size;
+                key_stream_idx_ += update_size;
+            }
         }
-        cipher_.encrypt_block(iv_, iv_);
-        memory_utils::memxor_n(out, iv_, in, inl);
+        // body
+        while (inl >= BLOCK_SIZE)
+        {
+            cipher_.encrypt_block(key_stream_buf_, iv_);
+            memory_utils::memxor_n(out, key_stream_buf_, in, BLOCK_SIZE);
+            std::memcpy(iv_, out, BLOCK_SIZE);
+            out += BLOCK_SIZE;
+            in += BLOCK_SIZE, inl -= BLOCK_SIZE;
+        }
+        // epilogue
+        if (inl > 0)
+        {
+            cipher_.encrypt_block(key_stream_buf_, iv_);
+            memory_utils::memxor_n(out, key_stream_buf_, in, inl);
+            std::memcpy(iv_, out, inl);
+            key_stream_idx_ = inl;
+        }
+        *outl = input_len;
     }
-};
 
-template <class Cipher>
-class CfbDecryptorImpl : public BlockCipherModeImpl<Cipher::BLOCK_SIZE>
-{
-public:
-    static constexpr std::size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
-
-    static constexpr std::size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
-
-public:
-    const char* fetch_name() const noexcept override
+    void do_final(std::uint8_t*       out,
+                  std::size_t*        outl,
+                  std::size_t         outl_max,
+                  const std::uint8_t* in  = nullptr,
+                  std::size_t         inl = 0) override
     {
-        return "CFB-DEC";
+        this->update(out, outl, outl_max, in, inl);
     }
 
-    std::size_t fetch_block_size() const noexcept override
+public:
+    std::size_t get_block_size() const noexcept override
     {
-        return BLOCK_SIZE;
+        return 1;
     }
 
-    std::size_t fetch_user_key_len() const noexcept override
+    std::size_t get_key_len() const noexcept override
     {
         return USER_KEY_LEN;
     }
 
+    void set_padding(bool value) override
+    {
+        (void)value;
+    }
+
+    bool get_padding() const override
+    {
+        return false;
+    }
+};
+
+template <class Cipher>
+class CfbDecryptorImpl : public BlockCipherMode
+{
+private:
+    using Base = BlockCipherMode;
+
+private:
+    static constexpr std::size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static constexpr std::size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
+    static constexpr std::size_t PARALLEL_NUM = Cipher::PARALLEL_NUM;
+
 private:
     Cipher       cipher_;
-    std::uint8_t iv_[Cipher::BLOCK_SIZE];
+    std::uint8_t iv_[BLOCK_SIZE];
+    std::uint8_t key_stream_buf_[BLOCK_SIZE * PARALLEL_NUM];
+    std::size_t  key_stream_idx_ = sizeof(key_stream_buf_);
 
 public:
     CfbDecryptorImpl() = default;
 
-    CfbDecryptorImpl(const std::uint8_t* user_key, const std::uint8_t* iv)
-    {
-        this->init(user_key, iv);
-    }
-
     ~CfbDecryptorImpl()
     {
         std::memset(iv_, 0, sizeof(iv_));
+        std::memset(key_stream_buf_, 0, sizeof(key_stream_buf_));
     }
 
 public:
-    const BlockCipher& fetch_cipher_ctx() const noexcept override
+    const char* get_name() const noexcept override
+    {
+        return "CFB-DEC";
+    }
+
+    const BlockCipher& get_cipher_ctx() const noexcept override
     {
         return cipher_;
     }
 
 public:
-    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    std::unique_ptr<BlockCipherMode> clone() const override final
     {
-        if (std::strcmp(cmd, "init") == 0)
-        {
-            if (argc != 2)
-            {
-                throw std::invalid_argument(
-                    "invalid number of arguments in CfbDecryptorImpl");
-            }
-            this->init(*(const std::uint8_t**)argv[0],
-                       *(const std::uint8_t**)argv[1]);
-            return;
-        }
-        if (std::strcmp(cmd, "reset") == 0)
-        {
-            if (argc != 1)
-            {
-                throw std::invalid_argument(
-                    "invalid number of arguments in CfbDecryptorImpl");
-            }
-            this->reset(*(const std::uint8_t**)argv[0]);
-            return;
-        }
-        throw std::runtime_error("CfbDecryptorImpl does not support ctrl");
-    }
-
-    std::unique_ptr<BlockCipherMode> clone() const override
-    {
-        return std::unique_ptr<BlockCipherMode>(new CfbDecryptorImpl(*this));
+        return std::make_unique<CfbDecryptorImpl>(*this);
     }
 
 public:
-    void init(const std::uint8_t* user_key, const std::uint8_t* iv)
+    void init(const std::uint8_t* user_key,
+              std::size_t         user_key_len,
+              const std::uint8_t* iv,
+              std::size_t         iv_len,
+              const std::uint8_t* aad,
+              std::size_t         aad_len) override final
     {
-        cipher_.set_key(user_key, Cipher::ENCRYPTION);
-        std::memcpy(iv_, iv, Cipher::BLOCK_SIZE);
+        if (user_key != nullptr)
+        {
+            if (user_key_len != USER_KEY_LEN)
+            {
+                throw std::invalid_argument(Error::INVALID_KEY_LENGTH);
+            }
+            cipher_.set_key(user_key, Cipher::ENCRYPTION);
+        }
+        if (iv != nullptr)
+        {
+            if (iv_len != BLOCK_SIZE)
+            {
+                throw std::invalid_argument(Error::INVALID_IV_LENGTH);
+            }
+            std::memcpy(iv_, iv, BLOCK_SIZE);
+        }
+        (void)aad;
+        (void)aad_len;
+        key_stream_idx_ = sizeof(key_stream_buf_);
     }
 
-    void reset(const std::uint8_t* iv) noexcept
+public:
+    void update(std::uint8_t*       out,
+                std::size_t*        outl,
+                std::size_t         outl_max,
+                const std::uint8_t* in,
+                std::size_t         inl) override final
     {
-        this->BlockCipherModeImpl<Cipher::BLOCK_SIZE>::reset();
-        std::memcpy(iv_, iv, Cipher::BLOCK_SIZE);
+        *outl = 0;
+        if (outl_max < inl)
+        {
+            throw std::length_error(Error::BUFFER_TOO_SMALL);
+        }
+        std::size_t input_len = inl;
+        // prologue
+        if (inl > 0)
+        {
+            if (key_stream_idx_ < sizeof(key_stream_buf_))
+            {
+                std::size_t update_size = inl;
+                if (sizeof(key_stream_buf_) - key_stream_idx_ < update_size)
+                {
+                    update_size = sizeof(key_stream_buf_) - key_stream_idx_;
+                }
+                memory_utils::memxor_n(                                     //
+                    out, key_stream_buf_ + key_stream_idx_, in, update_size //
+                );                                                          //
+                std::memcpy(                                                //
+                    iv_ + key_stream_idx_ % BLOCK_SIZE, in, update_size     //
+                );                                                          //
+                in += update_size, inl -= update_size;
+                out += update_size;
+                key_stream_idx_ += update_size;
+            }
+        }
+        // body
+        while (inl >= sizeof(key_stream_buf_))
+        {
+            this->generate_key_stream_blocks_(                             //
+                key_stream_buf_, in, 0, PARALLEL_NUM                       //
+            );                                                             //
+            memory_utils::memxor_n(                                        //
+                out, key_stream_buf_, in, sizeof(key_stream_buf_)          //
+            );                                                             //
+            std::memcpy(                                                   //
+                iv_, in + sizeof(key_stream_buf_) - BLOCK_SIZE, BLOCK_SIZE //
+            );                                                             //
+            out += sizeof(key_stream_buf_);
+            in += sizeof(key_stream_buf_), inl -= sizeof(key_stream_buf_);
+        }
+        // epilogue
+        if (inl > 0)
+        {
+            std::size_t block_num = (inl + BLOCK_SIZE - 1) / BLOCK_SIZE;
+            std::size_t offset    = (PARALLEL_NUM - block_num) * BLOCK_SIZE;
+            this->generate_key_stream_blocks_(                              //
+                key_stream_buf_, in, PARALLEL_NUM - block_num, PARALLEL_NUM //
+            );                                                              //
+            memory_utils::memxor_n(out, key_stream_buf_ + offset, in, inl);
+            std::size_t feedback_offset = (block_num - 1) * BLOCK_SIZE;
+            std::memcpy(iv_, in + feedback_offset, inl - feedback_offset);
+            key_stream_idx_ = offset + inl;
+        }
+        *outl = input_len;
+    }
+
+    void do_final(std::uint8_t*       out,
+                  std::size_t*        outl,
+                  std::size_t         outl_max,
+                  const std::uint8_t* in  = nullptr,
+                  std::size_t         inl = 0) override final
+    {
+        this->update(out, outl, outl_max, in, inl);
     }
 
 private:
-    void update_blocks(std::uint8_t*       out,
-                       const std::uint8_t* in,
-                       std::size_t         block_num) override
+    void generate_key_stream_blocks_(std::uint8_t*       key_stream_blocks,
+                                     const std::uint8_t* in,
+                                     std::size_t         offset_block_num,
+                                     std::size_t         total_block_num)
     {
-        constexpr std::size_t block_size     = Cipher::BLOCK_SIZE;
-        constexpr std::size_t PARALLEL_NUM   = Cipher::PARALLEL_NUM;
-        constexpr std::size_t PARALLEL_BYTES = block_size * PARALLEL_NUM;
-        constexpr std::size_t REMAIN         = PARALLEL_BYTES - block_size;
-
-        std::uint8_t buffer[PARALLEL_BYTES];
-        while (block_num >= PARALLEL_NUM)
+        std::uint8_t* out = key_stream_blocks + offset_block_num * BLOCK_SIZE;
+        std::size_t   block_num = total_block_num - offset_block_num;
+        std::memcpy(out, iv_, BLOCK_SIZE);
+        if (block_num > 1)
         {
-            std::memcpy(buffer, iv_, BLOCK_SIZE);
-            std::memcpy(buffer + BLOCK_SIZE, in, REMAIN);
-            std::memcpy(iv_, in + REMAIN, BLOCK_SIZE);
-            cipher_.encrypt_blocks(buffer, buffer, PARALLEL_NUM);
-            memory_utils::memxor_n(out, in, buffer, PARALLEL_BYTES);
-            out += PARALLEL_BYTES;
-            in += PARALLEL_BYTES, block_num -= PARALLEL_NUM;
+            std::memcpy(out + BLOCK_SIZE, in, (block_num - 1) * BLOCK_SIZE);
         }
-        if (block_num)
-        {
-            std::size_t         remain_bytes = block_num * BLOCK_SIZE;
-            const std::uint8_t* nxt_iv       = in + remain_bytes - BLOCK_SIZE;
-            std::memcpy(buffer, iv_, BLOCK_SIZE);
-            std::memcpy(buffer + BLOCK_SIZE, in, remain_bytes - BLOCK_SIZE);
-            std::memcpy(iv_, nxt_iv, BLOCK_SIZE);
-            cipher_.encrypt_blocks(buffer, buffer, block_num);
-            memory_utils::memxor_n(out, in, buffer, remain_bytes);
-        }
+        cipher_.encrypt_blocks(out, out, block_num);
     }
 
-    void final_block(std::uint8_t*       out,
-                     const std::uint8_t* in,
-                     std::size_t         inl) override
+public:
+    std::size_t get_block_size() const noexcept override
     {
-        if (inl == 0)
-        {
-            return;
-        }
-        cipher_.encrypt_block(iv_, iv_);
-        memory_utils::memxor_n(out, in, iv_, inl);
+        return 1;
+    }
+
+    std::size_t get_key_len() const noexcept override
+    {
+        return USER_KEY_LEN;
+    }
+
+    void set_padding(bool value) override
+    {
+        (void)value;
+    }
+
+    bool get_padding() const override
+    {
+        return false;
     }
 };
 

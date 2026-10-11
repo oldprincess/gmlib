@@ -209,78 +209,90 @@ void test_gcm_mode()
     std::uint8_t buf[1024], get_tag[16];
     std::size_t  size, n;
 
-    auto e = SM4GcmEncryptor(user_key, iv, 16, aad, 16);
-    e.do_final(buf, &size, pt, 1024);
-    e.get_tag(get_tag);
+    auto e = SM4GcmEncryptor();
+    e.set_iv_len(sizeof(iv));
+    e.init(user_key, sizeof(user_key), iv, sizeof(iv), aad, sizeof(aad));
+    e.do_final(buf, &size, sizeof(buf), pt, 1024);
+    e.get_tag(get_tag, sizeof(get_tag));
     if (std::memcmp(buf, ct, 1024) != 0 || size != 1024 ||
         std::memcmp(tag, get_tag, 16) != 0)
     {
         throw std::runtime_error("err in gcm_mode");
     }
-    e.reset(iv, 16, aad, 16);
-    e.do_final(buf, &size, pt, 1024);
-    e.get_tag(get_tag);
+    e.init(nullptr, 0, iv, sizeof(iv), aad, sizeof(aad));
+    e.do_final(buf, &size, sizeof(buf), pt, 1024);
+    e.get_tag(get_tag, sizeof(get_tag));
     if (std::memcmp(buf, ct, 1024) != 0 || size != 1024 ||
         std::memcmp(tag, get_tag, 16) != 0)
     {
         throw std::runtime_error("err in gcm_mode");
     }
-    e = SM4GcmEncryptor(user_key, iv, 16, aad, 16);
-    e.update(buf, &n, pt, 100);
+    e = SM4GcmEncryptor();
+    e.set_iv_len(sizeof(iv));
+    e.init(user_key, sizeof(user_key), iv, sizeof(iv), aad, sizeof(aad));
+    e.update(buf, &n, sizeof(buf), pt, 100);
     size = n;
-    e.do_final(buf + size, &n, pt + 100, 1024 - 100);
+    e.do_final(buf + size, &n, sizeof(buf) - size, pt + 100, 1024 - 100);
     size += n;
-    e.get_tag(get_tag);
+    e.get_tag(get_tag, sizeof(get_tag));
     if (std::memcmp(buf, ct, 1024) != 0 || size != 1024 ||
         std::memcmp(tag, get_tag, 16) != 0)
     {
         throw std::runtime_error("err in gcm_mode");
     }
-    e = SM4GcmEncryptor(user_key, iv, 16, aad, 16);
-    e.update(buf, &n, pt, 100);
+    e = SM4GcmEncryptor();
+    e.set_iv_len(sizeof(iv));
+    e.init(user_key, sizeof(user_key), iv, sizeof(iv), aad, sizeof(aad));
+    e.update(buf, &n, sizeof(buf), pt, 100);
     size = n;
-    e.update(buf + size, &n, pt + 100, 1024 - 100);
+    e.update(buf + size, &n, sizeof(buf) - size, pt + 100, 1024 - 100);
     size += n;
-    e.do_final(buf + size, &n, nullptr, 0);
+    e.do_final(buf + size, &n, sizeof(buf) - size, nullptr, 0);
     size += n;
-    e.get_tag(get_tag);
+    e.get_tag(get_tag, sizeof(get_tag));
     if (std::memcmp(buf, ct, 1024) != 0 || size != 1024 ||
         std::memcmp(tag, get_tag, 16) != 0)
     {
         throw std::runtime_error("err in gcm_mode");
     }
 
-    auto d = SM4GcmDecryptor(user_key, iv, 16, aad, 16);
-    d.set_tag(tag);
-    d.do_final(buf, &size, ct, 1024);
+    auto d = SM4GcmDecryptor();
+    d.set_iv_len(sizeof(iv));
+    d.init(user_key, sizeof(user_key), iv, sizeof(iv), aad, sizeof(aad));
+    d.set_tag(tag, sizeof(tag));
+    d.do_final(buf, &size, sizeof(buf), ct, 1024);
     if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
     {
         throw std::runtime_error("err in gcm_mode");
     }
-    d.reset(iv, 16, aad, 16);
-    d.set_tag(tag);
-    d.do_final(buf, &size, ct, 1024);
+    d.init(nullptr, 0, iv, sizeof(iv), aad, sizeof(aad));
+    d.set_tag(tag, sizeof(tag));
+    d.do_final(buf, &size, sizeof(buf), ct, 1024);
     if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
     {
         throw std::runtime_error("err in gcm_mode");
     }
-    d = SM4GcmDecryptor(user_key, iv, 16, aad, 16);
-    d.set_tag(tag);
-    d.update(buf, &n, ct, 100);
+    d = SM4GcmDecryptor();
+    d.set_iv_len(sizeof(iv));
+    d.init(user_key, sizeof(user_key), iv, sizeof(iv), aad, sizeof(aad));
+    d.set_tag(tag, sizeof(tag));
+    d.update(buf, &n, sizeof(buf), ct, 100);
     size = n;
-    d.do_final(buf + size, &n, ct + 100, 1024 - 100);
+    d.do_final(buf + size, &n, sizeof(buf) - size, ct + 100, 1024 - 100);
     size += n;
     if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
     {
         throw std::runtime_error("err in gcm_mode");
     }
-    d = SM4GcmDecryptor(user_key, iv, 16, aad, 16);
-    d.set_tag(tag);
-    d.update(buf, &n, ct, 100);
+    d = SM4GcmDecryptor();
+    d.set_iv_len(sizeof(iv));
+    d.init(user_key, sizeof(user_key), iv, sizeof(iv), aad, sizeof(aad));
+    d.set_tag(tag, sizeof(tag));
+    d.update(buf, &n, sizeof(buf), ct, 100);
     size = n;
-    d.update(buf + size, &n, ct + 100, 1024 - 100);
+    d.update(buf + size, &n, sizeof(buf) - size, ct + 100, 1024 - 100);
     size += n;
-    d.do_final(buf + size, &n, nullptr, 0);
+    d.do_final(buf + size, &n, sizeof(buf) - size, nullptr, 0);
     size += n;
     if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
     {

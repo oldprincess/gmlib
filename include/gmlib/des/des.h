@@ -2,7 +2,6 @@
 #define DES_DES_H
 
 #include <gmlib/block_cipher_mode/block_cipher.h>
-#include <gmlib/block_cipher_mode/block_cipher_mode.h>
 #include <gmlib/des/provider.h>
 
 #include <memory>
@@ -17,119 +16,7 @@ namespace des {
 class DES : public block_cipher_mode::BlockCipher
 {
 public:
-    using Cipher     = std::unique_ptr<block_cipher_mode::BlockCipher>;
-    using CipherMode = std::unique_ptr<block_cipher_mode::BlockCipherMode>;
-
-public:
-    static Cipher create_cipher(const char* provider = nullptr)
-    {
-        auto* p = get_des_provider(provider);
-        if (p == nullptr || p->create_cipher == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cipher();
-    }
-
-    static CipherMode create_ecb_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_des_provider(provider);
-        if (p == nullptr || p->create_ecb_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ecb_encryptor();
-    }
-
-    static CipherMode create_ecb_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_des_provider(provider);
-        if (p == nullptr || p->create_ecb_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ecb_decryptor();
-    }
-
-    static CipherMode create_cbc_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_des_provider(provider);
-        if (p == nullptr || p->create_cbc_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cbc_encryptor();
-    }
-
-    static CipherMode create_cbc_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_des_provider(provider);
-        if (p == nullptr || p->create_cbc_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cbc_decryptor();
-    }
-
-    static CipherMode create_ofb_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_des_provider(provider);
-        if (p == nullptr || p->create_ofb_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ofb_encryptor();
-    }
-
-    static CipherMode create_ofb_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_des_provider(provider);
-        if (p == nullptr || p->create_ofb_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ofb_decryptor();
-    }
-
-    static CipherMode create_cfb_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_des_provider(provider);
-        if (p == nullptr || p->create_cfb_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cfb_encryptor();
-    }
-
-    static CipherMode create_cfb_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_des_provider(provider);
-        if (p == nullptr || p->create_cfb_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cfb_decryptor();
-    }
-
-    static CipherMode create_ctr_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_des_provider(provider);
-        if (p == nullptr || p->create_ctr_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ctr_encryptor();
-    }
-
-    static CipherMode create_ctr_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_des_provider(provider);
-        if (p == nullptr || p->create_ctr_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ctr_decryptor();
-    }
+    using Cipher = std::unique_ptr<block_cipher_mode::BlockCipher>;
 
 public:
     static constexpr const char* NAME = "DES";
@@ -140,19 +27,21 @@ public:
     static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
-    Cipher impl_ = DES::create_cipher();
+    Cipher impl_;
 
 public:
-    DES() noexcept = default;
-
-    DES(const std::uint8_t* user_key, int enc) noexcept
+    explicit DES(const char* provider = nullptr)
     {
-        this->set_key(user_key, enc);
+        const auto* p = get_des_provider(provider);
+        if (p == nullptr || p->create_cipher == nullptr)
+        {
+            throw std::runtime_error("DES: cipher not available");
+        }
+        impl_ = p->create_cipher();
     }
 
-    DES(const DES& other)
+    DES(const DES& other) : impl_(other.impl_->clone())
     {
-        impl_ = other.impl_->clone();
     }
 
     DES& operator=(const DES& other)
@@ -168,34 +57,34 @@ public:
     DES& operator=(DES&& other) noexcept = default;
 
 public:
-    const char* fetch_name() const noexcept override
+    const char* get_name() const override
     {
-        return impl_->fetch_name();
+        return impl_->get_name();
     }
 
-    const char* fetch_impl_algo() const noexcept override
+    const char* get_impl_algo() const override
     {
-        return impl_->fetch_impl_algo();
+        return impl_->get_impl_algo();
     }
 
-    std::size_t fetch_block_size() const noexcept override
+    std::size_t get_block_size() const override
     {
-        return impl_->fetch_block_size();
+        return impl_->get_block_size();
     }
 
-    std::size_t fetch_user_key_len() const noexcept override
+    std::size_t get_key_len() const override
     {
-        return impl_->fetch_user_key_len();
+        return impl_->get_key_len();
     }
 
-    std::size_t fetch_parallel_num() const noexcept override
+    std::size_t get_parallel_num() const override
     {
-        return impl_->fetch_parallel_num();
+        return impl_->get_parallel_num();
     }
 
-    std::size_t fetch_security_strength() const noexcept override
+    std::size_t get_security_strength() const override
     {
-        return impl_->fetch_security_strength();
+        return impl_->get_security_strength();
     }
 
     Cipher clone() const override
@@ -204,33 +93,33 @@ public:
     }
 
 public:
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override
+    void set_key(const std::uint8_t* user_key, int enc) override
     {
         impl_->set_key(user_key, enc);
     }
 
     void encrypt_block(std::uint8_t*       ciphertext,
-                       const std::uint8_t* plaintext) const noexcept override
+                       const std::uint8_t* plaintext) const override
     {
         impl_->encrypt_block(ciphertext, plaintext);
     }
 
     void decrypt_block(std::uint8_t*       plaintext,
-                       const std::uint8_t* ciphertext) const noexcept override
+                       const std::uint8_t* ciphertext) const override
     {
         impl_->decrypt_block(plaintext, ciphertext);
     }
 
     void encrypt_blocks(std::uint8_t*       ciphertext,
                         const std::uint8_t* plaintext,
-                        std::size_t         block_num) const noexcept override
+                        std::size_t         block_num) const override
     {
         impl_->encrypt_blocks(ciphertext, plaintext, block_num);
     }
 
     void decrypt_blocks(std::uint8_t*       plaintext,
                         const std::uint8_t* ciphertext,
-                        std::size_t         block_num) const noexcept override
+                        std::size_t         block_num) const override
     {
         impl_->decrypt_blocks(plaintext, ciphertext, block_num);
     }

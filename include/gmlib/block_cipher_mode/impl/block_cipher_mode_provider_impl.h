@@ -48,32 +48,32 @@ struct BlockCipherModeProviderImpl
         static constexpr std::size_t PARALLEL_NUM = Traits::PARALLEL_NUM;
 
     public:
-        const char* fetch_name() const noexcept override
-        {
-            return Traits::NAME;
-        }
-
-        const char* fetch_impl_algo() const noexcept override
-        {
-            return Traits::ALGO_NAME;
-        }
-
-        std::size_t fetch_block_size() const noexcept override
+        std::size_t get_block_size() const noexcept override
         {
             return Traits::BLOCK_SIZE;
         }
 
-        std::size_t fetch_user_key_len() const noexcept override
+        const char* get_impl_algo() const noexcept override
+        {
+            return Traits::ALGO_NAME;
+        }
+
+        const char* get_name() const noexcept override
+        {
+            return Traits::NAME;
+        }
+
+        std::size_t get_key_len() const noexcept override
         {
             return Traits::USER_KEY_LEN;
         }
 
-        std::size_t fetch_parallel_num() const noexcept override
+        std::size_t get_parallel_num() const noexcept override
         {
             return Traits::PARALLEL_NUM;
         }
 
-        std::size_t fetch_security_strength() const noexcept override
+        std::size_t get_security_strength() const noexcept override
         {
             return Traits::SECURITY_STRENGTH;
         }

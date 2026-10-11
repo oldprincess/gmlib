@@ -196,54 +196,56 @@ void test_ecb_mode()
     std::uint8_t   buf[1024];
     std::size_t    size, n;
 
-    auto e = SM4EcbEncryptor(user_key);
-    e.do_final(buf, &size, pt, 1024);
+    auto e = SM4EcbEncryptor();
+    e.init(user_key, sizeof(user_key), nullptr, 0, nullptr, 0);
+    e.do_final(buf, &size, sizeof(buf), pt, 1024);
     if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
     {
         throw std::runtime_error("err in ecb_mode");
     }
-    e.reset();
-    e.update(buf, &n, pt, 100);
+    e.init(nullptr, 0, nullptr, 0, nullptr, 0);
+    e.update(buf, &n, sizeof(buf), pt, 100);
     size = n;
-    e.do_final(buf + size, &n, pt + 100, 1024 - 100);
+    e.do_final(buf + size, &n, sizeof(buf) - size, pt + 100, 1024 - 100);
     size += n;
     if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
     {
         throw std::runtime_error("err in ecb_mode");
     }
-    e.reset();
-    e.update(buf, &n, pt, 100);
+    e.init(nullptr, 0, nullptr, 0, nullptr, 0);
+    e.update(buf, &n, sizeof(buf), pt, 100);
     size = n;
-    e.update(buf + size, &n, pt + 100, 1024 - 100);
+    e.update(buf + size, &n, sizeof(buf) - size, pt + 100, 1024 - 100);
     size += n;
-    e.do_final(buf + size, &n, nullptr, 0);
+    e.do_final(buf + size, &n, sizeof(buf) - size, nullptr, 0);
     size += n;
     if (std::memcmp(buf, ct, 1024) != 0 || size != 1024)
     {
         throw std::runtime_error("err in ecb_mode");
     }
 
-    auto d = SM4EcbDecryptor(user_key);
-    d.do_final(buf, &size, ct, 1024);
+    auto d = SM4EcbDecryptor();
+    d.init(user_key, sizeof(user_key), nullptr, 0, nullptr, 0);
+    d.do_final(buf, &size, sizeof(buf), ct, 1024);
     if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
     {
         throw std::runtime_error("err in ecb_mode");
     }
-    d.reset();
-    d.update(buf, &n, ct, 100);
+    d.init(nullptr, 0, nullptr, 0, nullptr, 0);
+    d.update(buf, &n, sizeof(buf), ct, 100);
     size = n;
-    d.do_final(buf + size, &n, ct + 100, 1024 - 100);
+    d.do_final(buf + size, &n, sizeof(buf) - size, ct + 100, 1024 - 100);
     size += n;
     if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
     {
         throw std::runtime_error("err in ecb_mode");
     }
-    d.reset();
-    d.update(buf, &n, ct, 100);
+    d.init(nullptr, 0, nullptr, 0, nullptr, 0);
+    d.update(buf, &n, sizeof(buf), ct, 100);
     size = n;
-    d.update(buf + size, &n, ct + 100, 1024 - 100);
+    d.update(buf + size, &n, sizeof(buf) - size, ct + 100, 1024 - 100);
     size += n;
-    d.do_final(buf + size, &n, nullptr, 0);
+    d.do_final(buf + size, &n, sizeof(buf) - size, nullptr, 0);
     size += n;
     if (std::memcmp(buf, pt, 1024) != 0 || size != 1024)
     {

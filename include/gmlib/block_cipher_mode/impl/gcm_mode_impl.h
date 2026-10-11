@@ -4,7 +4,8 @@
 #include <gmlib/block_cipher_mode/impl/block_cipher_mode_impl.h>
 #include <gmlib/ghash/ghash.h>
 #include <gmlib/memory_utils/endian.h>
-#include <gmlib/memory_utils/memxor.h>
+
+#include <cstring>
 
 namespace block_cipher_mode::impl::internal {
 
@@ -16,7 +17,7 @@ static inline void gctr_generate_fixed_batch(std::uint8_t* out,
 
     alignas(std::uint32_t) std::uint8_t counter_prefix[12];
     std::memcpy(counter_prefix, counter, sizeof(counter_prefix));
-    const std::uint32_t low = memory_utils::load32_be_aligned(counter + 12);
+    std::uint32_t low = memory_utils::load32_be_aligned(counter + 12);
     for (std::size_t i = 0; i < BATCH_SIZE; ++i)
     {
         std::uint8_t* dst = out + i * 16;
@@ -63,554 +64,256 @@ static inline void gctr_generate_batched(std::uint8_t* out,
 namespace block_cipher_mode::impl {
 
 template <class Cipher>
-class GctrCryptorImpl : public BlockCipherModeImpl<Cipher::BLOCK_SIZE>
+using GcmCryptorBase = BlockCipherModeStreamCryptor<Cipher::BLOCK_SIZE,
+                                                    Cipher::PARALLEL_NUM,
+                                                    alignof(std::uint64_t)>;
+
+template <class Cipher>
+class GcmCryptorImpl : public GcmCryptorBase<Cipher>
 {
-public:
-    static constexpr std::size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
+    static_assert(Cipher::BLOCK_SIZE == 16, "block size must be 16");
+
+    using Base = GcmCryptorBase<Cipher>;
+
+private:
     static constexpr std::size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
 
-protected:
+private:
     Cipher cipher_;
-    alignas(std::uint32_t) std::uint8_t counter_[16];
-    alignas(std::uint32_t) std::uint8_t counter0_[16];
+
+    alignas(std::uint64_t) std::uint8_t iv_[16];
+    ghash::GHash  hash_;
+    std::uint8_t  tag_[16], encrypted_j0_[16];
+    std::uint64_t aad_len_ = 0, data_len_ = 0, iv_len_ = 12, tag_len_ = 16;
+
+    bool enc_;
+
+    static constexpr const std::uint8_t ZEROS[16] = {0};
 
 public:
-    GctrCryptorImpl() = default;
-
-    GctrCryptorImpl(const std::uint8_t* user_key,
-                    const std::uint8_t* iv,
-                    std::size_t         iv_len,
-                    ghash::GHash&       hash)
+    GcmCryptorImpl(bool enc) noexcept : enc_{enc}
     {
-        this->init(user_key, iv, iv_len, hash);
     }
 
-    ~GctrCryptorImpl()
+    ~GcmCryptorImpl() override
     {
-        std::memset(counter_, 0, sizeof(counter_));
-        std::memset(counter0_, 0, sizeof(counter0_));
+        std::memset(tag_, 0, sizeof(tag_));
+        std::memset(encrypted_j0_, 0, sizeof(encrypted_j0_));
+        std::memset(iv_, 0, sizeof(iv_));
     }
 
-protected:
-    const std::uint8_t* get_counter0() const noexcept
+public:
+    const BlockCipher& get_cipher_ctx() const noexcept override
     {
-        return counter0_;
+        return cipher_;
+    }
+
+    const char* get_name() const noexcept override
+    {
+        return enc_ ? "GCM-ENC" : "GCM-DEC";
+    }
+
+public:
+    std::unique_ptr<BlockCipherMode> clone() const override
+    {
+        return std::unique_ptr<BlockCipherMode>(new GcmCryptorImpl(*this));
     }
 
 public:
     void init(const std::uint8_t* user_key,
+              std::size_t         user_key_len,
               const std::uint8_t* iv,
               std::size_t         iv_len,
-              ghash::GHash&       hash)
+              const std::uint8_t* aad,
+              std::size_t         aad_len) override
     {
-        static const std::uint8_t ZERO[16] = {0};
-        std::uint8_t              t[16];
-
-        cipher_.set_key(user_key, Cipher::ENCRYPTION);
-        cipher_.encrypt_block(t, ZERO);
-        hash.set_key(t);
-        // init counter
-        if (iv_len == 12)
+        if (user_key != nullptr)
         {
-            std::memcpy(counter0_, iv, 12);
-            counter0_[12] = 0, counter0_[13] = 0;
-            counter0_[14] = 0, counter0_[15] = 1;
+            if (user_key_len != USER_KEY_LEN)
+            {
+                throw std::invalid_argument(Error::INVALID_KEY_LENGTH);
+            }
+            cipher_.set_key(user_key, Cipher::ENCRYPTION);
+            // init ghash
+            std::uint8_t h[16];
+            cipher_.encrypt_block(h, ZEROS);
+            hash_.set_key(h);
         }
-        else
+        if (iv != nullptr)
         {
-            // H(IV || 0(s+64) || ivlen(64) )
-            hash.update(iv, iv_len);
-            hash.update(ZERO, (16 - (iv_len % 16)) % 16);
-            memory_utils::store64_be(t + 0, 0);
-            memory_utils::store64_be(t + 8, iv_len * 8);
-            hash.update(t, 16);
-            hash.do_final(counter0_);
-            hash.reset();
+            if (iv_len != iv_len_)
+            {
+                throw std::invalid_argument(Error::INVALID_IV_LENGTH);
+            }
+            if (iv_len_ == 12)
+            {
+                std::memcpy(iv_, iv, 12);
+                std::memset(iv_ + 12, 0, 4);
+                iv_[15] = 1;
+            }
+            else
+            {
+                hash_.reset();
+                hash_.update(iv, iv_len);
+                hash_.update(ZEROS, (16 - iv_len_ % 16) % 16);
+                alignas(std::uint64_t) std::uint8_t t[8];
+                memory_utils::store64_be_aligned(t, (std::uint64_t)iv_len * 8);
+                hash_.update(ZEROS, 8);
+                hash_.update(t, 8);
+                hash_.do_final(iv_);
+            }
+            // init encrypt j0
+            cipher_.encrypt_block(encrypted_j0_, iv_);
+            // init iv = j1
+            internal::gctr_generate_batched(iv_, iv_, 1);
         }
-        std::memcpy(counter_, counter0_, sizeof(counter_));
-        internal::gctr_generate_fixed_batch<1>(counter_, counter_);
-    }
-
-    void reset(const std::uint8_t* iv, std::size_t iv_len, ghash::GHash& hash)
-    {
-        static const std::uint8_t ZERO[16] = {0};
-        std::uint8_t              t[16];
-
-        this->BlockCipherModeImpl<Cipher::BLOCK_SIZE>::reset();
-        hash.reset();
-        // init counter
-        if (iv_len == 12)
+        hash_.reset();
+        aad_len_ = 0;
+        if (aad != nullptr)
         {
-            std::memcpy(counter0_, iv, 12);
-            counter0_[12] = 0, counter0_[13] = 0;
-            counter0_[14] = 0, counter0_[15] = 1;
+            hash_.update(aad, aad_len);
+            aad_len_ = aad_len;
+            hash_.update(ZEROS, (16 - aad_len_ % 16) % 16);
         }
-        else
-        {
-            // H(IV || 0(s+64) || ivlen(64) )
-            hash.update(iv, iv_len);
-            hash.update(ZERO, (16 - (iv_len % 16)) % 16);
-            memory_utils::store64_be(t + 0, 0);
-            memory_utils::store64_be(t + 8, iv_len * 8);
-            hash.update(t, 16);
-            hash.do_final(counter0_);
-            hash.reset();
-        }
-        std::memcpy(counter_, counter0_, sizeof(counter_));
-        internal::gctr_generate_fixed_batch<1>(counter_, counter_);
+        data_len_ = 0;
+        this->Base::init_();
     }
 
 private:
-    void gen_block_key_stream(std::uint8_t* out, std::size_t block_num)
+    void generate_key_stream_blocks_(std::uint8_t* key_stream_blocks,
+                                     std::size_t   offset_block_num,
+                                     std::size_t   total_block_num) override
     {
-        if (block_num == 0)
-        {
-            return;
-        }
-        // generate counter
-        internal::gctr_generate_batched(out, counter_, block_num);
-        // generate key stream
+        std::uint8_t* out       = key_stream_blocks + offset_block_num * 16;
+        std::size_t   block_num = total_block_num - offset_block_num;
+        internal::gctr_generate_batched(out, iv_, block_num);
         cipher_.encrypt_blocks(out, out, block_num);
     }
 
-protected:
-    void update_blocks(std::uint8_t*       out,
-                       const std::uint8_t* in,
-                       std::size_t         block_num) override
-    {
-        if (block_num == 0)
-        {
-            return;
-        }
-        constexpr std::size_t block_size     = Cipher::BLOCK_SIZE;
-        constexpr std::size_t PARALLEL_NUM   = Cipher::PARALLEL_NUM;
-        constexpr std::size_t PARALLEL_BYTES = block_size * PARALLEL_NUM;
-
-        // gctr
-        alignas(std::uint32_t) std::uint8_t key_stream[PARALLEL_BYTES];
-        while (block_num >= PARALLEL_NUM)
-        {
-            this->gen_block_key_stream(key_stream, PARALLEL_NUM);
-            memory_utils::memxor_n(out, in, key_stream, PARALLEL_BYTES);
-            in += PARALLEL_BYTES, out += PARALLEL_BYTES;
-            block_num -= PARALLEL_NUM;
-        }
-        if (block_num)
-        {
-            std::size_t remain_bytes = block_num * block_size;
-            this->gen_block_key_stream(key_stream, block_num);
-            memory_utils::memxor_n(out, in, key_stream, remain_bytes);
-        }
-    }
-
-    void final_block(std::uint8_t*       out,
-                     const std::uint8_t* in,
-                     std::size_t         inl) override
-    {
-        if (inl != 0)
-        {
-            alignas(std::uint32_t) std::uint8_t key_stream[16];
-            this->gen_block_key_stream(key_stream, 1);
-            memory_utils::memxor_n(out, key_stream, in, inl);
-        }
-    }
-};
-
-template <class Cipher>
-class GcmEncryptorImpl : public GctrCryptorImpl<Cipher>
-{
-    static_assert(Cipher::BLOCK_SIZE == 16, "gcm need BLOCK_SIZE=16");
-
 public:
-    static constexpr std::size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
-
-    static constexpr std::size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
-
-public:
-    const char* fetch_name() const noexcept override
+    void update(std::uint8_t*       out,
+                std::size_t*        outl,
+                std::size_t         outl_max,
+                const std::uint8_t* in,
+                std::size_t         inl) override
     {
-        return "GCM-ENC";
-    }
-
-    std::size_t fetch_block_size() const noexcept override
-    {
-        return BLOCK_SIZE;
-    }
-
-    std::size_t fetch_user_key_len() const noexcept override
-    {
-        return USER_KEY_LEN;
-    }
-
-private:
-    ghash::GHash  hash_;
-    std::uint8_t  tag_[16];
-    std::uint64_t ct_len_, aad_len_;
-
-public:
-    GcmEncryptorImpl() = default;
-
-    GcmEncryptorImpl(const std::uint8_t* user_key,
-                     const std::uint8_t* iv,
-                     std::size_t         iv_len,
-                     const std::uint8_t* aad,
-                     std::size_t         aad_len)
-    {
-        this->init(user_key, iv, iv_len, aad, aad_len);
-    }
-
-    ~GcmEncryptorImpl()
-    {
-        std::memset(tag_, 0, sizeof(tag_));
-        aad_len_ = 0;
-        ct_len_  = 0;
-    }
-
-public:
-    const BlockCipher& fetch_cipher_ctx() const noexcept override
-    {
-        return this->cipher_;
-    }
-
-public:
-    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
-    {
-        if (std::strcmp(cmd, "init") == 0)
+        if (out == nullptr) // aad
         {
-            if (argc != 5)
-            {
-                throw std::invalid_argument(
-                    "invalid number of arguments in GcmEncryptorImpl");
-            }
-            this->init(
-                *(const std::uint8_t**)argv[0], *(const std::uint8_t**)argv[1],
-                *(const std::size_t*)argv[2], *(const std::uint8_t**)argv[3],
-                *(const std::size_t*)argv[4]);
-            return;
-        }
-        if (std::strcmp(cmd, "reset") == 0)
-        {
-            if (argc != 4)
-            {
-                throw std::invalid_argument(
-                    "invalid number of arguments in GcmEncryptorImpl");
-            }
-            this->reset(
-                *(const std::uint8_t**)argv[0], *(const std::size_t*)argv[1],
-                *(const std::uint8_t**)argv[2], *(const std::size_t*)argv[3]);
-            return;
-        }
-        if (std::strcmp(cmd, "get_tag") == 0)
-        {
-            if (argc != 1)
-            {
-                throw std::invalid_argument("invalid number of arguments");
-            }
-            std::memcpy(*(std::uint8_t**)argv[0], tag_, sizeof(tag_));
-            return;
-        }
-        throw std::runtime_error("GcmEncryptorImpl does not support ctrl");
-    }
-
-    std::unique_ptr<BlockCipherMode> clone() const override
-    {
-        return std::unique_ptr<BlockCipherMode>(new GcmEncryptorImpl(*this));
-    }
-
-public:
-    void init(const std::uint8_t* user_key,
-              const std::uint8_t* iv,
-              std::size_t         iv_len,
-              const std::uint8_t* aad,
-              std::size_t         aad_len)
-    {
-        if (aad_len > UINT64_MAX / 8)
-        {
-            throw std::runtime_error(
-                "additional authenticated data length too loog");
-        }
-        this->GctrCryptorImpl<Cipher>::init(user_key, iv, iv_len, hash_);
-        // gmac aad(additional authenticated data)
-        static std::uint8_t ZERO[16] = {0};
-        hash_.update(aad, aad_len);
-        hash_.update(ZERO, (16 - (aad_len % 16)) % 16);
-        aad_len_ = (std::uint64_t)aad_len;
-        ct_len_  = 0;
-        std::memset(tag_, 0, 16);
-    }
-
-    void reset(const std::uint8_t* iv,
-               std::size_t         iv_len,
-               const std::uint8_t* aad,
-               std::size_t         aad_len)
-    {
-        if (aad_len > UINT64_MAX / 8)
-        {
-            throw std::runtime_error(
-                "additional authenticated data length too loog");
-        }
-        this->GctrCryptorImpl<Cipher>::reset(iv, iv_len, hash_);
-        // gmac aad(additional authenticated data)
-        static std::uint8_t ZERO[16] = {0};
-        hash_.update(aad, aad_len);
-        hash_.update(ZERO, (16 - (aad_len % 16)) % 16);
-        aad_len_ = (std::uint64_t)aad_len;
-        ct_len_  = 0;
-        std::memset(tag_, 0, 16);
-    }
-
-    void get_tag(std::uint8_t tag[16]) const noexcept
-    {
-        std::memcpy(tag, tag_, 16);
-    }
-
-protected:
-    void update_blocks(std::uint8_t*       out,
-                       const std::uint8_t* in,
-                       std::size_t         block_num) override
-    {
-        this->GctrCryptorImpl<Cipher>::update_blocks(out, in, block_num);
-        // gmac
-        std::size_t outl       = block_num * Cipher::BLOCK_SIZE;
-        std::size_t nxt_ct_len = ct_len_ + outl;
-        if (nxt_ct_len < ct_len_ || (nxt_ct_len > UINT64_MAX / 8))
-        {
-            throw std::runtime_error("ciphertext too long");
-        }
-        ct_len_ = nxt_ct_len;
-        hash_.update(out, outl);
-    }
-
-    void final_block(std::uint8_t*       out,
-                     const std::uint8_t* in,
-                     std::size_t         inl) override
-    {
-        static const std::uint8_t ZERO[16] = {0};
-        if (inl)
-        {
-            this->GctrCryptorImpl<Cipher>::final_block(out, in, inl);
-            hash_.update(out, inl);
-            hash_.update(ZERO, (16 - inl % 16) % 16);
-
-            std::size_t nxt_ct_len = ct_len_ + inl;
-            if (nxt_ct_len < ct_len_ || (nxt_ct_len > UINT64_MAX / 8))
-            {
-                throw std::runtime_error("ciphertext too long");
-            }
-            ct_len_ = nxt_ct_len;
-        }
-        std::uint8_t t[16];
-        memory_utils::store64_be(t + 0, aad_len_ * 8);
-        memory_utils::store64_be(t + 8, ct_len_ * 8);
-        hash_.update(t, 16);
-        hash_.do_final(tag_);
-        this->GctrCryptorImpl<Cipher>::cipher_.encrypt_block(
-            t, this->GctrCryptorImpl<Cipher>::get_counter0());
-        memory_utils::memxor_n(tag_, tag_, t, 16);
-    }
-};
-
-template <class Cipher>
-class GcmDecryptorImpl : public GctrCryptorImpl<Cipher>
-{
-    static_assert(Cipher::BLOCK_SIZE == 16, "gcm need BLOCK_SIZE=16");
-
-public:
-    static constexpr std::size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
-
-    static constexpr std::size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
-
-public:
-    const char* fetch_name() const noexcept override
-    {
-        return "GCM-DEC";
-    }
-
-    std::size_t fetch_block_size() const noexcept override
-    {
-        return BLOCK_SIZE;
-    }
-
-    std::size_t fetch_user_key_len() const noexcept override
-    {
-        return USER_KEY_LEN;
-    }
-
-private:
-    ghash::GHash  hash_;
-    std::uint8_t  tag_[16];
-    std::uint64_t aad_len_, ct_len_;
-
-public:
-    GcmDecryptorImpl() = default;
-
-    GcmDecryptorImpl(const std::uint8_t* user_key,
-                     const std::uint8_t* iv,
-                     std::size_t         iv_len,
-                     const std::uint8_t* aad,
-                     std::size_t         aad_len)
-    {
-        this->init(user_key, iv, iv_len, aad, aad_len);
-    }
-
-    ~GcmDecryptorImpl()
-    {
-        std::memset(tag_, 0, sizeof(tag_));
-        aad_len_ = 0;
-        ct_len_  = 0;
-    }
-
-public:
-    const BlockCipher& fetch_cipher_ctx() const noexcept override
-    {
-        return this->cipher_;
-    }
-
-public:
-    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
-    {
-        if (std::strcmp(cmd, "init") == 0)
-        {
-            if (argc != 5)
-            {
-                throw std::invalid_argument(
-                    "invalid number of arguments in GcmDecryptorImpl");
-            }
-            this->init(
-                *(const std::uint8_t**)argv[0], *(const std::uint8_t**)argv[1],
-                *(const std::size_t*)argv[2], *(const std::uint8_t**)argv[3],
-                *(const std::size_t*)argv[4]);
-            return;
-        }
-        if (std::strcmp(cmd, "reset") == 0)
-        {
-            if (argc != 4)
-            {
-                throw std::invalid_argument(
-                    "invalid number of arguments in GcmDecryptorImpl");
-            }
-            this->reset(
-                *(const std::uint8_t**)argv[0], *(const std::size_t*)argv[1],
-                *(const std::uint8_t**)argv[2], *(const std::size_t*)argv[3]);
-            return;
-        }
-        if (std::strcmp(cmd, "set_tag") == 0)
-        {
-            if (argc != 1)
-            {
-                throw std::invalid_argument("invalid number of arguments");
-            }
-            this->set_tag(*(const std::uint8_t**)argv[0]);
-            return;
-        }
-        throw std::runtime_error("GcmDecryptorImpl does not support ctrl");
-    }
-
-    std::unique_ptr<BlockCipherMode> clone() const override
-    {
-        return std::unique_ptr<BlockCipherMode>(new GcmDecryptorImpl(*this));
-    }
-
-public:
-    void init(const std::uint8_t* user_key,
-              const std::uint8_t* iv,
-              std::size_t         iv_len,
-              const std::uint8_t* aad,
-              std::size_t         aad_len)
-    {
-        if (aad_len > UINT64_MAX / 8)
-        {
-            throw std::runtime_error(
-                "additional authenticated data length too loog");
-        }
-        this->GctrCryptorImpl<Cipher>::init(user_key, iv, iv_len, hash_);
-        static const std::uint8_t ZERO[16] = {0};
-        // gmac aad(additional authenticated data)
-        hash_.update(aad, aad_len);
-        hash_.update(ZERO, (16 - (aad_len % 16)) % 16);
-        aad_len_ = aad_len;
-        ct_len_  = 0;
-    }
-
-    void reset(const std::uint8_t* iv,
-               std::size_t         iv_len,
-               const std::uint8_t* aad,
-               std::size_t         aad_len)
-    {
-        if (aad_len > UINT64_MAX / 8)
-        {
-            throw std::runtime_error(
-                "additional authenticated data length too loog");
-        }
-        this->GctrCryptorImpl<Cipher>::reset(iv, iv_len, hash_);
-        // gmac aad(additional authenticated data)
-        static std::uint8_t ZERO[16] = {0};
-        hash_.update(aad, aad_len);
-        hash_.update(ZERO, (16 - (aad_len % 16)) % 16);
-        aad_len_ = (std::uint64_t)aad_len;
-        ct_len_  = 0;
-        std::memset(tag_, 0, 16);
-    }
-
-    void set_tag(const std::uint8_t tag[16]) noexcept
-    {
-        std::memcpy(tag_, tag, 16);
-    }
-
-private:
-    void update_blocks(std::uint8_t*       out,
-                       const std::uint8_t* in,
-                       std::size_t         block_num) override
-    {
-        if (block_num == 0)
-        {
-            return;
-        }
-        // gmac
-        std::size_t nxt_ct_len = ct_len_ + block_num * Cipher::BLOCK_SIZE;
-        if (nxt_ct_len < ct_len_)
-        {
-            throw std::runtime_error("input data too long");
-        }
-        ct_len_ = nxt_ct_len;
-        hash_.update(in, block_num * Cipher::BLOCK_SIZE);
-        // gctr
-        this->GctrCryptorImpl<Cipher>::update_blocks(out, in, block_num);
-    }
-
-    void final_block(std::uint8_t*       out,
-                     const std::uint8_t* in,
-                     std::size_t         inl) override
-    {
-        std::uint8_t t[16] = {0}, tag[16];
-        if (inl != 0)
-        {
-            std::size_t nxt_ct_len = ct_len_ + inl;
-            if (nxt_ct_len < ct_len_)
-            {
-                throw std::runtime_error("input data too long");
-            }
-            ct_len_ = nxt_ct_len;
-
+            hash_.reset();
             hash_.update(in, inl);
-            hash_.update(t, (16 - inl % 16) % 16);
-
-            this->GctrCryptorImpl<Cipher>::final_block(out, in, inl);
+            aad_len_ = inl;
+            hash_.update(ZEROS, (16 - inl % 16) % 16);
         }
-        memory_utils::store64_be(t + 0, aad_len_ * 8);
-        memory_utils::store64_be(t + 8, ct_len_ * 8);
-        hash_.update(t, 16);
-        hash_.do_final(tag);
-        this->GctrCryptorImpl<Cipher>::cipher_.encrypt_block(
-            t, this->GctrCryptorImpl<Cipher>::get_counter0());
-        memory_utils::memxor_n(tag, tag, t, 16);
-        if (std::memcmp(tag, tag_, 16) != 0)
+        else
         {
-            throw std::runtime_error("invalid gcm ciphertext");
+            if (!enc_)
+            {
+                hash_.update(in, inl);
+            }
+            this->Base::update(out, outl, outl_max, in, inl);
+            if (enc_)
+            {
+                hash_.update(out, *outl);
+            }
+            data_len_ += inl;
         }
+    }
+
+    void do_final(std::uint8_t*       out,
+                  std::size_t*        outl,
+                  std::size_t         outl_max,
+                  const std::uint8_t* in  = nullptr,
+                  std::size_t         inl = 0) override
+    {
+        if (!enc_)
+        {
+            hash_.update(in, inl);
+        }
+        this->Base::do_final(out, outl, outl_max, in, inl);
+        if (enc_)
+        {
+            hash_.update(out, *outl);
+        }
+        data_len_ += *outl;
+        // final tag
+        alignas(8) std::uint8_t tmp[16];
+        hash_.update(ZEROS, (16 - data_len_ % 16) % 16);
+        memory_utils::store64_be_aligned(tmp, aad_len_ * 8);
+        memory_utils::store64_be_aligned(tmp + 8, data_len_ * 8);
+        hash_.update(tmp, 16);
+        hash_.do_final(tmp);
+        memory_utils::memxor_n(tmp, tmp, encrypted_j0_, 16);
+        if (enc_)
+        {
+            std::memcpy(tag_, tmp, 16);
+        }
+        else
+        {
+            if (std::memcmp(tag_, tmp, tag_len_) != 0)
+            {
+                throw std::runtime_error(Error::BAD_DECRYPT);
+            }
+        }
+    }
+
+public:
+    std::size_t get_block_size() const noexcept override
+    {
+        return 1;
+    }
+
+    std::size_t get_iv_len() const noexcept override
+    {
+        return iv_len_;
+    }
+
+    void set_iv_len(std::size_t value) noexcept override
+    {
+        iv_len_ = value;
+    }
+
+    std::size_t get_key_len() const noexcept override
+    {
+        return USER_KEY_LEN;
+    }
+
+    void get_tag(std::uint8_t* out, std::size_t tag_len) const override
+    {
+        if (tag_len > tag_len_)
+        {
+            throw std::invalid_argument("Tag length is too large.");
+        }
+        std::memcpy(out, tag_, tag_len);
+    }
+
+    void set_tag(const std::uint8_t* in, std::size_t inl) override
+    {
+        if (inl > 16)
+        {
+            throw std::invalid_argument("Tag length is too large.");
+        }
+        std::memcpy(tag_, in, inl);
+        tag_len_ = inl;
+    }
+};
+
+template <class Cipher>
+class GcmEncryptorImpl : public GcmCryptorImpl<Cipher>
+{
+public:
+    GcmEncryptorImpl() : GcmCryptorImpl<Cipher>(true)
+    {
+    }
+};
+
+template <class Cipher>
+class GcmDecryptorImpl : public GcmCryptorImpl<Cipher>
+{
+public:
+    GcmDecryptorImpl() : GcmCryptorImpl<Cipher>(false)
+    {
     }
 };
 
 } // namespace block_cipher_mode::impl
-
 #endif

@@ -2,7 +2,6 @@
 #define UBLOCK_UBLOCK_H
 
 #include <gmlib/block_cipher_mode/block_cipher.h>
-#include <gmlib/block_cipher_mode/block_cipher_mode.h>
 #include <gmlib/ublock/provider.h>
 
 #include <memory>
@@ -13,139 +12,7 @@ namespace ublock {
 class uBlock128128 : public block_cipher_mode::BlockCipher
 {
 public:
-    using Cipher     = std::unique_ptr<block_cipher_mode::BlockCipher>;
-    using CipherMode = std::unique_ptr<block_cipher_mode::BlockCipherMode>;
-
-public:
-    static Cipher create_cipher(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128128_provider(provider);
-        if (p == nullptr || p->create_cipher == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cipher();
-    }
-
-    static CipherMode create_ecb_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128128_provider(provider);
-        if (p == nullptr || p->create_ecb_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ecb_encryptor();
-    }
-
-    static CipherMode create_ecb_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128128_provider(provider);
-        if (p == nullptr || p->create_ecb_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ecb_decryptor();
-    }
-
-    static CipherMode create_cbc_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128128_provider(provider);
-        if (p == nullptr || p->create_cbc_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cbc_encryptor();
-    }
-
-    static CipherMode create_cbc_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128128_provider(provider);
-        if (p == nullptr || p->create_cbc_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cbc_decryptor();
-    }
-
-    static CipherMode create_ofb_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128128_provider(provider);
-        if (p == nullptr || p->create_ofb_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ofb_encryptor();
-    }
-
-    static CipherMode create_ofb_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128128_provider(provider);
-        if (p == nullptr || p->create_ofb_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ofb_decryptor();
-    }
-
-    static CipherMode create_cfb_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128128_provider(provider);
-        if (p == nullptr || p->create_cfb_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cfb_encryptor();
-    }
-
-    static CipherMode create_cfb_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128128_provider(provider);
-        if (p == nullptr || p->create_cfb_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cfb_decryptor();
-    }
-
-    static CipherMode create_ctr_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128128_provider(provider);
-        if (p == nullptr || p->create_ctr_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ctr_encryptor();
-    }
-
-    static CipherMode create_ctr_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128128_provider(provider);
-        if (p == nullptr || p->create_ctr_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ctr_decryptor();
-    }
-
-    static CipherMode create_gcm_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128128_provider(provider);
-        if (p == nullptr || p->create_gcm_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_gcm_encryptor();
-    }
-
-    static CipherMode create_gcm_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128128_provider(provider);
-        if (p == nullptr || p->create_gcm_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_gcm_decryptor();
-    }
+    using Cipher = std::unique_ptr<block_cipher_mode::BlockCipher>;
 
 public:
     static constexpr const char* NAME              = "uBlock-128-128";
@@ -155,19 +22,21 @@ public:
     static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
-    Cipher impl_ = uBlock128128::create_cipher();
+    Cipher impl_;
 
 public:
-    uBlock128128() noexcept = default;
-
-    uBlock128128(const std::uint8_t* user_key, int enc)
+    explicit uBlock128128(const char* provider = nullptr)
     {
-        this->set_key(user_key, enc);
+        const auto* p = get_ublock128128_provider(provider);
+        if (p == nullptr || p->create_cipher == nullptr)
+        {
+            throw std::runtime_error("uBlock128128: cipher not available");
+        }
+        impl_ = p->create_cipher();
     }
 
-    uBlock128128(const uBlock128128& other)
+    uBlock128128(const uBlock128128& other) : impl_(other.impl_->clone())
     {
-        impl_ = other.impl_->clone();
     }
 
     uBlock128128& operator=(const uBlock128128& other)
@@ -183,34 +52,34 @@ public:
     uBlock128128& operator=(uBlock128128&& other) noexcept = default;
 
 public:
-    const char* fetch_name() const noexcept override
+    const char* get_name() const override
     {
-        return impl_->fetch_name();
+        return impl_->get_name();
     }
 
-    const char* fetch_impl_algo() const noexcept override
+    const char* get_impl_algo() const override
     {
-        return impl_->fetch_impl_algo();
+        return impl_->get_impl_algo();
     }
 
-    std::size_t fetch_block_size() const noexcept override
+    std::size_t get_block_size() const override
     {
-        return impl_->fetch_block_size();
+        return impl_->get_block_size();
     }
 
-    std::size_t fetch_user_key_len() const noexcept override
+    std::size_t get_key_len() const override
     {
-        return impl_->fetch_user_key_len();
+        return impl_->get_key_len();
     }
 
-    std::size_t fetch_parallel_num() const noexcept override
+    std::size_t get_parallel_num() const override
     {
-        return impl_->fetch_parallel_num();
+        return impl_->get_parallel_num();
     }
 
-    std::size_t fetch_security_strength() const noexcept override
+    std::size_t get_security_strength() const override
     {
-        return impl_->fetch_security_strength();
+        return impl_->get_security_strength();
     }
 
     Cipher clone() const override
@@ -219,33 +88,33 @@ public:
     }
 
 public:
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override
+    void set_key(const std::uint8_t* user_key, int enc) override
     {
         impl_->set_key(user_key, enc);
     }
 
     void encrypt_block(std::uint8_t*       ciphertext,
-                       const std::uint8_t* plaintext) const noexcept override
+                       const std::uint8_t* plaintext) const override
     {
         impl_->encrypt_block(ciphertext, plaintext);
     }
 
     void decrypt_block(std::uint8_t*       plaintext,
-                       const std::uint8_t* ciphertext) const noexcept override
+                       const std::uint8_t* ciphertext) const override
     {
         impl_->decrypt_block(plaintext, ciphertext);
     }
 
     void encrypt_blocks(std::uint8_t*       ciphertext,
                         const std::uint8_t* plaintext,
-                        std::size_t         block_num) const noexcept override
+                        std::size_t         block_num) const override
     {
         impl_->encrypt_blocks(ciphertext, plaintext, block_num);
     }
 
     void decrypt_blocks(std::uint8_t*       plaintext,
                         const std::uint8_t* ciphertext,
-                        std::size_t         block_num) const noexcept override
+                        std::size_t         block_num) const override
     {
         impl_->decrypt_blocks(plaintext, ciphertext, block_num);
     }
@@ -254,139 +123,7 @@ public:
 class uBlock128256 : public block_cipher_mode::BlockCipher
 {
 public:
-    using Cipher     = std::unique_ptr<block_cipher_mode::BlockCipher>;
-    using CipherMode = std::unique_ptr<block_cipher_mode::BlockCipherMode>;
-
-public:
-    static Cipher create_cipher(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128256_provider(provider);
-        if (p == nullptr || p->create_cipher == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cipher();
-    }
-
-    static CipherMode create_ecb_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128256_provider(provider);
-        if (p == nullptr || p->create_ecb_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ecb_encryptor();
-    }
-
-    static CipherMode create_ecb_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128256_provider(provider);
-        if (p == nullptr || p->create_ecb_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ecb_decryptor();
-    }
-
-    static CipherMode create_cbc_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128256_provider(provider);
-        if (p == nullptr || p->create_cbc_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cbc_encryptor();
-    }
-
-    static CipherMode create_cbc_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128256_provider(provider);
-        if (p == nullptr || p->create_cbc_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cbc_decryptor();
-    }
-
-    static CipherMode create_ofb_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128256_provider(provider);
-        if (p == nullptr || p->create_ofb_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ofb_encryptor();
-    }
-
-    static CipherMode create_ofb_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128256_provider(provider);
-        if (p == nullptr || p->create_ofb_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ofb_decryptor();
-    }
-
-    static CipherMode create_cfb_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128256_provider(provider);
-        if (p == nullptr || p->create_cfb_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cfb_encryptor();
-    }
-
-    static CipherMode create_cfb_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128256_provider(provider);
-        if (p == nullptr || p->create_cfb_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cfb_decryptor();
-    }
-
-    static CipherMode create_ctr_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128256_provider(provider);
-        if (p == nullptr || p->create_ctr_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ctr_encryptor();
-    }
-
-    static CipherMode create_ctr_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128256_provider(provider);
-        if (p == nullptr || p->create_ctr_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ctr_decryptor();
-    }
-
-    static CipherMode create_gcm_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128256_provider(provider);
-        if (p == nullptr || p->create_gcm_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_gcm_encryptor();
-    }
-
-    static CipherMode create_gcm_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock128256_provider(provider);
-        if (p == nullptr || p->create_gcm_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_gcm_decryptor();
-    }
+    using Cipher = std::unique_ptr<block_cipher_mode::BlockCipher>;
 
 public:
     static constexpr const char* NAME              = "uBlock-128-256";
@@ -396,19 +133,21 @@ public:
     static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
-    Cipher impl_ = uBlock128256::create_cipher();
+    Cipher impl_;
 
 public:
-    uBlock128256() noexcept = default;
-
-    uBlock128256(const std::uint8_t* user_key, int enc)
+    explicit uBlock128256(const char* provider = nullptr)
     {
-        this->set_key(user_key, enc);
+        const auto* p = get_ublock128256_provider(provider);
+        if (p == nullptr || p->create_cipher == nullptr)
+        {
+            throw std::runtime_error("uBlock128256: cipher not available");
+        }
+        impl_ = p->create_cipher();
     }
 
-    uBlock128256(const uBlock128256& other)
+    uBlock128256(const uBlock128256& other) : impl_(other.impl_->clone())
     {
-        impl_ = other.impl_->clone();
     }
 
     uBlock128256& operator=(const uBlock128256& other)
@@ -424,34 +163,34 @@ public:
     uBlock128256& operator=(uBlock128256&& other) noexcept = default;
 
 public:
-    const char* fetch_name() const noexcept override
+    const char* get_name() const override
     {
-        return impl_->fetch_name();
+        return impl_->get_name();
     }
 
-    const char* fetch_impl_algo() const noexcept override
+    const char* get_impl_algo() const override
     {
-        return impl_->fetch_impl_algo();
+        return impl_->get_impl_algo();
     }
 
-    std::size_t fetch_block_size() const noexcept override
+    std::size_t get_block_size() const override
     {
-        return impl_->fetch_block_size();
+        return impl_->get_block_size();
     }
 
-    std::size_t fetch_user_key_len() const noexcept override
+    std::size_t get_key_len() const override
     {
-        return impl_->fetch_user_key_len();
+        return impl_->get_key_len();
     }
 
-    std::size_t fetch_parallel_num() const noexcept override
+    std::size_t get_parallel_num() const override
     {
-        return impl_->fetch_parallel_num();
+        return impl_->get_parallel_num();
     }
 
-    std::size_t fetch_security_strength() const noexcept override
+    std::size_t get_security_strength() const override
     {
-        return impl_->fetch_security_strength();
+        return impl_->get_security_strength();
     }
 
     Cipher clone() const override
@@ -460,33 +199,33 @@ public:
     }
 
 public:
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override
+    void set_key(const std::uint8_t* user_key, int enc) override
     {
         impl_->set_key(user_key, enc);
     }
 
     void encrypt_block(std::uint8_t*       ciphertext,
-                       const std::uint8_t* plaintext) const noexcept override
+                       const std::uint8_t* plaintext) const override
     {
         impl_->encrypt_block(ciphertext, plaintext);
     }
 
     void decrypt_block(std::uint8_t*       plaintext,
-                       const std::uint8_t* ciphertext) const noexcept override
+                       const std::uint8_t* ciphertext) const override
     {
         impl_->decrypt_block(plaintext, ciphertext);
     }
 
     void encrypt_blocks(std::uint8_t*       ciphertext,
                         const std::uint8_t* plaintext,
-                        std::size_t         block_num) const noexcept override
+                        std::size_t         block_num) const override
     {
         impl_->encrypt_blocks(ciphertext, plaintext, block_num);
     }
 
     void decrypt_blocks(std::uint8_t*       plaintext,
                         const std::uint8_t* ciphertext,
-                        std::size_t         block_num) const noexcept override
+                        std::size_t         block_num) const override
     {
         impl_->decrypt_blocks(plaintext, ciphertext, block_num);
     }
@@ -495,119 +234,7 @@ public:
 class uBlock256256 : public block_cipher_mode::BlockCipher
 {
 public:
-    using Cipher     = std::unique_ptr<block_cipher_mode::BlockCipher>;
-    using CipherMode = std::unique_ptr<block_cipher_mode::BlockCipherMode>;
-
-public:
-    static Cipher create_cipher(const char* provider = nullptr)
-    {
-        auto* p = get_ublock256256_provider(provider);
-        if (p == nullptr || p->create_cipher == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cipher();
-    }
-
-    static CipherMode create_ecb_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock256256_provider(provider);
-        if (p == nullptr || p->create_ecb_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ecb_encryptor();
-    }
-
-    static CipherMode create_ecb_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock256256_provider(provider);
-        if (p == nullptr || p->create_ecb_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ecb_decryptor();
-    }
-
-    static CipherMode create_cbc_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock256256_provider(provider);
-        if (p == nullptr || p->create_cbc_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cbc_encryptor();
-    }
-
-    static CipherMode create_cbc_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock256256_provider(provider);
-        if (p == nullptr || p->create_cbc_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cbc_decryptor();
-    }
-
-    static CipherMode create_ofb_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock256256_provider(provider);
-        if (p == nullptr || p->create_ofb_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ofb_encryptor();
-    }
-
-    static CipherMode create_ofb_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock256256_provider(provider);
-        if (p == nullptr || p->create_ofb_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ofb_decryptor();
-    }
-
-    static CipherMode create_cfb_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock256256_provider(provider);
-        if (p == nullptr || p->create_cfb_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cfb_encryptor();
-    }
-
-    static CipherMode create_cfb_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock256256_provider(provider);
-        if (p == nullptr || p->create_cfb_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_cfb_decryptor();
-    }
-
-    static CipherMode create_ctr_encryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock256256_provider(provider);
-        if (p == nullptr || p->create_ctr_encryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ctr_encryptor();
-    }
-
-    static CipherMode create_ctr_decryptor(const char* provider = nullptr)
-    {
-        auto* p = get_ublock256256_provider(provider);
-        if (p == nullptr || p->create_ctr_decryptor == nullptr)
-        {
-            throw std::runtime_error("No provider available");
-        }
-        return p->create_ctr_decryptor();
-    }
+    using Cipher = std::unique_ptr<block_cipher_mode::BlockCipher>;
 
 public:
     static constexpr const char* NAME              = "uBlock-256-256";
@@ -617,19 +244,21 @@ public:
     static constexpr std::size_t SECURITY_STRENGTH = USER_KEY_LEN;
 
 private:
-    Cipher impl_ = uBlock256256::create_cipher();
+    Cipher impl_;
 
 public:
-    uBlock256256() noexcept = default;
-
-    uBlock256256(const std::uint8_t* user_key, int enc)
+    explicit uBlock256256(const char* provider = nullptr)
     {
-        this->set_key(user_key, enc);
+        const auto* p = get_ublock256256_provider(provider);
+        if (p == nullptr || p->create_cipher == nullptr)
+        {
+            throw std::runtime_error("uBlock256256: cipher not available");
+        }
+        impl_ = p->create_cipher();
     }
 
-    uBlock256256(const uBlock256256& other)
+    uBlock256256(const uBlock256256& other) : impl_(other.impl_->clone())
     {
-        impl_ = other.impl_->clone();
     }
 
     uBlock256256& operator=(const uBlock256256& other)
@@ -645,34 +274,34 @@ public:
     uBlock256256& operator=(uBlock256256&& other) noexcept = default;
 
 public:
-    const char* fetch_name() const noexcept override
+    const char* get_name() const override
     {
-        return impl_->fetch_name();
+        return impl_->get_name();
     }
 
-    const char* fetch_impl_algo() const noexcept override
+    const char* get_impl_algo() const override
     {
-        return impl_->fetch_impl_algo();
+        return impl_->get_impl_algo();
     }
 
-    std::size_t fetch_block_size() const noexcept override
+    std::size_t get_block_size() const override
     {
-        return impl_->fetch_block_size();
+        return impl_->get_block_size();
     }
 
-    std::size_t fetch_user_key_len() const noexcept override
+    std::size_t get_key_len() const override
     {
-        return impl_->fetch_user_key_len();
+        return impl_->get_key_len();
     }
 
-    std::size_t fetch_parallel_num() const noexcept override
+    std::size_t get_parallel_num() const override
     {
-        return impl_->fetch_parallel_num();
+        return impl_->get_parallel_num();
     }
 
-    std::size_t fetch_security_strength() const noexcept override
+    std::size_t get_security_strength() const override
     {
-        return impl_->fetch_security_strength();
+        return impl_->get_security_strength();
     }
 
     Cipher clone() const override
@@ -681,33 +310,33 @@ public:
     }
 
 public:
-    void set_key(const std::uint8_t* user_key, int enc) noexcept override
+    void set_key(const std::uint8_t* user_key, int enc) override
     {
         impl_->set_key(user_key, enc);
     }
 
     void encrypt_block(std::uint8_t*       ciphertext,
-                       const std::uint8_t* plaintext) const noexcept override
+                       const std::uint8_t* plaintext) const override
     {
         impl_->encrypt_block(ciphertext, plaintext);
     }
 
     void decrypt_block(std::uint8_t*       plaintext,
-                       const std::uint8_t* ciphertext) const noexcept override
+                       const std::uint8_t* ciphertext) const override
     {
         impl_->decrypt_block(plaintext, ciphertext);
     }
 
     void encrypt_blocks(std::uint8_t*       ciphertext,
                         const std::uint8_t* plaintext,
-                        std::size_t         block_num) const noexcept override
+                        std::size_t         block_num) const override
     {
         impl_->encrypt_blocks(ciphertext, plaintext, block_num);
     }
 
     void decrypt_blocks(std::uint8_t*       plaintext,
                         const std::uint8_t* ciphertext,
-                        std::size_t         block_num) const noexcept override
+                        std::size_t         block_num) const override
     {
         impl_->decrypt_blocks(plaintext, ciphertext, block_num);
     }

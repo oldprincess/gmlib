@@ -5,10 +5,7 @@
 #include <gmlib/memory_utils/endian.h>
 #include <gmlib/memory_utils/memxor.h>
 
-#include <cstddef>
-#include <cstdint>
 #include <cstring>
-#include <stdexcept>
 
 namespace block_cipher_mode::impl::internal {
 
@@ -16,7 +13,7 @@ struct CtrU64TypeTraits
 {
     using T = std::uint64_t;
 
-    static constexpr std::size_t MAX = UINT64_MAX;
+    static constexpr T MAX = UINT64_MAX;
 
     static constexpr auto load_be_aligned = memory_utils::load64_be_aligned;
 
@@ -27,7 +24,7 @@ struct CtrU32TypeTraits
 {
     using T = std::uint32_t;
 
-    static constexpr std::size_t MAX = UINT32_MAX;
+    static constexpr T MAX = UINT32_MAX;
 
     static constexpr auto load_be_aligned = memory_utils::load32_be_aligned;
 
@@ -131,6 +128,8 @@ static inline void ctr_generate_batched(std::uint8_t* out,
 }
 
 /**
+ * @pre out (block_num * BLOCK_SIZE bytes) and counter (BLOCK_SIZE bytes)
+ *      do not overlap.
  * @pre When a limb implementation is selected, `out` and `counter` satisfy
  *      the natural alignment requirement of that limb type.
  */
@@ -159,8 +158,8 @@ static inline void ctr_generate(std::uint8_t* out,
     }
     else
     {
-        const auto increment_counter = [](std::uint8_t*       dst,
-                                          const std::uint8_t* src) noexcept {
+        auto increment_counter = [](std::uint8_t*       dst,
+                                    const std::uint8_t* src) noexcept {
             std::uint16_t carry = 1;
             for (std::size_t i = BLOCK_SIZE; i != 0; --i)
             {
@@ -187,155 +186,108 @@ static inline void ctr_generate(std::uint8_t* out,
 namespace block_cipher_mode::impl {
 
 template <class Cipher>
-class CtrCryptorImpl : public BlockCipherModeImpl<Cipher::BLOCK_SIZE>
+class CtrCryptorImpl
+    : public BlockCipherModeStreamCryptor<Cipher::BLOCK_SIZE,
+                                          Cipher::PARALLEL_NUM,
+                                          alignof(std::uint64_t)>
 {
-public:
-    static constexpr std::size_t BLOCK_SIZE = Cipher::BLOCK_SIZE;
+private:
+    using Base = BlockCipherModeStreamCryptor< //
+        Cipher::BLOCK_SIZE,                    //
+        Cipher::PARALLEL_NUM,                  //
+        alignof(std::uint64_t)                 //
+        >;                                     //
 
+private:
+    static constexpr std::size_t BLOCK_SIZE   = Cipher::BLOCK_SIZE;
     static constexpr std::size_t USER_KEY_LEN = Cipher::USER_KEY_LEN;
-
-public:
-    const char* fetch_name() const noexcept override
-    {
-        return "CTR";
-    }
-
-    std::size_t fetch_block_size() const noexcept override
-    {
-        return BLOCK_SIZE;
-    }
-
-    std::size_t fetch_user_key_len() const noexcept override
-    {
-        return USER_KEY_LEN;
-    }
+    static constexpr std::size_t PARALLEL_NUM = Cipher::PARALLEL_NUM;
 
 private:
     Cipher cipher_;
-    alignas(std::uint64_t) std::uint8_t counter_[Cipher::BLOCK_SIZE];
+    alignas(std::uint64_t) std::uint8_t iv_[BLOCK_SIZE];
 
 public:
     CtrCryptorImpl() = default;
 
-    CtrCryptorImpl(const std::uint8_t* user_key, const std::uint8_t* iv)
+    ~CtrCryptorImpl() override
     {
-        this->init(user_key, iv);
-    }
-
-    ~CtrCryptorImpl()
-    {
-        std::memset(counter_, 0, sizeof(counter_));
+        std::memset(iv_, 0, sizeof(iv_));
     }
 
 public:
-    const BlockCipher& fetch_cipher_ctx() const noexcept override
+    const BlockCipher& get_cipher_ctx() const noexcept override
     {
         return cipher_;
     }
 
-public:
-    void ctrl(const char* cmd, std::size_t argc, void* argv[]) override
+    const char* get_name() const noexcept override
     {
-        if (std::strcmp(cmd, "init") == 0)
-        {
-            if (argc != 2)
-            {
-                throw std::invalid_argument(
-                    "invalid number of arguments in CtrCryptorImpl");
-            }
-            this->init(*(const std::uint8_t**)argv[0],
-                       *(const std::uint8_t**)argv[1]);
-            return;
-        }
-        if (std::strcmp(cmd, "reset") == 0)
-        {
-            if (argc != 1)
-            {
-                throw std::invalid_argument(
-                    "invalid number of arguments in CtrCryptorImpl");
-            }
-            this->reset(*(const std::uint8_t**)argv[0]);
-            return;
-        }
-        throw std::runtime_error("CtrCryptorImpl does not support ctrl");
+        return "CTR";
     }
 
+public:
     std::unique_ptr<BlockCipherMode> clone() const override
     {
-        return std::unique_ptr<BlockCipherMode>(new CtrCryptorImpl(*this));
+        return std::make_unique<CtrCryptorImpl>(*this);
     }
 
 public:
-    void init(const std::uint8_t* user_key, const std::uint8_t* iv)
+    void init(const std::uint8_t* user_key,
+              std::size_t         user_key_len,
+              const std::uint8_t* iv,
+              std::size_t         iv_len,
+              const std::uint8_t* aad,
+              std::size_t         aad_len) override
     {
-        cipher_.set_key(user_key, Cipher::ENCRYPTION);
-        std::memcpy(counter_, iv, Cipher::BLOCK_SIZE);
-    }
-
-    void reset(const std::uint8_t* iv) noexcept
-    {
-        this->BlockCipherModeImpl<Cipher::BLOCK_SIZE>::reset();
-        std::memcpy(counter_, iv, Cipher::BLOCK_SIZE);
+        if (user_key != nullptr)
+        {
+            if (user_key_len != USER_KEY_LEN)
+            {
+                throw std::invalid_argument(Error::INVALID_KEY_LENGTH);
+            }
+            cipher_.set_key(user_key, Cipher::ENCRYPTION);
+        }
+        if (iv != nullptr)
+        {
+            if (iv_len != BLOCK_SIZE)
+            {
+                throw std::invalid_argument(Error::INVALID_IV_LENGTH);
+            }
+            std::memcpy(iv_, iv, BLOCK_SIZE);
+        }
+        (void)aad;
+        (void)aad_len;
+        this->Base::init_();
     }
 
 private:
-    void gen_block_key_stream(std::uint8_t* out, std::size_t block_num)
+    void generate_key_stream_blocks_(std::uint8_t* key_stream_blocks,
+                                     std::size_t   offset_block_num,
+                                     std::size_t   total_block_num) override
     {
-        if (block_num == 0)
-        {
-            return;
-        }
-        constexpr std::size_t block_size = Cipher::BLOCK_SIZE;
-        // generate counter
-        internal::ctr_generate<block_size>(out, counter_, block_num);
-        // generate key stream
+        // offsets preserve the alignment used by the generation helpers.
+        std::uint8_t* out = key_stream_blocks + offset_block_num * BLOCK_SIZE;
+        std::size_t   block_num = total_block_num - offset_block_num;
+        // Generate counter blocks in fixed batches, then encrypt in parallel.
+        internal::ctr_generate<BLOCK_SIZE>(out, iv_, block_num);
         cipher_.encrypt_blocks(out, out, block_num);
     }
 
-protected:
-    void update_blocks(std::uint8_t*       out,
-                       const std::uint8_t* in,
-                       std::size_t         block_num) override
+public:
+    std::size_t get_block_size() const noexcept override
     {
-        constexpr std::size_t block_size     = Cipher::BLOCK_SIZE;
-        constexpr std::size_t PARALLEL_NUM   = Cipher::PARALLEL_NUM;
-        constexpr std::size_t PARALLEL_BYTES = block_size * PARALLEL_NUM;
-
-        alignas(std::uint64_t) std::uint8_t key_stream[PARALLEL_BYTES];
-        while (block_num >= PARALLEL_NUM)
-        {
-            this->gen_block_key_stream(key_stream, PARALLEL_NUM);
-            memory_utils::memxor_n(out, in, key_stream, PARALLEL_BYTES);
-            in += PARALLEL_BYTES, out += PARALLEL_BYTES;
-            block_num -= PARALLEL_NUM;
-        }
-        if (block_num)
-        {
-            std::size_t remain_bytes = block_num * block_size;
-            this->gen_block_key_stream(key_stream, block_num);
-            memory_utils::memxor_n(out, in, key_stream, remain_bytes);
-        }
+        return 1;
     }
 
-    void final_block(std::uint8_t*       out,
-                     const std::uint8_t* in,
-                     std::size_t         inl) override
+    std::size_t get_key_len() const noexcept override
     {
-        constexpr std::size_t block_size = Cipher::BLOCK_SIZE;
-
-        if (inl == 0)
-        {
-            return;
-        }
-        alignas(std::uint64_t) std::uint8_t key_stream[block_size];
-        this->gen_block_key_stream(key_stream, 1);
-        memory_utils::memxor_n(out, key_stream, in, inl);
+        return USER_KEY_LEN;
     }
 };
 
 template <class Cipher>
 using CtrEncryptorImpl = CtrCryptorImpl<Cipher>;
-
 template <class Cipher>
 using CtrDecryptorImpl = CtrCryptorImpl<Cipher>;
 

@@ -180,68 +180,34 @@ inline void init_mode(BlockCipherMode&                 context,
                       const std::vector<std::uint8_t>& iv,
                       const std::vector<std::uint8_t>& aad)
 {
-    const std::uint8_t* key_ptr = key.data();
-    if (mode == "ECB")
-    {
-        void* args[] = {&key_ptr};
-        context.ctrl("init", 1, args);
-        return;
-    }
-
-    const std::uint8_t* iv_ptr = iv.data();
     if (mode == "GCM")
     {
-        const std::uint8_t* aad_ptr = aad.data();
-        std::size_t         iv_len  = iv.size();
-        std::size_t         aad_len = aad.size();
-        void* args[] = {&key_ptr, &iv_ptr, &iv_len, &aad_ptr, &aad_len};
-        context.ctrl("init", 5, args);
-        return;
+        context.set_iv_len(iv.size());
     }
-
-    void* args[] = {&key_ptr, &iv_ptr};
-    context.ctrl("init", 2, args);
+    context.init(key.data(), key.size(), iv.data(), iv.size(), aad.data(), aad.size());
 }
 
-inline void reset_mode(BlockCipherMode&                 context,
-                       const std::string&               mode,
+inline void reset_mode(BlockCipherMode& context,
+                       const std::string& mode,
                        const std::vector<std::uint8_t>& iv,
                        const std::vector<std::uint8_t>& aad)
 {
-    if (mode == "ECB")
-    {
-        context.ctrl("reset", 0, nullptr);
-        return;
-    }
-
-    const std::uint8_t* iv_ptr = iv.data();
     if (mode == "GCM")
     {
-        const std::uint8_t* aad_ptr = aad.data();
-        std::size_t         iv_len  = iv.size();
-        std::size_t         aad_len = aad.size();
-        void*               args[]  = {&iv_ptr, &iv_len, &aad_ptr, &aad_len};
-        context.ctrl("reset", 4, args);
-        return;
+        context.set_iv_len(iv.size());
     }
-
-    void* args[] = {&iv_ptr};
-    context.ctrl("reset", 1, args);
+    context.init(nullptr, 0, iv.data(), iv.size(), aad.data(), aad.size());
 }
 
 inline void get_tag(BlockCipherMode& context, std::uint8_t* tag)
 {
-    std::uint8_t* tag_ptr = tag;
-    void*         args[]  = {&tag_ptr};
-    context.ctrl("get_tag", 1, args);
+    context.get_tag(tag, 16);
 }
 
-inline void set_tag(BlockCipherMode&                 context,
+inline void set_tag(BlockCipherMode& context,
                     const std::vector<std::uint8_t>& tag)
 {
-    const std::uint8_t* tag_ptr = tag.data();
-    void*               args[]  = {&tag_ptr};
-    context.ctrl("set_tag", 1, args);
+    context.set_tag(tag.data(), tag.size());
 }
 
 inline std::size_t process(BlockCipherMode&                 context,
@@ -312,13 +278,19 @@ inline std::size_t process(BlockCipherMode&                 context,
     return written + n;
 }
 
+inline std::size_t mode_processing_block_size(const std::string& mode,
+                                               std::size_t cipher_block_size)
+{
+    return mode == "ECB" || mode == "CBC" ? cipher_block_size : 1;
+}
+
 inline void validate_mode_metadata(const BlockCipherMode& context,
                                    const CipherSpec&      spec,
                                    const std::string&     test_context,
                                    const std::string&     mode,
                                    bool                   encrypt)
 {
-    if (context.fetch_name() == nullptr || context.fetch_name()[0] == '\0')
+    if (context.get_name() == nullptr || context.get_name()[0] == '\0')
     {
         fail(test_context, "mode name is empty");
     }
@@ -327,21 +299,21 @@ inline void validate_mode_metadata(const BlockCipherMode& context,
     {
         expected_name += encrypt ? "-ENC" : "-DEC";
     }
-    if (expected_name != context.fetch_name())
+    if (expected_name != context.get_name())
     {
         fail(test_context, "mode name or direction mismatch");
     }
-    if (context.fetch_block_size() != spec.block_size)
+    if (context.get_block_size() != mode_processing_block_size(mode, spec.block_size))
     {
-        fail(test_context, "mode block size mismatch");
+        fail(test_context, "mode processing block size mismatch");
     }
-    if (context.fetch_user_key_len() != spec.user_key_len)
+    if (context.get_key_len() != spec.user_key_len)
     {
         fail(test_context, "mode user key length mismatch");
     }
-    const BlockCipher& cipher = context.fetch_cipher_ctx();
-    if (cipher.fetch_block_size() != spec.block_size ||
-        cipher.fetch_user_key_len() != spec.user_key_len)
+    const BlockCipher& cipher = context.get_cipher_ctx();
+    if (cipher.get_block_size() != spec.block_size ||
+        cipher.get_key_len() != spec.user_key_len)
     {
         fail(test_context, "underlying cipher metadata mismatch");
     }
@@ -496,6 +468,10 @@ inline void test_mode_lifecycle(
         require_equal(tag, expected_tag, context, "reset tag");
     }
 
+    // Stream modes preflight the entire output. Buffered modes may emit
+    // complete blocks before finalization rejects an undersized tail buffer.
+    const bool stream_mode =
+        mode == "CFB" || mode == "OFB" || mode == "CTR" || mode == "GCM";
     if (!input.empty())
     {
         mode_context = create_initialized_mode(suite, provider, mode, encrypt,
@@ -521,13 +497,21 @@ inline void test_mode_lifecycle(
         {
             fail(context, "undersized output buffer was accepted");
         }
-        if (!std::all_of(too_small.begin(), too_small.end(),
+        const std::size_t untouched_offset = stream_mode ? 0 : input.size() - 1;
+        if (!std::all_of(too_small.begin() + untouched_offset, too_small.end(),
                          [](std::uint8_t value) { return value == SENTINEL; }))
         {
-            fail(context, "output changed after capacity failure");
+            fail(context, stream_mode ? "output changed after capacity failure"
+                                      : "final wrote beyond output capacity");
         }
 
-        if (input.size() >= suite.cipher.block_size)
+        // A fresh ordinary decryptor retains the final block even without
+        // padding. Stream modes produce one output byte per input byte.
+        const std::size_t block_size = suite.cipher.block_size;
+        const std::size_t update_output = stream_mode
+            ? input.size()
+            : (encrypt ? input.size() : input.size() - 1) / block_size * block_size;
+        if (update_output > 0)
         {
             mode_context = create_initialized_mode(
                 suite, provider, mode, encrypt, key, iv, aad, context);
@@ -535,8 +519,6 @@ inline void test_mode_lifecycle(
             {
                 set_tag(*mode_context, expected_tag);
             }
-            const std::size_t update_output =
-                input.size() - input.size() % suite.cipher.block_size;
             too_small.assign(input.size(), SENTINEL);
             rejected = false;
             try
@@ -634,31 +616,31 @@ inline void test_mode_lifecycle(
         set_tag(*mode_context, expected_tag);
     }
     output.assign(input.size(), 0);
-    const std::size_t legacy_prefix  = input.size() / 2;
-    std::size_t       legacy_written = 0;
-    mode_context->update(output.data(), &legacy_written, input.data(),
-                         legacy_prefix);
-    if (legacy_written > output.size())
+    const std::size_t split_prefix  = input.size() / 2;
+    std::size_t       split_written = 0;
+    mode_context->update(output.data(), &split_written, output.size(), input.data(),
+                         split_prefix);
+    if (split_written > output.size())
     {
         fail(context,
-             "legacy update overload reported an invalid output length");
+             "split update reported an invalid output length");
     }
-    const std::uint8_t* legacy_tail = input.data();
-    if (legacy_tail != nullptr)
+    const std::uint8_t* split_tail = input.data();
+    if (split_tail != nullptr)
     {
-        legacy_tail += legacy_prefix;
+        split_tail += split_prefix;
     }
-    std::size_t legacy_final_written = 0;
+    std::size_t split_final_written = 0;
     mode_context->do_final(
-        output.empty() ? nullptr : output.data() + legacy_written,
-        &legacy_final_written, legacy_tail, input.size() - legacy_prefix);
-    if (legacy_final_written > output.size() - legacy_written)
+        output.empty() ? nullptr : output.data() + split_written,
+        &split_final_written, output.size() - split_written, split_tail, input.size() - split_prefix);
+    if (split_final_written > output.size() - split_written)
     {
         fail(context,
-             "legacy final overload reported an invalid output length");
+             "split final reported an invalid output length");
     }
-    output.resize(legacy_written + legacy_final_written);
-    require_equal(output, expected_output, context, "legacy overload output");
+    output.resize(split_written + split_final_written);
+    require_equal(output, expected_output, context, "split output");
 }
 
 inline void run_cipher_kat(const TestSuite&               suite,
@@ -672,16 +654,16 @@ inline void run_cipher_kat(const TestSuite&               suite,
     {
         fail(context, "cipher factory returned null");
     }
-    if (cipher->fetch_name() == nullptr ||
-        suite.cipher.logical_name != cipher->fetch_name() ||
-        cipher->fetch_block_size() != suite.cipher.block_size ||
-        cipher->fetch_user_key_len() != suite.cipher.user_key_len ||
-        cipher->fetch_security_strength() != suite.cipher.security_strength ||
-        cipher->fetch_parallel_num() == 0)
+    if (cipher->get_name() == nullptr ||
+        suite.cipher.logical_name != cipher->get_name() ||
+        cipher->get_block_size() != suite.cipher.block_size ||
+        cipher->get_key_len() != suite.cipher.user_key_len ||
+        cipher->get_security_strength() != suite.cipher.security_strength ||
+        cipher->get_parallel_num() == 0)
     {
         fail(context, "cipher metadata mismatch");
     }
-    const char* implementation = cipher->fetch_impl_algo();
+    const char* implementation = cipher->get_impl_algo();
     if (implementation == nullptr ||
         std::strcmp(implementation, provider.algo_name) != 0)
     {
@@ -917,7 +899,7 @@ inline void run_generated_cases(const TestSuite&               suite,
         }
         const std::vector<std::uint8_t> key =
             random_bytes(generator, suite.cipher.user_key_len);
-        const std::size_t parallel = cipher->fetch_parallel_num();
+        const std::size_t parallel = cipher->get_parallel_num();
         const std::array<std::size_t, 4> block_counts = {
             1,
             2,
@@ -1100,20 +1082,20 @@ struct SpeedCipherInfo
 inline SpeedCipherInfo speed_cipher_info(const BlockCipher& cipher,
                                          const std::string& context)
 {
-    const char* name = cipher.fetch_name();
+    const char* name = cipher.get_name();
     if (name == nullptr || name[0] == '\0')
     {
         fail(context, "cipher name is empty");
     }
-    if (cipher.fetch_block_size() == 0)
+    if (cipher.get_block_size() == 0)
     {
         fail(context, "cipher block size is zero");
     }
-    if (cipher.fetch_user_key_len() == 0)
+    if (cipher.get_key_len() == 0)
     {
         fail(context, "cipher user key length is zero");
     }
-    return {name, cipher.fetch_block_size(), cipher.fetch_user_key_len()};
+    return {name, cipher.get_block_size(), cipher.get_key_len()};
 }
 
 inline std::size_t benchmark_size(std::size_t block_size)
@@ -1283,17 +1265,17 @@ inline std::unique_ptr<BlockCipherMode> create_speed_mode(
         fail(context, "mode factory returned null");
     }
     const SpeedCipherInfo current =
-        speed_cipher_info(mode_context->fetch_cipher_ctx(), context);
+        speed_cipher_info(mode_context->get_cipher_ctx(), context);
     if (current.name != cipher.name ||
         current.block_size != cipher.block_size ||
         current.user_key_len != cipher.user_key_len)
     {
         fail(context, "mode factory returned inconsistent cipher metadata");
     }
-    if (mode_context->fetch_block_size() != cipher.block_size ||
-        mode_context->fetch_user_key_len() != cipher.user_key_len)
+    if (mode_context->get_block_size() != mode_processing_block_size(mode, cipher.block_size) ||
+        mode_context->get_key_len() != cipher.user_key_len)
     {
-        fail(context, "mode metadata does not match its cipher");
+        fail(context, "mode processing block size or key length mismatch");
     }
     init_mode(*mode_context, mode, key, iv, aad);
     return mode_context;
@@ -1317,15 +1299,15 @@ inline SpeedModeData prepare_speed_mode_data(
     }
 
     SpeedModeData data;
-    data.cipher = speed_cipher_info(probe->fetch_cipher_ctx(), context);
+    data.cipher = speed_cipher_info(probe->get_cipher_ctx(), context);
     if (mode == "GCM" && data.cipher.block_size != 16)
     {
         fail(context, "GCM requires a 16-byte block cipher");
     }
-    if (probe->fetch_block_size() != data.cipher.block_size ||
-        probe->fetch_user_key_len() != data.cipher.user_key_len)
+    if (probe->get_block_size() != mode_processing_block_size(mode, data.cipher.block_size) ||
+        probe->get_key_len() != data.cipher.user_key_len)
     {
-        fail(context, "mode metadata does not match its cipher");
+        fail(context, "mode processing block size or key length mismatch");
     }
     const std::size_t size = benchmark_size(data.cipher.block_size);
     data.key               = random_bytes(generator, data.cipher.user_key_len);
@@ -1363,7 +1345,7 @@ inline SpeedModeData prepare_speed_mode_data(
             auto decryptor =
                 create_speed_mode(factories.decryptor, mode, data.cipher,
                                   data.key, data.iv, data.aad, context);
-            prepare_gcm_decryption_data(decryptor->fetch_cipher_ctx(), data);
+            prepare_gcm_decryption_data(decryptor->get_cipher_ctx(), data);
         }
         else
         {

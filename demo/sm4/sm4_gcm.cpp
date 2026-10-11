@@ -1,6 +1,7 @@
 #include <gmlib/memory_utils/memdump.h>
 #include <gmlib/rng/std_rng.h>
-#include <gmlib/sm4/sm4_mode.h>
+#include <gmlib/sm4/provider.h>
+#include <gmlib/sm4/sm4.h>
 
 #include <iostream>
 #include <memory>
@@ -15,9 +16,21 @@ int main()
     std::uint8_t buf[32], tag[16];
     std::size_t  outl;
 
-    sm4::SM4GcmEncryptor encryptor;
-    sm4::SM4GcmDecryptor decryptor;
-    rng::StdRng          rng;
+    auto provider = sm4::get_sm4_provider(nullptr);
+    if (provider == nullptr)
+    {
+        log("provider not found");
+        return -1;
+    }
+    if (provider->create_gcm_encryptor == nullptr ||
+        provider->create_gcm_decryptor == nullptr)
+    {
+        log("provider not support gcm mode");
+        return -1;
+    }
+    auto        encryptor = provider->create_gcm_encryptor();
+    auto        decryptor = provider->create_gcm_decryptor();
+    rng::StdRng rng;
 
     log("generate random user key");
     rng.gen(user_key, sizeof(user_key));
@@ -36,18 +49,20 @@ int main()
     memory_utils::memdump(buf, sizeof(buf));
 
     log("encrypt");
-    encryptor.init(user_key, iv, sizeof(iv), aad, sizeof(aad));
-    encryptor.do_final(buf, &outl, buf, sizeof(buf));
-    encryptor.get_tag(tag);
+    encryptor->init(user_key, sizeof(user_key), iv, sizeof(iv), aad,
+                    sizeof(aad));
+    encryptor->do_final(buf, &outl, sizeof(buf), buf, sizeof(buf));
+    encryptor->get_tag(tag, sizeof(tag));
     log("ciphertext: ");
     memory_utils::memdump(buf, sizeof(buf));
     log("tag: ");
     memory_utils::memdump(tag, sizeof(tag));
 
     log("decrypt");
-    decryptor.init(user_key, iv, sizeof(iv), aad, sizeof(aad));
-    decryptor.set_tag(tag);
-    decryptor.do_final(buf, &outl, buf, sizeof(buf));
+    decryptor->init(user_key, sizeof(user_key), iv, sizeof(iv), aad,
+                    sizeof(aad));
+    decryptor->set_tag(tag, sizeof(tag));
+    decryptor->do_final(buf, &outl, sizeof(buf), buf, sizeof(buf));
     log("plaintext: ");
     memory_utils::memdump(buf, sizeof(buf));
 

@@ -1,5 +1,6 @@
 #include <gmlib/memory_utils/memdump.h>
 #include <gmlib/rng/std_rng.h>
+#include <gmlib/sm4/provider.h>
 #include <gmlib/sm4/sm4.h>
 
 #include <iostream>
@@ -14,7 +15,18 @@ int main()
     std::uint8_t user_key[sm4::SM4::USER_KEY_LEN];
     std::uint8_t buf[32];
 
-    sm4::SM4    cipher;
+    auto provider = sm4::get_sm4_provider(nullptr);
+    if (provider == nullptr)
+    {
+        log("provider not found");
+        return -1;
+    }
+    if (provider->create_cipher == nullptr)
+    {
+        log("provider not support block cipher");
+        return -1;
+    }
+    auto        cipher = provider->create_cipher();
     rng::StdRng rng;
 
     log("generate random user key");
@@ -26,13 +38,13 @@ int main()
     memory_utils::memdump(buf, sizeof(buf));
 
     log("encrypt");
-    cipher.set_key(user_key, sm4::SM4::ENCRYPTION);
-    cipher.encrypt_blocks(buf, buf, sizeof(buf) / cipher.BLOCK_SIZE);
+    cipher->set_key(user_key, sm4::SM4::ENCRYPTION);
+    cipher->encrypt_blocks(buf, buf, sizeof(buf) / cipher->get_block_size());
     memory_utils::memdump(buf, sizeof(buf));
 
     log("decrypt");
-    cipher.set_key(user_key, sm4::SM4::DECRYPTION);
-    cipher.encrypt_blocks(buf, buf, sizeof(buf) / cipher.BLOCK_SIZE);
+    cipher->set_key(user_key, sm4::SM4::DECRYPTION);
+    cipher->decrypt_blocks(buf, buf, sizeof(buf) / cipher->get_block_size());
     memory_utils::memdump(buf, sizeof(buf));
 
     log("sm4 cipher demo end");
