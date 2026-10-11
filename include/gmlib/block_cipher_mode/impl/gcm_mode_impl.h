@@ -277,7 +277,7 @@ public:
         return USER_KEY_LEN;
     }
 
-    void get_tag(std::uint8_t* out, std::size_t tag_len) const override
+    void get_tag(std::uint8_t* out, std::size_t tag_len = 16) const override
     {
         if (tag_len > tag_len_)
         {
@@ -286,7 +286,7 @@ public:
         std::memcpy(out, tag_, tag_len);
     }
 
-    void set_tag(const std::uint8_t* in, std::size_t inl) override
+    void set_tag(const std::uint8_t* in, std::size_t inl = 16) override
     {
         if (inl > 16)
         {
@@ -304,6 +304,11 @@ public:
     GcmEncryptorImpl() : GcmCryptorImpl<Cipher>(true)
     {
     }
+
+public:
+    using BlockCipherMode::do_final;
+    using BlockCipherMode::init;
+    using BlockCipherMode::update;
 };
 
 template <class Cipher>
@@ -313,6 +318,11 @@ public:
     GcmDecryptorImpl() : GcmCryptorImpl<Cipher>(false)
     {
     }
+
+public:
+    using BlockCipherMode::do_final;
+    using BlockCipherMode::init;
+    using BlockCipherMode::update;
 };
 
 } // namespace block_cipher_mode::impl

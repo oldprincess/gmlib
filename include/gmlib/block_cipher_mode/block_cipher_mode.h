@@ -151,10 +151,10 @@ public:
      */
     virtual void init(const std::uint8_t* user_key,
                       std::size_t         user_key_len,
-                      const std::uint8_t* iv,
-                      std::size_t         iv_len,
-                      const std::uint8_t* aad,
-                      std::size_t         aad_len)
+                      const std::uint8_t* iv      = nullptr,
+                      std::size_t         iv_len  = 0,
+                      const std::uint8_t* aad     = nullptr,
+                      std::size_t         aad_len = 0)
     {
         (void)user_key;
         (void)user_key_len;
@@ -166,42 +166,29 @@ public:
     }
 
     /**
-     * @brief Initialize or reinitialize a message with optional key setup.
-     * @param[in] user_key New user key, or nullptr to retain an installed
-     *                     key or defer key setup until a later init().
-     * @param[in] user_key_len Key length in bytes. Must be zero when
-     *                         @p user_key is nullptr; otherwise it must
-     *                         match the configured key length.
+     * @brief Initialize a message through the legacy five-parameter API.
      *
-     * @note This is a simplified version of the full six-parameter virtual
-     *       init() overload, passing nullptr and zero for both IV and AAD.
-     */
-    void init(const std::uint8_t* user_key, std::size_t user_key_len)
-    {
-        this->init(user_key, user_key_len, nullptr, 0, nullptr, 0);
-    }
-
-    /**
-     * @brief Initialize or reinitialize a message with optional key and IV
-     * setup.
-     * @param[in] user_key New user key, or nullptr to retain an installed
-     *                     key or defer key setup until a later init().
-     * @param[in] user_key_len Key length in bytes. Must be zero when
-     *                         @p user_key is nullptr; otherwise it must
-     *                         match the configured key length.
-     * @param[in] iv New IV or nonce, or nullptr to omit IV setup.
-     * @param[in] iv_len IV length in bytes. Must be zero when @p iv is
-     *                   nullptr. Modes without an IV require zero.
+     * @param[in] user_key User key with the length reported by get_key_len().
+     * @param[in] iv IV or nonce, or nullptr to omit IV setup.
+     * @param[in] iv_len IV length in bytes. When @p iv is non-null, zero
+     *                   selects the length reported by get_iv_len().
+     * @param[in] aad Optional initial AAD for this message, where supported.
+     * @param[in] aad_len AAD length in bytes. Must be zero when @p aad is
+     *                    nullptr. Non-AEAD modes require zero.
      *
-     * @note This is a simplified version of the full six-parameter virtual
-     *       init() overload, passing nullptr and zero for AAD.
+     * @deprecated This overload is retained only for compatibility with
+     *             the old API. Use the six-parameter virtual init() overload
+     *             with an explicit user_key_len instead.
      */
     void init(const std::uint8_t* user_key,
-              std::size_t         user_key_len,
-              const std::uint8_t* iv,
-              std::size_t         iv_len)
+              const std::uint8_t* iv      = nullptr,
+              std::size_t         iv_len  = 0,
+              const std::uint8_t* aad     = nullptr,
+              std::size_t         aad_len = 0)
     {
-        this->init(user_key, user_key_len, iv, iv_len, nullptr, 0);
+        std::size_t key_len = this->get_key_len();
+        iv_len = iv ? (iv_len != 0 ? iv_len : this->get_iv_len()) : 0;
+        this->init(user_key, key_len, iv, iv_len, aad, aad_len);
     }
 
     /**
@@ -394,28 +381,10 @@ public:
      */
     void do_final(std::uint8_t*       out,
                   std::size_t*        outl,
-                  const std::uint8_t* in,
-                  std::size_t         inl)
+                  const std::uint8_t* in  = nullptr,
+                  std::size_t         inl = 0)
     {
         this->do_final(out, outl, (std::size_t)(-1), in, inl);
-    }
-
-    /**
-     * @brief Finish the message without supplying additional input.
-     * @param[out] out Buffer receiving any remaining buffered or padded
-     *                 output. Must provide sufficient writable storage
-     *                 whenever the mode may produce output.
-     * @param[out] outl Non-null pointer receiving the total number of bytes
-     *                  written by this call, excluding earlier updates.
-     *
-     * @note This is a simplified version of the full five-parameter virtual
-     *       do_final() overload, passing (std::size_t)(-1) for outl_max
-     *       and nullptr and zero for the final input and its length.
-     *       The caller is responsible for ensuring sufficient output capacity.
-     */
-    void do_final(std::uint8_t* out, std::size_t* outl)
-    {
-        this->do_final(out, outl, (std::size_t)(-1), nullptr, 0);
     }
 
 public:

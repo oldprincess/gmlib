@@ -12,31 +12,29 @@ project(gmlibprov C CXX)
 # ============ 1.1. Config OpenSSL Path =============
 # ===================================================
 
-if(${OPENSSL_BASE_DIR})
-    # Windows
-    if(WIN32)
-        option(OPENSSL_BASE_DIR C:/Programming/OpenSSL-Win64)
-        set(OPENSSL_INCLUDE_DIR ${OPENSSL_BASE_DIR}/include)
-        set(OPENSSL_LIBRARY_DIR ${OPENSSL_BASE_DIR}/lib)
-        set(OPENSSL_LIBRARIES libcrypto)
+# Windows
+if(WIN32)
+    option(OPENSSL_BASE_DIR C:/Programming/OpenSSL-Win64)
+    set(OPENSSL_INCLUDE_DIR ${OPENSSL_BASE_DIR}/include)
+    set(OPENSSL_LIBRARY_DIR ${OPENSSL_BASE_DIR}/lib)
+    set(OPENSSL_LIBRARIES libcrypto)
 
-        message(STATUS "[GMLIBPROV] Platform: Windows")
-        message(STATUS "[GMLIBPROV] OpenSSL Base Dir: " ${OPENSSL_BASE_DIR})
-        message(STATUS "[GMLIBPROV] OpenSSL INCLUDE Dir: " ${OPENSSL_INCLUDE_DIR})
-        message(STATUS "[GMLIBPROV] OpenSSL LIBRARY Dir: " ${OPENSSL_LIBRARY_DIR})
-    endif()  
-    # Linux
-    if(UNIX)
-        option(OPENSSL_BASE_DIR /usr/local/ssl)
-        set(OPENSSL_INCLUDE_DIR ${OPENSSL_BASE_DIR}/include)
-        set(OPENSSL_LIBRARY_DIR ${OPENSSL_BASE_DIR}/lib64)
-        set(OPENSSL_LIBRARIES crypto)
+    message(STATUS "[GMLIBPROV] Platform: Windows")
+    message(STATUS "[GMLIBPROV] OpenSSL Base Dir: " ${OPENSSL_BASE_DIR})
+    message(STATUS "[GMLIBPROV] OpenSSL INCLUDE Dir: " ${OPENSSL_INCLUDE_DIR})
+    message(STATUS "[GMLIBPROV] OpenSSL LIBRARY Dir: " ${OPENSSL_LIBRARY_DIR})
+endif()  
+# Linux
+if(UNIX)
+    option(OPENSSL_BASE_DIR /usr/local/ssl)
+    set(OPENSSL_INCLUDE_DIR ${OPENSSL_BASE_DIR}/include)
+    set(OPENSSL_LIBRARY_DIR ${OPENSSL_BASE_DIR}/lib64)
+    set(OPENSSL_LIBRARIES crypto)
 
-        message(STATUS "[GMLIBPROV] Platform: UNIX")
-        message(STATUS "[GMLIBPROV] OpenSSL Base Dir: " ${OPENSSL_BASE_DIR})
-        message(STATUS "[GMLIBPROV] OpenSSL INCLUDE Dir: " ${OPENSSL_INCLUDE_DIR})
-        message(STATUS "[GMLIBPROV] OpenSSL LIBRARY Dir: " ${OPENSSL_LIBRARY_DIR})
-    endif()
+    message(STATUS "[GMLIBPROV] Platform: UNIX")
+    message(STATUS "[GMLIBPROV] OpenSSL Base Dir: " ${OPENSSL_BASE_DIR})
+    message(STATUS "[GMLIBPROV] OpenSSL INCLUDE Dir: " ${OPENSSL_INCLUDE_DIR})
+    message(STATUS "[GMLIBPROV] OpenSSL LIBRARY Dir: " ${OPENSSL_LIBRARY_DIR})
 endif()
 
 # ===================================================
@@ -66,29 +64,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
     message(STATUS "[GMLIBPROV] Use Compiler GCC")
 endif()
-
-# ***************************************************
-# ***************************************************
-# ************ 3. Message Config ********************
-# ***************************************************
-# ***************************************************
-
-# message(STATUS "[GMLIBPROV] OPENSSL_INCLUDE_DIR=" ${OPENSSL_INCLUDE_DIR})
-# message(STATUS "[GMLIBPROV] OPENSSL_LIBRARY_DIR=" ${OPENSSL_LIBRARY_DIR})
-# foreach(LIB ${OPENSSL_LIBRARIES})
-#     message(STATUS "[GMLIBPROV] OPENSSL_LIBRARIES=" ${LIB})
-# endforeach()
-
-# message(STATUS "[GMLIBPROV] GMLIB_INCLUDE_DIR=" ${GMLIB_INCLUDE_DIR})
-# message(STATUS "[GMLIBPROV] GMLIB_LIBRARY_DIR=" ${GMLIB_LIBRARY_DIR})
-# message(STATUS "[GMLIBPROV] GMLIB_LIBRARIES=" ${GMLIB_LIBRARIES})
-
-# foreach(FILE ${GMLIBPROV_LIB_SRC})
-#     message(STATUS "[GMLIBPROV] GMLIBPROV_LIB_SRC=" ${FILE})
-# endforeach()
-# foreach(FILE ${GMLIBPROV_TEST_SRC})
-#     message(STATUS "[GMLIBPROV] GMLIBPROV_TEST_SRC=" ${FILE})
-# endforeach()
 
 # ***************************************************
 # ***************************************************

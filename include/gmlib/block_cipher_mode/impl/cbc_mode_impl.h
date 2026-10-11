@@ -99,10 +99,20 @@ public:
         return BLOCK_SIZE;
     }
 
+    std::size_t get_iv_len() const noexcept override
+    {
+        return BLOCK_SIZE;
+    }
+
     std::size_t get_key_len() const noexcept override
     {
         return USER_KEY_LEN;
     }
+
+public:
+    using BlockCipherMode::do_final;
+    using BlockCipherMode::init;
+    using BlockCipherMode::update;
 };
 
 template <class Cipher>
@@ -205,10 +215,20 @@ public:
         return BLOCK_SIZE;
     }
 
+    std::size_t get_iv_len() const noexcept override
+    {
+        return BLOCK_SIZE;
+    }
+
     std::size_t get_key_len() const noexcept override
     {
         return USER_KEY_LEN;
     }
+
+public:
+    using BlockCipherMode::do_final;
+    using BlockCipherMode::init;
+    using BlockCipherMode::update;
 };
 
 } // namespace block_cipher_mode::impl
