@@ -2,25 +2,822 @@
 #define BLOCK_CIPHER_MODE_TEST_SUITE_H
 
 #include <gmlib/block_cipher_mode/provider.h>
-#include <gmlib/ghash/ghash.h>
+#include <gmlib/rng/cstd_rng.h>
 
-#include <algorithm>
-#include <array>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <limits>
+#include <functional>
 #include <memory>
-#include <random>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
 namespace block_cipher_mode::test {
+
+namespace detail {
+
+inline void run_final_safe(BlockCipherMode&    cryptor,
+                           std::uint8_t*       out,
+                           std::size_t*        outl,
+                           std::size_t         outl_max,
+                           const std::uint8_t* in,
+                           std::size_t         inl)
+{
+    cryptor.do_final(out, outl, outl_max, in, inl);
+}
+
+inline void run_final_unsafe(BlockCipherMode&    cryptor,
+                             std::uint8_t*       out,
+                             std::size_t*        outl,
+                             const std::uint8_t* in,
+                             std::size_t         inl)
+{
+    cryptor.do_final(out, outl, in, inl);
+}
+
+inline void run_update_final0_safe(BlockCipherMode&    cryptor,
+                                   std::uint8_t*       out,
+                                   std::size_t*        outl,
+                                   std::size_t         outl_max,
+                                   const std::uint8_t* in,
+                                   std::size_t         inl)
+{
+    std::size_t outl_tmp = 0;
+    *outl                = 0;
+    cryptor.update(out, &outl_tmp, outl_max, in, inl);
+    out += outl_tmp, outl_max -= outl_tmp, *outl += outl_tmp;
+    cryptor.do_final(out, &outl_tmp, outl_max);
+    *outl += outl_tmp;
+}
+
+inline void run_update_final0_unsafe(BlockCipherMode&    cryptor,
+                                     std::uint8_t*       out,
+                                     std::size_t*        outl,
+                                     const std::uint8_t* in,
+                                     std::size_t         inl)
+{
+    std::size_t outl_tmp = 0;
+    *outl                = 0;
+    cryptor.update(out, &outl_tmp, in, inl);
+    out += outl_tmp, *outl += outl_tmp;
+    cryptor.do_final(out, &outl_tmp);
+    *outl += outl_tmp;
+}
+
+inline void run_update_update_final0_safe(BlockCipherMode&    cryptor,
+                                          std::uint8_t*       out,
+                                          std::size_t*        outl,
+                                          std::size_t         outl_max,
+                                          const std::uint8_t* in,
+                                          std::size_t         inl,
+                                          rng::Rng&           rng)
+{
+    std::size_t part0_len = rng.rand<std::size_t>() % (inl ? inl : 1);
+    std::size_t part1_len = inl - part0_len;
+
+    std::size_t outl_tmp = 0;
+    *outl                = 0;
+    cryptor.update(out, &outl_tmp, outl_max, in, part0_len);
+    out += outl_tmp, outl_max -= outl_tmp, *outl += outl_tmp;
+    cryptor.update(out, &outl_tmp, outl_max, in + part0_len, part1_len);
+    out += outl_tmp, outl_max -= outl_tmp, *outl += outl_tmp;
+    cryptor.do_final(out, &outl_tmp, outl_max);
+    *outl += outl_tmp;
+}
+
+inline void run_update_update_final0_unsafe(BlockCipherMode&    cryptor,
+                                            std::uint8_t*       out,
+                                            std::size_t*        outl,
+                                            const std::uint8_t* in,
+                                            std::size_t         inl,
+                                            rng::Rng&           rng)
+{
+    std::size_t part0_len = rng.rand<std::size_t>() % (inl ? inl : 1);
+    std::size_t part1_len = inl - part0_len;
+
+    std::size_t outl_tmp = 0;
+    *outl                = 0;
+    cryptor.update(out, &outl_tmp, in, part0_len);
+    out += outl_tmp, *outl += outl_tmp;
+    cryptor.update(out, &outl_tmp, in + part0_len, part1_len);
+    out += outl_tmp, *outl += outl_tmp;
+    cryptor.do_final(out, &outl_tmp);
+    *outl += outl_tmp;
+}
+
+inline void run_update_update_final_safe(BlockCipherMode&    cryptor,
+                                         std::uint8_t*       out,
+                                         std::size_t*        outl,
+                                         std::size_t         outl_max,
+                                         const std::uint8_t* in,
+                                         std::size_t         inl,
+                                         rng::Rng&           rng)
+{
+    std::size_t part0_len = rng.rand<std::size_t>() % (inl ? inl : 1);
+    std::size_t remain0   = inl - part0_len;
+    std::size_t part1_len = rng.rand<std::size_t>() % (remain0 ? remain0 : 1);
+    std::size_t remain1   = remain0 - part1_len;
+    std::size_t part2_len = remain1;
+
+    std::size_t outl_tmp = 0;
+    *outl                = 0;
+    cryptor.update(out, &outl_tmp, outl_max, in, part0_len);
+    out += outl_tmp, outl_max -= outl_tmp, *outl += outl_tmp, in += part0_len;
+    cryptor.update(out, &outl_tmp, outl_max, in, part1_len);
+    out += outl_tmp, outl_max -= outl_tmp, *outl += outl_tmp, in += part1_len;
+    cryptor.do_final(out, &outl_tmp, outl_max, in, part2_len);
+    *outl += outl_tmp;
+}
+
+inline void run_update_update_final_unsafe(BlockCipherMode&    cryptor,
+                                           std::uint8_t*       out,
+                                           std::size_t*        outl,
+                                           const std::uint8_t* in,
+                                           std::size_t         inl,
+                                           rng::Rng&           rng)
+{
+    std::size_t part0_len = rng.rand<std::size_t>() % (inl ? inl : 1);
+    std::size_t remain0   = inl - part0_len;
+    std::size_t part1_len = rng.rand<std::size_t>() % (remain0 ? remain0 : 1);
+    std::size_t remain1   = remain0 - part1_len;
+    std::size_t part2_len = remain1;
+
+    std::size_t outl_tmp = 0;
+    *outl                = 0;
+    cryptor.update(out, &outl_tmp, in, part0_len);
+    out += outl_tmp, *outl += outl_tmp, in += part0_len;
+    cryptor.update(out, &outl_tmp, in, part1_len);
+    out += outl_tmp, *outl += outl_tmp, in += part1_len;
+    cryptor.do_final(out, &outl_tmp, in, part2_len);
+    *outl += outl_tmp;
+}
+
+class TestCase
+{
+public:
+    virtual ~TestCase() = default;
+
+    virtual BlockCipherMode&           get_inited_encryptor()  = 0;
+    virtual BlockCipherMode&           get_inited_decryptor()  = 0;
+    virtual std::vector<std::uint8_t>& get_plaintext()         = 0;
+    virtual std::vector<std::uint8_t>& get_ciphertext()        = 0;
+    virtual std::vector<std::uint8_t>& get_encrypt_out_buf()   = 0;
+    virtual std::vector<std::uint8_t>& get_decrypt_out_buf()   = 0;
+    virtual bool                       check_encrypt_results() = 0;
+    virtual bool                       check_decrypt_results() = 0;
+
+public:
+    void run(std::size_t iterations, rng::Rng& rng)
+    {
+        auto& plaintext          = this->get_plaintext();
+        auto& ciphertext         = this->get_ciphertext();
+        auto& encrypt_output_buf = this->get_encrypt_out_buf();
+        auto& decrypt_output_buf = this->get_decrypt_out_buf();
+        auto  encrypt_capacity   = encrypt_output_buf.size();
+        auto  decrypt_capacity   = decrypt_output_buf.size();
+
+        using run_case_fn =
+            std::function<void(BlockCipherMode&,                // cryptor
+                               std::vector<std::uint8_t>&,      // output
+                               std::size_t*,                    // outl
+                               const std::vector<std::uint8_t>& // input
+                               )>;
+
+        auto run_case = [&](std::string name, const run_case_fn& runner) {
+            for (bool enc : {true, false})
+            {
+                // get cryptor and buffer
+                auto& encryptor = this->get_inited_encryptor();
+                auto& decryptor = this->get_inited_decryptor();
+                auto& cryptor   = enc ? encryptor : decryptor;
+                auto& input     = enc ? plaintext : ciphertext;
+                auto& output    = enc ? encrypt_output_buf : decrypt_output_buf;
+                // randomize output
+                output.resize(enc ? encrypt_capacity : decrypt_capacity);
+                rng.gen(output.data(), output.size());
+                // run
+                std::size_t outl = 0;
+                runner(cryptor, output, &outl, input);
+                output.resize(outl);
+                // check
+                if (!(enc ? this->check_encrypt_results()
+                          : this->check_decrypt_results()))
+                {
+                    auto msg = name + (enc ? "encrypt" : "decrypt") + "fail";
+                    throw std::runtime_error(msg);
+                }
+            }
+        };
+
+        for (std::size_t i = 0; i < iterations; ++i)
+        {
+            run_case(
+                "run_final_safe",
+                [&](BlockCipherMode& cryptor, std::vector<std::uint8_t>& output,
+                    std::size_t* outl, const std::vector<std::uint8_t>& input) {
+                    run_final_safe(cryptor, output.data(), outl, output.size(),
+                                   input.data(), input.size());
+                });
+            run_case(
+                "run_final_unsafe",
+                [&](BlockCipherMode& cryptor, std::vector<std::uint8_t>& output,
+                    std::size_t* outl, const std::vector<std::uint8_t>& input) {
+                    run_final_unsafe(cryptor, output.data(), outl, input.data(),
+                                     input.size());
+                });
+            run_case(
+                "run_update_final0_safe",
+                [&](BlockCipherMode& cryptor, std::vector<std::uint8_t>& output,
+                    std::size_t* outl, const std::vector<std::uint8_t>& input) {
+                    run_update_final0_safe(cryptor, output.data(), outl,
+                                           output.size(), input.data(),
+                                           input.size());
+                });
+            run_case(
+                "run_update_final0_unsafe",
+                [&](BlockCipherMode& cryptor, std::vector<std::uint8_t>& output,
+                    std::size_t* outl, const std::vector<std::uint8_t>& input) {
+                    run_update_final0_unsafe(cryptor, output.data(), outl,
+                                             input.data(), input.size());
+                });
+            run_case(
+                "run_update_update_final0_safe",
+                [&](BlockCipherMode& cryptor, std::vector<std::uint8_t>& output,
+                    std::size_t* outl, const std::vector<std::uint8_t>& input) {
+                    run_update_update_final0_safe(cryptor, output.data(), outl,
+                                                  output.size(), input.data(),
+                                                  input.size(), rng);
+                });
+            run_case(
+                "run_update_update_final0_unsafe",
+                [&](BlockCipherMode& cryptor, std::vector<std::uint8_t>& output,
+                    std::size_t* outl, const std::vector<std::uint8_t>& input) {
+                    run_update_update_final0_unsafe(cryptor, output.data(),
+                                                    outl, input.data(),
+                                                    input.size(), rng);
+                });
+            run_case(
+                "run_update_update_final_safe",
+                [&](BlockCipherMode& cryptor, std::vector<std::uint8_t>& output,
+                    std::size_t* outl, const std::vector<std::uint8_t>& input) {
+                    run_update_update_final_safe(cryptor, output.data(), outl,
+                                                 output.size(), input.data(),
+                                                 input.size(), rng);
+                });
+            run_case(
+                "run_update_update_final_unsafe",
+                [&](BlockCipherMode& cryptor, std::vector<std::uint8_t>& output,
+                    std::size_t* outl, const std::vector<std::uint8_t>& input) {
+                    run_update_update_final_unsafe(cryptor, output.data(), outl,
+                                                   input.data(), input.size(),
+                                                   rng);
+                });
+        }
+    }
+};
+
+class CfbModeTestCase : public TestCase
+{
+private:
+    std::vector<std::uint8_t> key_;
+    std::vector<std::uint8_t> iv_;
+    std::vector<std::uint8_t> plaintext_;
+    std::vector<std::uint8_t> ciphertext_;
+
+    std::vector<std::uint8_t>        encrypt_out_buf_;
+    std::vector<std::uint8_t>        decrypt_out_buf_;
+    std::unique_ptr<BlockCipherMode> encryptor_;
+    std::unique_ptr<BlockCipherMode> decryptor_;
+
+public:
+    CfbModeTestCase(const BlockCipherModeProvider*   provider,
+                    const std::vector<std::uint8_t>& key,
+                    const std::vector<std::uint8_t>& iv,
+                    const std::vector<std::uint8_t>& plaintext,
+                    const std::vector<std::uint8_t>& ciphertext)
+        : key_(key),
+          iv_(iv),
+          plaintext_(plaintext),
+          ciphertext_(ciphertext),
+          encrypt_out_buf_(plaintext.size()),
+          decrypt_out_buf_(ciphertext.size()),
+          encryptor_(provider && provider->create_cfb_encryptor
+                         ? provider->create_cfb_encryptor()
+                         : nullptr),
+          decryptor_(provider && provider->create_cfb_decryptor
+                         ? provider->create_cfb_decryptor()
+                         : nullptr)
+    {
+    }
+
+public:
+    BlockCipherMode& get_inited_encryptor() override
+    {
+        if (!encryptor_)
+        {
+            throw std::invalid_argument("CFB encryptor is unavailable");
+        }
+        encryptor_->init(key_.data(), key_.size(), iv_.data(), iv_.size());
+        return *encryptor_;
+    }
+
+    BlockCipherMode& get_inited_decryptor() override
+    {
+        if (!decryptor_)
+        {
+            throw std::invalid_argument("CFB decryptor is unavailable");
+        }
+        decryptor_->init(key_.data(), key_.size(), iv_.data(), iv_.size());
+        return *decryptor_;
+    }
+
+    std::vector<std::uint8_t>& get_plaintext() override
+    {
+        return plaintext_;
+    }
+
+    std::vector<std::uint8_t>& get_ciphertext() override
+    {
+        return ciphertext_;
+    }
+
+    std::vector<std::uint8_t>& get_encrypt_out_buf() override
+    {
+        return encrypt_out_buf_;
+    }
+
+    std::vector<std::uint8_t>& get_decrypt_out_buf() override
+    {
+        return decrypt_out_buf_;
+    }
+
+    bool check_encrypt_results() override
+    {
+        return ciphertext_ == encrypt_out_buf_;
+    }
+
+    bool check_decrypt_results() override
+    {
+        return plaintext_ == decrypt_out_buf_;
+    }
+};
+
+// No padding: plaintext and ciphertext must be block-aligned.
+class EcbModeTestCase : public TestCase
+{
+private:
+    std::vector<std::uint8_t> key_;
+    std::vector<std::uint8_t> plaintext_;
+    std::vector<std::uint8_t> ciphertext_;
+
+    std::vector<std::uint8_t>        encrypt_out_buf_;
+    std::vector<std::uint8_t>        decrypt_out_buf_;
+    std::unique_ptr<BlockCipherMode> encryptor_;
+    std::unique_ptr<BlockCipherMode> decryptor_;
+
+public:
+    EcbModeTestCase(const BlockCipherModeProvider*   provider,
+                    const std::vector<std::uint8_t>& key,
+                    const std::vector<std::uint8_t>& plaintext,
+                    const std::vector<std::uint8_t>& ciphertext)
+        : key_(key),
+          plaintext_(plaintext),
+          ciphertext_(ciphertext),
+          encrypt_out_buf_(plaintext.size()),
+          decrypt_out_buf_(ciphertext.size()),
+          encryptor_(provider && provider->create_ecb_encryptor
+                         ? provider->create_ecb_encryptor()
+                         : nullptr),
+          decryptor_(provider && provider->create_ecb_decryptor
+                         ? provider->create_ecb_decryptor()
+                         : nullptr)
+    {
+    }
+
+public:
+    BlockCipherMode& get_inited_encryptor() override
+    {
+        if (!encryptor_)
+        {
+            throw std::invalid_argument("ECB encryptor is unavailable");
+        }
+        encryptor_->init(key_.data(), key_.size());
+        encryptor_->set_padding(false);
+        return *encryptor_;
+    }
+
+    BlockCipherMode& get_inited_decryptor() override
+    {
+        if (!decryptor_)
+        {
+            throw std::invalid_argument("ECB decryptor is unavailable");
+        }
+        decryptor_->init(key_.data(), key_.size());
+        decryptor_->set_padding(false);
+        return *decryptor_;
+    }
+
+    std::vector<std::uint8_t>& get_plaintext() override
+    {
+        return plaintext_;
+    }
+
+    std::vector<std::uint8_t>& get_ciphertext() override
+    {
+        return ciphertext_;
+    }
+
+    std::vector<std::uint8_t>& get_encrypt_out_buf() override
+    {
+        return encrypt_out_buf_;
+    }
+
+    std::vector<std::uint8_t>& get_decrypt_out_buf() override
+    {
+        return decrypt_out_buf_;
+    }
+
+    bool check_encrypt_results() override
+    {
+        return ciphertext_ == encrypt_out_buf_;
+    }
+
+    bool check_decrypt_results() override
+    {
+        return plaintext_ == decrypt_out_buf_;
+    }
+};
+
+// No padding: plaintext and ciphertext must be block-aligned.
+class CbcModeTestCase : public TestCase
+{
+private:
+    std::vector<std::uint8_t> key_;
+    std::vector<std::uint8_t> iv_;
+    std::vector<std::uint8_t> plaintext_;
+    std::vector<std::uint8_t> ciphertext_;
+
+    std::vector<std::uint8_t>        encrypt_out_buf_;
+    std::vector<std::uint8_t>        decrypt_out_buf_;
+    std::unique_ptr<BlockCipherMode> encryptor_;
+    std::unique_ptr<BlockCipherMode> decryptor_;
+
+public:
+    CbcModeTestCase(const BlockCipherModeProvider*   provider,
+                    const std::vector<std::uint8_t>& key,
+                    const std::vector<std::uint8_t>& iv,
+                    const std::vector<std::uint8_t>& plaintext,
+                    const std::vector<std::uint8_t>& ciphertext)
+        : key_(key),
+          iv_(iv),
+          plaintext_(plaintext),
+          ciphertext_(ciphertext),
+          encrypt_out_buf_(plaintext.size()),
+          decrypt_out_buf_(ciphertext.size()),
+          encryptor_(provider && provider->create_cbc_encryptor
+                         ? provider->create_cbc_encryptor()
+                         : nullptr),
+          decryptor_(provider && provider->create_cbc_decryptor
+                         ? provider->create_cbc_decryptor()
+                         : nullptr)
+    {
+    }
+
+public:
+    BlockCipherMode& get_inited_encryptor() override
+    {
+        if (!encryptor_)
+        {
+            throw std::invalid_argument("CBC encryptor is unavailable");
+        }
+        encryptor_->init(key_.data(), key_.size(), iv_.data(), iv_.size());
+        encryptor_->set_padding(false);
+        return *encryptor_;
+    }
+
+    BlockCipherMode& get_inited_decryptor() override
+    {
+        if (!decryptor_)
+        {
+            throw std::invalid_argument("CBC decryptor is unavailable");
+        }
+        decryptor_->init(key_.data(), key_.size(), iv_.data(), iv_.size());
+        decryptor_->set_padding(false);
+        return *decryptor_;
+    }
+
+    std::vector<std::uint8_t>& get_plaintext() override
+    {
+        return plaintext_;
+    }
+
+    std::vector<std::uint8_t>& get_ciphertext() override
+    {
+        return ciphertext_;
+    }
+
+    std::vector<std::uint8_t>& get_encrypt_out_buf() override
+    {
+        return encrypt_out_buf_;
+    }
+
+    std::vector<std::uint8_t>& get_decrypt_out_buf() override
+    {
+        return decrypt_out_buf_;
+    }
+
+    bool check_encrypt_results() override
+    {
+        return ciphertext_ == encrypt_out_buf_;
+    }
+
+    bool check_decrypt_results() override
+    {
+        return plaintext_ == decrypt_out_buf_;
+    }
+};
+
+class OfbModeTestCase : public TestCase
+{
+private:
+    std::vector<std::uint8_t> key_;
+    std::vector<std::uint8_t> iv_;
+    std::vector<std::uint8_t> plaintext_;
+    std::vector<std::uint8_t> ciphertext_;
+
+    std::vector<std::uint8_t>        encrypt_out_buf_;
+    std::vector<std::uint8_t>        decrypt_out_buf_;
+    std::unique_ptr<BlockCipherMode> encryptor_;
+    std::unique_ptr<BlockCipherMode> decryptor_;
+
+public:
+    OfbModeTestCase(const BlockCipherModeProvider*   provider,
+                    const std::vector<std::uint8_t>& key,
+                    const std::vector<std::uint8_t>& iv,
+                    const std::vector<std::uint8_t>& plaintext,
+                    const std::vector<std::uint8_t>& ciphertext)
+        : key_(key),
+          iv_(iv),
+          plaintext_(plaintext),
+          ciphertext_(ciphertext),
+          encrypt_out_buf_(plaintext.size()),
+          decrypt_out_buf_(ciphertext.size()),
+          encryptor_(provider && provider->create_ofb_encryptor
+                         ? provider->create_ofb_encryptor()
+                         : nullptr),
+          decryptor_(provider && provider->create_ofb_decryptor
+                         ? provider->create_ofb_decryptor()
+                         : nullptr)
+    {
+    }
+
+public:
+    BlockCipherMode& get_inited_encryptor() override
+    {
+        if (!encryptor_)
+        {
+            throw std::invalid_argument("OFB encryptor is unavailable");
+        }
+        encryptor_->init(key_.data(), key_.size(), iv_.data(), iv_.size());
+        return *encryptor_;
+    }
+
+    BlockCipherMode& get_inited_decryptor() override
+    {
+        if (!decryptor_)
+        {
+            throw std::invalid_argument("OFB decryptor is unavailable");
+        }
+        decryptor_->init(key_.data(), key_.size(), iv_.data(), iv_.size());
+        return *decryptor_;
+    }
+
+    std::vector<std::uint8_t>& get_plaintext() override
+    {
+        return plaintext_;
+    }
+
+    std::vector<std::uint8_t>& get_ciphertext() override
+    {
+        return ciphertext_;
+    }
+
+    std::vector<std::uint8_t>& get_encrypt_out_buf() override
+    {
+        return encrypt_out_buf_;
+    }
+
+    std::vector<std::uint8_t>& get_decrypt_out_buf() override
+    {
+        return decrypt_out_buf_;
+    }
+
+    bool check_encrypt_results() override
+    {
+        return ciphertext_ == encrypt_out_buf_;
+    }
+
+    bool check_decrypt_results() override
+    {
+        return plaintext_ == decrypt_out_buf_;
+    }
+};
+
+class CtrModeTestCase : public TestCase
+{
+private:
+    std::vector<std::uint8_t> key_;
+    std::vector<std::uint8_t> iv_;
+    std::vector<std::uint8_t> plaintext_;
+    std::vector<std::uint8_t> ciphertext_;
+
+    std::vector<std::uint8_t>        encrypt_out_buf_;
+    std::vector<std::uint8_t>        decrypt_out_buf_;
+    std::unique_ptr<BlockCipherMode> encryptor_;
+    std::unique_ptr<BlockCipherMode> decryptor_;
+
+public:
+    CtrModeTestCase(const BlockCipherModeProvider*   provider,
+                    const std::vector<std::uint8_t>& key,
+                    const std::vector<std::uint8_t>& iv,
+                    const std::vector<std::uint8_t>& plaintext,
+                    const std::vector<std::uint8_t>& ciphertext)
+        : key_(key),
+          iv_(iv),
+          plaintext_(plaintext),
+          ciphertext_(ciphertext),
+          encrypt_out_buf_(plaintext.size()),
+          decrypt_out_buf_(ciphertext.size()),
+          encryptor_(provider && provider->create_ctr_encryptor
+                         ? provider->create_ctr_encryptor()
+                         : nullptr),
+          decryptor_(provider && provider->create_ctr_decryptor
+                         ? provider->create_ctr_decryptor()
+                         : nullptr)
+    {
+    }
+
+public:
+    BlockCipherMode& get_inited_encryptor() override
+    {
+        if (!encryptor_)
+        {
+            throw std::invalid_argument("CTR encryptor is unavailable");
+        }
+        encryptor_->init(key_.data(), key_.size(), iv_.data(), iv_.size());
+        return *encryptor_;
+    }
+
+    BlockCipherMode& get_inited_decryptor() override
+    {
+        if (!decryptor_)
+        {
+            throw std::invalid_argument("CTR decryptor is unavailable");
+        }
+        decryptor_->init(key_.data(), key_.size(), iv_.data(), iv_.size());
+        return *decryptor_;
+    }
+
+    std::vector<std::uint8_t>& get_plaintext() override
+    {
+        return plaintext_;
+    }
+
+    std::vector<std::uint8_t>& get_ciphertext() override
+    {
+        return ciphertext_;
+    }
+
+    std::vector<std::uint8_t>& get_encrypt_out_buf() override
+    {
+        return encrypt_out_buf_;
+    }
+
+    std::vector<std::uint8_t>& get_decrypt_out_buf() override
+    {
+        return decrypt_out_buf_;
+    }
+
+    bool check_encrypt_results() override
+    {
+        return ciphertext_ == encrypt_out_buf_;
+    }
+
+    bool check_decrypt_results() override
+    {
+        return plaintext_ == decrypt_out_buf_;
+    }
+};
+
+class GcmModeTestCase : public TestCase
+{
+private:
+    std::vector<std::uint8_t> key_;
+    std::vector<std::uint8_t> iv_;
+    std::vector<std::uint8_t> aad_;
+    std::vector<std::uint8_t> tag_;
+    std::vector<std::uint8_t> plaintext_;
+    std::vector<std::uint8_t> ciphertext_;
+
+    std::vector<std::uint8_t>        encrypt_out_buf_;
+    std::vector<std::uint8_t>        decrypt_out_buf_;
+    std::unique_ptr<BlockCipherMode> encryptor_;
+    std::unique_ptr<BlockCipherMode> decryptor_;
+
+public:
+    GcmModeTestCase(const BlockCipherModeProvider*   provider,
+                    const std::vector<std::uint8_t>& key,
+                    const std::vector<std::uint8_t>& iv,
+                    const std::vector<std::uint8_t>& aad,
+                    const std::vector<std::uint8_t>& plaintext,
+                    const std::vector<std::uint8_t>& ciphertext,
+                    const std::vector<std::uint8_t>& tag)
+        : key_(key),
+          iv_(iv),
+          aad_(aad),
+          tag_(tag),
+          plaintext_(plaintext),
+          ciphertext_(ciphertext),
+          encrypt_out_buf_(plaintext.size()),
+          decrypt_out_buf_(ciphertext.size()),
+          encryptor_(provider && provider->create_gcm_encryptor
+                         ? provider->create_gcm_encryptor()
+                         : nullptr),
+          decryptor_(provider && provider->create_gcm_decryptor
+                         ? provider->create_gcm_decryptor()
+                         : nullptr)
+    {
+        if (tag_.empty() || tag_.size() > 16)
+        {
+            throw std::invalid_argument(
+                "GCM tag length must be between 1 and 16 bytes");
+        }
+    }
+
+public:
+    BlockCipherMode& get_inited_encryptor() override
+    {
+        if (!encryptor_)
+        {
+            throw std::invalid_argument("GCM encryptor is unavailable");
+        }
+        encryptor_->set_iv_len(iv_.size());
+        encryptor_->init(key_.data(), key_.size(), iv_.data(), iv_.size(),
+                         aad_.data(), aad_.size());
+        return *encryptor_;
+    }
+
+    BlockCipherMode& get_inited_decryptor() override
+    {
+        if (!decryptor_)
+        {
+            throw std::invalid_argument("GCM decryptor is unavailable");
+        }
+        decryptor_->set_iv_len(iv_.size());
+        decryptor_->init(key_.data(), key_.size(), iv_.data(), iv_.size(),
+                         aad_.data(), aad_.size());
+        decryptor_->set_tag(tag_.data(), tag_.size());
+        return *decryptor_;
+    }
+
+    std::vector<std::uint8_t>& get_plaintext() override
+    {
+        return plaintext_;
+    }
+
+    std::vector<std::uint8_t>& get_ciphertext() override
+    {
+        return ciphertext_;
+    }
+
+    std::vector<std::uint8_t>& get_encrypt_out_buf() override
+    {
+        return encrypt_out_buf_;
+    }
+
+    std::vector<std::uint8_t>& get_decrypt_out_buf() override
+    {
+        return decrypt_out_buf_;
+    }
+
+    bool check_encrypt_results() override
+    {
+        std::vector<std::uint8_t> actual_tag(tag_.size());
+        encryptor_->get_tag(actual_tag.data(), actual_tag.size());
+        return ciphertext_ == encrypt_out_buf_ && tag_ == actual_tag;
+    }
+
+    bool check_decrypt_results() override
+    {
+        return plaintext_ == decrypt_out_buf_;
+    }
+};
+
+} // namespace detail
 
 struct CipherSpec
 {
@@ -36,7 +833,8 @@ struct CipherKat
     std::vector<std::uint8_t> key;
     std::vector<std::uint8_t> plaintext;
     std::vector<std::uint8_t> ciphertext;
-    std::size_t               iterations = 1;
+    // Consecutive cipher applications, feeding each output into the next.
+    std::size_t iterations = 1;
 };
 
 struct ModeKat
@@ -72,1507 +870,362 @@ struct TestSuite
 
 namespace detail {
 
-using ModeFactory = std::unique_ptr<BlockCipherMode> (*)();
-
-struct ModeFactories
+class CipherTestCase
 {
-    ModeFactory encryptor;
-    ModeFactory decryptor;
-};
+private:
+    std::string                  case_name_;
+    std::vector<std::uint8_t>    key_;
+    std::vector<std::uint8_t>    plaintext_;
+    std::vector<std::uint8_t>    ciphertext_;
+    std::size_t                  cipher_iterations_;
+    std::unique_ptr<BlockCipher> cipher_;
 
-enum class Feed
-{
-    ONE_SHOT,
-    BYTEWISE,
-    IRREGULAR,
-};
-
-struct CryptResult
-{
-    std::vector<std::uint8_t> output;
-    std::vector<std::uint8_t> tag;
-};
-
-[[noreturn]] inline void invalid(const std::string& message)
-{
-    throw std::invalid_argument(message);
-}
-
-[[noreturn]] inline void fail(const std::string& context,
-                              const std::string& message)
-{
-    throw std::runtime_error(context + ": " + message);
-}
-
-inline void require_config(bool condition, const std::string& message)
-{
-    if (!condition)
+public:
+    CipherTestCase(const BlockCipherModeProvider& provider,
+                   const CipherKat&               kat)
+        : case_name_(kat.case_name),
+          key_(kat.key),
+          plaintext_(kat.plaintext),
+          ciphertext_(kat.ciphertext),
+          cipher_iterations_(kat.iterations),
+          cipher_(provider.create_cipher ? provider.create_cipher() : nullptr)
     {
-        invalid(message);
-    }
-}
-
-inline bool is_mode(const std::string& mode)
-{
-    return mode == "ECB" || mode == "CBC" || mode == "CFB" || mode == "OFB" ||
-           mode == "CTR";
-}
-
-inline ModeFactories mode_factories(const BlockCipherModeProvider& provider,
-                                    const std::string&             mode)
-{
-    if (mode == "ECB")
-    {
-        return {provider.create_ecb_encryptor, provider.create_ecb_decryptor};
-    }
-    if (mode == "CBC")
-    {
-        return {provider.create_cbc_encryptor, provider.create_cbc_decryptor};
-    }
-    if (mode == "CFB")
-    {
-        return {provider.create_cfb_encryptor, provider.create_cfb_decryptor};
-    }
-    if (mode == "OFB")
-    {
-        return {provider.create_ofb_encryptor, provider.create_ofb_decryptor};
-    }
-    if (mode == "CTR")
-    {
-        return {provider.create_ctr_encryptor, provider.create_ctr_decryptor};
-    }
-    if (mode == "GCM")
-    {
-        return {provider.create_gcm_encryptor, provider.create_gcm_decryptor};
-    }
-    invalid("unknown block cipher mode: " + mode);
-}
-
-inline const char* feed_name(Feed feed)
-{
-    switch (feed)
-    {
-        case Feed::ONE_SHOT:
-            return "one-shot";
-        case Feed::BYTEWISE:
-            return "bytewise";
-        case Feed::IRREGULAR:
-            return "irregular";
-    }
-    return "unknown";
-}
-
-inline std::string case_context(const TestSuite&   suite,
-                                const char*        provider_name,
-                                const std::string& mode,
-                                const std::string& case_name,
-                                Feed               feed)
-{
-    std::ostringstream out;
-    out << suite.name << '/' << provider_name << '/' << mode << '/' << case_name
-        << '/' << feed_name(feed);
-    return out.str();
-}
-
-inline void init_mode(BlockCipherMode&                 context,
-                      const std::string&               mode,
-                      const std::vector<std::uint8_t>& key,
-                      const std::vector<std::uint8_t>& iv,
-                      const std::vector<std::uint8_t>& aad)
-{
-    if (mode == "GCM")
-    {
-        context.set_iv_len(iv.size());
-    }
-    context.init(key.data(), key.size(), iv.data(), iv.size(), aad.data(), aad.size());
-}
-
-inline void reset_mode(BlockCipherMode& context,
-                       const std::string& mode,
-                       const std::vector<std::uint8_t>& iv,
-                       const std::vector<std::uint8_t>& aad)
-{
-    if (mode == "GCM")
-    {
-        context.set_iv_len(iv.size());
-    }
-    context.init(nullptr, 0, iv.data(), iv.size(), aad.data(), aad.size());
-}
-
-inline void get_tag(BlockCipherMode& context, std::uint8_t* tag)
-{
-    context.get_tag(tag, 16);
-}
-
-inline void set_tag(BlockCipherMode& context,
-                    const std::vector<std::uint8_t>& tag)
-{
-    context.set_tag(tag.data(), tag.size());
-}
-
-inline std::size_t process(BlockCipherMode&                 context,
-                           Feed                             feed,
-                           std::uint8_t*                    output,
-                           std::size_t                      output_capacity,
-                           const std::vector<std::uint8_t>& input)
-{
-    std::size_t written = 0;
-    auto        update  = [&](const std::uint8_t* data, std::size_t size) {
-        std::size_t       n         = 0;
-        const std::size_t remaining = output_capacity - written;
-        context.update(output == nullptr ? nullptr : output + written, &n,
-                       remaining, data, size);
-        if (n > remaining)
+        if (!cipher_)
         {
-            throw std::runtime_error(
-                "block cipher mode reported an invalid output length");
+            throw std::invalid_argument("cipher is unavailable");
         }
-        written += n;
-    };
-
-    if (feed == Feed::ONE_SHOT)
-    {
-        context.do_final(output, &written, output_capacity, input.data(),
-                         input.size());
-        if (written > output_capacity)
+        auto block_size = cipher_->get_block_size();
+        if (block_size == 0 || plaintext_.empty() ||
+            plaintext_.size() % block_size != 0 ||
+            plaintext_.size() != ciphertext_.size() ||
+            key_.size() != cipher_->get_key_len() || cipher_iterations_ == 0)
         {
-            throw std::runtime_error(
-                "block cipher mode reported an invalid final output length");
-        }
-        return written;
-    }
-
-    if (feed == Feed::BYTEWISE)
-    {
-        for (std::size_t i = 0; i < input.size(); ++i)
-        {
-            update(input.data() + i, 1);
-        }
-    }
-    else
-    {
-        static constexpr std::array<std::size_t, 10> CHUNKS = {
-            1, 2, 3, 5, 8, 13, 16, 17, 31, 33,
-        };
-        std::size_t offset = 0;
-        std::size_t index  = 0;
-        while (offset != input.size())
-        {
-            const std::size_t size =
-                std::min(CHUNKS[index], input.size() - offset);
-            update(input.data() + offset, size);
-            offset += size;
-            index = (index + 1) % CHUNKS.size();
+            throw std::invalid_argument(case_name_ + ": invalid cipher vector");
         }
     }
 
-    std::size_t       n         = 0;
-    const std::size_t remaining = output_capacity - written;
-    context.do_final(output == nullptr ? nullptr : output + written, &n,
-                     remaining, nullptr, 0);
-    if (n > remaining)
+    void run(std::size_t iterations, rng::Rng& rng)
     {
-        throw std::runtime_error(
-            "block cipher mode reported an invalid final output length");
-    }
-    return written + n;
-}
+        std::size_t               block_size = cipher_->get_block_size();
+        std::vector<std::uint8_t> input(plaintext_.size());
+        std::vector<std::uint8_t> output(input.size());
 
-inline std::size_t mode_processing_block_size(const std::string& mode,
-                                               std::size_t cipher_block_size)
-{
-    return mode == "ECB" || mode == "CBC" ? cipher_block_size : 1;
-}
+        using run_case_fn =
+            std::function<void(BlockCipher&,                    // cipher
+                               std::vector<std::uint8_t>&,      // output
+                               const std::vector<std::uint8_t>& // input
+                               )>;
 
-inline void validate_mode_metadata(const BlockCipherMode& context,
-                                   const CipherSpec&      spec,
-                                   const std::string&     test_context,
-                                   const std::string&     mode,
-                                   bool                   encrypt)
-{
-    if (context.get_name() == nullptr || context.get_name()[0] == '\0')
-    {
-        fail(test_context, "mode name is empty");
-    }
-    std::string expected_name = mode;
-    if (mode != "OFB" && mode != "CTR")
-    {
-        expected_name += encrypt ? "-ENC" : "-DEC";
-    }
-    if (expected_name != context.get_name())
-    {
-        fail(test_context, "mode name or direction mismatch");
-    }
-    if (context.get_block_size() != mode_processing_block_size(mode, spec.block_size))
-    {
-        fail(test_context, "mode processing block size mismatch");
-    }
-    if (context.get_key_len() != spec.user_key_len)
-    {
-        fail(test_context, "mode user key length mismatch");
-    }
-    const BlockCipher& cipher = context.get_cipher_ctx();
-    if (cipher.get_block_size() != spec.block_size ||
-        cipher.get_key_len() != spec.user_key_len)
-    {
-        fail(test_context, "underlying cipher metadata mismatch");
-    }
-}
-
-inline std::unique_ptr<BlockCipherMode> create_initialized_mode(
-    const TestSuite&                 suite,
-    const BlockCipherModeProvider&   provider,
-    const std::string&               mode,
-    bool                             encrypt,
-    const std::vector<std::uint8_t>& key,
-    const std::vector<std::uint8_t>& iv,
-    const std::vector<std::uint8_t>& aad,
-    const std::string&               context);
-
-inline CryptResult crypt(const TestSuite&                 suite,
-                         const BlockCipherModeProvider&   provider,
-                         const std::string&               mode,
-                         bool                             encrypt,
-                         const std::vector<std::uint8_t>& key,
-                         const std::vector<std::uint8_t>& iv,
-                         const std::vector<std::uint8_t>& aad,
-                         const std::vector<std::uint8_t>& tag,
-                         const std::vector<std::uint8_t>& input,
-                         const std::string&               case_name,
-                         Feed                             feed)
-{
-    const std::string context =
-        case_context(suite, provider.algo_name, mode, case_name, feed);
-    auto mode_context = create_initialized_mode(suite, provider, mode, encrypt,
-                                                key, iv, aad, context);
-    if (mode == "GCM" && !encrypt)
-    {
-        set_tag(*mode_context, tag);
-    }
-
-    static constexpr std::size_t  GUARD_SIZE = 16;
-    static constexpr std::uint8_t GUARD      = 0xa5;
-    CryptResult                   result;
-    result.output.assign(input.size() + GUARD_SIZE, GUARD);
-    std::uint8_t* out = result.output.empty() ? nullptr : result.output.data();
-    const std::size_t written =
-        process(*mode_context, feed, out, input.size(), input);
-    if (written != input.size())
-    {
-        fail(context, "output size mismatch");
-    }
-    for (std::size_t i = input.size(); i < result.output.size(); ++i)
-    {
-        if (result.output[i] != GUARD)
-        {
-            fail(context, "output buffer guard was overwritten");
-        }
-    }
-    result.output.resize(written);
-
-    if (mode == "GCM" && encrypt)
-    {
-        result.tag.resize(16);
-        get_tag(*mode_context, result.tag.data());
-    }
-    return result;
-}
-
-inline void require_equal(const std::vector<std::uint8_t>& actual,
-                          const std::vector<std::uint8_t>& expected,
-                          const std::string&               context,
-                          const char*                      what)
-{
-    if (actual != expected)
-    {
-        fail(context, std::string(what) + " mismatch");
-    }
-}
-
-inline std::unique_ptr<BlockCipherMode> create_initialized_mode(
-    const TestSuite&                 suite,
-    const BlockCipherModeProvider&   provider,
-    const std::string&               mode,
-    bool                             encrypt,
-    const std::vector<std::uint8_t>& key,
-    const std::vector<std::uint8_t>& iv,
-    const std::vector<std::uint8_t>& aad,
-    const std::string&               context)
-{
-    const ModeFactories factories = mode_factories(provider, mode);
-    const ModeFactory   factory =
-        encrypt ? factories.encryptor : factories.decryptor;
-    if (factory == nullptr)
-    {
-        fail(context, "mode factory is unavailable");
-    }
-    auto mode_context = factory();
-    if (mode_context == nullptr)
-    {
-        fail(context, "mode factory returned null");
-    }
-    validate_mode_metadata(*mode_context, suite.cipher, context, mode, encrypt);
-    init_mode(*mode_context, mode, key, iv, aad);
-    return mode_context;
-}
-
-inline void test_mode_lifecycle(
-    const TestSuite&                 suite,
-    const BlockCipherModeProvider&   provider,
-    const std::string&               mode,
-    bool                             encrypt,
-    const std::vector<std::uint8_t>& key,
-    const std::vector<std::uint8_t>& iv,
-    const std::vector<std::uint8_t>& aad,
-    const std::vector<std::uint8_t>& input,
-    const std::vector<std::uint8_t>& expected_output,
-    const std::vector<std::uint8_t>& expected_tag,
-    const std::string&               case_name)
-{
-    const std::string context =
-        suite.name + "/" + provider.algo_name + "/" + mode + "/" + case_name +
-        "/" + (encrypt ? "encrypt" : "decrypt") + "-lifecycle";
-    auto mode_context = create_initialized_mode(suite, provider, mode, encrypt,
-                                                key, iv, aad, context);
-    if (mode == "GCM" && !encrypt)
-    {
-        set_tag(*mode_context, expected_tag);
-    }
-
-    std::vector<std::uint8_t> output(input.size());
-    const std::size_t         written = process(*mode_context, Feed::ONE_SHOT,
-                                                output.data(), output.size(), input);
-    output.resize(written);
-    require_equal(output, expected_output, context, "reset baseline output");
-    if (mode == "GCM" && encrypt)
-    {
-        std::vector<std::uint8_t> tag(16);
-        get_tag(*mode_context, tag.data());
-        require_equal(tag, expected_tag, context, "reset baseline tag");
-    }
-
-    reset_mode(*mode_context, mode, iv, aad);
-    if (mode == "GCM" && !encrypt)
-    {
-        set_tag(*mode_context, expected_tag);
-    }
-    output.assign(input.size(), 0);
-    const std::size_t reset_written = process(
-        *mode_context, Feed::ONE_SHOT, output.data(), output.size(), input);
-    output.resize(reset_written);
-    require_equal(output, expected_output, context, "reset output");
-    if (mode == "GCM" && encrypt)
-    {
-        std::vector<std::uint8_t> tag(16);
-        get_tag(*mode_context, tag.data());
-        require_equal(tag, expected_tag, context, "reset tag");
-    }
-
-    // Stream modes preflight the entire output. Buffered modes may emit
-    // complete blocks before finalization rejects an undersized tail buffer.
-    const bool stream_mode =
-        mode == "CFB" || mode == "OFB" || mode == "CTR" || mode == "GCM";
-    if (!input.empty())
-    {
-        mode_context = create_initialized_mode(suite, provider, mode, encrypt,
-                                               key, iv, aad, context);
-        if (mode == "GCM" && !encrypt)
-        {
-            set_tag(*mode_context, expected_tag);
-        }
-        static constexpr std::uint8_t SENTINEL = 0xa5;
-        std::vector<std::uint8_t>     too_small(input.size(), SENTINEL);
-        std::size_t                   ignored  = 0;
-        bool                          rejected = false;
-        try
-        {
-            mode_context->do_final(too_small.data(), &ignored, input.size() - 1,
-                                   input.data(), input.size());
-        }
-        catch (const std::length_error&)
-        {
-            rejected = true;
-        }
-        if (!rejected)
-        {
-            fail(context, "undersized output buffer was accepted");
-        }
-        const std::size_t untouched_offset = stream_mode ? 0 : input.size() - 1;
-        if (!std::all_of(too_small.begin() + untouched_offset, too_small.end(),
-                         [](std::uint8_t value) { return value == SENTINEL; }))
-        {
-            fail(context, stream_mode ? "output changed after capacity failure"
-                                      : "final wrote beyond output capacity");
-        }
-
-        // A fresh ordinary decryptor retains the final block even without
-        // padding. Stream modes produce one output byte per input byte.
-        const std::size_t block_size = suite.cipher.block_size;
-        const std::size_t update_output = stream_mode
-            ? input.size()
-            : (encrypt ? input.size() : input.size() - 1) / block_size * block_size;
-        if (update_output > 0)
-        {
-            mode_context = create_initialized_mode(
-                suite, provider, mode, encrypt, key, iv, aad, context);
-            if (mode == "GCM" && !encrypt)
+        auto run_case = [&](const char* name, int direction,
+                            const std::vector<std::uint8_t>& source,
+                            const std::vector<std::uint8_t>& expected,
+                            const run_case_fn&               runner) {
+            cipher_->set_key(key_.data(), direction);
+            input = source;
+            rng.gen(output.data(), output.size());
+            for (std::size_t round = 0; round < cipher_iterations_; ++round)
             {
-                set_tag(*mode_context, expected_tag);
+                runner(*cipher_, output, input);
+                input.swap(output);
             }
-            too_small.assign(input.size(), SENTINEL);
-            rejected = false;
-            try
+            if (input != expected)
             {
-                mode_context->update(too_small.data(), &ignored,
-                                     update_output - 1, input.data(),
-                                     input.size());
+                throw std::runtime_error(case_name_ + ": " + name + " failed");
             }
-            catch (const std::length_error&)
-            {
-                rejected = true;
-            }
-            if (!rejected)
-            {
-                fail(context, "undersized update output buffer was accepted");
-            }
-            if (!std::all_of(
-                    too_small.begin(), too_small.end(),
-                    [](std::uint8_t value) { return value == SENTINEL; }))
-            {
-                fail(context, "output changed after update capacity failure");
-            }
-        }
-    }
-
-    mode_context = create_initialized_mode(suite, provider, mode, encrypt, key,
-                                           iv, aad, context);
-    if (mode == "GCM" && !encrypt)
-    {
-        set_tag(*mode_context, expected_tag);
-    }
-    const std::size_t         prefix = input.size() / 2;
-    std::vector<std::uint8_t> original_output(input.size());
-    std::size_t               prefix_written = 0;
-    mode_context->update(original_output.data(), &prefix_written,
-                         original_output.size(), input.data(), prefix);
-    if (prefix_written > original_output.size())
-    {
-        fail(context, "mode reported an invalid cloned-prefix output length");
-    }
-    auto cloned_context = mode_context->clone();
-    if (cloned_context == nullptr)
-    {
-        fail(context, "clone returned null");
-    }
-    std::vector<std::uint8_t> cloned_output = original_output;
-
-    const std::uint8_t* tail = input.data();
-    if (tail != nullptr)
-    {
-        tail += prefix;
-    }
-    const std::size_t tail_size             = input.size() - prefix;
-    std::size_t       original_tail_written = 0;
-    std::uint8_t*     original_tail         = original_output.empty()
-                                                  ? nullptr
-                                                  : original_output.data() + prefix_written;
-    mode_context->do_final(original_tail, &original_tail_written,
-                           original_output.size() - prefix_written, tail,
-                           tail_size);
-    if (original_tail_written > original_output.size() - prefix_written)
-    {
-        fail(context, "mode reported an invalid original-tail output length");
-    }
-    std::size_t   cloned_tail_written = 0;
-    std::uint8_t* cloned_tail =
-        cloned_output.empty() ? nullptr : cloned_output.data() + prefix_written;
-    cloned_context->do_final(cloned_tail, &cloned_tail_written,
-                             cloned_output.size() - prefix_written, tail,
-                             tail_size);
-    if (cloned_tail_written > cloned_output.size() - prefix_written)
-    {
-        fail(context, "mode reported an invalid cloned-tail output length");
-    }
-    original_output.resize(prefix_written + original_tail_written);
-    cloned_output.resize(prefix_written + cloned_tail_written);
-    require_equal(original_output, expected_output, context,
-                  "original output after clone");
-    require_equal(cloned_output, expected_output, context, "cloned output");
-    if (mode == "GCM" && encrypt)
-    {
-        std::vector<std::uint8_t> original_tag(16);
-        std::vector<std::uint8_t> cloned_tag(16);
-        get_tag(*mode_context, original_tag.data());
-        get_tag(*cloned_context, cloned_tag.data());
-        require_equal(original_tag, expected_tag, context,
-                      "original tag after clone");
-        require_equal(cloned_tag, expected_tag, context, "cloned tag");
-    }
-
-    mode_context = create_initialized_mode(suite, provider, mode, encrypt, key,
-                                           iv, aad, context);
-    if (mode == "GCM" && !encrypt)
-    {
-        set_tag(*mode_context, expected_tag);
-    }
-    output.assign(input.size(), 0);
-    const std::size_t split_prefix  = input.size() / 2;
-    std::size_t       split_written = 0;
-    mode_context->update(output.data(), &split_written, output.size(), input.data(),
-                         split_prefix);
-    if (split_written > output.size())
-    {
-        fail(context,
-             "split update reported an invalid output length");
-    }
-    const std::uint8_t* split_tail = input.data();
-    if (split_tail != nullptr)
-    {
-        split_tail += split_prefix;
-    }
-    std::size_t split_final_written = 0;
-    mode_context->do_final(
-        output.empty() ? nullptr : output.data() + split_written,
-        &split_final_written, output.size() - split_written, split_tail, input.size() - split_prefix);
-    if (split_final_written > output.size() - split_written)
-    {
-        fail(context,
-             "split final reported an invalid output length");
-    }
-    output.resize(split_written + split_final_written);
-    require_equal(output, expected_output, context, "split output");
-}
-
-inline void run_cipher_kat(const TestSuite&               suite,
-                           const BlockCipherModeProvider& provider,
-                           const CipherKat&               kat)
-{
-    const std::string context =
-        suite.name + "/" + provider.algo_name + "/cipher/" + kat.case_name;
-    auto cipher = provider.create_cipher();
-    if (cipher == nullptr)
-    {
-        fail(context, "cipher factory returned null");
-    }
-    if (cipher->get_name() == nullptr ||
-        suite.cipher.logical_name != cipher->get_name() ||
-        cipher->get_block_size() != suite.cipher.block_size ||
-        cipher->get_key_len() != suite.cipher.user_key_len ||
-        cipher->get_security_strength() != suite.cipher.security_strength ||
-        cipher->get_parallel_num() == 0)
-    {
-        fail(context, "cipher metadata mismatch");
-    }
-    const char* implementation = cipher->get_impl_algo();
-    if (implementation == nullptr ||
-        std::strcmp(implementation, provider.algo_name) != 0)
-    {
-        fail(context, "cipher implementation name mismatch");
-    }
-
-    const std::size_t blocks = kat.plaintext.size() / suite.cipher.block_size;
-    std::vector<std::uint8_t> output(kat.ciphertext.size());
-    cipher->set_key(kat.key.data(), BlockCipher::ENCRYPTION);
-
-    if (kat.iterations > 1)
-    {
-        if (blocks != 1)
-        {
-            fail(context, "iterated cipher KAT must contain one block");
-        }
-        output = kat.plaintext;
-        for (std::size_t i = 0; i < kat.iterations; ++i)
-        {
-            cipher->encrypt_block(output.data(), output.data());
-        }
-        require_equal(output, kat.ciphertext, context, "iterated ciphertext");
-
-        cipher->set_key(kat.key.data(), BlockCipher::DECRYPTION);
-        for (std::size_t i = 0; i < kat.iterations; ++i)
-        {
-            cipher->decrypt_block(output.data(), output.data());
-        }
-        require_equal(output, kat.plaintext, context, "iterated plaintext");
-        return;
-    }
-
-    std::vector<std::uint8_t> single_block(suite.cipher.block_size);
-    cipher->encrypt_block(single_block.data(), kat.plaintext.data());
-    if (!std::equal(single_block.begin(), single_block.end(),
-                    kat.ciphertext.begin()))
-    {
-        fail(context, "single-block ciphertext mismatch");
-    }
-
-    auto cloned_cipher = cipher->clone();
-    if (cloned_cipher == nullptr)
-    {
-        fail(context, "cipher clone returned null");
-    }
-    cipher->encrypt_blocks(output.data(), kat.plaintext.data(), blocks);
-    require_equal(output, kat.ciphertext, context, "ciphertext");
-
-    cipher->set_key(kat.key.data(), BlockCipher::DECRYPTION);
-    cipher->decrypt_block(single_block.data(), kat.ciphertext.data());
-    if (!std::equal(single_block.begin(), single_block.end(),
-                    kat.plaintext.begin()))
-    {
-        fail(context, "single-block plaintext mismatch");
-    }
-    cipher->decrypt_blocks(output.data(), kat.ciphertext.data(), blocks);
-    require_equal(output, kat.plaintext, context, "plaintext");
-
-    cloned_cipher->encrypt_blocks(output.data(), kat.plaintext.data(), blocks);
-    require_equal(output, kat.ciphertext, context,
-                  "independent cloned cipher output");
-
-    std::vector<std::uint8_t> in_place = kat.plaintext;
-    cipher->set_key(kat.key.data(), BlockCipher::ENCRYPTION);
-    cipher->encrypt_blocks(in_place.data(), in_place.data(), blocks);
-    require_equal(in_place, kat.ciphertext, context,
-                  "in-place multi-block ciphertext");
-    cipher->set_key(kat.key.data(), BlockCipher::DECRYPTION);
-    cipher->decrypt_blocks(in_place.data(), in_place.data(), blocks);
-    require_equal(in_place, kat.plaintext, context,
-                  "in-place multi-block plaintext");
-
-    in_place.assign(kat.plaintext.begin(),
-                    kat.plaintext.begin() + suite.cipher.block_size);
-    cipher->set_key(kat.key.data(), BlockCipher::ENCRYPTION);
-    cipher->encrypt_block(in_place.data(), in_place.data());
-    if (!std::equal(in_place.begin(), in_place.end(), kat.ciphertext.begin()))
-    {
-        fail(context, "in-place single-block ciphertext mismatch");
-    }
-    cipher->set_key(kat.key.data(), BlockCipher::DECRYPTION);
-    cipher->decrypt_block(in_place.data(), in_place.data());
-    if (!std::equal(in_place.begin(), in_place.end(), kat.plaintext.begin()))
-    {
-        fail(context, "in-place single-block plaintext mismatch");
-    }
-}
-
-inline void run_mode_kat(const TestSuite&               suite,
-                         const BlockCipherModeProvider& provider,
-                         const ModeKat&                 kat)
-{
-    static const std::vector<std::uint8_t> EMPTY;
-    for (Feed feed : {Feed::ONE_SHOT, Feed::BYTEWISE, Feed::IRREGULAR})
-    {
-        const std::string context = case_context(suite, provider.algo_name,
-                                                 kat.mode, kat.case_name, feed);
-        CryptResult       encrypted =
-            crypt(suite, provider, kat.mode, true, kat.key, kat.iv, EMPTY,
-                  EMPTY, kat.plaintext, kat.case_name, feed);
-        require_equal(encrypted.output, kat.ciphertext, context, "ciphertext");
-
-        CryptResult decrypted =
-            crypt(suite, provider, kat.mode, false, kat.key, kat.iv, EMPTY,
-                  EMPTY, kat.ciphertext, kat.case_name, feed);
-        require_equal(decrypted.output, kat.plaintext, context, "plaintext");
-    }
-    test_mode_lifecycle(suite, provider, kat.mode, true, kat.key, kat.iv, EMPTY,
-                        kat.plaintext, kat.ciphertext, EMPTY, kat.case_name);
-    test_mode_lifecycle(suite, provider, kat.mode, false, kat.key, kat.iv,
-                        EMPTY, kat.ciphertext, kat.plaintext, EMPTY,
-                        kat.case_name);
-}
-
-inline void run_aead_kat(const TestSuite&               suite,
-                         const BlockCipherModeProvider& provider,
-                         const AeadKat&                 kat)
-{
-    for (Feed feed : {Feed::ONE_SHOT, Feed::BYTEWISE, Feed::IRREGULAR})
-    {
-        const std::string context = case_context(suite, provider.algo_name,
-                                                 kat.mode, kat.case_name, feed);
-        CryptResult       encrypted =
-            crypt(suite, provider, kat.mode, true, kat.key, kat.nonce, kat.aad,
-                  kat.tag, kat.plaintext, kat.case_name, feed);
-        require_equal(encrypted.output, kat.ciphertext, context, "ciphertext");
-        require_equal(encrypted.tag, kat.tag, context, "authentication tag");
-
-        CryptResult decrypted =
-            crypt(suite, provider, kat.mode, false, kat.key, kat.nonce, kat.aad,
-                  kat.tag, kat.ciphertext, kat.case_name, feed);
-        require_equal(decrypted.output, kat.plaintext, context, "plaintext");
-    }
-
-    test_mode_lifecycle(suite, provider, kat.mode, true, kat.key, kat.nonce,
-                        kat.aad, kat.plaintext, kat.ciphertext, kat.tag,
-                        kat.case_name);
-    test_mode_lifecycle(suite, provider, kat.mode, false, kat.key, kat.nonce,
-                        kat.aad, kat.ciphertext, kat.plaintext, kat.tag,
-                        kat.case_name);
-
-    auto expect_authentication_failure =
-        [&](const std::vector<std::uint8_t>& ciphertext,
-            const std::vector<std::uint8_t>& tag, const char* suffix) {
-            const std::string context = suite.name + "/" + provider.algo_name +
-                                        "/" + kat.mode + "/" + kat.case_name +
-                                        suffix;
-            auto mode_context =
-                create_initialized_mode(suite, provider, kat.mode, false,
-                                        kat.key, kat.nonce, kat.aad, context);
-            set_tag(*mode_context, tag);
-            std::vector<std::uint8_t> output(ciphertext.size());
-            std::size_t               written = 0;
-            mode_context->update(output.data(), &written, output.size(),
-                                 ciphertext.data(), ciphertext.size());
-            if (written > output.size())
-            {
-                fail(context,
-                     "decryptor reported an invalid update output length");
-            }
-
-            std::size_t final_written = 0;
-            try
-            {
-                mode_context->do_final(
-                    output.empty() ? nullptr : output.data() + written,
-                    &final_written, output.size() - written, nullptr, 0);
-            }
-            catch (const std::runtime_error&)
-            {
-                return;
-            }
-            fail(context, "authentication failure was accepted");
         };
 
-    std::vector<std::uint8_t> invalid_tag = kat.tag;
-    invalid_tag[0] ^= 1;
-    expect_authentication_failure(kat.ciphertext, invalid_tag, "-invalid-tag");
-
-    if (!kat.ciphertext.empty())
-    {
-        std::vector<std::uint8_t> invalid_ciphertext = kat.ciphertext;
-        invalid_ciphertext[0] ^= 1;
-        expect_authentication_failure(invalid_ciphertext, kat.tag,
-                                      "-invalid-ciphertext");
-    }
-}
-
-inline std::uint64_t random_seed()
-{
-    std::random_device source;
-    return (static_cast<std::uint64_t>(source()) << 32) ^
-           static_cast<std::uint64_t>(source());
-}
-
-inline std::vector<std::uint8_t> random_bytes(std::mt19937_64& generator,
-                                              std::size_t      size)
-{
-    std::vector<std::uint8_t> output(size);
-    for (std::uint8_t& value : output)
-    {
-        value = static_cast<std::uint8_t>(generator());
-    }
-    return output;
-}
-
-template <class Kat>
-inline std::vector<std::string> unique_modes(const std::vector<Kat>& kats)
-{
-    std::vector<std::string> modes;
-    for (const Kat& kat : kats)
-    {
-        if (std::find(modes.begin(), modes.end(), kat.mode) == modes.end())
+        for (std::size_t i = 0; i < iterations; ++i)
         {
-            modes.push_back(kat.mode);
+            run_case("encrypt_block", BlockCipher::ENCRYPTION, plaintext_,
+                     ciphertext_,
+                     [&](BlockCipher& cipher, std::vector<std::uint8_t>& out,
+                         const std::vector<std::uint8_t>& in) {
+                         for (std::size_t j = 0; j < in.size(); j += block_size)
+                         {
+                             std::uint8_t*       out_ptr = out.data() + j;
+                             const std::uint8_t* in_ptr  = in.data() + j;
+                             cipher.encrypt_block(out_ptr, in_ptr);
+                         }
+                     });
+            run_case("decrypt_block", BlockCipher::DECRYPTION, ciphertext_,
+                     plaintext_,
+                     [&](BlockCipher& cipher, std::vector<std::uint8_t>& out,
+                         const std::vector<std::uint8_t>& in) {
+                         for (std::size_t j = 0; j < in.size(); j += block_size)
+                         {
+                             std::uint8_t*       out_ptr = out.data() + j;
+                             const std::uint8_t* in_ptr  = in.data() + j;
+                             cipher.decrypt_block(out_ptr, in_ptr);
+                         }
+                     });
+            run_case("encrypt_blocks", BlockCipher::ENCRYPTION, plaintext_,
+                     ciphertext_,
+                     [&](BlockCipher& cipher, std::vector<std::uint8_t>& out,
+                         const std::vector<std::uint8_t>& in) {
+                         cipher.encrypt_blocks(out.data(), in.data(),
+                                               in.size() / block_size);
+                     });
+            run_case("decrypt_blocks", BlockCipher::DECRYPTION, ciphertext_,
+                     plaintext_,
+                     [&](BlockCipher& cipher, std::vector<std::uint8_t>& out,
+                         const std::vector<std::uint8_t>& in) {
+                         cipher.decrypt_blocks(out.data(), in.data(),
+                                               in.size() / block_size);
+                     });
         }
     }
-    return modes;
-}
-
-inline void run_generated_cases(const TestSuite&               suite,
-                                const BlockCipherModeProvider& provider,
-                                std::uint64_t                  seed)
-{
-    std::mt19937_64 generator(seed);
-    if (!suite.cipher_kats.empty())
-    {
-        auto cipher = provider.create_cipher();
-        if (cipher == nullptr)
-        {
-            fail(suite.name + "/" + provider.algo_name + "/cipher/generated",
-                 "cipher factory returned null");
-        }
-        const std::vector<std::uint8_t> key =
-            random_bytes(generator, suite.cipher.user_key_len);
-        const std::size_t parallel = cipher->get_parallel_num();
-        const std::array<std::size_t, 4> block_counts = {
-            1,
-            2,
-            parallel,
-            parallel + 1,
-        };
-        for (std::size_t blocks : block_counts)
-        {
-            const std::size_t size = blocks * suite.cipher.block_size;
-            const std::vector<std::uint8_t> plaintext =
-                random_bytes(generator, size);
-            std::vector<std::uint8_t> ciphertext(size);
-            std::vector<std::uint8_t> recovered(size);
-            cipher->set_key(key.data(), BlockCipher::ENCRYPTION);
-            cipher->encrypt_blocks(ciphertext.data(), plaintext.data(), blocks);
-            cipher->set_key(key.data(), BlockCipher::DECRYPTION);
-            cipher->decrypt_blocks(recovered.data(), ciphertext.data(), blocks);
-            require_equal(recovered, plaintext,
-                          suite.name + "/" + provider.algo_name +
-                              "/cipher/generated-" + std::to_string(blocks) +
-                              "-blocks",
-                          "generated round-trip plaintext");
-        }
-    }
-
-    const std::size_t              block_size   = suite.cipher.block_size;
-    const std::vector<std::string> tested_modes = unique_modes(suite.mode_kats);
-    for (const std::string& mode : tested_modes)
-    {
-        const std::vector<std::size_t> lengths =
-            (mode == "ECB" || mode == "CBC")
-                ? std::vector<std::size_t>{0, block_size, 2 * block_size}
-                : std::vector<std::size_t>{0,
-                                           1,
-                                           block_size - 1,
-                                           block_size,
-                                           block_size + 1,
-                                           2 * block_size + 1};
-        const std::vector<std::uint8_t> key =
-            random_bytes(generator, suite.cipher.user_key_len);
-        const std::vector<std::uint8_t> iv =
-            mode == "ECB" ? std::vector<std::uint8_t>{}
-                          : random_bytes(generator, block_size);
-        for (std::size_t length : lengths)
-        {
-            const std::vector<std::uint8_t> plaintext =
-                random_bytes(generator, length);
-            const std::string case_name =
-                "generated-" + std::to_string(length) + "-bytes";
-            static const std::vector<std::uint8_t> EMPTY;
-            CryptResult                            encrypted =
-                crypt(suite, provider, mode, true, key, iv, EMPTY, EMPTY,
-                      plaintext, case_name, Feed::IRREGULAR);
-            CryptResult decrypted =
-                crypt(suite, provider, mode, false, key, iv, EMPTY, EMPTY,
-                      encrypted.output, case_name, Feed::BYTEWISE);
-            require_equal(decrypted.output, plaintext,
-                          case_context(suite, provider.algo_name, mode,
-                                       case_name, Feed::BYTEWISE),
-                          "generated round-trip plaintext");
-        }
-    }
-
-    if (!suite.aead_kats.empty())
-    {
-        const std::vector<std::uint8_t> key =
-            random_bytes(generator, suite.cipher.user_key_len);
-        const std::vector<std::uint8_t> nonce = random_bytes(generator, 12);
-        const std::vector<std::uint8_t> aad =
-            random_bytes(generator, block_size + 1);
-        for (std::size_t length :
-             {std::size_t(0), std::size_t(1), block_size, block_size + 1})
-        {
-            const std::vector<std::uint8_t> plaintext =
-                random_bytes(generator, length);
-            const std::string case_name =
-                "generated-" + std::to_string(length) + "-bytes";
-            static const std::vector<std::uint8_t> EMPTY_TAG;
-            CryptResult                            encrypted =
-                crypt(suite, provider, "GCM", true, key, nonce, aad, EMPTY_TAG,
-                      plaintext, case_name, Feed::IRREGULAR);
-            CryptResult decrypted = crypt(
-                suite, provider, "GCM", false, key, nonce, aad, encrypted.tag,
-                encrypted.output, case_name, Feed::BYTEWISE);
-            require_equal(decrypted.output, plaintext,
-                          case_context(suite, provider.algo_name, "GCM",
-                                       case_name, Feed::BYTEWISE),
-                          "generated round-trip plaintext");
-        }
-    }
-}
-
-using BenchmarkClock = std::chrono::steady_clock;
-
-inline volatile std::uint8_t& benchmark_sink()
-{
-    static volatile std::uint8_t sink = 0;
-    return sink;
-}
-
-template <class RunBatch>
-inline double measure_mbits_per_second(std::size_t bytes_per_iteration,
-                                       RunBatch&&  run_batch)
-{
-    static constexpr double      MIN_SAMPLE_SECONDS     = 0.1;
-    static constexpr std::size_t SAMPLE_COUNT           = 5;
-    static constexpr std::size_t MAX_CALIBRATION_ROUNDS = 32;
-    static constexpr double      MAX_SCALE              = 1024.0;
-
-    std::size_t iterations = 1;
-    bool        calibrated = false;
-    for (std::size_t round = 0; round < MAX_CALIBRATION_ROUNDS; ++round)
-    {
-        const auto start = BenchmarkClock::now();
-        run_batch(iterations);
-        const double seconds =
-            std::chrono::duration<double>(BenchmarkClock::now() - start)
-                .count();
-        if (seconds >= MIN_SAMPLE_SECONDS)
-        {
-            calibrated = true;
-            break;
-        }
-        const double scale = seconds > 0 ? MIN_SAMPLE_SECONDS / seconds : 10.0;
-        const std::size_t multiplier = std::max<std::size_t>(
-            2, static_cast<std::size_t>(std::min(scale, MAX_SCALE)) + 1);
-        if (iterations > std::numeric_limits<std::size_t>::max() / multiplier)
-        {
-            throw std::runtime_error(
-                "benchmark iteration calibration overflow");
-        }
-        iterations *= multiplier;
-    }
-    if (!calibrated)
-    {
-        throw std::runtime_error("benchmark iteration calibration failed");
-    }
-
-    std::array<double, SAMPLE_COUNT> samples{};
-    for (double& sample : samples)
-    {
-        const auto start = BenchmarkClock::now();
-        run_batch(iterations);
-        const double seconds =
-            std::chrono::duration<double>(BenchmarkClock::now() - start)
-                .count();
-        if (seconds <= 0)
-        {
-            throw std::runtime_error("benchmark sample duration is zero");
-        }
-        sample = static_cast<double>(bytes_per_iteration) * 8.0 *
-                 static_cast<double>(iterations) / (1024.0 * 1024.0) / seconds;
-    }
-    std::sort(samples.begin(), samples.end());
-    return samples[SAMPLE_COUNT / 2];
-}
-
-inline void print_speed_result(const std::string& cipher_name,
-                               const char*        provider_name,
-                               const char*        operation,
-                               bool               encrypt,
-                               std::size_t        size,
-                               double             mbits_per_second)
-{
-    std::printf(
-        "cipher=%s provider=%s operation=%s direction=%s bytes=%zu "
-        "%.3f Mbit/s\n",
-        cipher_name.c_str(), provider_name, operation,
-        encrypt ? "encrypt" : "decrypt", size, mbits_per_second);
-    std::fflush(stdout);
-}
-
-struct SpeedCipherInfo
-{
-    std::string name;
-    std::size_t block_size;
-    std::size_t user_key_len;
 };
 
-inline SpeedCipherInfo speed_cipher_info(const BlockCipher& cipher,
-                                         const std::string& context)
+inline std::unique_ptr<TestCase> make_mode_test_case(
+    const BlockCipherModeProvider* provider,
+    const ModeKat&                 kat)
 {
-    const char* name = cipher.get_name();
-    if (name == nullptr || name[0] == '\0')
+    if (kat.mode == "ECB")
     {
-        fail(context, "cipher name is empty");
+        return std::make_unique<EcbModeTestCase>(            //
+            provider, kat.key, kat.plaintext, kat.ciphertext //
+        );
     }
-    if (cipher.get_block_size() == 0)
+    if (kat.mode == "CBC")
     {
-        fail(context, "cipher block size is zero");
+        return std::make_unique<CbcModeTestCase>(                    //
+            provider, kat.key, kat.iv, kat.plaintext, kat.ciphertext //
+        );
     }
-    if (cipher.get_key_len() == 0)
+    if (kat.mode == "CFB")
     {
-        fail(context, "cipher user key length is zero");
+        return std::make_unique<CfbModeTestCase>(                    //
+            provider, kat.key, kat.iv, kat.plaintext, kat.ciphertext //
+        );
     }
-    return {name, cipher.get_block_size(), cipher.get_key_len()};
+    if (kat.mode == "OFB")
+    {
+        return std::make_unique<OfbModeTestCase>(                    //
+            provider, kat.key, kat.iv, kat.plaintext, kat.ciphertext //
+        );
+    }
+    if (kat.mode == "CTR")
+    {
+        return std::make_unique<CtrModeTestCase>(                    //
+            provider, kat.key, kat.iv, kat.plaintext, kat.ciphertext //
+        );
+    }
+    throw std::invalid_argument("unsupported test case mode: " + kat.mode);
 }
 
-inline std::size_t benchmark_size(std::size_t block_size)
+inline std::unique_ptr<TestCase> make_mode_test_case(
+    const BlockCipherModeProvider* provider,
+    const AeadKat&                 kat)
 {
-    static constexpr std::size_t TARGET_SIZE = 16 * 1024;
-    return std::max<std::size_t>(1, TARGET_SIZE / block_size) * block_size;
-}
-
-inline void run_cipher_speed(const BlockCipherModeProvider& provider,
-                             std::mt19937_64&               generator)
-{
-    const std::string context =
-        std::string("speed/") + provider.algo_name + "/BlockCipher";
-    auto probe = provider.create_cipher();
-    if (probe == nullptr)
+    if (kat.mode != "GCM")
     {
-        fail(context, "cipher factory returned null");
+        throw std::invalid_argument("unsupported AEAD mode: " + kat.mode);
     }
-    const SpeedCipherInfo           info   = speed_cipher_info(*probe, context);
-    const std::size_t               size   = benchmark_size(info.block_size);
-    const std::size_t               blocks = size / info.block_size;
-    const std::vector<std::uint8_t> key =
-        random_bytes(generator, info.user_key_len);
-    const std::vector<std::uint8_t> input = random_bytes(generator, size);
-    std::vector<std::uint8_t>       output(size);
-
-    for (bool encrypt : {true, false})
-    {
-        auto cipher = provider.create_cipher();
-        if (cipher == nullptr)
-        {
-            fail(context, "cipher factory returned null");
-        }
-        const SpeedCipherInfo current = speed_cipher_info(*cipher, context);
-        if (current.name != info.name ||
-            current.block_size != info.block_size ||
-            current.user_key_len != info.user_key_len)
-        {
-            fail(context, "cipher factory returned inconsistent metadata");
-        }
-        cipher->set_key(key.data(), encrypt ? BlockCipher::ENCRYPTION
-                                            : BlockCipher::DECRYPTION);
-        const double speed =
-            measure_mbits_per_second(size, [&](std::size_t iterations) {
-                for (std::size_t i = 0; i < iterations; ++i)
-                {
-                    if (encrypt)
-                    {
-                        cipher->encrypt_blocks(output.data(), input.data(),
-                                               blocks);
-                    }
-                    else
-                    {
-                        cipher->decrypt_blocks(output.data(), input.data(),
-                                               blocks);
-                    }
-                }
-                benchmark_sink() ^= output[0];
-            });
-        print_speed_result(info.name, provider.algo_name, "BlockCipher",
-                           encrypt, size, speed);
-    }
-}
-
-struct SpeedModeData
-{
-    std::vector<std::uint8_t> key;
-    std::vector<std::uint8_t> iv;
-    std::vector<std::uint8_t> aad;
-    std::vector<std::uint8_t> plaintext;
-    std::vector<std::uint8_t> ciphertext;
-    std::vector<std::uint8_t> tag;
-    SpeedCipherInfo           cipher;
-};
-
-inline void increment_gcm_counter(std::array<std::uint8_t, 16>& counter)
-{
-    for (std::size_t i = counter.size(); i-- > 12;)
-    {
-        if (++counter[i] != 0)
-        {
-            return;
-        }
-    }
-}
-
-inline void store_u64_be(std::uint8_t out[8], std::uint64_t value)
-{
-    for (std::size_t i = 8; i-- > 0;)
-    {
-        out[i] = static_cast<std::uint8_t>(value);
-        value >>= 8;
-    }
-}
-
-inline void ghash_padded(ghash::GHash&                    hash,
-                         const std::vector<std::uint8_t>& data)
-{
-    hash.update(data.data(), data.size());
-    const std::size_t remainder = data.size() % 16;
-    if (remainder != 0)
-    {
-        static constexpr std::array<std::uint8_t, 16> ZERO = {};
-        hash.update(ZERO.data(), ZERO.size() - remainder);
-    }
-}
-
-inline void prepare_gcm_decryption_data(const BlockCipher& cipher,
-                                        SpeedModeData&     data)
-{
-    std::array<std::uint8_t, 16> hash_key{};
-    std::array<std::uint8_t, 16> zero{};
-    cipher.encrypt_block(hash_key.data(), zero.data());
-
-    std::array<std::uint8_t, 16> initial_counter{};
-    std::copy(data.iv.begin(), data.iv.end(), initial_counter.begin());
-    initial_counter.back() = 1;
-
-    data.ciphertext.resize(data.plaintext.size());
-    std::array<std::uint8_t, 16> counter = initial_counter;
-    std::array<std::uint8_t, 16> stream{};
-    for (std::size_t offset = 0; offset < data.plaintext.size(); offset += 16)
-    {
-        increment_gcm_counter(counter);
-        cipher.encrypt_block(stream.data(), counter.data());
-        const std::size_t size =
-            std::min<std::size_t>(16, data.plaintext.size() - offset);
-        for (std::size_t i = 0; i < size; ++i)
-        {
-            data.ciphertext[offset + i] =
-                data.plaintext[offset + i] ^ stream[i];
-        }
-    }
-
-    ghash::GHash hash(hash_key.data());
-    ghash_padded(hash, data.aad);
-    ghash_padded(hash, data.ciphertext);
-    std::array<std::uint8_t, 16> lengths{};
-    store_u64_be(lengths.data(),
-                 static_cast<std::uint64_t>(data.aad.size()) * 8);
-    store_u64_be(lengths.data() + 8,
-                 static_cast<std::uint64_t>(data.ciphertext.size()) * 8);
-    std::array<std::uint8_t, 16> authentication{};
-    hash.do_final(authentication.data(), lengths.data(), lengths.size());
-
-    std::array<std::uint8_t, 16> tag_mask{};
-    cipher.encrypt_block(tag_mask.data(), initial_counter.data());
-    data.tag.resize(16);
-    for (std::size_t i = 0; i < data.tag.size(); ++i)
-    {
-        data.tag[i] = authentication[i] ^ tag_mask[i];
-    }
-}
-
-inline std::unique_ptr<BlockCipherMode> create_speed_mode(
-    ModeFactory                      factory,
-    const std::string&               mode,
-    const SpeedCipherInfo&           cipher,
-    const std::vector<std::uint8_t>& key,
-    const std::vector<std::uint8_t>& iv,
-    const std::vector<std::uint8_t>& aad,
-    const std::string&               context)
-{
-    auto mode_context = factory();
-    if (mode_context == nullptr)
-    {
-        fail(context, "mode factory returned null");
-    }
-    const SpeedCipherInfo current =
-        speed_cipher_info(mode_context->get_cipher_ctx(), context);
-    if (current.name != cipher.name ||
-        current.block_size != cipher.block_size ||
-        current.user_key_len != cipher.user_key_len)
-    {
-        fail(context, "mode factory returned inconsistent cipher metadata");
-    }
-    if (mode_context->get_block_size() != mode_processing_block_size(mode, cipher.block_size) ||
-        mode_context->get_key_len() != cipher.user_key_len)
-    {
-        fail(context, "mode processing block size or key length mismatch");
-    }
-    init_mode(*mode_context, mode, key, iv, aad);
-    return mode_context;
-}
-
-inline SpeedModeData prepare_speed_mode_data(
-    const BlockCipherModeProvider& provider,
-    const std::string&             mode,
-    const ModeFactories&           factories,
-    std::mt19937_64&               generator)
-{
-    const std::string context =
-        std::string("speed/") + provider.algo_name + "/" + mode;
-    const ModeFactory probe_factory = factories.encryptor != nullptr
-                                          ? factories.encryptor
-                                          : factories.decryptor;
-    auto              probe         = probe_factory();
-    if (probe == nullptr)
-    {
-        fail(context, "mode factory returned null");
-    }
-
-    SpeedModeData data;
-    data.cipher = speed_cipher_info(probe->get_cipher_ctx(), context);
-    if (mode == "GCM" && data.cipher.block_size != 16)
-    {
-        fail(context, "GCM requires a 16-byte block cipher");
-    }
-    if (probe->get_block_size() != mode_processing_block_size(mode, data.cipher.block_size) ||
-        probe->get_key_len() != data.cipher.user_key_len)
-    {
-        fail(context, "mode processing block size or key length mismatch");
-    }
-    const std::size_t size = benchmark_size(data.cipher.block_size);
-    data.key               = random_bytes(generator, data.cipher.user_key_len);
-    data.iv                = mode == "ECB"
-                                 ? std::vector<std::uint8_t>{}
-                                 : random_bytes(generator,
-                                 mode == "GCM" ? 12 : data.cipher.block_size);
-    data.aad               = mode == "GCM"
-                                 ? random_bytes(generator, data.cipher.block_size + 1)
-                                 : std::vector<std::uint8_t>{};
-    data.plaintext         = random_bytes(generator, size);
-    if (factories.encryptor != nullptr)
-    {
-        auto encryptor =
-            create_speed_mode(factories.encryptor, mode, data.cipher, data.key,
-                              data.iv, data.aad, context);
-        data.ciphertext.resize(size);
-        const std::size_t written =
-            process(*encryptor, Feed::ONE_SHOT, data.ciphertext.data(),
-                    data.ciphertext.size(), data.plaintext);
-        if (written != size)
-        {
-            fail(context, "speed preparation output size mismatch");
-        }
-        if (mode == "GCM")
-        {
-            data.tag.resize(16);
-            get_tag(*encryptor, data.tag.data());
-        }
-    }
-    else
-    {
-        if (mode == "GCM")
-        {
-            auto decryptor =
-                create_speed_mode(factories.decryptor, mode, data.cipher,
-                                  data.key, data.iv, data.aad, context);
-            prepare_gcm_decryption_data(decryptor->get_cipher_ctx(), data);
-        }
-        else
-        {
-            data.ciphertext = random_bytes(generator, size);
-        }
-    }
-    return data;
-}
-
-inline void run_mode_speed(const BlockCipherModeProvider& provider,
-                           const std::string&             mode,
-                           const ModeFactories&           factories,
-                           const SpeedModeData&           data)
-{
-    const std::size_t         size = data.plaintext.size();
-    std::vector<std::uint8_t> output(size);
-    for (bool encrypt : {true, false})
-    {
-        const ModeFactory factory =
-            encrypt ? factories.encryptor : factories.decryptor;
-        if (factory == nullptr)
-        {
-            continue;
-        }
-        const std::string context =
-            data.cipher.name + "/" + provider.algo_name + "/" + mode + "/speed";
-        auto mode_context = create_speed_mode(
-            factory, mode, data.cipher, data.key, data.iv, data.aad, context);
-        const std::vector<std::uint8_t>& input =
-            encrypt ? data.plaintext : data.ciphertext;
-        std::vector<std::uint8_t> measured_tag(16);
-        const double              speed =
-            measure_mbits_per_second(size, [&](std::size_t iterations) {
-                for (std::size_t i = 0; i < iterations; ++i)
-                {
-                    reset_mode(*mode_context, mode, data.iv, data.aad);
-                    if (mode == "GCM" && !encrypt)
-                    {
-                        set_tag(*mode_context, data.tag);
-                    }
-                    const std::size_t written =
-                        process(*mode_context, Feed::ONE_SHOT, output.data(),
-                                output.size(), input);
-                    if (written != size)
-                    {
-                        fail(context, "benchmark output size mismatch");
-                    }
-                    if (mode == "GCM" && encrypt)
-                    {
-                        get_tag(*mode_context, measured_tag.data());
-                        benchmark_sink() ^= measured_tag[0];
-                    }
-                }
-                benchmark_sink() ^= output[0];
-            });
-        print_speed_result(data.cipher.name, provider.algo_name, mode.c_str(),
-                           encrypt, size, speed);
-    }
+    return std::make_unique<GcmModeTestCase>( //
+        provider, kat.key, kat.nonce, kat.aad, kat.plaintext, kat.ciphertext,
+        kat.tag);
 }
 
 } // namespace detail
 
 /**
- * @brief Validate the structure and test vectors of a test suite.
- * @throws std::invalid_argument if the suite is invalid.
- */
-inline void validate_test_suite(const TestSuite& suite)
-{
-    detail::require_config(!suite.name.empty(), "test suite name is empty");
-    detail::require_config(!suite.cipher.logical_name.empty(),
-                           suite.name + ": cipher name is empty");
-    detail::require_config(suite.cipher.block_size != 0,
-                           suite.name + ": block size is zero");
-    detail::require_config(suite.cipher.user_key_len != 0,
-                           suite.name + ": user key length is zero");
-    detail::require_config(suite.cipher.security_strength != 0,
-                           suite.name + ": security strength is zero");
-    for (const CipherKat& kat : suite.cipher_kats)
-    {
-        const std::string prefix = suite.name + "/cipher/" + kat.case_name;
-        detail::require_config(!kat.case_name.empty(),
-                               suite.name + ": empty cipher KAT name");
-        detail::require_config(kat.key.size() == suite.cipher.user_key_len,
-                               prefix + ": invalid key length");
-        detail::require_config(!kat.plaintext.empty(),
-                               prefix + ": plaintext is empty");
-        detail::require_config(kat.iterations != 0,
-                               prefix + ": iteration count is zero");
-        detail::require_config(kat.plaintext.size() == kat.ciphertext.size(),
-                               prefix + ": plaintext/ciphertext size mismatch");
-        detail::require_config(
-            kat.plaintext.size() % suite.cipher.block_size == 0,
-            prefix + ": data is not block aligned");
-    }
-
-    for (const ModeKat& kat : suite.mode_kats)
-    {
-        const std::string prefix =
-            suite.name + "/" + kat.mode + "/" + kat.case_name;
-        detail::require_config(!kat.case_name.empty(),
-                               suite.name + ": empty mode KAT name");
-        detail::require_config(detail::is_mode(kat.mode),
-                               prefix + ": unknown mode");
-        detail::require_config(kat.key.size() == suite.cipher.user_key_len,
-                               prefix + ": invalid key length");
-        detail::require_config(kat.plaintext.size() == kat.ciphertext.size(),
-                               prefix + ": plaintext/ciphertext size mismatch");
-        detail::require_config(kat.mode == "ECB"
-                                   ? kat.iv.empty()
-                                   : kat.iv.size() == suite.cipher.block_size,
-                               prefix + ": invalid IV length");
-        if (kat.mode == "ECB" || kat.mode == "CBC")
-        {
-            detail::require_config(
-                kat.plaintext.size() % suite.cipher.block_size == 0,
-                prefix + ": data is not block aligned");
-        }
-    }
-
-    for (const AeadKat& kat : suite.aead_kats)
-    {
-        const std::string prefix =
-            suite.name + "/" + kat.mode + "/" + kat.case_name;
-        detail::require_config(!kat.case_name.empty(),
-                               suite.name + ": empty AEAD KAT name");
-        detail::require_config(kat.mode == "GCM",
-                               prefix + ": unknown AEAD mode");
-        detail::require_config(suite.cipher.block_size == 16,
-                               prefix + ": GCM requires a 16-byte block");
-        detail::require_config(kat.key.size() == suite.cipher.user_key_len,
-                               prefix + ": invalid key length");
-        detail::require_config(kat.plaintext.size() == kat.ciphertext.size(),
-                               prefix + ": plaintext/ciphertext size mismatch");
-        detail::require_config(kat.tag.size() == 16,
-                               prefix + ": GCM tag must be 16 bytes");
-    }
-}
-
-/**
- * @brief Run a test suite against one block cipher mode provider.
- * @throws std::invalid_argument if the suite or provider is invalid.
+ * @brief Run the mode test cases against one provider.
+ * @throws std::invalid_argument if the provider or mode is unavailable.
  * @throws std::runtime_error if a test fails.
  */
 inline void run_test_suite(const TestSuite&               suite,
                            const BlockCipherModeProvider* provider)
 {
-    validate_test_suite(suite);
-    detail::require_config(provider != nullptr,
-                           suite.name + ": provider is null");
-    detail::require_config(
-        provider->algo_name != nullptr && provider->algo_name[0] != '\0',
-        suite.name + ": provider name is empty");
-    if (!suite.cipher_kats.empty())
+    if (provider == nullptr)
     {
-        detail::require_config(provider->create_cipher != nullptr,
-                               suite.name + "/" + provider->algo_name +
-                                   ": cipher factory is unavailable");
+        throw std::invalid_argument("provider is null");
     }
-
+    rng::CstdRng rng;
     for (const CipherKat& kat : suite.cipher_kats)
     {
-        detail::run_cipher_kat(suite, *provider, kat);
+        detail::CipherTestCase test_case(*provider, kat);
+        test_case.run(10, rng);
     }
     for (const ModeKat& kat : suite.mode_kats)
     {
-        detail::run_mode_kat(suite, *provider, kat);
+        auto test_case = detail::make_mode_test_case(provider, kat);
+        test_case->run(1000, rng);
     }
     for (const AeadKat& kat : suite.aead_kats)
     {
-        detail::run_aead_kat(suite, *provider, kat);
-    }
-
-    const std::uint64_t seed = detail::random_seed();
-    std::printf(
-        "Testing generated block cipher cases. suite: %s, provider: "
-        "%s, seed: %llu\n",
-        suite.name.c_str(), provider->algo_name,
-        static_cast<unsigned long long>(seed));
-    try
-    {
-        detail::run_generated_cases(suite, *provider, seed);
-    }
-    catch (const std::exception& error)
-    {
-        std::ostringstream message;
-        message << error.what() << " (generated-case seed: " << seed << ')';
-        throw std::runtime_error(message.str());
+        auto test_case = detail::make_mode_test_case(provider, kat);
+        test_case->run(1000, rng);
     }
 }
 
-/**
- * @brief Measure all throughput operations exposed by a provider.
- *
- * Uses an approximately 16 KiB message to match TLS's 2^14-byte plaintext
- * fragment limit, adaptive iteration counts, five samples, and reports the
- * median Mbit/s. Context creation, key setup, and allocation are outside the
- * timed region. Modes include reset/final and GCM tag handling in each timed
- * message.
- */
-inline void run_speed_test(const BlockCipherModeProvider* provider)
+inline void run_speed_test(const BlockCipherModeProvider* provider,
+                           std::size_t                    msg_len = 1 << 14)
 {
-    detail::require_config(provider != nullptr, "provider is null");
-    detail::require_config(
-        provider->algo_name != nullptr && provider->algo_name[0] != '\0',
-        "provider name is empty");
+    using namespace std::chrono;
+    using clock_t = std::chrono::high_resolution_clock;
+    using Factory = std::unique_ptr<BlockCipherMode> (*)();
 
-    std::mt19937_64 generator(detail::random_seed());
-    if (provider->create_cipher != nullptr)
+    if (provider == nullptr || msg_len == 0)
     {
-        detail::run_cipher_speed(*provider, generator);
+        throw std::invalid_argument(
+            "provider is null or message length is zero");
     }
 
-    static constexpr std::array<const char*, 6> MODES = {
-        "ECB", "CBC", "CFB", "OFB", "CTR", "GCM",
+    struct Mode
+    {
+        const char* name;
+        Factory     encrypt;
+        Factory     decrypt;
     };
-    for (const char* mode : MODES)
+
+    Mode modes[] = {
+        {"ECB", provider->create_ecb_encryptor, provider->create_ecb_decryptor},
+        {"CBC", provider->create_cbc_encryptor, provider->create_cbc_decryptor},
+        {"CFB", provider->create_cfb_encryptor, provider->create_cfb_decryptor},
+        {"OFB", provider->create_ofb_encryptor, provider->create_ofb_decryptor},
+        {"CTR", provider->create_ctr_encryptor, provider->create_ctr_decryptor},
+        {"GCM", provider->create_gcm_encryptor, provider->create_gcm_decryptor},
+    };
+
+    auto cipher = provider->create_cipher ? provider->create_cipher() : nullptr;
+    std::unique_ptr<BlockCipherMode> probe;
+    if (!cipher)
     {
-        const detail::ModeFactories factories =
-            detail::mode_factories(*provider, mode);
-        if (factories.encryptor == nullptr && factories.decryptor == nullptr)
+        for (auto& mode : modes)
         {
-            continue;
+            auto factory = mode.encrypt ? mode.encrypt : mode.decrypt;
+            if (factory)
+            {
+                probe = factory();
+                break;
+            }
         }
-        const detail::SpeedModeData data = detail::prepare_speed_mode_data(
-            *provider, mode, factories, generator);
-        detail::run_mode_speed(*provider, mode, factories, data);
     }
+    if (!cipher && !probe)
+    {
+        throw std::invalid_argument("provider has no cipher or modes");
+    }
+    auto& metadata   = cipher ? *cipher : probe->get_cipher_ctx();
+    auto  block_size = metadata.get_block_size();
+
+    std::vector<std::uint8_t> key(metadata.get_key_len());
+    std::vector<std::uint8_t> input(msg_len);
+    std::vector<std::uint8_t> output(msg_len);
+    volatile std::uint8_t     sink = 0;
+    const char*               border =
+        "+--------------------" // Test
+        "+------------------"   // Data length
+        "+--------------"       // Loops
+        "+------------------+"; // Speed
+
+    std::printf("\n%s / %s\n%s\n", //
+                metadata.get_name(), provider->algo_name, border);
+    std::printf("| %-18s | %16s | %12s | %16s |\n", //
+                "Test", "Data length (KB)", "Loops", "Speed (Mbit/s)");
+    std::puts(border);
+    std::fflush(stdout);
+
+    auto measure = [&](const std::string&           name,
+                       const std::function<void()>& run) {
+        std::size_t         loops   = 0;
+        double              seconds = 0;
+        clock_t::time_point start   = clock_t::now();
+        do
+        {
+            for (std::size_t i = 0; i < 1024; ++i)
+            {
+                run();
+            }
+            loops += 1024;
+            sink ^= output[0];
+            seconds = duration<double>(clock_t::now() - start).count();
+        } while (seconds < 1.0);
+        double speed = (double)(msg_len)*loops * 8 / seconds / 1024 / 1024;
+        std::printf("| %-18s | %16.3f | %12zu | %16.3f |\n", name.c_str(),
+                    msg_len / 1024.0, loops, speed);
+        std::fflush(stdout);
+    };
+
+    if (cipher)
+    {
+        measure("Cipher Encrypt", [&]() {
+            cipher->set_key(key.data(), BlockCipher::ENCRYPTION);
+            cipher->encrypt_blocks(output.data(), input.data(),
+                                   msg_len / block_size);
+        });
+        measure("Cipher Decrypt", [&]() {
+            cipher->set_key(key.data(), BlockCipher::DECRYPTION);
+            cipher->decrypt_blocks(output.data(), input.data(),
+                                   msg_len / block_size);
+        });
+    }
+    bool skipped_gcm_decrypt = false;
+    for (auto& mode : modes)
+    {
+        bool gcm      = std::strcmp(mode.name, "GCM") == 0;
+        bool buffered = std::strcmp(mode.name, "ECB") == 0 ||
+                        std::strcmp(mode.name, "CBC") == 0;
+        std::vector<std::uint8_t> iv(
+            std::strcmp(mode.name, "ECB") == 0 ? 0 : (gcm ? 12 : block_size));
+        std::vector<std::uint8_t> ciphertext(msg_len);
+        std::vector<std::uint8_t> tag(16);
+        auto encryptor = mode.encrypt ? mode.encrypt() : nullptr;
+        auto decryptor = mode.decrypt ? mode.decrypt() : nullptr;
+        if (gcm && encryptor && decryptor)
+        {
+            // Prepare authenticated dummy ciphertext outside the timed region.
+            encryptor->set_iv_len(iv.size());
+            encryptor->init(key.data(), key.size(), iv.data(), iv.size());
+            std::size_t written = 0;
+            detail::run_final_safe(*encryptor, ciphertext.data(), &written,
+                                   ciphertext.size(), input.data(),
+                                   input.size());
+            encryptor->get_tag(tag.data(), tag.size());
+        }
+        for (bool encrypt : {true, false})
+        {
+            auto* cryptor = encrypt ? encryptor.get() : decryptor.get();
+            if (cryptor == nullptr)
+            {
+                continue;
+            }
+            if (gcm && !encrypt && !encryptor)
+            {
+                skipped_gcm_decrypt = true;
+                continue;
+            }
+            if (gcm)
+            {
+                cryptor->set_iv_len(iv.size());
+            }
+            auto& data = gcm && !encrypt ? ciphertext : input;
+            measure(
+                std::string(mode.name) + (encrypt ? " Encrypt" : " Decrypt"),
+                [&]() {
+                    cryptor->init(key.data(), key.size(), iv.data(), iv.size());
+                    if (buffered)
+                    {
+                        cryptor->set_padding(false);
+                    }
+                    if (gcm && !encrypt)
+                    {
+                        cryptor->set_tag(tag.data(), tag.size());
+                    }
+                    std::size_t written = 0;
+                    detail::run_final_safe(*cryptor, output.data(), &written,
+                                           output.size(), data.data(),
+                                           data.size());
+                });
+        }
+    }
+    std::puts(border);
+    if (skipped_gcm_decrypt)
+    {
+        std::puts(
+            "GCM Decrypt skipped: an encryptor is required to prepare the "
+            "tag.");
+    }
+    std::fflush(stdout);
 }
 
 } // namespace block_cipher_mode::test
