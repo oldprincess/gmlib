@@ -1,0 +1,2 @@
+test md5 finish!
+speed md5 common ... 3767.329717 Mbps

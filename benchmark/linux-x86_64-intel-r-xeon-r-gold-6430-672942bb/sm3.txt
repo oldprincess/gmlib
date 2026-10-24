@@ -1,0 +1,2 @@
+test sm3 finish!
+speed sm3 yang15 ... 940.924967 Mbps

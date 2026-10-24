@@ -1,0 +1,5 @@
+test sha2 finish!
+speed sha224 sha ... 8704.250460 Mbps
+speed sha256 sha ... 8707.403383 Mbps
+speed sha384 common ... 2341.174708 Mbps
+speed sha512 common ... 2348.141024 Mbps

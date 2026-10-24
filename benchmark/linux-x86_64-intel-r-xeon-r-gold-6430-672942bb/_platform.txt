@@ -1,0 +1,34 @@
+Git commit: 52dab70c9932e560ecf8b8726d3089964d218006
+OS: Linux-5.15.0-105-generic-x86_64-with-glibc2.35
+Architecture: x86_64
+CPU: Intel(R) Xeon(R) Gold 6430
+Logical CPUs: 128
+Memory (bytes): 1081813950464
+Compiler: GNU
+Compiler version: 11.4.0
+Configuration: Release
+CMake generator: Unix Makefiles
+Build options: {"CMAKE_CXX_FLAGS": "", "CMAKE_CXX_FLAGS-ADVANCED": "1", "CMAKE_CXX_FLAGS_DEBUG": "-g", "CMAKE_CXX_FLAGS_DEBUG-ADVANCED": "1", "CMAKE_CXX_FLAGS_MINSIZEREL": "-Os -DNDEBUG", "CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED": "1", "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG", "CMAKE_CXX_FLAGS_RELEASE-ADVANCED": "1", "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O2 -g -DNDEBUG", "CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED": "1", "SUPPORT_AES_AESNI": "ON", "SUPPORT_AES_ARM_AES": "ON", "SUPPORT_BASE64_AVX2": "ON", "SUPPORT_BASE64_CHROMIUM": "ON", "SUPPORT_GHASH_PCLMUL": "ON", "SUPPORT_NUMBER_X64": "ON", "SUPPORT_SHA1_SHA": "ON", "SUPPORT_SHA2_SHA": "ON", "SUPPORT_SM3_YANG15": "ON", "SUPPORT_SM4_GONG23_AESNI": "ON", "SUPPORT_SM4_GONG23_GFNI": "ON", "SUPPORT_SM4_LANG18": "ON", "SUPPORT_SM4_LANG18_AVX2": "ON", "SUPPORT_SM4_SM4NI": "ON", "SUPPORT_UBLOCK_GONG25": "ON", "SUPPORT_UBLOCK_STANDARD": "ON"}
+Compiler path: /usr/bin/c++
+Test arguments: speed
+
+Exit codes:
+ctest: 0
+aes_test: 0
+asn1_test: 0
+ballet_test: 0
+base64_test: 0
+block_cipher_mode_test: 0
+cpuinfo_test: 0
+des_test: 0
+ghash_test: 0
+md5_test: 0
+memory_utils_test: 0
+number_test: 0
+sha1_test: 0
+sha2_test: 0
+sm2_test: 0
+sm3_test: 0
+sm4_test: 0
+sm9_test: 0
+ublock_test: 0

@@ -1,0 +1,5 @@
+test sm2 finish!
+speed sm2-sm3 sign (64 bytes)... 18483.2 opt/s
+speed sm2-sm3 verify ... 5736.11 opt/s
+speed sm2-sm3 encrypt (64 bytes)... 4268.07 opt/s
+speed sm2-sm3 decrypt (64 bytes)... 6669.24 opt/s

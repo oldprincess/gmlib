@@ -1,0 +1,8 @@
+test number finish!
+speed bn256 mul bn256 ... 7.518950e+06 opt/s
+speed bn512 div bn256...3.133734e+06 opt/s
+speed uint256 x64 mul ... 8.094806e+07 opt/s
+speed uint256 x64 sqr ... 7.979445e+07 opt/s
+speed mont256 x64 mul ... 2.400661e+07 opt/s
+speed mont256 x64 sqr ... 2.594101e+07 opt/s
+speed mont256 x64 inv ... 1.620746e+08 opt/s

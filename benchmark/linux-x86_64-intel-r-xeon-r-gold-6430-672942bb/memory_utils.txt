@@ -1,0 +1,7 @@
+test memory_utils ok!
+speed memxor_n 64 bytes, loop=16777216 ... 50567901234.567902 Mbps, checksum=7362
+speed memxor_n 256 bytes, loop=4194304 ... 39766990291.262138 Mbps, checksum=32153
+speed memxor_n 1024 bytes, loop=1048576 ... 17174004192.872116 Mbps, checksum=132448
+speed memxor_n 4096 bytes, loop=262144 ... 4713463751.438436 Mbps, checksum=524627
+speed memxor_n 65536 bytes, loop=16384 ... 295090234.501639 Mbps, checksum=8337521
+speed memxor_n 1048576 bytes, loop=1024 ... 12856306.605336 Mbps, checksum=133728896

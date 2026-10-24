@@ -1,0 +1,13 @@
+30 15                      ;  SEQUENCE(length = 21 Bytes,UNIVERSAL,CONSTRUCTED)
+   02 01                      ;  INTEGER(length = 1 Bytes,UNIVERSAL,PRIMITIVE)
+      01 
+   03 02                      ;  BIT_STRING(length = 2 Bytes,UNIVERSAL,PRIMITIVE)
+      04 f0 
+   23 0c                      ;  BIT_STRING(length = 12 Bytes,UNIVERSAL,CONSTRUCTED)
+      01 01                      ;  BOOLEAN(length = 1 Bytes,UNIVERSAL,PRIMITIVE)
+         ff 
+      01 01                      ;  BOOLEAN(length = 1 Bytes,UNIVERSAL,PRIMITIVE)
+         00 
+      04 04                      ;  OCTET_STRING(length = 4 Bytes,UNIVERSAL,PRIMITIVE)
+         20 21 22 23 
+test asn1 finish

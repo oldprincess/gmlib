@@ -1,0 +1,5 @@
+test sm9 finish!
+speed sm9-sm3 encrypt (64 bytes)... 418.392 opt/s
+speed sm9-sm3 decrypt (64 bytes)... 365.465 opt/s
+speed sm9-sm3 sign (64 bytes)... 460.089 opt/s
+speed sm9-sm3 verify (64 bytes)... 183.655 opt/s

@@ -1,0 +1,14 @@
+  provider 'avx2' passed
+  provider 'chromium' passed
+  provider 'common' passed
+test base64 ok
+speed base64 ... 
+  speed base64 [avx2] ... 
+    [encode] 87024.627970 Mbps
+    [decode] 36954.573590 Mbps
+  speed base64 [chromium] ... 
+    [encode] 11995.010076 Mbps
+    [decode] 19117.534603 Mbps
+  speed base64 [common] ... 
+    [encode] 10704.403256 Mbps
+    [decode] 12050.878810 Mbps

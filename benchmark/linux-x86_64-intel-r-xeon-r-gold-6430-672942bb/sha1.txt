@@ -1,0 +1,2 @@
+test sha1 finish!
+speed sha1 sha ... 10006.083699 Mbps
