@@ -8,13 +8,13 @@
 
 sm2签名
 
-```
+```sh
 python make.py sm2\sm2_sign.cpp  demo.exe
 ```
 
 sm2加密
 
-```
+```sh
 python make.py sm2\sm2_cipher.cpp  demo.exe
 ```
 
@@ -22,13 +22,13 @@ python make.py sm2\sm2_cipher.cpp  demo.exe
 
 * 哈希
 
-```
+```sh
 python make.py sm3\sm3_hash.cpp  demo.exe
 ```
 
 * 消息认证码
 
-```
+```sh
 python make.py sm3\sm3_hmac.cpp  demo.exe
 ```
 
@@ -36,26 +36,26 @@ python make.py sm3\sm3_hmac.cpp  demo.exe
 
 * 加密解密
 
-```
+```sh
 python make.py sm4\sm4_cipher.cpp  demo.exe
 ```
 
 * 工作模式
 
-```
+```sh
 python make.py sm4\sm4_cbc.cpp  demo.exe
 ```
 
-```
+```sh
 python make.py sm4\sm4_gcm.cpp  demo.exe
 ```
 
 ## sm9
 
-```
+```sh
 python make.py sm9\sm9_enc.cpp  demo.exe
 ```
 
-```
+```sh
 python make.py sm9\sm9_sign.cpp  demo.exe
 ```
