@@ -2,8 +2,6 @@
 
 namespace sm4::internal::common {
 
-#pragma region "SM4 Params"
-
 static inline std::uint32_t MEM_LOAD32BE(const void *src)
 {
     return ((std::uint32_t)(((const std::uint8_t *)src)[0]) << 24) |
@@ -65,10 +63,6 @@ static const std::uint32_t CK[32] = {
     0xa0a7aeb5, 0xbcc3cad1, 0xd8dfe6ed, 0xf4fb0209, 0x10171e25, 0x2c333a41,
     0x484f565d, 0x646b7279,
 };
-
-#pragma endregion
-
-#pragma region "SM4 CORE"
 
 /**
  * @brief               SM4 key schedule
@@ -160,8 +154,6 @@ static void sm4_compute_block(const std::uint32_t round_key[32],
     MEM_STORE32BE(out + 8, x[1]);
     MEM_STORE32BE(out + 12, x[0]);
 }
-
-#pragma endregion
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 // **************************************************

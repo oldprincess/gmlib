@@ -2,8 +2,6 @@
 
 namespace aes::internal::lut {
 
-#pragma region "AES LUT PARAM"
-
 #define MEM_LOAD32BE(src)                                        \
     (((std::uint32_t)(((const std::uint8_t *)(src))[0]) << 24) | \
      ((std::uint32_t)(((const std::uint8_t *)(src))[1]) << 16) | \
@@ -434,10 +432,6 @@ static const std::uint32_t TD3[256] = {
     0xcb84617b, 0x32b670d5, 0x6c5c7448, 0xb85742d0,
 };
 
-#pragma endregion
-
-#pragma region "AES LUT CORE"
-
 /**
  * @brief               AES key schedule (encryption)
  * @param round_key     44/52/60-dword round key (11/13/15-round)
@@ -808,15 +802,11 @@ static void aes_dec_blocks(const std::uint32_t *round_key,
     }
 }
 
-#pragma endregion
-
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 // **************************************************
 // ************** AES CIPHER ALGO *******************
 // **************************************************
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
-
-#pragma region "AES CIPHER ALGO"
 
 void aes128_enc_block(const std::uint8_t round_key[11 * 16],
                       std::uint8_t       ciphertext[16],
@@ -913,7 +903,5 @@ void aes256_dec_blocks(const std::uint8_t  round_key[15 * 16],
     aes_dec_blocks((const std::uint32_t *)round_key, plaintext, ciphertext,
                    block_num, 256);
 }
-
-#pragma endregion
 
 }; // namespace aes::internal::lut

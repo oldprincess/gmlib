@@ -2,8 +2,6 @@
 
 namespace des::internal::common {
 
-#pragma region "DES CORE"
-
 #define MEM_LOAD64BE(src)                              \
     (((uint64_t)(((const uint8_t *)(src))[0]) << 56) | \
      ((uint64_t)(((const uint8_t *)(src))[1]) << 48) | \
@@ -223,8 +221,6 @@ static uint64_t des_crypt(const uint64_t *key_rounds, uint64_t text)
     uint64_t output = (((uint64_t)text2) << 32) | text1;
     return ip_i_trans(output);
 }
-
-#pragma endregion
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 // **************************************************

@@ -162,8 +162,6 @@ public:
     }
 };
 
-#pragma region "SM9 BN"
-
 int sm9_bn_cmp(const sm9_bn_t a, const sm9_bn_t b) noexcept
 {
     return number::uint256_cmp(a, b);
@@ -229,14 +227,10 @@ void sm9_bn_to_bytes(std::uint8_t out[32], const sm9_bn_t a) noexcept
     number::uint256_to_bytes(out, a);
 }
 
-#pragma endregion
-
 // =============================================================================
 // =================================== n =======================================
 // === 0xb640000002a3a6f1d603ab4ff58ec74449f2934b18ea8beee56ee19cd69ecf25 =====
 // =============================================================================
-
-#pragma region "SM9 FN ALGO"
 
 void sm9_fn_add(sm9_fn_t r, const sm9_fn_t a, const sm9_fn_t b) noexcept
 {
@@ -324,14 +318,10 @@ void sm9_fn_to_bytes(std::uint8_t out[32], const sm9_fn_t a) noexcept
     number::mont256_to_bytes(ctx, out, a);
 }
 
-#pragma endregion
-
 // ======================================================================
 // ============================== p =====================================
 // = 0xb640000002a3a6f1d603ab4ff58ec74521f2934b1a7aeedbe56f9b27e351457d =
 // ======================================================================
-
-#pragma region "SM9 FP ALGO"
 
 void sm9_fp_add(sm9_fp_t r, const sm9_fp_t a, const sm9_fp_t b) noexcept
 {
@@ -478,10 +468,6 @@ void sm9_fp_to_bytes(std::uint8_t out[32], const sm9_fp_t a) noexcept
     number::mont256_to_bytes(ctx, out, a);
 }
 
-#pragma endregion
-
-#pragma region "SM9 FP FN BN CAST"
-
 void sm9_fp_to_bn(sm9_bn_t r, const sm9_fp_t a) noexcept
 {
     std::uint8_t buf[32];
@@ -523,10 +509,6 @@ void sm9_fn_to_fp(sm9_fp_t r, const sm9_fn_t a) noexcept
     sm9_fn_to_bytes(buf, a);
     sm9_fp_from_bytes(r, buf);
 }
-
-#pragma endregion
-
-#pragma region "SM9 FP2 ALGO"
 
 void sm9_fp2_to_bytes(std::uint8_t dst[64], const sm9_fp2_t a) noexcept
 {
@@ -668,10 +650,6 @@ void sm9_fp2_inv(sm9_fp2_t r, const sm9_fp2_t a) noexcept
     sm9_fp_neg(r[1], r[1]);
 }
 
-#pragma endregion
-
-#pragma region "SM9 FP4 ALGO"
-
 void sm9_fp4_to_bytes(std::uint8_t dst[128], const sm9_fp4_t a) noexcept
 {
     sm9_fp2_to_bytes(dst, a[1]);
@@ -808,10 +786,6 @@ void sm9_fp4_inv(sm9_fp4_t r, const sm9_fp4_t a) noexcept
     sm9_fp2_neg(r[1], r[1]);
 }
 
-#pragma endregion
-
-#pragma region "SM9 FP12 ALGO"
-
 void sm9_fp12_to_bytes(std::uint8_t dst[384], const sm9_fp12_t a) noexcept
 {
     sm9_fp4_to_bytes(dst, a[2]);
@@ -878,6 +852,7 @@ void sm9_fp12_neg(sm9_fp12_t r, const sm9_fp12_t a) noexcept
     sm9_fp4_neg(r[1], a[1]);
     sm9_fp4_neg(r[2], a[2]);
 }
+
 void sm9_fp12_sub(sm9_fp12_t r, const sm9_fp12_t a, const sm9_fp12_t b) noexcept
 {
     sm9_fp4_sub(r[0], a[0], b[0]);
@@ -1041,10 +1016,6 @@ void sm9_fp12_pow(sm9_fp12_t         r,
     }
     sm9_fp12_cpy(r, t);
 }
-
-#pragma endregion
-
-#pragma region "SM9 EC"
 
 void sm9_ec_a_cpy(sm9_ec_a R, const sm9_ec_a P) noexcept
 {
@@ -1532,10 +1503,6 @@ bool sm9_ec_j_equal(const sm9_ec_j P, const sm9_ec_j Q) noexcept
     return true;
 }
 
-#pragma endregion
-
-#pragma region "SM9 EC2"
-
 void sm9_ec2_a_cpy(sm9_ec2_a R, const sm9_ec2_a P) noexcept
 {
     sm9_fp2_cpy(R[0], P[0]);
@@ -1994,10 +1961,6 @@ bool sm9_ec2_j_equal(const sm9_ec2_j P, const sm9_ec2_j Q) noexcept
     }
     return true;
 }
-
-#pragma endregion
-
-#pragma region "SM9 PAIRING"
 
 static void sm9_fp2_conjugate(sm9_fp2_t r, const sm9_fp2_t a) noexcept
 {
@@ -2528,7 +2491,5 @@ void sm9_pairing_P_P2(sm9_fp12_t r, const sm9_ec_a P) noexcept
     sm9_fp2_from_bytes(P2[1], SM9_CURVE2_GY);
     sm9_pairing(r, P, P2);
 }
-
-#pragma endregion
 
 } // namespace sm9::internal

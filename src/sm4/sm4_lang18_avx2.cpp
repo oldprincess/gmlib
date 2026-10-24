@@ -10,8 +10,6 @@ namespace sm4::internal::lang18_avx2 {
 
 using namespace sm4::internal::lang18_tables;
 
-#pragma region "Params And Define"
-
 static inline std::uint32_t MEM_LOAD32BE(const void *src)
 {
     return ((std::uint32_t)(((const std::uint8_t *)src)[0]) << 24) |
@@ -43,10 +41,6 @@ static const std::uint32_t CK[32] = {
     0xa0a7aeb5, 0xbcc3cad1, 0xd8dfe6ed, 0xf4fb0209, 0x10171e25, 0x2c333a41,
     0x484f565d, 0x646b7279,
 };
-
-#pragma endregion
-
-#pragma region "Core Func"
 
 /**
  * @brief               SM4 key schedule
@@ -533,8 +527,6 @@ static void sm4_compute_blocks(const std::uint32_t round_key[32],
         out += 16, in += 16, block_num -= 1;
     }
 }
-
-#pragma endregion
 
 void sm4_enc_key_init(SM4Context *ctx, const uint8_t user_key[16]) noexcept
 {

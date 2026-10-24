@@ -4,8 +4,6 @@
 
 #include <immintrin.h>
 
-#pragma region "SM4 GFNI"
-
 namespace sm4::internal::gong23_gfni::gfni {
 
 static uint8_t Matrix_A1[64] = {
@@ -1012,11 +1010,7 @@ static void sm4_gfni_v2_avx512_crypt(const std::uint32_t *trk,
 
 } // namespace sm4::internal::gong23_gfni::gfni
 
-#pragma endregion
-
 namespace sm4::internal::gong23_gfni {
-
-#pragma region "SM4 Params"
 
 static inline std::uint32_t MEM_LOAD32BE(const void *src)
 {
@@ -1079,10 +1073,6 @@ static const std::uint32_t CK[32] = {
     0xa0a7aeb5, 0xbcc3cad1, 0xd8dfe6ed, 0xf4fb0209, 0x10171e25, 0x2c333a41,
     0x484f565d, 0x646b7279,
 };
-
-#pragma endregion
-
-#pragma region "SM4 CORE"
 
 /**
  * @brief               SM4 key schedule
@@ -1174,8 +1164,6 @@ static void sm4_compute_block(const std::uint32_t round_key[32],
     MEM_STORE32BE(out + 8, x[1]);
     MEM_STORE32BE(out + 12, x[0]);
 }
-
-#pragma endregion
 
 void sm4_enc_key_init(SM4Context *ctx, const std::uint8_t user_key[16]) noexcept
 {
