@@ -190,6 +190,8 @@ class BlockCipherModeDecryptor : public BlockCipherMode
 private:
     std::uint8_t buf_[BLOCK_SIZE * PARALLEL_NUM];
     std::size_t  pending_len_ = 0;
+    std::uint8_t pt_buf_[BLOCK_SIZE * PARALLEL_NUM];
+    std::size_t  pt_buf_block_num_ = 0;
 
 protected:
     Padding padding_ = Padding::None;
@@ -206,7 +208,9 @@ public:
     ~BlockCipherModeDecryptor()
     {
         std::memset(buf_, 0, sizeof(buf_));
-        pending_len_ = 0;
+        std::memset(pt_buf_, 0, sizeof(pt_buf_));
+        pending_len_      = 0;
+        pt_buf_block_num_ = 0;
     }
 
     // ==============================================
@@ -216,7 +220,8 @@ public:
 protected:
     void init_() noexcept
     {
-        pending_len_ = 0;
+        pending_len_      = 0;
+        pt_buf_block_num_ = 0;
     }
 
 public:
@@ -226,20 +231,24 @@ public:
                 const std::uint8_t* in,
                 std::size_t         inl) override final
     {
+        if (inl == 0)
+        {
+            *outl = 0;
+            return;
+        }
         std::size_t total_pending_len  = pending_len_ + inl;
         std::size_t remain_pending_len = total_pending_len % BLOCK_SIZE;
-        if (remain_pending_len == 0 && total_pending_len > 0)
-        {
-            remain_pending_len = BLOCK_SIZE;
-        }
-        if (outl_max < total_pending_len - remain_pending_len)
+        std::size_t outl_need =
+            pt_buf_block_num_ * BLOCK_SIZE +
+            (remain_pending_len ? total_pending_len - remain_pending_len
+                                : total_pending_len - BLOCK_SIZE);
+        if (outl_max < outl_need)
         {
             throw std::length_error(Error::BUFFER_TOO_SMALL);
         }
-
-        *outl = total_pending_len - remain_pending_len;
+        *outl = outl_need;
         // ==============================================
-        //  situation1: pending_len_ + inl <= BLOCK_SIZE
+        //  situation1: pending_len_ + inl < BLOCK_SIZE
         // ==============================================
         // |--------- BLOCK_SIZE -----------|
         // |--- pending ---|--- inl ---|
@@ -247,11 +256,13 @@ public:
         // ==============================================
         if (pending_len_ + inl == remain_pending_len)
         {
-            if (inl > 0)
-            {
-                std::memcpy(buf_ + pending_len_, in, inl);
-                pending_len_ += inl;
-            }
+            // flush plaintext buffer
+            std::memcpy(out, pt_buf_, pt_buf_block_num_ * BLOCK_SIZE);
+            out += BLOCK_SIZE * pt_buf_block_num_;
+            pt_buf_block_num_ = 0;
+            // deal with input ciphertext
+            std::memcpy(buf_ + pending_len_, in, inl);
+            pending_len_ += inl;
         }
         // ==============================================
         //  situation2: pending_len_ + inl > BLOCK_SIZE
@@ -264,6 +275,10 @@ public:
             // prologue
             if (pending_len_ > 0)
             {
+                // flush plaintext buffer
+                std::memcpy(out, pt_buf_, pt_buf_block_num_ * BLOCK_SIZE);
+                out += BLOCK_SIZE * pt_buf_block_num_;
+                // deal with input ciphertext
                 std::size_t cpy_size = inl - remain_pending_len;
                 if (sizeof(buf_) - pending_len_ < cpy_size)
                 {
@@ -274,33 +289,58 @@ public:
                 in += cpy_size, inl -= cpy_size;
 
                 std::size_t block_num = pending_len_ / BLOCK_SIZE;
-                this->update_blocks_(out, buf_, block_num);
-                out += block_num * BLOCK_SIZE;
-                pending_len_ = 0;
+                this->update_blocks_(pt_buf_, buf_, block_num);
+                pt_buf_block_num_ = block_num;
+                pending_len_      = 0;
             }
             // body
-            while (inl - remain_pending_len >= sizeof(buf_))
+            while (inl >= sizeof(buf_))
             {
+                // flush plaintext buffer
+                std::memcpy(out, pt_buf_, pt_buf_block_num_ * BLOCK_SIZE);
+                out += BLOCK_SIZE * pt_buf_block_num_;
+                // deal with input ciphertext
                 std::memcpy(buf_, in, sizeof(buf_));
                 in += sizeof(buf_), inl -= sizeof(buf_);
-                this->update_blocks_(out, buf_, PARALLEL_NUM);
-                out += PARALLEL_NUM * BLOCK_SIZE;
+                this->update_blocks_(pt_buf_, buf_, PARALLEL_NUM);
+                pt_buf_block_num_ = PARALLEL_NUM;
             }
             // epilogue
-            if (inl - remain_pending_len > 0)
+            if (inl >= BLOCK_SIZE)
             {
+                // flush plaintext buffer
+                std::memcpy(out, pt_buf_, pt_buf_block_num_ * BLOCK_SIZE);
+                out += BLOCK_SIZE * pt_buf_block_num_;
+                // deal with input ciphertext
                 std::memcpy(buf_, in, inl - remain_pending_len);
                 pending_len_ = inl - remain_pending_len;
 
                 std::size_t block_num = pending_len_ / BLOCK_SIZE;
-                this->update_blocks_(out, buf_, block_num);
-                out += block_num * BLOCK_SIZE;
-                pending_len_ = 0;
+                this->update_blocks_(pt_buf_, buf_, block_num);
+                pt_buf_block_num_ = block_num;
+                pending_len_      = 0;
                 in += block_num * BLOCK_SIZE, inl -= block_num * BLOCK_SIZE;
             }
+            // final
+            if (inl > 0)
+            {
+                std::memcpy(out, pt_buf_, pt_buf_block_num_ * BLOCK_SIZE);
+                out += BLOCK_SIZE * pt_buf_block_num_;
+                pt_buf_block_num_ = 0;
 
-            std::memcpy(buf_, in, inl);
-            pending_len_ = inl;
+                std::memcpy(buf_, in, inl);
+                pending_len_ = inl;
+            }
+            else
+            {
+                std::size_t output_block_num = pt_buf_block_num_ - 1;
+                std::size_t output_size      = output_block_num * BLOCK_SIZE;
+                std::memcpy(out, pt_buf_, output_size);
+                out += output_size;
+
+                std::memmove(pt_buf_, pt_buf_ + output_size, BLOCK_SIZE);
+                pt_buf_block_num_ = 1;
+            }
         }
     }
 
@@ -318,43 +358,39 @@ public:
             out += outl_tmp, outl_max -= outl_tmp;
         }
 
+        if (pending_len_ != 0)
+        {
+            throw std::invalid_argument(                 //
+                Error::DATA_NOT_MULTIPLE_OF_BLOCK_LENGTH //
+            );                                           //
+        }
+
         if (padding_ == Padding::None)
         {
-            if (pending_len_ != 0 && pending_len_ != BLOCK_SIZE)
+            if (outl_max < pt_buf_block_num_ * BLOCK_SIZE)
             {
-                throw std::invalid_argument(                 //
-                    Error::DATA_NOT_MULTIPLE_OF_BLOCK_LENGTH //
-                );                                           //
+                throw std::length_error(Error::BUFFER_TOO_SMALL);
             }
-            if (pending_len_ == BLOCK_SIZE)
-            {
-                if (outl_max < BLOCK_SIZE)
-                {
-                    throw std::length_error(Error::BUFFER_TOO_SMALL);
-                }
-                this->update_blocks_(out, buf_, 1);
-                *outl += BLOCK_SIZE;
-                pending_len_ = 0;
-            }
+            std::memcpy(out, pt_buf_, pt_buf_block_num_ * BLOCK_SIZE);
+            *outl += pt_buf_block_num_ * BLOCK_SIZE;
+            pt_buf_block_num_ = 0;
         }
         else if (padding_ == Padding::PKCS7)
         {
-            if (pending_len_ != BLOCK_SIZE)
+            if (pt_buf_block_num_ != 1)
             {
                 throw std::invalid_argument(                 //
                     Error::DATA_NOT_MULTIPLE_OF_BLOCK_LENGTH //
                 );                                           //
             }
-            std::uint8_t buf_pt[BLOCK_SIZE];
-            this->update_blocks_(buf_pt, buf_, 1);
-            std::uint8_t pad_value = buf_pt[BLOCK_SIZE - 1];
+            std::uint8_t pad_value = pt_buf_[BLOCK_SIZE - 1];
             if ((std::size_t)pad_value > BLOCK_SIZE || pad_value == 0)
             {
                 throw std::invalid_argument(Error::BAD_DECRYPT);
             }
             for (std::size_t i = 0; i < (std::size_t)pad_value; i++)
             {
-                if (buf_pt[BLOCK_SIZE - 1 - i] != pad_value)
+                if (pt_buf_[BLOCK_SIZE - 1 - i] != pad_value)
                 {
                     throw std::invalid_argument(Error::BAD_DECRYPT);
                 }
@@ -364,9 +400,9 @@ public:
             {
                 throw std::length_error(Error::BUFFER_TOO_SMALL);
             }
-            std::memcpy(out, buf_pt, plaintext_len);
+            std::memcpy(out, pt_buf_, plaintext_len);
             *outl += plaintext_len;
-            pending_len_ = 0;
+            pt_buf_block_num_ = 0;
         }
         else
         {
